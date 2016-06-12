@@ -367,13 +367,17 @@ Public Class IOUIManager
                 End If
             Next
 
-            Dim doDispose = (FileDisposalSettings.ContainsKey(File) AndAlso FileDisposalSettings(File))
-            If doDispose Then
-                If TypeOf File Is IDisposable Then
-                    DirectCast(File, IDisposable).Dispose()
+            Dim didDispose As Boolean = False
+            If FileDisposalSettings.ContainsKey(File) Then
+                If FileDisposalSettings(File) Then
+                    If TypeOf File Is IDisposable Then
+                        DirectCast(File, IDisposable).Dispose()
+                        didDispose = True
+                    End If
                 End If
+                FileDisposalSettings.Remove(File)
             End If
-            RaiseEvent FileClosed(Me, New FileClosedEventArgs With {.File = File, .Disposed = doDispose})
+            RaiseEvent FileClosed(Me, New FileClosedEventArgs With {.File = File, .Disposed = didDispose})
         End If
     End Sub
 #End Region
@@ -512,6 +516,7 @@ Public Class IOUIManager
     Public Sub ShowAnchorable(model As AnchorableViewModel)
         Dim targetType = model.GetType
         If Not (From m In AnchorableViewModels Where ReflectionHelpers.IsOfType(m, targetType.GetTypeInfo, False)).Any Then
+            model.CurrentIOUIManager = Me
             AnchorableViewModels.Add(model)
         End If
     End Sub
