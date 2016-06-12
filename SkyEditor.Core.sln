@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core.Android", "S
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.Windows", "SkyEditor.Core.Windows\SkyEditor.Core.Windows.vbproj", "{8238A6A2-76AF-4741-8564-D1D2A4B067BB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C6561B48-E3A6-4DFA-A1BB-82EA5107062F}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.Tests", "Tests\SkyEditor.Core.Tests\SkyEditor.Core.Tests.vbproj", "{2A654374-1ACE-4907-8416-9C31D13DEED8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +31,15 @@ Global
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A654374-1ACE-4907-8416-9C31D13DEED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A654374-1ACE-4907-8416-9C31D13DEED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A654374-1ACE-4907-8416-9C31D13DEED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A654374-1ACE-4907-8416-9C31D13DEED8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2A654374-1ACE-4907-8416-9C31D13DEED8} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
 	EndGlobalSection
 EndGlobal
