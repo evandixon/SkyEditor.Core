@@ -53,17 +53,17 @@ Public Class IOUIManager
     End Sub
 
     Private Sub _openFiles_CollectionChanged(sender As Object, e As NotifyCollectionChangedEventArgs) Handles _openFiles.CollectionChanged
-        'If e.NewItems IsNot Nothing Then
-        '    For Each item As GenericViewModel In e.NewItems
-        '        AddHandler item.CloseCommandExecuted, AddressOf File_OnClosed
-        '    Next
-        'End If
+        If e.NewItems IsNot Nothing Then
+            For Each item As GenericViewModel In e.NewItems
+                AddHandler item.CloseCommandExecuted, AddressOf File_OnClosed
+            Next
+        End If
 
-        'If e.OldItems IsNot Nothing Then
-        '    For Each item As GenericViewModel In e.OldItems
-        '        RemoveHandler item.CloseCommandExecuted, AddressOf File_OnClosed
-        '    Next
-        'End If
+        If e.OldItems IsNot Nothing Then
+            For Each item As GenericViewModel In e.OldItems
+                RemoveHandler item.CloseCommandExecuted, AddressOf File_OnClosed
+            Next
+        End If
     End Sub
 
     Private Sub File_OnClosed(sender As Object, e As EventArgs)
@@ -324,8 +324,7 @@ Public Class IOUIManager
     Public Sub OpenFile(File As Object, DisposeOnClose As Boolean)
         If File IsNot Nothing Then
             If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper As New GenericViewModel
-                wrapper.File = File
+                Dim wrapper = GetViewModel(File)
                 OpenFiles.Add(wrapper)
                 FileDisposalSettings.Add(File, DisposeOnClose)
                 RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = File, .DisposeOnExit = DisposeOnClose})
@@ -344,8 +343,7 @@ Public Class IOUIManager
     Public Sub OpenFile(File As Object, ParentProject As Project)
         If File IsNot Nothing Then
             If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper As New GenericViewModel
-                wrapper.File = File
+                Dim wrapper = GetViewModel(File)
                 OpenFiles.Add(wrapper)
                 OpenedProjectFiles.Add(File, ParentProject)
                 RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = File, .DisposeOnExit = False, .ParentProject = ParentProject})
@@ -517,6 +515,12 @@ Public Class IOUIManager
             AnchorableViewModels.Add(model)
         End If
     End Sub
+
+    Protected Overridable Function GetViewModel(model As Object) As GenericViewModel
+        Dim out As New GenericViewModel
+        out.File = model
+        Return out
+    End Function
 
 #End Region
 

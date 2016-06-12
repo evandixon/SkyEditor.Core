@@ -1,4 +1,5 @@
-﻿Imports SkyEditor.Core.Interfaces
+﻿Imports System.Windows.Input
+Imports SkyEditor.Core.Interfaces
 Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.Utilities
 
@@ -8,12 +9,14 @@ Namespace UI
 
         Public Sub New()
             IsFileModified = False
+            CloseCommand = New RelayCommand(AddressOf OnClosed)
         End Sub
         Public Sub New(file As Object)
             Me.New
             Me.File = file
         End Sub
 
+        Public Event CloseCommandExecuted(sender As Object, e As EventArgs)
         Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
         Public Property File As Object
@@ -79,6 +82,13 @@ Namespace UI
             End Set
         End Property
         Dim _isFileModified As Boolean
+
+        Public ReadOnly Property CloseCommand As ICommand
+
+        Protected Overridable Function OnClosed() As Task
+            RaiseEvent CloseCommandExecuted(Me, New EventArgs)
+            Return Task.FromResult(0)
+        End Function
 
         Private Sub File_OnSaved(sender As Object, e As EventArgs)
             IsFileModified = False
