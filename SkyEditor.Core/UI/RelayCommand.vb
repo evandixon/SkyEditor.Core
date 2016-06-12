@@ -11,6 +11,7 @@ Namespace UI
                 Throw New ArgumentNullException(NameOf(execute))
             End If
             _Execute = execute
+            _isEnabled = True
         End Sub
 
         Public Event CanExecuteChanged As EventHandler Implements ICommand.CanExecuteChanged
