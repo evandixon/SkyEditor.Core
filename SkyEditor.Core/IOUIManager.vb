@@ -18,7 +18,7 @@ Public Class IOUIManager
         Me.CurrentSolution = Nothing
         Me.OpenedProjectFiles = New Dictionary(Of Object, Project)
         Me.FileDisposalSettings = New Dictionary(Of Object, Boolean)
-        Me.OpenFiles = New ObservableCollection(Of AvalonDockFileWrapper)
+        Me.OpenFiles = New ObservableCollection(Of GenericViewModel)
         Me.RunningTasks = New ObservableCollection(Of Task)
         AnchorableViewModels = New ObservableCollection(Of AnchorableViewModel)
     End Sub
@@ -53,17 +53,17 @@ Public Class IOUIManager
     End Sub
 
     Private Sub _openFiles_CollectionChanged(sender As Object, e As NotifyCollectionChangedEventArgs) Handles _openFiles.CollectionChanged
-        If e.NewItems IsNot Nothing Then
-            For Each item As AvalonDockFileWrapper In e.NewItems
-                AddHandler item.CloseCommandExecuted, AddressOf File_OnClosed
-            Next
-        End If
+        'If e.NewItems IsNot Nothing Then
+        '    For Each item As GenericViewModel In e.NewItems
+        '        AddHandler item.CloseCommandExecuted, AddressOf File_OnClosed
+        '    Next
+        'End If
 
-        If e.OldItems IsNot Nothing Then
-            For Each item As AvalonDockFileWrapper In e.OldItems
-                RemoveHandler item.CloseCommandExecuted, AddressOf File_OnClosed
-            Next
-        End If
+        'If e.OldItems IsNot Nothing Then
+        '    For Each item As GenericViewModel In e.OldItems
+        '        RemoveHandler item.CloseCommandExecuted, AddressOf File_OnClosed
+        '    Next
+        'End If
     End Sub
 
     Private Sub File_OnClosed(sender As Object, e As EventArgs)
@@ -74,7 +74,7 @@ Public Class IOUIManager
 
         If Not args.Cancel Then
             'Doing the directcast again in case something changed args
-            CloseFile(DirectCast(sender, AvalonDockFileWrapper).File)
+            CloseFile(DirectCast(sender, GenericViewModel).File)
         End If
     End Sub
 #End Region
@@ -85,15 +85,15 @@ Public Class IOUIManager
     ''' The files that are currently open
     ''' </summary>
     ''' <returns></returns>
-    Public Property OpenFiles As ObservableCollection(Of AvalonDockFileWrapper)
+    Public Property OpenFiles As ObservableCollection(Of GenericViewModel)
         Get
             Return _openFiles
         End Get
-        Set(value As ObservableCollection(Of AvalonDockFileWrapper))
+        Set(value As ObservableCollection(Of GenericViewModel))
             _openFiles = value
         End Set
     End Property
-    Private WithEvents _openFiles As ObservableCollection(Of AvalonDockFileWrapper)
+    Private WithEvents _openFiles As ObservableCollection(Of GenericViewModel)
 
     Public Property AnchorableViewModels As ObservableCollection(Of AnchorableViewModel)
         Get
@@ -111,11 +111,11 @@ Public Class IOUIManager
     ''' Gets or sets the selected file
     ''' </summary>
     ''' <returns></returns>
-    Public Property SelectedFile As AvalonDockFileWrapper
+    Public Property SelectedFile As GenericViewModel
         Get
             Return _selectedFile
         End Get
-        Set(value As AvalonDockFileWrapper)
+        Set(value As GenericViewModel)
             If _selectedFile IsNot value Then
                 'If we actually changed something...
 
@@ -127,7 +127,7 @@ Public Class IOUIManager
             End If
         End Set
     End Property
-    Dim _selectedFile As AvalonDockFileWrapper
+    Dim _selectedFile As GenericViewModel
 
     Public Property ActiveContent As Object
         Get
@@ -141,7 +141,7 @@ Public Class IOUIManager
             End If
 
             'If the active content is a file, update the active file
-            If TypeOf value Is AvalonDockFileWrapper Then
+            If TypeOf value Is GenericViewModel Then
                 SelectedFile = value
             End If
         End Set
@@ -324,7 +324,7 @@ Public Class IOUIManager
     Public Sub OpenFile(File As Object, DisposeOnClose As Boolean)
         If File IsNot Nothing Then
             If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper As New AvalonDockFileWrapper
+                Dim wrapper As New GenericViewModel
                 wrapper.File = File
                 OpenFiles.Add(wrapper)
                 FileDisposalSettings.Add(File, DisposeOnClose)
@@ -344,7 +344,7 @@ Public Class IOUIManager
     Public Sub OpenFile(File As Object, ParentProject As Project)
         If File IsNot Nothing Then
             If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper As New AvalonDockFileWrapper
+                Dim wrapper As New GenericViewModel
                 wrapper.File = File
                 OpenFiles.Add(wrapper)
                 OpenedProjectFiles.Add(File, ParentProject)

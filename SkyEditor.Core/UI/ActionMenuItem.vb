@@ -7,7 +7,6 @@ Public Class ActionMenuItem
     Public Sub New()
         Me.Actions = New List(Of MenuAction)
         Me.Children = New ObservableCollection(Of ActionMenuItem)
-        Command = New RelayCommand(AddressOf RunActions)
     End Sub
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
@@ -42,8 +41,6 @@ Public Class ActionMenuItem
     Dim _isVisible As Boolean
 
     Public Property Children As ObservableCollection(Of ActionMenuItem)
-
-    Public Property Command As ICommand
 
     Public Property ContextTargets As IEnumerable(Of Object)
 

@@ -3,7 +3,7 @@
 Namespace IO
     Public Class FileClosingEventArgs
         Public Property Cancel As Boolean
-        Public Property File As AvalonDockFileWrapper
+        Public Property File As GenericViewModel
         Public Sub New()
             Me.Cancel = False
         End Sub
