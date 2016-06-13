@@ -1,5 +1,5 @@
-﻿Namespace Interfaces
-    Public Interface iNamed
+﻿Namespace Utilities
+    Public Interface INamed
         ReadOnly Property Name As String
     End Interface
 

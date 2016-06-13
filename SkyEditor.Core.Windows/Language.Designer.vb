@@ -63,5 +63,41 @@ Namespace My.Resources
                 resourceCulture = value
             End Set
         End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to .
+        '''</summary>
+        Friend Shared ReadOnly Property ConsoleCoreAuthor() As String
+            Get
+                Return ResourceManager.GetString("ConsoleCoreAuthor", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to .
+        '''</summary>
+        Friend Shared ReadOnly Property ConsoleCoreCredits() As String
+            Get
+                Return ResourceManager.GetString("ConsoleCoreCredits", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Sky Editor Core - Console.
+        '''</summary>
+        Friend Shared ReadOnly Property ConsoleCorePluginName() As String
+            Get
+                Return ResourceManager.GetString("ConsoleCorePluginName", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Sky Editor Solution.
+        '''</summary>
+        Friend Shared ReadOnly Property SkyEditorSolution() As String
+            Get
+                Return ResourceManager.GetString("SkyEditorSolution", resourceCulture)
+            End Get
+        End Property
     End Class
 End Namespace

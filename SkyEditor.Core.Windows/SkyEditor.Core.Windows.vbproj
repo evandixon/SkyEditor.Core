@@ -69,11 +69,13 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyReflectionManager.vb" />
-    <Compile Include="AssemblyReflectionProxy.vb" />
+    <Compile Include="ConsoleCommands\GeneratePluginExtensions.vb" />
+    <Compile Include="Utilities\AssemblyReflectionManager.vb" />
+    <Compile Include="Utilities\AssemblyReflectionProxy.vb" />
+    <Compile Include="CoreMods\ConsoleCoreMod.vb" />
+    <Compile Include="Internal\ConsoleManager.vb" />
     <Compile Include="Processes\ConsoleApp.vb" />
     <Compile Include="EnvironmentPaths.vb" />
-    <Compile Include="ExecutableFile.vb" />
     <Compile Include="Language.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -82,10 +84,10 @@
     <Compile Include="Processes\ConsoleDataRecievedEventArgs.vb" />
     <Compile Include="Processes\ServerStatus.vb" />
     <Compile Include="Processes\StatusChangedEventArgs.vb" />
-    <Compile Include="RedistributionHelpers.vb" />
-    <Compile Include="WindowsConsoleProvider.vb" />
-    <Compile Include="WindowsCoreSkyEditorPlugin.vb" />
-    <Compile Include="IOProvider.vb" />
+    <Compile Include="Utilities\RedistributionHelpers.vb" />
+    <Compile Include="Providers\WindowsConsoleProvider.vb" />
+    <Compile Include="CoreMods\WindowsCoreSkyEditorPlugin.vb" />
+    <Compile Include="Providers\IOProvider.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -101,7 +103,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="WindowsReflectionHelpers.vb" />
+    <Compile Include="Utilities\WindowsReflectionHelpers.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Language.resx">
@@ -145,7 +147,8 @@
   <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release'">
     <!-- Only download a new copy of nuget.exe if we don't have a copy available -->
     <WebDownload Condition="!Exists('nuget.exe')" Filename="nuget.exe" FileUri="https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" />
-    <Exec Command="nuget pack SkyEditor.Core.Windows.vbproj -Prop Configuration=Release"></Exec>
+    <Exec Command="nuget pack SkyEditor.Core.Windows.vbproj -Prop Configuration=Release">
+    </Exec>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

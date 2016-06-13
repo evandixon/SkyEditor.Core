@@ -275,8 +275,8 @@ Namespace IO
         ''' </summary>
         ''' <param name="Path">Path to look for a file.</param>
         ''' <returns></returns>
-        Public Async Function GetFileByPath(Path As String, manager As PluginManager) As Task(Of Object)
-            Return Await GetProjectItemByPath(Path)?.GetFile(manager)
+        Public Async Function GetFileByPath(Path As String, manager As PluginManager, duplicateMatchSelector As IOHelper.DuplicateMatchSelector) As Task(Of Object)
+            Return Await GetProjectItemByPath(Path)?.GetFile(manager, duplicateMatchSelector)
         End Function
 
         ''' <summary>

@@ -1,7 +1,7 @@
 ﻿Namespace IO
     Public Class ProjectBuildStatusChanged
-        Inherits EventArgs
-        Public Property Progress As Single
+        Inherits BuildProgressedEventArgs
+
         Public Property StatusMessage As String
     End Class
 

@@ -1,6 +1,5 @@
 ﻿Imports System.Collections.Concurrent
 Imports SkyEditor.Core
-Imports SkyEditor.Core.Interfaces
 Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.Utilities
 

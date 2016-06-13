@@ -1,4 +1,4 @@
-﻿Namespace EventArguments
+﻿Namespace Utilities
     Public Class LoadingStatusChangedEventArgs
         Inherits EventArgs
         Public Property Complete As Boolean

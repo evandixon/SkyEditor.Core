@@ -1,13 +1,13 @@
 ﻿Imports System.Text
-Imports System.IO
-Imports SkyEditor.Core.Interfaces
+Imports SkyEditor.Core.Utilities
+
 Namespace IO
     Public Class GenericFile
         Implements IDisposable
-        Implements iNamed
+        Implements INamed
         'Implements iCreatableFile 'Excluded because this might not apply to children
         Implements IOpenableFile
-        Implements iOnDisk
+        Implements IOnDisk
         Implements ISavableAs
 
 
@@ -136,7 +136,7 @@ Namespace IO
         ''' Name of the file.
         ''' </summary>
         ''' <returns></returns>
-        Public Property Name As String Implements iNamed.Name
+        Public Property Name As String Implements INamed.Name
             Get
                 If _name Is Nothing Then
                     Return Path.GetFileName(OriginalFilename)
@@ -419,7 +419,7 @@ Namespace IO
         ''' </summary>
         ''' <param name="sender"></param>
         ''' <param name="e"></param>
-        Public Event FileSaved(sender As Object, e As EventArgs) Implements iSavable.FileSaved
+        Public Event FileSaved(sender As Object, e As EventArgs) Implements ISavable.FileSaved
 
         ''' <summary>
         ''' Raised when the file is being saved, but before any changes have been written to disk.

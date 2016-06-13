@@ -1,5 +1,4 @@
 ﻿Imports System.Reflection
-Imports SkyEditor.Core.Interfaces
 Imports SkyEditor.Core.Utilities
 
 Namespace UI
@@ -200,7 +199,7 @@ Namespace UI
                     out.EditingObject = ObjectToEdit
                 Else
                     For Each type In out.GetSupportedTypes
-                        If ReflectionHelpers.IsIContainerOfType(ObjectToEdit, type.GetTypeInfo, True) Then
+                        If ReflectionHelpers.IsIContainerOfType(ObjectToEdit, type.GetTypeInfo) Then
                             out.EditingObject = ReflectionHelpers.GetIContainerContents(ObjectToEdit, type)
                             Exit For
                         End If
@@ -282,7 +281,7 @@ Namespace UI
 
                     If Not direct Then
                         For Each type In supportedTypes
-                            If ReflectionHelpers.IsIContainerOfType(ObjectToEdit, type.GetTypeInfo, True) Then
+                            If ReflectionHelpers.IsIContainerOfType(ObjectToEdit, type.GetTypeInfo) Then
                                 t.EditingObject = ReflectionHelpers.GetIContainerContents(ObjectToEdit, type)
                                 Exit For
                             End If
