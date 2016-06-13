@@ -98,16 +98,16 @@ Namespace IO
         ''' Gets the file at this node, opening it if it hasn't already been.
         ''' </summary>
         ''' <returns></returns>
-        Public Async Function GetFile(manager As PluginManager) As Task(Of Object)
+        Public Async Function GetFile(manager As PluginManager, duplicateMatchSelector As IOHelper.DuplicateMatchSelector) As Task(Of Object)
 
             If File Is Nothing Then
                 Dim f = GetFilename()
                 If String.IsNullOrEmpty(AssemblyQualifiedTypeName) Then
-                    Return Await IOHelper.OpenObject(f, AddressOf IOHelper.PickFirstDuplicateMatchSelector, manager)
+                    Return Await IOHelper.OpenObject(f, duplicateMatchSelector, manager)
                 Else
                     Dim t = ReflectionHelpers.GetTypeByName(AssemblyQualifiedTypeName, manager)
                     If t Is Nothing Then
-                        Return Await IOHelper.OpenObject(f, AddressOf IOHelper.PickFirstDuplicateMatchSelector, manager)
+                        Return Await IOHelper.OpenObject(f, duplicateMatchSelector, manager)
                     Else
                         Return IOHelper.OpenFile(f, t, manager)
                     End If

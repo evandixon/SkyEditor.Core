@@ -3,8 +3,6 @@ Imports System.Reflection
 Imports System.Threading.Tasks
 Imports SkyEditor
 Imports SkyEditor.Core.Extensions
-Imports SkyEditor.Core.Interfaces
-Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.Utilities
 
 Namespace Extensions

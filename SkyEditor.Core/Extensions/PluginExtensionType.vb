@@ -25,12 +25,26 @@ Namespace Extensions
             Return ExtensionInstallResult.RestartRequired
         End Function
 
+        ''' <summary>
+        ''' Gets the directory that stores the files for the given extension ID.
+        ''' </summary>
+        ''' <param name="extensionID">ID of the extension for which to get the directory.</param>
+        ''' <returns></returns>
+        ''' <remarks>If the extensionID is an empty Guid, returns the plugin development directory.</remarks>
         Public Overrides Function GetExtensionDirectory(extensionID As Guid) As String
             If extensionID = Guid.Empty Then
-                Return Path.Combine(RootExtensionDirectory, InternalName, "Development")
+                Return GetDevDirectory()
             Else
                 Return MyBase.GetExtensionDirectory(extensionID)
             End If
+        End Function
+
+        ''' <summary>
+        ''' Gets the plugin development directory.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overridable Function GetDevDirectory() As String
+            Return Path.Combine(RootExtensionDirectory, InternalName, "Development")
         End Function
 
         Public Overrides Function GetInstalledExtensions(manager As PluginManager) As IEnumerable(Of ExtensionInfo)

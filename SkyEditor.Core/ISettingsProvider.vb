@@ -1,5 +1,4 @@
-﻿Imports SkyEditor.Core.Interfaces
-Imports SkyEditor.Core.IO
+﻿Imports SkyEditor.Core.IO
 
 Public Interface ISettingsProvider
     Inherits ISavable

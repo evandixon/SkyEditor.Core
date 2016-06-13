@@ -126,6 +126,7 @@ Namespace IO
         Public Event Created(sender As Object, e As EventArgs)
         Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
         Public Event SolutionBuildStarted(sender As Object, e As EventArgs)
+        Public Event SolutionBuildProgressed(sender As Object, e As BuildProgressedEventArgs)
         Public Event SolutionBuildCompleted(sender As Object, e As EventArgs)
         Public Event DirectoryCreated(sender As Object, e As DirectoryCreatedEventArgs)
         Public Event DirectoryDeleted(sender As Object, e As DirectoryDeletedEventArgs)
@@ -460,9 +461,9 @@ Namespace IO
             End If
         End Function
 
-        <Obsolete> Private Sub UpdateBuildLoadingStatus(toBuild As Dictionary(Of Project, Boolean))
-            'Dim built As Integer = (From v In toBuild.Values Where v = True).Count
-            'PluginHelper.SetLoadingStatus(String.Format(My.Resources.Language.LoadingBuildingProjectsXofY, built, toBuild.Count), built / toBuild.Count)
+        Private Sub UpdateBuildLoadingStatus(toBuild As Dictionary(Of Project, Boolean))
+            Dim built As Integer = (From v In toBuild.Values Where v = True).Count
+            RaiseEvent SolutionBuildProgressed(Me, New BuildProgressedEventArgs With {.Progress = built / toBuild.Count})
         End Sub
 #End Region
 

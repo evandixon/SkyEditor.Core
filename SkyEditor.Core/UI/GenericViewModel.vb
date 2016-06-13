@@ -1,5 +1,4 @@
 ﻿Imports System.Windows.Input
-Imports SkyEditor.Core.Interfaces
 Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.Utilities
 

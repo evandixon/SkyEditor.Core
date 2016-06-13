@@ -101,38 +101,4 @@ Public Class EnvironmentPaths
         Return Path.Combine(EnvironmentPaths.GetRootResourceDirectory, "settings.json")
     End Function
 
-    ''' <summary>
-    ''' Gets absolute paths of all the assemblies in the development plugin directory.
-    ''' Not all of these are guarenteed to be supported plugins.
-    ''' </summary>
-    ''' <returns></returns>
-    <Obsolete> Public Shared Function GetPluginAssemblies() As List(Of String)
-        Dim FromFolder = Path.Combine(GetRootResourceDirectory, "Extensions", "Plugins", "Development")
-        Dim assemblyPaths As New List(Of String)
-        If Directory.Exists(FromFolder) Then
-            For Each item In Directory.GetFiles(FromFolder, "*.dll")
-                If Not assemblyPaths.Contains(item) Then
-                    assemblyPaths.Add(item)
-                End If
-            Next
-            For Each item In Directory.GetFiles(FromFolder, "*.exe")
-                If Not assemblyPaths.Contains(item) Then
-                    assemblyPaths.Add(item)
-                End If
-            Next
-        Else
-            'If the "proper" plugin directory doesn't exist, we'll also load from the working directory (because plugins often reference SkyEditor.exe, which will be copied to the same directory).
-            For Each item In Directory.GetFiles(Environment.CurrentDirectory, "*.dll")
-                If Not assemblyPaths.Contains(item) Then
-                    assemblyPaths.Add(item)
-                End If
-            Next
-            For Each item In Directory.GetFiles(Environment.CurrentDirectory, "*.exe")
-                If Not assemblyPaths.Contains(item) Then
-                    assemblyPaths.Add(item)
-                End If
-            Next
-        End If
-        Return assemblyPaths
-    End Function
 End Class

@@ -1,6 +1,8 @@
-﻿Imports System.Reflection
+﻿Imports System.IO
+Imports System.Reflection
+Imports SkyEditor.Core.ConsoleCommands
 Imports SkyEditor.Core.Extensions
-
+Imports SkyEditor.Core.Windows.Utilities
 
 Namespace ConsoleCommands
     Public Class GeneratePluginExtensions
@@ -21,7 +23,7 @@ Namespace ConsoleCommands
                         If Not .DirectoryExists(Path.GetDirectoryName(workingPath)) Then
                             .CreateDirectory(Path.GetDirectoryName(workingPath))
                         End If
-                        'Await RedistributionHelpers.PackPlugins({item}, workingPath, info, CurrentPluginManager)
+                        Await RedistributionHelpers.PackPlugins({item}, workingPath, info, CurrentPluginManager)
                     End If
                 Next
             End With

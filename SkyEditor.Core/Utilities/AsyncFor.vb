@@ -1,6 +1,4 @@
-﻿Imports SkyEditor.Core.EventArguments
-
-Namespace Utilities
+﻿Namespace Utilities
     ''' <summary>
     ''' Runs a provided delegate function or sub repeatedly and asynchronously in the style of a For statement.
     ''' </summary>

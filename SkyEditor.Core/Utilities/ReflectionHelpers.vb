@@ -1,6 +1,5 @@
 ﻿Imports System.Reflection
 Imports System.Resources
-Imports SkyEditor.Core.Interfaces
 
 Namespace Utilities
     Public Class ReflectionHelpers
@@ -52,23 +51,22 @@ Namespace Utilities
             Return match
         End Function
 
-        Public Shared Function IsIContainerOfType(obj As Object, typeToCheck As TypeInfo, Optional checkContainer As Boolean = False) As Boolean
-            Dim Original As TypeInfo = Nothing
-
-            'Check if the object we're checking is itself a TypeInfo
-            If TypeOf obj Is TypeInfo Then
-                'If so, we'll Obj to compare
-                Original = obj
-            Else
-                'If not, we'll compare the type of the object we're checking
-                Original = obj.GetType.GetTypeInfo
-            End If
-            Return IsOfType(Original,
-                            GetType(IContainer(Of Object)).GetGenericTypeDefinition.MakeGenericType(typeToCheck.AsType).GetTypeInfo, 'Get the type definition of "IContainer(Of TypeToCheck)".
-                            False 'If this was true, then we'd be in an infinite loop, checking for "IContainer(Of IContainer(Of TypeToCheck)", "IContainer(Of IContainer(Of IContainer(Of TypeToCheck))", and so on.  The plugin management code will only handle IContainer(Of T), so we only want to check one level.
-                            )
+        ''' <summary>
+        ''' Determines whether the given object is an IContainer of the given type.
+        ''' </summary>
+        ''' <param name="obj">Object to check</param>
+        ''' <param name="typeToCheck">Type of container for which to check</param>
+        ''' <returns></returns>
+        Public Shared Function IsIContainerOfType(obj As Object, typeToCheck As TypeInfo) As Boolean
+            Return (From t In obj.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(typeToCheck)).Any
         End Function
 
+        ''' <summary>
+        ''' Gets the contents of the given IContainer object
+        ''' </summary>
+        ''' <param name="container">Object that implements IContainer(Of containedType)</param>
+        ''' <param name="containedType">Type of the container of which to get the contents</param>
+        ''' <returns></returns>
         Public Shared Function GetIContainerContents(container As Object, containedType As Type) As Object
             Dim interfaceType As Type = (From t In container.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(containedType)).FirstOrDefault
             Dim targetProperty = (From p In interfaceType?.GetTypeInfo.DeclaredProperties Where p.Name = NameOf(IContainer(Of Object).Item)).FirstOrDefault
@@ -76,6 +74,11 @@ Namespace Utilities
             Return targetProperty.GetValue(container)
         End Function
 
+        ''' <summary>
+        ''' Sets the contents of the given IContainer object
+        ''' </summary>
+        ''' <param name="container">Object that implements IContainer(Of containedType)</param>
+        ''' <param name="containedType">Type of the container of which to set the contents</param>
         Public Shared Sub SetIContainerContents(container As Object, containedType As TypeInfo, value As Object)
             Dim interfaceType As Type = (From t In container.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(containedType)).FirstOrDefault
             Dim targetProperty = (From p In interfaceType?.GetTypeInfo.DeclaredProperties Where p.Name = NameOf(IContainer(Of Object).Item)).FirstOrDefault
@@ -83,6 +86,12 @@ Namespace Utilities
             targetProperty.SetValue(container, value)
         End Sub
 
+        ''' <summary>
+        ''' Gets a type using the assembly qualified name, or null if the type can't be found
+        ''' </summary>
+        ''' <param name="AssemblyQualifiedName">Assembly qualified name of the type to get</param>
+        ''' <param name="Manager">Current instance of the plugin manager</param>
+        ''' <returns></returns>
         Public Shared Function GetTypeByName(AssemblyQualifiedName As String, Manager As PluginManager) As TypeInfo
             Dim t = Type.GetType(AssemblyQualifiedName, False)
             If t Is Nothing Then
@@ -153,13 +162,17 @@ Namespace Utilities
             If output Is Nothing Then
                 'Then either the language resources doesn't exist, or does not contain what we're looking for.
                 'In either case, we'll look at the other resource files.
-                For Each item In resxNames
-                    manager = New ResourceManager(item.Replace(".resources", ""), parent)
-                    output = manager.GetString(type.FullName.Replace(".", "_"))
-                    If output IsNot Nothing Then
-                        Exit For 'We found something.  Time to return it.
-                    End If
-                Next
+                Try
+                    For Each item In resxNames
+                        manager = New ResourceManager(item.Replace(".resources", ""), parent)
+                        output = manager.GetString(type.FullName.Replace(".", "_"))
+                        If output IsNot Nothing Then
+                            Exit For 'We found something.  Time to return it.
+                        End If
+                    Next
+                Catch ex As MissingManifestResourceException
+                    'We can't find the resouce file.  Therefore, we will default to just using the type name.
+                End Try
             End If
 
             If output IsNot Nothing Then
