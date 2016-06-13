@@ -56,10 +56,6 @@
       <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SkyEditor.Core, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SkyEditor.Core.1.0.7\lib\portable45-net45+win8+wpa81\SkyEditor.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -92,7 +88,7 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GenericFileTests.vb" />
+    <Compile Include="IO\GenericFileTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -108,6 +104,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Utilities\ReflectionHelpersTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -128,6 +125,12 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.vbproj">
+      <Project>{6f869961-8d92-4fb1-9680-a1d5c6938350}</Project>
+      <Name>SkyEditor.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
