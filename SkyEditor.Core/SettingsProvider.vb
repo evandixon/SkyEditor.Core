@@ -6,6 +6,7 @@ Imports SkyEditor.Core.Utilities
 
 Public Class SettingsProvider
     Implements ISettingsProvider
+    Implements INotifyModified
 
     Protected Class SerializedSettings
         Public Property Settings As Dictionary(Of String, SerializedValue)
@@ -143,9 +144,11 @@ Public Class SettingsProvider
         End If
 
         Settings(name) = value
+        RaiseEvent Modified(Me, New EventArgs)
     End Sub
 
-    Public Event FileSaved(sender As Object, e As EventArgs) Implements iSavable.FileSaved
+    Public Event FileSaved(sender As Object, e As EventArgs) Implements ISavable.FileSaved
+    Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
 
     ''' <summary>
     ''' Gets a setting with the given name or returns null if it doesn't exist.
