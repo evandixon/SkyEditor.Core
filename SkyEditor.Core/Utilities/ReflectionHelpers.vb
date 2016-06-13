@@ -61,6 +61,12 @@ Namespace Utilities
             Return (From t In obj.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(typeToCheck)).Any
         End Function
 
+        ''' <summary>
+        ''' Gets the contents of the given IContainer object
+        ''' </summary>
+        ''' <param name="container">Object that implements IContainer(Of containedType)</param>
+        ''' <param name="containedType">Type of the container of which to get the contents</param>
+        ''' <returns></returns>
         Public Shared Function GetIContainerContents(container As Object, containedType As Type) As Object
             Dim interfaceType As Type = (From t In container.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(containedType)).FirstOrDefault
             Dim targetProperty = (From p In interfaceType?.GetTypeInfo.DeclaredProperties Where p.Name = NameOf(IContainer(Of Object).Item)).FirstOrDefault
@@ -68,6 +74,11 @@ Namespace Utilities
             Return targetProperty.GetValue(container)
         End Function
 
+        ''' <summary>
+        ''' Sets the contents of the given IContainer object
+        ''' </summary>
+        ''' <param name="container">Object that implements IContainer(Of containedType)</param>
+        ''' <param name="containedType">Type of the container of which to set the contents</param>
         Public Shared Sub SetIContainerContents(container As Object, containedType As TypeInfo, value As Object)
             Dim interfaceType As Type = (From t In container.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(containedType)).FirstOrDefault
             Dim targetProperty = (From p In interfaceType?.GetTypeInfo.DeclaredProperties Where p.Name = NameOf(IContainer(Of Object).Item)).FirstOrDefault
@@ -75,6 +86,12 @@ Namespace Utilities
             targetProperty.SetValue(container, value)
         End Sub
 
+        ''' <summary>
+        ''' Gets a type using the assembly qualified name, or null if the type can't be found
+        ''' </summary>
+        ''' <param name="AssemblyQualifiedName">Assembly qualified name of the type to get</param>
+        ''' <param name="Manager">Current instance of the plugin manager</param>
+        ''' <returns></returns>
         Public Shared Function GetTypeByName(AssemblyQualifiedName As String, Manager As PluginManager) As TypeInfo
             Dim t = Type.GetType(AssemblyQualifiedName, False)
             If t Is Nothing Then
@@ -145,13 +162,17 @@ Namespace Utilities
             If output Is Nothing Then
                 'Then either the language resources doesn't exist, or does not contain what we're looking for.
                 'In either case, we'll look at the other resource files.
-                For Each item In resxNames
-                    manager = New ResourceManager(item.Replace(".resources", ""), parent)
-                    output = manager.GetString(type.FullName.Replace(".", "_"))
-                    If output IsNot Nothing Then
-                        Exit For 'We found something.  Time to return it.
-                    End If
-                Next
+                Try
+                    For Each item In resxNames
+                        manager = New ResourceManager(item.Replace(".resources", ""), parent)
+                        output = manager.GetString(type.FullName.Replace(".", "_"))
+                        If output IsNot Nothing Then
+                            Exit For 'We found something.  Time to return it.
+                        End If
+                    Next
+                Catch ex As MissingManifestResourceException
+                    'We can't find the resouce file.  Therefore, we will default to just using the type name.
+                End Try
             End If
 
             If output IsNot Nothing Then

@@ -65,68 +65,75 @@ Namespace Utilities
                 Next
             End If
 
-            Me.TypeName = AssemblyQualifiedName.Substring(0, index)
+            If index > 0 Then
+                Me.TypeName = AssemblyQualifiedName.Substring(0, index)
 
-            If Me.TypeName.Contains("`") Then
-                Me.GenericTypeName = Me.TypeName.Substring(0, Me.TypeName.IndexOf("`"c) + 2)
-                IsGenericType = True
-            Else
-                Me.GenericTypeName = Me.TypeName
-                IsGenericType = False
-            End If
-
-
-            Me.CSharpStyleName = New Lazy(Of String)(Function()
-                                                         Return Me.LanguageStyle("<", ">")
-
-                                                     End Function)
-
-            Me.VBNetStyleName = New Lazy(Of String)(Function()
-                                                        Return Me.LanguageStyle("(Of ", ")")
-
-                                                    End Function)
-
-            Me.AssemblyDescriptionString = AssemblyQualifiedName.Substring(index + 2)
-
-            If True Then
-                Dim parts As List(Of String) = AssemblyDescriptionString.Split(","c).[Select](Function(x) x.Trim()).ToList()
-                Me.Version = LookForPairThenRemove(parts, "Version")
-                Me.Culture = LookForPairThenRemove(parts, "Culture")
-                Me.PublicKeyToken = LookForPairThenRemove(parts, "PublicKeyToken")
-                If parts.Count > 0 Then
-                    Me.ShortAssemblyName = parts(0)
+                If Me.TypeName.Contains("`") Then
+                    Me.GenericTypeName = Me.TypeName.Substring(0, Me.TypeName.IndexOf("`"c) + 2)
+                    IsGenericType = True
+                Else
+                    Me.GenericTypeName = Me.TypeName
+                    IsGenericType = False
                 End If
-            End If
 
-            Me.AssemblyNameDescriptor = New Lazy(Of AssemblyName)(Function() New System.Reflection.AssemblyName(Me.AssemblyDescriptionString))
 
-            Me.FoundType = New Lazy(Of Type)(Function() As Type
-                                                 Dim searchedType = Type.GetType(TypeName)
-                                                 If searchedType IsNot Nothing Then
-                                                     Return searchedType
-                                                 End If
-                                                 For Each assem In Assemblies
-                                                     If IsGenericType Then
-                                                         searchedType = assem.GetType(GenericTypeName)
-                                                         If searchedType IsNot Nothing Then
-                                                             Dim types As New List(Of Type)
-                                                             For Each item In GenericParameters
-                                                                 types.Add(ReflectionHelpers.GetTypeByName(item.AssemblyQualifiedName, manager).AsType)
-                                                             Next
-                                                             Return searchedType.MakeGenericType(types.ToArray)
-                                                         End If
-                                                     Else
-                                                         searchedType = assem.GetType(GenericTypeName)
-                                                         If searchedType IsNot Nothing Then
-                                                             Return searchedType
-                                                         End If
+                Me.CSharpStyleName = New Lazy(Of String)(Function()
+                                                             Return Me.LanguageStyle("<", ">")
+
+                                                         End Function)
+
+                Me.VBNetStyleName = New Lazy(Of String)(Function()
+                                                            Return Me.LanguageStyle("(Of ", ")")
+
+                                                        End Function)
+
+                Me.AssemblyDescriptionString = AssemblyQualifiedName.Substring(index + 2)
+
+                If True Then
+                    Dim parts As List(Of String) = AssemblyDescriptionString.Split(","c).[Select](Function(x) x.Trim()).ToList()
+                    Me.Version = LookForPairThenRemove(parts, "Version")
+                    Me.Culture = LookForPairThenRemove(parts, "Culture")
+                    Me.PublicKeyToken = LookForPairThenRemove(parts, "PublicKeyToken")
+                    If parts.Count > 0 Then
+                        Me.ShortAssemblyName = parts(0)
+                    End If
+                End If
+
+                Me.AssemblyNameDescriptor = New Lazy(Of AssemblyName)(Function() New System.Reflection.AssemblyName(Me.AssemblyDescriptionString))
+
+                Me.FoundType = New Lazy(Of Type)(Function() As Type
+                                                     Dim searchedType = Type.GetType(TypeName)
+                                                     If searchedType IsNot Nothing Then
+                                                         Return searchedType
                                                      End If
+                                                     For Each assem In Assemblies
+                                                         If IsGenericType Then
+                                                             searchedType = assem.GetType(GenericTypeName)
+                                                             If searchedType IsNot Nothing Then
+                                                                 Dim types As New List(Of Type)
+                                                                 For Each item In GenericParameters
+                                                                     types.Add(ReflectionHelpers.GetTypeByName(item.AssemblyQualifiedName, manager).AsType)
+                                                                 Next
+                                                                 Return searchedType.MakeGenericType(types.ToArray)
+                                                             End If
+                                                         Else
+                                                             searchedType = assem.GetType(GenericTypeName)
+                                                             If searchedType IsNot Nothing Then
+                                                                 Return searchedType
+                                                             End If
+                                                         End If
 
-                                                 Next
-                                                 ' Not found.
-                                                 Return Nothing
+                                                     Next
+                                                     ' Not found.
+                                                     Return Nothing
 
-                                             End Function)
+                                                 End Function)
+            Else
+                'Failed to parse the type name, or it's null
+                Me.FoundType = New Lazy(Of Type)(Function() As Type
+                                                     Return Nothing
+                                                 End Function)
+            End If
         End Sub
 
         Friend Function LanguageStyle(prefix As String, suffix As String) As String
