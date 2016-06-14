@@ -69,6 +69,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleCommands\DistPrep.vb" />
     <Compile Include="ConsoleCommands\GeneratePluginExtensions.vb" />
     <Compile Include="Utilities\AssemblyReflectionManager.vb" />
     <Compile Include="Utilities\AssemblyReflectionProxy.vb" />

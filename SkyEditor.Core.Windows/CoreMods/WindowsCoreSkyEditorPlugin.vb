@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports SkyEditor.Core.ConsoleCommands
+Imports SkyEditor.Core.Windows.ConsoleCommands
 Imports SkyEditor.Core.Windows.Providers
 Imports SkyEditor.Core.Windows.Utilities
 
@@ -19,6 +20,8 @@ Namespace CoreMods
             MyBase.Load(manager)
 
             manager.RegisterTypeRegister(GetType(ConsoleCommandAsync))
+            manager.RegisterType(GetType(ConsoleCommandAsync), GetType(DistPrep))
+            manager.RegisterType(GetType(ConsoleCommandAsync), GetType(GeneratePluginExtensions))
             manager.CurrentIOUIManager.RegisterIOFilter("*.skysln", My.Resources.Language.SkyEditorSolution)
         End Sub
 
