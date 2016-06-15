@@ -284,17 +284,25 @@ Public Class PluginManager
         Dim pluginTypeInfo = pluginType.GetTypeInfo
         Dim pluginAssembly = pluginTypeInfo.Assembly
 
-        For Each item In Plugins
-            If item.GetType.Equals(pluginType) Then
-                'Then we already have this plugin loaded and should do nothing
-            Else
-                targetPlugin.Load(Me)
-                If Not Assemblies.Contains(pluginAssembly) Then
-                    Assemblies.Add(pluginAssembly)
+        If Plugins.Count > 0 Then
+            For Each item In Plugins
+                If item.GetType.Equals(pluginType) Then
+                    'Then we already have this plugin loaded and should do nothing
+                Else
+                    targetPlugin.Load(Me)
+                    If Not Assemblies.Contains(pluginAssembly) Then
+                        Assemblies.Add(pluginAssembly)
+                    End If
+                    LoadTypes(pluginAssembly)
                 End If
-                LoadTypes(pluginAssembly)
+            Next
+        Else
+            targetPlugin.Load(Me)
+            If Not Assemblies.Contains(pluginAssembly) Then
+                Assemblies.Add(pluginAssembly)
             End If
-        Next
+            LoadTypes(pluginAssembly)
+        End If
 
         'Mark this plugin as a dependant
         If Not DependantPlugins.ContainsKey(pluginAssembly) Then
