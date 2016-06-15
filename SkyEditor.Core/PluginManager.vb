@@ -289,10 +289,10 @@ Public Class PluginManager
                 'Then we already have this plugin loaded and should do nothing
             Else
                 targetPlugin.Load(Me)
-
                 If Not Assemblies.Contains(pluginAssembly) Then
                     Assemblies.Add(pluginAssembly)
                 End If
+                LoadTypes(pluginAssembly)
             End If
         Next
 
