@@ -31,7 +31,7 @@ Namespace Processes
             Dim p As New Process()
             p.StartInfo.FileName = Filename
             p.StartInfo.Arguments = Arguments
-            p.StartInfo.RedirectStandardOutput = True
+            p.StartInfo.RedirectStandardOutput = False 'True
             p.StartInfo.UseShellExecute = False
             p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             p.StartInfo.CreateNoWindow = True
@@ -39,7 +39,8 @@ Namespace Processes
 
             'Start the process
             p.Start()
-            p.BeginOutputReadLine()
+
+            'p.BeginOutputReadLine()
 
             'Wait for the process to close
             Await WaitForProcess(p)
