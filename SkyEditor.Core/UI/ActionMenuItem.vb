@@ -47,10 +47,10 @@ Public Class ActionMenuItem
 
     Public Property Command As ICommand
 
-    Private Async Sub RunActions()
-        'Dim tasks As New List(Of Task) 
+    Private Sub RunActions()
+        'We're running these actions synchronously to avoid threading issues
         For Each t In Actions
-            Await t.DoAction(GetTargets(t))
+            t.DoAction(GetTargets(t)).Wait()
         Next
     End Sub
 
