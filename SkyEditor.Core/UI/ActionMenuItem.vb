@@ -50,7 +50,7 @@ Public Class ActionMenuItem
     Private Sub RunActions()
         'We're running these actions synchronously to avoid threading issues
         For Each t In Actions
-            t.DoAction(GetTargets(t)).Wait()
+            t.DoAction(GetTargets(t))
         Next
     End Sub
 

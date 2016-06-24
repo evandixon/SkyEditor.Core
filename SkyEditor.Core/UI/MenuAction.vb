@@ -97,7 +97,7 @@ Namespace UI
             Return (From o In Objects Where SupportsObject(o)).Any
         End Function
 
-        Public MustOverride Function DoAction(Targets As IEnumerable(Of Object)) As Task
+        Public MustOverride Sub DoAction(Targets As IEnumerable(Of Object))
 
         Public Sub New(Path As IEnumerable(Of String))
             _alwaysVisible = False
