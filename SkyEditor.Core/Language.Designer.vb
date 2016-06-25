@@ -147,6 +147,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to No method to open the file of type &quot;{0}&quot; could be found.  This type must either implement IOpenableFile or have a registered IFileOpener that supports this type..
+        '''</summary>
+        Friend Shared ReadOnly Property ErrorNoFileOpener() As String
+            Get
+                Return ResourceManager.GetString("ErrorNoFileOpener", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Using GenericFile.Save() requires GenericFile.OriginalFilename to not be null..
         '''</summary>
         Friend Shared ReadOnly Property ErrorNoSaveFilename() As String

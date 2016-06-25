@@ -79,14 +79,13 @@ Namespace IO
                 Throw New ArgumentNullException(NameOf(Manager))
             End If
 
-            If Not ReflectionHelpers.IsOfType(FileType, GetType(IOpenableFile).GetTypeInfo) Then
-                Throw New ArgumentException(My.Resources.Language.ErrorTypeMustInheritIOpenableFile, NameOf(FileType))
+            Dim openers = (From o In Manager.GetRegisteredObjects(Of IFileOpener) Where o.SupportsType(FileType))
+            If Not openers.Any() Then
+                Throw New ArgumentException(String.Format(My.Resources.Language.ErrorNoFileOpener, FileType.ToString), NameOf(FileType))
             End If
 
             If ReflectionHelpers.CanCreateInstance(FileType) Then
-                Dim f As IOpenableFile = ReflectionHelpers.CreateInstance(FileType)
-                Await f.OpenFile(Filename, Manager.CurrentIOProvider)
-                Return f
+                Return Await openers.First.OpenFile(FileType, Filename, Manager.CurrentIOProvider)
             Else
                 Throw New ArgumentException(My.Resources.Language.ErrorTypeNoDefaultConstructor, NameOf(FileType))
             End If
