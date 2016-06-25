@@ -188,6 +188,7 @@ Public Class PluginManager
         RegisterTypeRegister(GetType(IFileTypeDetector).GetTypeInfo)
         RegisterTypeRegister(GetType(MenuAction).GetTypeInfo)
         RegisterTypeRegister(GetType(AnchorableViewModel).GetTypeInfo)
+        RegisterTypeRegister(GetType(GenericViewModel).GetTypeInfo)
 
 
         'Load types
