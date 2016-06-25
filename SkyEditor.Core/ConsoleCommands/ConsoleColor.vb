@@ -8,7 +8,7 @@
         DarkGreen
         DarkMagenta
         DarkRed
-        DarkYelloiw
+        DarkYellow
         Gray
         Green
         Magenta
