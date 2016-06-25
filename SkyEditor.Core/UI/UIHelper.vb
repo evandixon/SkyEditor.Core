@@ -162,7 +162,10 @@ Namespace UI
             Dim viewModelType As Type = Nothing
             If model IsNot Nothing Then
                 'Look for a supported Object Control
-                For Each item In (From o In GetObjectControls(Manager) Where RequestedTabTypes.Contains(o.GetType) Order By o.GetSortOrder(model.GetType, False) Descending)
+                For Each item In (From o In GetObjectControls(Manager) Where RequestedTabTypes.Any(Function(t As Type) As Boolean
+                                                                                                       Return ReflectionHelpers.IsOfType(o, t.GetTypeInfo, False)
+                                                                                                   End Function)
+                                  Order By o.GetSortOrder(model.GetType, False) Descending)
                     'We're only looking for the first non-backup control
                     If out Is Nothing OrElse out.IsBackupControl(model) Then
                         'Check to see if the control supports what we want to edit
@@ -172,7 +175,7 @@ Namespace UI
                                 'Check to see if the view supports a view model that supports the model
                                 Dim viewModel As GenericViewModel = ReflectionHelpers.GetCachedInstance(t.GetTypeInfo)
 
-                                If viewModel.SupportsObject(modelType) Then
+                                If viewModel.SupportsObject(model) Then
                                     'This view model supports our model
                                     out = item
                                     viewModelType = t
@@ -237,7 +240,11 @@ Namespace UI
 
             Dim objControls As List(Of IObjectControl) = GetObjectControls(Manager)
 
-            For Each etab In (From e In objControls Where RequestedTabTypes.Contains(e.GetType) Order By e.GetSortOrder(modelType.AsType, True) Ascending)
+            For Each etab In (From e In objControls Where RequestedTabTypes.Any(Function(t As Type) As Boolean
+                                                                                    Return ReflectionHelpers.IsOfType(e, t.GetTypeInfo, False)
+                                                                                End Function)
+                              Order By e.GetSortOrder(modelType.AsType, True) Ascending)
+
                 etab.SetPluginManager(Manager)
                 Dim isMatch As Boolean = False
                 Dim viewModelType As Type = Nothing
@@ -251,7 +258,7 @@ Namespace UI
                         'Check to see if the view supports a view model that supports the model
                         Dim viewModel As GenericViewModel = ReflectionHelpers.GetCachedInstance(t.GetTypeInfo)
 
-                        If viewModel.SupportsObject(modelType) Then
+                        If viewModel.SupportsObject(model) Then
                             'This view model supports our model
                             isMatch = True
                             viewModelType = t

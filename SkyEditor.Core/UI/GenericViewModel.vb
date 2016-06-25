@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports SkyEditor.Core.Utilities
 
 Namespace UI
     Public MustInherit Class GenericViewModel
@@ -25,7 +26,7 @@ Namespace UI
         Public Overridable Function SupportsObject(Obj As Object) As Boolean
             Dim currentType = Obj.GetType.GetTypeInfo
             Return GetSupportedTypes.Any(Function(x As TypeInfo) As Boolean
-                                             Return currentType.Equals(x)
+                                             Return ReflectionHelpers.IsOfType(currentType, x, False)
                                          End Function)
         End Function
 
