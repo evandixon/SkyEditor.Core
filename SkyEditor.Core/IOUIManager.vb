@@ -18,7 +18,7 @@ Public Class IOUIManager
         Me.CurrentSolution = Nothing
         Me.OpenedProjectFiles = New Dictionary(Of Object, Project)
         Me.FileDisposalSettings = New Dictionary(Of Object, Boolean)
-        Me.OpenFiles = New ObservableCollection(Of GenericViewModel)
+        Me.OpenFiles = New ObservableCollection(Of FileViewModel)
         Me.RunningTasks = New ObservableCollection(Of Task)
         AnchorableViewModels = New ObservableCollection(Of AnchorableViewModel)
     End Sub
@@ -54,13 +54,13 @@ Public Class IOUIManager
 
     Private Sub _openFiles_CollectionChanged(sender As Object, e As NotifyCollectionChangedEventArgs) Handles _openFiles.CollectionChanged
         If e.NewItems IsNot Nothing Then
-            For Each item As GenericViewModel In e.NewItems
+            For Each item As FileViewModel In e.NewItems
                 AddHandler item.CloseCommandExecuted, AddressOf File_OnClosed
             Next
         End If
 
         If e.OldItems IsNot Nothing Then
-            For Each item As GenericViewModel In e.OldItems
+            For Each item As FileViewModel In e.OldItems
                 RemoveHandler item.CloseCommandExecuted, AddressOf File_OnClosed
             Next
         End If
@@ -74,7 +74,7 @@ Public Class IOUIManager
 
         If Not args.Cancel Then
             'Doing the directcast again in case something changed args
-            CloseFile(DirectCast(sender, GenericViewModel).File)
+            CloseFile(DirectCast(sender, FileViewModel).File)
         End If
     End Sub
 #End Region
@@ -85,15 +85,15 @@ Public Class IOUIManager
     ''' The files that are currently open
     ''' </summary>
     ''' <returns></returns>
-    Public Property OpenFiles As ObservableCollection(Of GenericViewModel)
+    Public Property OpenFiles As ObservableCollection(Of FileViewModel)
         Get
             Return _openFiles
         End Get
-        Set(value As ObservableCollection(Of GenericViewModel))
+        Set(value As ObservableCollection(Of FileViewModel))
             _openFiles = value
         End Set
     End Property
-    Private WithEvents _openFiles As ObservableCollection(Of GenericViewModel)
+    Private WithEvents _openFiles As ObservableCollection(Of FileViewModel)
 
     Public Property AnchorableViewModels As ObservableCollection(Of AnchorableViewModel)
         Get
@@ -111,11 +111,11 @@ Public Class IOUIManager
     ''' Gets or sets the selected file
     ''' </summary>
     ''' <returns></returns>
-    Public Property SelectedFile As GenericViewModel
+    Public Property SelectedFile As FileViewModel
         Get
             Return _selectedFile
         End Get
-        Set(value As GenericViewModel)
+        Set(value As FileViewModel)
             If _selectedFile IsNot value Then
                 'If we actually changed something...
 
@@ -127,7 +127,7 @@ Public Class IOUIManager
             End If
         End Set
     End Property
-    Dim _selectedFile As GenericViewModel
+    Dim _selectedFile As FileViewModel
 
     Public Property ActiveContent As Object
         Get
@@ -141,7 +141,7 @@ Public Class IOUIManager
             End If
 
             'If the active content is a file, update the active file
-            If TypeOf value Is GenericViewModel Then
+            If TypeOf value Is FileViewModel Then
                 SelectedFile = value
             End If
         End Set
@@ -521,8 +521,8 @@ Public Class IOUIManager
         End If
     End Sub
 
-    Protected Overridable Function GetViewModel(model As Object) As GenericViewModel
-        Dim out As New GenericViewModel
+    Protected Overridable Function GetViewModel(model As Object) As FileViewModel
+        Dim out As New FileViewModel
         out.File = model
         Return out
     End Function

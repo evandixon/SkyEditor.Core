@@ -12,7 +12,7 @@ Namespace Utilities
         ''' <param name="ObjectToSerialize">Object to serialize.</param>
         ''' <returns>Json text that represents the given object.</returns>
         Public Shared Function Serialize(ObjectToSerialize As Object) As String
-            Return Newtonsoft.Json.JsonConvert.SerializeObject(ObjectToSerialize)
+            ' Return Newtonsoft.Json.JsonConvert.SerializeObject(ObjectToSerialize)
         End Function
 
         ''' <summary>
@@ -22,7 +22,7 @@ Namespace Utilities
         ''' <param name="Json">The JSON to deserialize</param>
         ''' <returns></returns>
         Public Shared Function Deserialize(Of T)(Json As String) As T
-            Return Newtonsoft.Json.JsonConvert.DeserializeObject(Of T)(Json)
+            ' Return Newtonsoft.Json.JsonConvert.DeserializeObject(Of T)(Json)
         End Function
         ''' <summary>
         ''' Deserializes the given json string into a new object of type T.
@@ -30,7 +30,7 @@ Namespace Utilities
         ''' <param name="Json">The JSON to deserialize</param>
         ''' <returns></returns>
         Public Shared Function Deserialize(Type As Type, Json As String) As Object
-            Return Newtonsoft.Json.JsonConvert.DeserializeObject(Json, Type)
+            'Return Newtonsoft.Json.JsonConvert.DeserializeObject(Json, Type)
         End Function
 
         ''' <summary>

@@ -1,10 +1,10 @@
 ﻿Namespace ConsoleCommands
-    Public Class ConsoleHelper
-        Public Shared Async Function RunConsole(Manager As PluginManager) As Task
-            Dim Console = Manager.CurrentConsoleProvider
+    Public NotInheritable Class ConsoleHelper
+        Public Shared Async Function RunConsole(manager As PluginManager) As Task
+            Dim Console = manager.CurrentConsoleProvider
             Dim AllCommands As New Dictionary(Of String, ConsoleCommandAsync)
-            For Each item In Manager.GetRegisteredObjects(Of ConsoleCommandAsync)
-                item.CurrentPluginManager = Manager
+            For Each item In manager.GetRegisteredObjects(Of ConsoleCommandAsync)
+                item.CurrentPluginManager = manager
                 item.Console = Console
                 AllCommands.Add(item.CommandName, item)
             Next

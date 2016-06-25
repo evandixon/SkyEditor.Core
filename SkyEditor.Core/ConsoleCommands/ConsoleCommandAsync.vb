@@ -1,6 +1,6 @@
 ﻿Namespace ConsoleCommands
     Public MustInherit Class ConsoleCommandAsync
-        Public MustOverride Function MainAsync(Arguments As String()) As Task
+        Public MustOverride Function MainAsync(arguments As String()) As Task
 
         Public Overridable ReadOnly Property CommandName As String
             Get

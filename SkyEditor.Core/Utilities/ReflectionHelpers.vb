@@ -1,8 +1,31 @@
-﻿Imports System.Reflection
+﻿Imports System.Collections.Concurrent
+Imports System.Reflection
 Imports System.Resources
 
 Namespace Utilities
     Public Class ReflectionHelpers
+
+        Shared Sub New()
+            CachedInstances = New ConcurrentDictionary(Of TypeInfo, Object)
+        End Sub
+
+        Private Shared Property CachedInstances As ConcurrentDictionary(Of TypeInfo, Object)
+
+        ''' <summary>
+        ''' Creates a new instance of the given type, or returns a cached version if available.
+        ''' </summary>
+        ''' <param name="type"></param>
+        ''' <returns></returns>
+        Public Shared Function GetCachedInstance(type As TypeInfo) As Object
+            'Create a new instance if we don't have one, then cache it
+            If Not CachedInstances.ContainsKey(type) Then
+                CachedInstances(type) = CreateInstance(type)
+            End If
+
+            'Return the cached instance
+            Return CachedInstances(type)
+        End Function
+
         ''' <summary>
         ''' Determines whether the given Object is, inherits, or implements the given type.
         ''' </summary>

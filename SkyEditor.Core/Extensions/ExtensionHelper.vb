@@ -15,7 +15,7 @@ Namespace Extensions
             End Get
         End Property
 
-        Public Shared Async Function InstallExtensionZip(ExtensionZipPath As String, extensionDirectory As String, manager As PluginManager) As Task(Of ExtensionInstallResult)
+        Public Shared Async Function InstallExtensionZip(extensionZipPath As String, extensionDirectory As String, manager As PluginManager) As Task(Of ExtensionInstallResult)
             Dim provider = manager.CurrentIOProvider
             Dim result As ExtensionInstallResult
 
@@ -26,7 +26,7 @@ Namespace Extensions
             Await Core.Utilities.FileSystem.ReCreateDirectory(tempDir, provider)
 
             'Extract the given zip file to it
-            Core.Utilities.Zip.Unzip(ExtensionZipPath, tempDir)
+            Core.Utilities.Zip.Unzip(extensionZipPath, tempDir)
 
             'Open the info file
             Dim infoFilename As String = Path.Combine(tempDir, "info.skyext")
@@ -55,8 +55,8 @@ Namespace Extensions
             Return result
         End Function
 
-        Public Shared Function GetExtensions(ExtensionType As Type, manager As PluginManager) As IEnumerable(Of ExtensionInfo)
-            Dim bank As IExtensionCollection = ReflectionHelpers.CreateInstance(ExtensionType.GetTypeInfo)
+        Public Shared Function GetExtensions(extensionType As Type, manager As PluginManager) As IEnumerable(Of ExtensionInfo)
+            Dim bank As IExtensionCollection = ReflectionHelpers.CreateInstance(extensionType.GetTypeInfo)
             Return bank.GetExtensions(manager)
         End Function
     End Class
