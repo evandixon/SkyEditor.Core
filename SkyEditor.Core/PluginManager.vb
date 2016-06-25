@@ -404,6 +404,15 @@ Public Class PluginManager
         RaiseEvent TypeRegistered(Me, New TypeRegisteredEventArgs With {.BaseType = Register, .RegisteredType = Type})
     End Sub
 
+    ''' <summary>
+    ''' Registers the given Type in the type registry.
+    ''' </summary>
+    ''' <typeparam name="T">The base type or interface that the given Type inherits or implements.</typeparam>
+    ''' <param name="type">The type to register.</param>
+    Public Sub RegisterType(Of T)(type As TypeInfo)
+        RegisterType(GetType(T).GetTypeInfo, type)
+    End Sub
+
 #End Region
 
 #Region "Functions"

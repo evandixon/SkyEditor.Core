@@ -104,7 +104,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="TestCoreMod.vb" />
+    <Compile Include="TestComponents\TestCoreMod.vb" />
+    <Compile Include="TestComponents\TestObjectControlDirectModelBind.vb" />
+    <Compile Include="TestComponents\TestObjectControlViewModelBind.vb" />
+    <Compile Include="TestComponents\TestViewModel.vb" />
+    <Compile Include="TestComponents\TextFile.vb" />
+    <Compile Include="UI\UIHelperTests.vb" />
     <Compile Include="Utilities\ReflectionHelpersTests.vb" />
   </ItemGroup>
   <ItemGroup>

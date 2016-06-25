@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports SkyEditor.Core.IO
+Imports SkyEditor.Core.Tests.TestComponents
 Imports SkyEditor.Core.Utilities
 
 Namespace Utilities
