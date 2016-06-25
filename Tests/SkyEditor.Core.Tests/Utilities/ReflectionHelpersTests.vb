@@ -1,4 +1,5 @@
-﻿Imports SkyEditor.Core.IO
+﻿Imports System.Reflection
+Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.Utilities
 
 Namespace Utilities
@@ -21,6 +22,19 @@ Namespace Utilities
                 IntegerItem = 7
             End Sub
         End Class
+
+        <TestMethod> Public Sub GetCachedInstanceTests()
+            Dim type As TypeInfo = GetType(TestContainerClassMulti).GetTypeInfo
+            Dim instance1 As TestContainerClassMulti = ReflectionHelpers.GetCachedInstance(type)
+            Dim instance2 As TestContainerClassMulti = ReflectionHelpers.GetCachedInstance(type)
+            Dim instance3 As New TestContainerClassMulti
+
+            Assert.IsNotNull(instance1)
+            Assert.IsNotNull(instance2)
+            Assert.ReferenceEquals(instance1, instance2)
+            Assert.IsTrue(instance1 IsNot instance3, "New instance should not have same reference of cached instance")
+        End Sub
+
         <TestMethod> Public Sub IsOfTypeTests()
             'Standard equality
             Assert.IsTrue(ReflectionHelpers.IsOfType(GetType(ReflectionHelpersTests), GetType(ReflectionHelpersTests), False), "Failed to see type equality (ReflectionHelpersTests is of type ReflectionHelpersTests)")

@@ -153,6 +153,7 @@
     <Compile Include="IO\Solution.vb" />
     <Compile Include="UI\ActionMenuItem.vb" />
     <Compile Include="UI\AnchorableViewModel.vb" />
+    <Compile Include="UI\FileViewModel.vb" />
     <Compile Include="UI\GenericViewModel.vb" />
     <Compile Include="UI\HeaderUpdatedEventArgs.vb" />
     <Compile Include="Utilities\LoadingStatusChangedEventArgs.vb" />

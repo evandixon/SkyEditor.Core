@@ -153,34 +153,36 @@ Namespace UI
         ''' <summary>
         ''' Gets an object control that can edit the given object.
         ''' </summary>
-        ''' <param name="ObjectToEdit"></param>
+        ''' <param name="model"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function GetObjectControl(ObjectToEdit As Object, RequestedTabTypes As IEnumerable(Of Type), Manager As PluginManager) As IObjectControl
+        Public Shared Function GetObjectControl(model As Object, RequestedTabTypes As IEnumerable(Of Type), Manager As PluginManager) As IObjectControl
             Dim out As IObjectControl = Nothing
-            If ObjectToEdit IsNot Nothing Then
+            Dim modelType = model.GetType.GetTypeInfo
+            Dim viewModelType As Type = Nothing
+            If model IsNot Nothing Then
                 'Look for a supported Object Control
-                For Each item In (From o In GetObjectControls(Manager) Order By o.GetSortOrder(ObjectToEdit.GetType, False) Descending)
+                For Each item In (From o In GetObjectControls(Manager) Where RequestedTabTypes.Contains(o.GetType) Order By o.GetSortOrder(model.GetType, False) Descending)
                     'We're only looking for the first non-backup control
-                    If out Is Nothing OrElse out.IsBackupControl(ObjectToEdit) Then
+                    If out Is Nothing OrElse out.IsBackupControl(model) Then
                         'Check to see if the control supports what we want to edit
                         For Each t In item.GetSupportedTypes
-                            If ReflectionHelpers.IsOfType(ObjectToEdit, t.GetTypeInfo) Then
+                            If ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
+                                'This object control's supported type is a view model
+                                'Check to see if the view supports a view model that supports the model
+                                Dim viewModel As GenericViewModel = ReflectionHelpers.GetCachedInstance(t.GetTypeInfo)
 
-                                'If the control supports our object, we also want to make sure it's supported in the environment.
-                                'It must be one of the types in RequestedTabTypes
-                                Dim isSupported As Boolean = False
-                                For Each r In RequestedTabTypes
-                                    If ReflectionHelpers.IsOfType(item, r.GetTypeInfo) Then
-                                        isSupported = True
-                                        Exit For
-                                    End If
-                                Next
-
-                                If isSupported Then
-                                    out = item '.GetType.GetConstructor({}).Invoke({})
+                                If viewModel.SupportsObject(modelType) Then
+                                    'This view model supports our model
+                                    out = item
+                                    viewModelType = t
                                     Exit For
                                 End If
+
+                                'Check to see if the view supports the model
+                            ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
+                                out = item
+                                Exit For
                             End If
                         Next
                     Else
@@ -194,102 +196,103 @@ Namespace UI
                 out = ReflectionHelpers.CreateNewInstance(out)
                 out.SetPluginManager(Manager)
 
-                'Set editing object based on IContainer support
-                If out.SupportsObject(ObjectToEdit) Then
-                    out.EditingObject = ObjectToEdit
+                'Set the appropriate object
+                If viewModelType IsNot Nothing Then
+                    'We have a view model that the view wants
+                    Dim newViewModel As GenericViewModel = ReflectionHelpers.CreateInstance(viewModelType)
+                    newViewModel.SetPluginManager(Manager)
+                    newViewModel.SetModel(model)
+
+                    out.EditingObject = newViewModel
+                ElseIf out.SupportsObject(model) Then
+                    'This model is what the view wants
+                    out.EditingObject = model
                 Else
+                    'This model is a container of what the view wants
                     For Each type In out.GetSupportedTypes
-                        If ReflectionHelpers.IsIContainerOfType(ObjectToEdit, type.GetTypeInfo) Then
-                            out.EditingObject = ReflectionHelpers.GetIContainerContents(ObjectToEdit, type)
-                            Exit For
-                        End If
-                    Next
+                            If ReflectionHelpers.IsIContainerOfType(model, type.GetTypeInfo) Then
+                                out.EditingObject = ReflectionHelpers.GetIContainerContents(model, type)
+                                Exit For
+                            End If
+                        Next
+                    End If
                 End If
-            End If
-            Return out
+                Return out
         End Function
 
         ''' <summary>
         ''' Returns a list of iObjectControl that edit the given ObjectToEdit.
         ''' </summary>
-        ''' <param name="ObjectToEdit">Object the iObjectControl should edit.</param>
+        ''' <param name="model">Object the iObjectControl should edit.</param>
         ''' <param name="RequestedTabTypes">Limits what types of iObjectControl should be returned.  If the iObjectControl is not of any type in this IEnumerable, it will not be used.  If empty or nothing, no constraints will be applied, which is not recommended because the iObjectControl could be made for a different environment (for example, a Windows Forms user control being used in a WPF environment).</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function GetRefreshedTabs(ObjectToEdit As Object, RequestedTabTypes As IEnumerable(Of Type), Manager As PluginManager) As IEnumerable(Of IObjectControl)
-            If ObjectToEdit Is Nothing Then
-                Throw New ArgumentNullException(NameOf(ObjectToEdit))
+        Public Shared Function GetRefreshedTabs(model As Object, RequestedTabTypes As IEnumerable(Of Type), Manager As PluginManager) As IEnumerable(Of IObjectControl)
+            If model Is Nothing Then
+                Throw New ArgumentNullException(NameOf(model))
             End If
-            Dim objType = ObjectToEdit.GetType
+
+            Dim modelType = model.GetType.GetTypeInfo
             Dim allTabs As New List(Of IObjectControl)
 
-            'This is our cache of reference-only object controls.
-            'We use this to find out which object controls support the given object.
-            'It's a static variable because we're likely going to be calling GetRefreshedTabs multiple times,
-            'So we'll only have to take a little more time the first time we run this
-            Static objControls As List(Of IObjectControl) = Nothing
-            If objControls Is Nothing Then
-                objControls = GetObjectControls(Manager)
-            End If
+            Dim objControls As List(Of IObjectControl) = GetObjectControls(Manager)
 
-            For Each etab In (From e In objControls Order By e.GetSortOrder(objType, True) Ascending)
+            For Each etab In (From e In objControls Where RequestedTabTypes.Contains(e.GetType) Order By e.GetSortOrder(modelType.AsType, True) Ascending)
                 etab.SetPluginManager(Manager)
-                Dim isMatch = False
-                'Check to see if the tab itself is supported
-                'It must be one of the types in RequestedTabTypes
-                For Each t In RequestedTabTypes
-                    If ReflectionHelpers.IsOfType(etab, t.GetTypeInfo, False) Then
-                        isMatch = True
+                Dim isMatch As Boolean = False
+                Dim viewModelType As Type = Nothing
+
+                'Check to see if the tab support the type of the given object
+                Dim supportedTypes = etab.GetSupportedTypes
+
+                For Each t In supportedTypes
+                    If ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
+                        'This object control's supported type is a view model
+                        'Check to see if the view supports a view model that supports the model
+                        Dim viewModel As GenericViewModel = ReflectionHelpers.GetCachedInstance(t.GetTypeInfo)
+
+                        If viewModel.SupportsObject(modelType) Then
+                            'This view model supports our model
+                            isMatch = True
+                            viewModelType = t
+                            Exit For
+                        End If
+
+                        'Check to see if the view supports the model
+                    ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
+                        isMatch = etab.SupportsObject(model)
                         Exit For
                     End If
                 Next
-                'Check to see if the tab support the type of the given object
-                Dim supportedTypes = etab.GetSupportedTypes
-                If isMatch Then
-                    isMatch = supportedTypes.Count > 0
-                End If
-                If isMatch Then
-                    For Each t In supportedTypes
-                        If ObjectToEdit Is Nothing OrElse Not ReflectionHelpers.IsOfType(ObjectToEdit, t.GetTypeInfo, True) Then
-                            isMatch = False
-                            Exit For
-                        End If
-                    Next
-                End If
-                'Check to see if the tab support the object itself
-                If isMatch Then
-                    isMatch = etab.SupportsObject(ObjectToEdit)
-                End If
+
                 'This is a supported tab.  We're adding it!
                 If isMatch Then
-                    'etab.EditingObject = ObjectToEdit
-                    'allTabs.Add(etab)
                     'Create another instance of etab, since etab is our cached, search-only instance.
-                    Dim t As IObjectControl = ReflectionHelpers.CreateNewInstance(etab)
-                    t.SetPluginManager(Manager)
+                    Dim tab As IObjectControl = ReflectionHelpers.CreateNewInstance(etab)
+                    tab.SetPluginManager(Manager)
 
-                    'Set editing object based on IContainer support
-                    Dim direct As Boolean = False
+                    'Set the appropriate object
+                    If viewModelType IsNot Nothing Then
+                        'We have a view model that the view wants
+                        Dim newViewModel As GenericViewModel = ReflectionHelpers.CreateInstance(viewModelType)
+                        newViewModel.SetPluginManager(Manager)
+                        newViewModel.SetModel(model)
 
-                    For Each type In supportedTypes
-                        If ReflectionHelpers.IsOfType(ObjectToEdit, type.GetTypeInfo, False) Then
-                            t.EditingObject = ObjectToEdit
-                            direct = True
-                            Exit For
-                        End If
-                    Next
-
-                    If Not direct Then
-                        For Each type In supportedTypes
-                            If ReflectionHelpers.IsIContainerOfType(ObjectToEdit, type.GetTypeInfo) Then
-                                t.EditingObject = ReflectionHelpers.GetIContainerContents(ObjectToEdit, type)
+                        tab.EditingObject = newViewModel
+                    ElseIf tab.SupportsObject(model) Then
+                        'This model is what the view wants
+                        tab.EditingObject = model
+                    Else
+                        'This model is a container of what the view wants
+                        For Each type In tab.GetSupportedTypes
+                            If ReflectionHelpers.IsIContainerOfType(model, type.GetTypeInfo) Then
+                                tab.EditingObject = ReflectionHelpers.GetIContainerContents(model, type)
                                 Exit For
                             End If
                         Next
                     End If
 
-
-                    allTabs.Add(t)
+                    allTabs.Add(tab)
                 End If
             Next
 
@@ -298,7 +301,7 @@ Namespace UI
 
             'Sort the backup vs non-backup tabs
             For Each item In allTabs
-                If item.IsBackupControl(ObjectToEdit) Then
+                If item.IsBackupControl(model) Then
                     backupTabs.Add(item)
                 Else
                     notBackup.Add(item)
@@ -309,7 +312,7 @@ Namespace UI
             If notBackup.Count > 0 Then
                 Return notBackup
             Else
-                Dim toUse = (From b In backupTabs Order By b.GetSortOrder(objType, True)).FirstOrDefault
+                Dim toUse = (From b In backupTabs Order By b.GetSortOrder(modelType.AsType, True)).FirstOrDefault
                 If toUse Is Nothing Then
                     Return {}
                 Else
