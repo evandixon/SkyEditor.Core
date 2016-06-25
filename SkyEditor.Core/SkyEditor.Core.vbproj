@@ -123,10 +123,12 @@
     <Compile Include="IO\FileRemovedEventArgs.vb" />
     <Compile Include="IO\FileTypeDetectionResult.vb" />
     <Compile Include="IO\IDirectoryTypeDetector.vb" />
+    <Compile Include="IO\IFileOpener.vb" />
     <Compile Include="IO\IFileTypeDetector.vb" />
     <Compile Include="IO\IOHelper.vb" />
     <Compile Include="IO\ObjectFile.vb" />
     <Compile Include="IO\ObjectFileDetector.vb" />
+    <Compile Include="IO\OpenableFileOpener.vb" />
     <Compile Include="IO\Project.vb" />
     <Compile Include="IO\ProjectAddedEventArgs.vb" />
     <Compile Include="IO\ProjectBuildStatusChanged.vb" />

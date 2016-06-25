@@ -145,6 +145,9 @@
   <data name="ErrorMenuActionEmptyActionPath" xml:space="preserve">
     <value>The action's ActionPath needs to contain at least 1 item.</value>
   </data>
+  <data name="ErrorNoFileOpener" xml:space="preserve">
+    <value>No method to open the file of type "{0}" could be found.  This type must either implement IOpenableFile or have a registered IFileOpener that supports this type.</value>
+  </data>
   <data name="ErrorNoSaveFilename" xml:space="preserve">
     <value>Using GenericFile.Save() requires GenericFile.OriginalFilename to not be null.</value>
     <comment>Message for an exception that's thrown when using GenericFile.Save() when the file doesn't have an original filename.</comment>
