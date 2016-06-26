@@ -174,7 +174,12 @@ Namespace UI
                     If out Is Nothing OrElse out.IsBackupControl(model) Then
                         'Check to see if the control supports what we want to edit
                         For Each t In item.GetSupportedTypes
-                            If ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
+                            'Check to see if the view supports the model
+                            If ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
+                                out = item
+                                Exit For
+
+                            ElseIf ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
                                 'This object control's supported type is a view model
                                 'Check to see if the view supports a view model that supports the model
                                 Dim viewModel As GenericViewModel = ReflectionHelpers.GetCachedInstance(t.GetTypeInfo)
@@ -186,10 +191,6 @@ Namespace UI
                                     Exit For
                                 End If
 
-                                'Check to see if the view supports the model
-                            ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
-                                out = item
-                                Exit For
                             End If
                         Next
                     Else
@@ -257,7 +258,12 @@ Namespace UI
                 Dim supportedTypes = etab.GetSupportedTypes
 
                 For Each t In supportedTypes
-                    If ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
+                    'Check to see if the view supports the model
+                    If ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
+                        isMatch = etab.SupportsObject(model)
+                        Exit For
+
+                    ElseIf ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
                         'This object control's supported type is a view model
                         'Check to see if the view supports a view model that supports the model
                         Dim viewModel As GenericViewModel = ReflectionHelpers.GetCachedInstance(t.GetTypeInfo)
@@ -269,10 +275,6 @@ Namespace UI
                             Exit For
                         End If
 
-                        'Check to see if the view supports the model
-                    ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
-                        isMatch = etab.SupportsObject(model)
-                        Exit For
                     End If
                 Next
 
