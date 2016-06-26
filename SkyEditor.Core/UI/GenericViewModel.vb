@@ -64,4 +64,21 @@ Namespace UI
         End Sub
     End Class
 
+    Public MustInherit Class GenericViewModel(Of T)
+        Inherits GenericViewModel
+
+        Public Shadows Property Model As T
+            Get
+                Return MyBase.Model
+            End Get
+            Set(value As T)
+                MyBase.Model = value
+            End Set
+        End Property
+
+        Public Overrides Function GetSupportedTypes() As IEnumerable(Of TypeInfo)
+            Return {GetType(T).GetTypeInfo}
+        End Function
+    End Class
+
 End Namespace
