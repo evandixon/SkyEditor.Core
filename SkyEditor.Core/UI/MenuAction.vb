@@ -5,6 +5,8 @@ Imports SkyEditor.Core.Utilities
 Namespace UI
     Public MustInherit Class MenuAction
 
+        Public Event CurrentPluginManagerChanged(sender As Object, e As EventArgs)
+
         ''' <summary>
         ''' Whether or not the menu item appears in context menus.
         ''' </summary>
@@ -22,6 +24,17 @@ Namespace UI
         ''' </summary>
         ''' <returns></returns>
         Public Property CurrentPluginManager As PluginManager
+            Get
+                Return _currentPluginManager
+            End Get
+            Set(value As PluginManager)
+                If value IsNot _currentPluginManager Then
+                    value = _currentPluginManager
+                    RaiseEvent CurrentPluginManagerChanged(Me, New EventArgs)
+                End If
+            End Set
+        End Property
+        Dim _currentPluginManager As PluginManager
 
         '''' <summary>
         '''' True to target all open files and the current project.
