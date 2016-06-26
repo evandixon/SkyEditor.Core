@@ -61,13 +61,14 @@ Namespace Extensions
                 info.IsInstalled = True
                 info.IsEnabled = True
                 info.Version = My.Resources.Language.PluginDevExtVersion
-                For Each item In manager.CurrentIOProvider.GetFiles(devDir, "*.dll", True)
-                    info.ExtensionFiles.Add(Path.GetFileName(item))
-                Next
-                ''While exe files can technically be loaded as plugins, it can cause some other problems, especially if we try to load another copy of the executing assembly
-                'For Each item In manager.CurrentIOProvider.GetFiles(devDir, "*.exe", True)
-                '    info.ExtensionFiles.Add(Path.GetFileName(item))
-                'Next
+                If manager.CurrentIOProvider.DirectoryExists(devDir) Then
+                    For Each item In manager.CurrentIOProvider.GetFiles(devDir, "*.dll", True)
+                        info.ExtensionFiles.Add(Path.GetFileName(item))
+                    Next
+                    For Each item In manager.CurrentIOProvider.GetFiles(devDir, "*.exe", True)
+                        info.ExtensionFiles.Add(Path.GetFileName(item))
+                    Next
+                End If
                 extensions.Add(info)
             End If
             Return extensions
