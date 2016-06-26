@@ -367,6 +367,10 @@ Public Class IOUIManager
                 End If
             Next
 
+            If File Is SelectedFile Then
+                SelectedFile = Nothing
+            End If
+
             Dim didDispose As Boolean = False
             If FileDisposalSettings.ContainsKey(File) Then
                 If FileDisposalSettings(File) Then
