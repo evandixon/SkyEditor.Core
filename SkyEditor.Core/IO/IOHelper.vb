@@ -144,7 +144,8 @@ Namespace IO
             End If
 
             Dim type = Await GetFileType(File, duplicateFileTypeSelector, manager)
-            If type Is Nothing OrElse Not ReflectionHelpers.IsOfType(type, GetType(IOpenableFile).GetTypeInfo) Then
+            Dim openers = (From o In manager.GetRegisteredObjects(Of IFileOpener) Where o.SupportsType(type))
+            If type Is Nothing OrElse Not openers.Any Then
                 'There is no class we found that can model this file.
                 'We will instead use GenericFile.  We're recreating it so it won't be readonly.
                 Dim filename = File.OriginalFilename
@@ -153,10 +154,7 @@ Namespace IO
                 Await g.OpenFile(File.OriginalFilename, manager.CurrentIOProvider)
                 Return g
             Else
-                Dim out As IOpenableFile = ReflectionHelpers.CreateInstance(type)
-                Await out.OpenFile(File.OriginalFilename, manager.CurrentIOProvider)
-                File.Dispose()
-                Return out
+                Return Await openers.First.OpenFile(type, File.OriginalFilename, manager.CurrentIOProvider)
             End If
         End Function
 
