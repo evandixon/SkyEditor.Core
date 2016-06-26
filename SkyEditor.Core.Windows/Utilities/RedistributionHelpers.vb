@@ -112,11 +112,7 @@ Namespace Utilities
                 End If
 
                 'Find the files we should pack
-                'ToCopy.Add(PluginFilename.Replace(".dll", "").Replace(".exe", ""))
                 ToCopy.Add(plgAssembly.Location)
-                'If Manager.PluginFiles.ContainsKey(filename) Then
-                '    ToCopy.AddRange(Manager.PluginFiles(filename))
-                'End If
 
                 'Try to detect dependencies.
                 For Each item In GetAssemblyDependencies(plgAssembly)
