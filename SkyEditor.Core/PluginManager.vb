@@ -296,6 +296,7 @@ Public Class PluginManager
                     'Then we already have this plugin loaded and should do nothing
                 Else
                     targetPlugin.Load(Me)
+
                     If Not Assemblies.Contains(pluginAssembly) Then
                         Assemblies.Add(pluginAssembly)
                     End If
@@ -308,6 +309,10 @@ Public Class PluginManager
                 Assemblies.Add(pluginAssembly)
             End If
             LoadTypes(pluginAssembly)
+        End If
+
+        If Not Plugins.Any(Function(p As SkyEditorPlugin) ReflectionHelpers.IsOfType(p, pluginTypeInfo)) Then
+            Plugins.Add(targetPlugin)
         End If
 
         'Mark this plugin as a dependant
