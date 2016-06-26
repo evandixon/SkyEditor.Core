@@ -15,6 +15,10 @@ Namespace UI
         ''' <param name="isDevMode">Whether or not to get the dev-only menu items.</param>
         ''' <returns></returns>
         Private Shared Function GetMenuItemInfo(isContextBased As Boolean, target As Object, pluginManager As PluginManager, isDevMode As Boolean) As List(Of MenuItemInfo)
+            If pluginManager Is Nothing Then
+                Throw New ArgumentNullException(NameOf(pluginManager))
+            End If
+
             Dim menuItems As New List(Of MenuItemInfo)
             For Each ActionInstance In pluginManager.GetRegisteredObjects(Of MenuAction)
                 ActionInstance.CurrentPluginManager = pluginManager
