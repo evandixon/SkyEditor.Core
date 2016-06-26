@@ -249,6 +249,9 @@ Public Class PluginManager
             RaiseEvent PluginLoadComplete(Me, New EventArgs)
         End If
 
+        'Add the core plugin so we can see it in the credits
+        Plugins.Add(Core)
+
     End Function
 
     ''' <summary>
