@@ -35,6 +35,7 @@ Namespace TestComponents
             manager.RegisterType(Of IObjectControl)(GetType(TestObjectControlViewModelBind))
             manager.RegisterType(Of GenericViewModel)(GetType(TestViewModel))
             manager.RegisterType(Of IOpenableFile)(GetType(TextFile))
+            manager.RegisterType(Of MenuAction)(GetType(TestMenuAction))
         End Sub
 
     End Class

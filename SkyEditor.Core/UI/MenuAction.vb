@@ -29,7 +29,7 @@ Namespace UI
             End Get
             Set(value As PluginManager)
                 If value IsNot _currentPluginManager Then
-                    value = _currentPluginManager
+                    _currentPluginManager = value
                     RaiseEvent CurrentPluginManagerChanged(Me, New EventArgs)
                 End If
             End Set

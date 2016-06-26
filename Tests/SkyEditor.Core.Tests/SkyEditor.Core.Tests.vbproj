@@ -88,6 +88,7 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IOUIManagerTests.vb" />
     <Compile Include="IO\GenericFileTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -105,6 +106,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="TestComponents\TestCoreMod.vb" />
+    <Compile Include="TestComponents\TestMenuAction.vb" />
     <Compile Include="TestComponents\TestObjectControlDirectModelBind.vb" />
     <Compile Include="TestComponents\TestObjectControlViewModelBind.vb" />
     <Compile Include="TestComponents\TestViewModel.vb" />
