@@ -8,7 +8,7 @@ Namespace TestComponents
     Public Class ViewModelTestMenuAction
         Inherits MenuAction
         Public Sub New()
-            MyBase.New({"Model"})
+            MyBase.New({"View Model"})
         End Sub
 
         Public Overrides Function SupportedTypes() As IEnumerable(Of TypeInfo)
