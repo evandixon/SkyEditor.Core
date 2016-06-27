@@ -48,7 +48,7 @@ Public Class IOUIManager
 
     Private Sub IOUIManager_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles Me.PropertyChanged
         For Each item In RootMenuItems
-            UpdateMenuItemVisibility(item, GetMenuActionTargets)
+            UpdateMenuItemVisibility(item)
         Next
     End Sub
 
@@ -221,9 +221,8 @@ Public Class IOUIManager
                 Next
                 'Update their visibility now that all of them have been created
                 'Doing this before they're all created will cause unintended behavior
-                Dim targets = GetMenuActionTargets()
                 For Each item In _rootMenuItems
-                    UpdateMenuItemVisibility(item, targets)
+                    UpdateMenuItemVisibility(item)
                 Next
             End If
             Return _rootMenuItems
@@ -403,7 +402,7 @@ Public Class IOUIManager
     ''' Gets the possible targets for a menu action.
     ''' </summary>
     ''' <returns></returns>
-    Public Function GetMenuActionTargets() As IEnumerable(Of Object)
+    Private Function GetMenuActionTargets() As IEnumerable(Of Object)
         Dim out As New List(Of Object)
 
         If CurrentSolution IsNot Nothing Then
@@ -416,6 +415,10 @@ Public Class IOUIManager
 
         If SelectedFile IsNot Nothing Then
             out.Add(SelectedFile.File)
+
+            If TypeOf SelectedFile.File Is GenericViewModel AndAlso DirectCast(SelectedFile.File, GenericViewModel).Model IsNot Nothing Then
+                out.Add(DirectCast(SelectedFile.File, GenericViewModel).Model)
+            End If
         End If
 
         Return out
@@ -440,9 +443,28 @@ Public Class IOUIManager
         End If
 
         'Add the selected file if supported
-        If SelectedFile IsNot Nothing AndAlso action.SupportsObject(SelectedFile.File) Then
-            targets.Add(SelectedFile.File)
+        If SelectedFile IsNot Nothing Then
+            'Add the view model if supported
+            If action.SupportsObject(SelectedFile.File) Then
+                targets.Add(SelectedFile.File)
+            End If
+
+            'Add the underlying model if supported
+            If DirectCast(SelectedFile.File, GenericViewModel).Model IsNot Nothing AndAlso action.SupportsObject(DirectCast(SelectedFile.File, GenericViewModel).Model) Then
+                targets.Add(DirectCast(SelectedFile.File, GenericViewModel).Model)
+            End If
+
+            'Add a view model for the current file if available
+            For Each item In From t In action.SupportedTypes
+                             Where ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo) AndAlso
+                                DirectCast(ReflectionHelpers.GetCachedInstance(t), GenericViewModel).SupportsObject(SelectedFile.File)
+                Dim viewModel As GenericViewModel = ReflectionHelpers.CreateInstance(item)
+                viewModel.CurrentPluginManager = CurrentPluginManager
+                viewModel.SetModel(SelectedFile.File)
+            Next
         End If
+
+
 
         Return targets
     End Function
@@ -466,9 +488,9 @@ Public Class IOUIManager
     ''' Updates the visibility for the given menu item and its children, and returns the updated visibility
     ''' </summary>
     ''' <param name="menuItem"></param>
-    ''' <param name="targets"></param>
     ''' <returns></returns>
-    Private Function UpdateMenuItemVisibility(menuItem As ActionMenuItem, targets As IEnumerable(Of Object)) As Boolean
+    Private Function UpdateMenuItemVisibility(menuItem As ActionMenuItem) As Boolean
+        Dim possibleTargets = GetMenuActionTargets() 'Note: Excludes view models for the selected file
 
         'Default to not visible
         Dim isVisible = False
@@ -485,7 +507,7 @@ Public Class IOUIManager
                         'And don't bother checking the rest
                         Exit For
                     Else
-                        For Each target In targets
+                        For Each target In possibleTargets
                             'Check to see if this target is supported
                             If item.SupportsObject(target) Then
                                 'If it is, then this menu item should be visible
@@ -495,6 +517,14 @@ Public Class IOUIManager
                                 Exit For
                             End If
                         Next
+
+                        If Not isVisible AndAlso SelectedFile?.File IsNot Nothing Then
+                            'Check to see if the action supports any view models
+                            'If there are any view models that support the selected file, 
+                            isVisible = (From t In item.SupportedTypes
+                                         Where ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo) AndAlso
+                                   DirectCast(ReflectionHelpers.GetCachedInstance(t), GenericViewModel).SupportsObject(SelectedFile.File)).Any
+                        End If
                     End If
                 Else
                     'Then this menu item is visible, and don't bother checking the rest
@@ -505,7 +535,7 @@ Public Class IOUIManager
 
         'Update children
         For Each item In menuItem.Children
-            If UpdateMenuItemVisibility(item, targets) Then
+            If UpdateMenuItemVisibility(item) Then
                 isVisible = True
             End If
         Next
