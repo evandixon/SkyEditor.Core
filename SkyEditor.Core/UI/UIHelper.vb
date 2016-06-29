@@ -189,7 +189,7 @@ Namespace UI
 
                 etab.SetPluginManager(Manager)
                 Dim isMatch As Boolean = False
-                Dim viewModelType As Type = Nothing
+                Dim viewModel As GenericViewModel = Nothing
 
                 'Check to see if the tab support the type of the given object
                 Dim supportedTypes = etab.GetSupportedTypes
@@ -201,14 +201,14 @@ Namespace UI
                         'The target is an interface.  Check to see if there's a view model that implements it.
                         'Otherwise, check the model
 
-                        Dim availableViewModels = From v In Manager.GetRegisteredObjects(Of GenericViewModel)
+                        Dim availableViewModels = From v In Manager.CurrentIOUIManager.GetViewModelsForModel(model)
                                                   Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)
 
                         If availableViewModels.Any Then
                             'This view model fits the critera
                             Dim first = availableViewModels.First
                             isMatch = etab.SupportsObject(first)
-                            viewModelType = first.GetType
+                            viewModel = first
                             If isMatch Then Exit For
                         ElseIf ReflectionHelpers.IsOfType(model, info, True) Then
                             'The model implements this interface
@@ -226,12 +226,12 @@ Namespace UI
                     ElseIf ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
                         'The object control is targeting a view model
                         'Check to see if the view model supports the model
-                        Dim viewModel As GenericViewModel = ReflectionHelpers.GetCachedInstance(t.GetTypeInfo)
-
-                        If viewModel.SupportsObject(model) Then
+                        Dim potentialViewModel As GenericViewModel = (From v In Manager.CurrentIOUIManager.GetViewModelsForModel(model)
+                                                                      Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)).FirstOrDefault
+                        If potentialViewModel IsNot Nothing Then
                             'This view model supports our model
-                            isMatch = etab.SupportsObject(viewModel)
-                            viewModelType = t
+                            isMatch = etab.SupportsObject(potentialViewModel)
+                            viewModel = potentialViewModel
                             If isMatch Then Exit For
                         End If
 
@@ -245,13 +245,9 @@ Namespace UI
                     tab.SetPluginManager(Manager)
 
                     'Set the appropriate object
-                    If viewModelType IsNot Nothing Then
+                    If viewModel IsNot Nothing Then
                         'We have a view model that the view wants
-                        Dim newViewModel As GenericViewModel = ReflectionHelpers.CreateInstance(viewModelType)
-                        newViewModel.SetPluginManager(Manager)
-                        newViewModel.SetModel(model)
-
-                        tab.EditingObject = newViewModel
+                        tab.EditingObject = viewModel
                     ElseIf tab.SupportsObject(model) Then
                         'This model is what the view wants
                         tab.EditingObject = model

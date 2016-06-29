@@ -20,7 +20,8 @@ Public Class IOUIManager
         Me.FileDisposalSettings = New Dictionary(Of Object, Boolean)
         Me.OpenFiles = New ObservableCollection(Of FileViewModel)
         Me.RunningTasks = New ObservableCollection(Of Task)
-        AnchorableViewModels = New ObservableCollection(Of AnchorableViewModel)
+        Me.AnchorableViewModels = New ObservableCollection(Of AnchorableViewModel)
+        Me.FileViewModels = New Dictionary(Of FileViewModel, List(Of GenericViewModel))
     End Sub
 
 #Region "Events"
@@ -33,18 +34,6 @@ Public Class IOUIManager
 #End Region
 
 #Region "Event Handlers"
-
-    '<Obsolete> Private Sub _pluginHelper_FileOpened(sender As Object, e As FileOpenedEventArguments)
-    '    If Not Me.OpenedFiles.ContainsKey(e.File) Then
-    '        Me.OpenedFiles.Add(e.File, e.ParentProject)
-    '    End If
-    'End Sub
-
-    '<Obsolete> Private Sub _pluginHelper_FileClosed(sender As Object, e As FileClosedEventArgs)
-    '    If Me.OpenedFiles.ContainsKey(e.File) Then
-    '        Me.OpenedFiles.Remove(e.File)
-    '    End If
-    'End Sub
 
     Private Sub IOUIManager_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles Me.PropertyChanged
         For Each item In RootMenuItems
@@ -74,11 +63,15 @@ Public Class IOUIManager
 
         If Not args.Cancel Then
             'Doing the directcast again in case something changed args
-            CloseFile(DirectCast(sender, FileViewModel).File)
+            CloseFile(DirectCast(sender, FileViewModel))
         End If
     End Sub
 #End Region
 
+    ''' <summary>
+    ''' Instance of the current plugin manager.
+    ''' </summary>
+    ''' <returns>The instance of the current plugin manager.</returns>
     Public Property CurrentPluginManager As PluginManager
 
     ''' <summary>
@@ -89,23 +82,25 @@ Public Class IOUIManager
         Get
             Return _openFiles
         End Get
-        Set(value As ObservableCollection(Of FileViewModel))
+        Private Set(value As ObservableCollection(Of FileViewModel))
             _openFiles = value
         End Set
     End Property
     Private WithEvents _openFiles As ObservableCollection(Of FileViewModel)
 
+    ''' <summary>
+    ''' The view models for anchorable views.
+    ''' </summary>
+    ''' <returns>The view models for anchorable views.</returns>
     Public Property AnchorableViewModels As ObservableCollection(Of AnchorableViewModel)
         Get
             Return _anchorableViewModels
         End Get
-        Set(value As ObservableCollection(Of AnchorableViewModel))
+        Private Set(value As ObservableCollection(Of AnchorableViewModel))
             _anchorableViewModels = value
         End Set
     End Property
     Dim _anchorableViewModels As ObservableCollection(Of AnchorableViewModel)
-
-    Public Property SupportedToolWindowTypes As IEnumerable(Of Type)
 
     ''' <summary>
     ''' Gets or sets the selected file
@@ -117,18 +112,17 @@ Public Class IOUIManager
         End Get
         Set(value As FileViewModel)
             If _selectedFile IsNot value Then
-                'If we actually changed something...
-
-                'Update the current
                 _selectedFile = value
-
-                'And report something changed
                 RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(SelectedFile)))
             End If
         End Set
     End Property
     Dim _selectedFile As FileViewModel
 
+    ''' <summary>
+    ''' Gets or sets the currently selected view model (Anchorable or File)
+    ''' </summary>
+    ''' <returns>The currently selected view model (Anchorable or File)</returns>
     Public Property ActiveContent As Object
         Get
             Return _activeContent
@@ -159,6 +153,8 @@ Public Class IOUIManager
     ''' </summary>
     ''' <returns></returns>
     Private Property OpenedProjectFiles As Dictionary(Of Object, Project)
+
+    Private Property FileViewModels As Dictionary(Of FileViewModel, List(Of GenericViewModel))
 
     ''' <summary>
     ''' Dictionary of (Extension, Friendly Name) used in the Open and Save file dialogs.
@@ -323,7 +319,7 @@ Public Class IOUIManager
     Public Sub OpenFile(File As Object, DisposeOnClose As Boolean)
         If File IsNot Nothing Then
             If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper = GetViewModel(File)
+                Dim wrapper = CreateViewModel(File)
                 OpenFiles.Add(wrapper)
                 FileDisposalSettings.Add(File, DisposeOnClose)
                 RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = File, .DisposeOnExit = DisposeOnClose})
@@ -342,7 +338,7 @@ Public Class IOUIManager
     Public Sub OpenFile(File As Object, ParentProject As Project)
         If File IsNot Nothing Then
             If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper = GetViewModel(File)
+                Dim wrapper = CreateViewModel(File)
                 OpenFiles.Add(wrapper)
                 OpenedProjectFiles.Add(File, ParentProject)
                 RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = File, .DisposeOnExit = False, .ParentProject = ParentProject})
@@ -357,33 +353,65 @@ Public Class IOUIManager
     ''' Closes the file
     ''' </summary>
     ''' <param name="File">File to close</param>
-    Public Sub CloseFile(File As Object)
-        If File IsNot Nothing Then
-            Dim toDelete = (From o In OpenFiles Where o.File Is File)
+    Public Sub CloseFile(file As FileViewModel)
+        If file IsNot Nothing Then
             For count = OpenFiles.Count - 1 To 0 Step -1
-                If OpenFiles(count).File Is File Then
+                If OpenFiles(count) Is file Then
                     OpenFiles.RemoveAt(count)
                 End If
             Next
 
-            If File Is SelectedFile Then
+            If file Is SelectedFile Then
                 SelectedFile = Nothing
             End If
 
+            If FileViewModels.ContainsKey(file) Then
+                FileViewModels.Remove(file)
+            End If
+
             Dim didDispose As Boolean = False
-            If FileDisposalSettings.ContainsKey(File) Then
-                If FileDisposalSettings(File) Then
-                    If TypeOf File Is IDisposable Then
-                        DirectCast(File, IDisposable).Dispose()
+            If FileDisposalSettings.ContainsKey(file.File) Then
+                If FileDisposalSettings(file.File) Then
+                    If TypeOf file.File Is IDisposable Then
+                        DirectCast(file.File, IDisposable).Dispose()
                         didDispose = True
                     End If
                 End If
-                FileDisposalSettings.Remove(File)
+                FileDisposalSettings.Remove(file.File)
             End If
-            RaiseEvent FileClosed(Me, New FileClosedEventArgs With {.File = File, .Disposed = didDispose})
+            RaiseEvent FileClosed(Me, New FileClosedEventArgs With {.File = file.File, .Disposed = didDispose})
         End If
     End Sub
 #End Region
+
+    ''' <summary>
+    ''' Gets the current view models for the given file, creating them if necessary.
+    ''' </summary>
+    ''' <param name="file">File of which to get the view models.</param>
+    ''' <returns>An IEnumerable of view models that support the given file's model.</returns>
+    Public Function GetViewModels(file As FileViewModel) As IEnumerable(Of GenericViewModel)
+        If Not FileViewModels.ContainsKey(file) Then
+            FileViewModels.Add(file, New List(Of GenericViewModel))
+            'do something
+            For Each viewModel In From vm In CurrentPluginManager.GetRegisteredObjects(Of GenericViewModel) Where vm.SupportsObject(file.File)
+                Dim vm As GenericViewModel = ReflectionHelpers.CreateNewInstance(viewModel)
+                vm.SetPluginManager(CurrentPluginManager)
+                vm.SetModel(file.File)
+                FileViewModels(file).Add(vm)
+            Next
+        End If
+        Return FileViewModels(file)
+    End Function
+
+    ''' <summary>
+    ''' Gets the current view models for the model, creating them if necessary.
+    ''' </summary>
+    ''' <param name="model">Model for which to get the view models.  Must be the model contained in an open file.</param>
+    ''' <returns>An IEnumerable of view models that support the given model.</returns>
+    Public Function GetViewModelsForModel(model As Object) As IEnumerable(Of GenericViewModel)
+        Dim file = (From f In OpenFiles Where f.File Is model).First
+        Return GetViewModels(file)
+    End Function
 
     ''' <summary>
     ''' Returns the file's parent project, if it exists.
@@ -455,16 +483,10 @@ Public Class IOUIManager
             End If
 
             'Add a view model for the current file if available
-            For Each item In From t In action.SupportedTypes
-                             Where ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo) AndAlso
-                                DirectCast(ReflectionHelpers.GetCachedInstance(t), GenericViewModel).SupportsObject(SelectedFile.File)
-                Dim viewModel As GenericViewModel = ReflectionHelpers.CreateInstance(item)
-                viewModel.CurrentPluginManager = CurrentPluginManager
-                viewModel.SetModel(SelectedFile.File)
+            For Each item In From vm In GetViewModels(SelectedFile.File) Where action.SupportsObject(vm)
+                targets.Add(item)
             Next
         End If
-
-
 
         Return targets
     End Function
@@ -521,9 +543,7 @@ Public Class IOUIManager
                         If Not isVisible AndAlso SelectedFile?.File IsNot Nothing Then
                             'Check to see if the action supports any view models
                             'If there are any view models that support the selected file, 
-                            isVisible = (From t In item.SupportedTypes
-                                         Where ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo) AndAlso
-                                   DirectCast(ReflectionHelpers.GetCachedInstance(t), GenericViewModel).SupportsObject(SelectedFile.File)).Any
+                            isVisible = (From vm In GetViewModels(SelectedFile) Where item.SupportsObject(vm)).Any
                         End If
                     End If
                 Else
@@ -555,7 +575,12 @@ Public Class IOUIManager
         End If
     End Sub
 
-    Protected Overridable Function GetViewModel(model As Object) As FileViewModel
+    ''' <summary>
+    ''' Creates a new FileViewModel wrapper for the given model.
+    ''' </summary>
+    ''' <param name="model">Model for which to create the FileViewModel wrapper.</param>
+    ''' <returns>A new FileViewModel wrapper.</returns>
+    Protected Overridable Function CreateViewModel(model As Object) As FileViewModel
         Dim out As New FileViewModel
         out.File = model
         Return out

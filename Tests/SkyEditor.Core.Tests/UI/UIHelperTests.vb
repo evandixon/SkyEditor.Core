@@ -11,6 +11,8 @@ Namespace UI
 
             Model = New TextFile
             Model.Text = "Test"
+
+            CurrentPluginManager.CurrentIOUIManager.OpenFile(Model, False)
         End Sub
 
         <TestMethod> Public Sub GetRefreshedTabsTests()
