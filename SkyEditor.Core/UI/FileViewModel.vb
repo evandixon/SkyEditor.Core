@@ -93,7 +93,27 @@ Namespace UI
         End Property
 
         Public ReadOnly Property CloseCommand As ICommand
+
+        Private Property ViewModels As List(Of GenericViewModel)
 #End Region
+
+        ''' <summary>
+        ''' Gets the current view models for the given file, creating them if necessary.
+        ''' </summary>
+        ''' <returns>An IEnumerable of view models that support the given file's model.</returns>
+        Public Function GetViewModels(manager As PluginManager) As IEnumerable(Of GenericViewModel)
+            If ViewModels Is Nothing Then
+                ViewModels = New List(Of GenericViewModel)
+                'do something
+                For Each viewModel In From vm In manager.GetRegisteredObjects(Of GenericViewModel) Where vm.SupportsObject(File)
+                    Dim vm As GenericViewModel = ReflectionHelpers.CreateNewInstance(viewModel)
+                    vm.SetPluginManager(manager)
+                    vm.SetModel(File)
+                    ViewModels.Add(vm)
+                Next
+            End If
+            Return ViewModels
+        End Function
 
         Protected Overridable Function OnClosed() As Task
             RaiseEvent CloseCommandExecuted(Me, New EventArgs)

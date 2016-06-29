@@ -21,7 +21,6 @@ Public Class IOUIManager
         Me.OpenFiles = New ObservableCollection(Of FileViewModel)
         Me.RunningTasks = New ObservableCollection(Of Task)
         Me.AnchorableViewModels = New ObservableCollection(Of AnchorableViewModel)
-        Me.FileViewModels = New Dictionary(Of FileViewModel, List(Of GenericViewModel))
     End Sub
 
 #Region "Events"
@@ -153,8 +152,6 @@ Public Class IOUIManager
     ''' </summary>
     ''' <returns></returns>
     Private Property OpenedProjectFiles As Dictionary(Of Object, Project)
-
-    Private Property FileViewModels As Dictionary(Of FileViewModel, List(Of GenericViewModel))
 
     ''' <summary>
     ''' Dictionary of (Extension, Friendly Name) used in the Open and Save file dialogs.
@@ -365,10 +362,6 @@ Public Class IOUIManager
                 SelectedFile = Nothing
             End If
 
-            If FileViewModels.ContainsKey(file) Then
-                FileViewModels.Remove(file)
-            End If
-
             Dim didDispose As Boolean = False
             If FileDisposalSettings.ContainsKey(file.File) Then
                 If FileDisposalSettings(file.File) Then
@@ -385,32 +378,13 @@ Public Class IOUIManager
 #End Region
 
     ''' <summary>
-    ''' Gets the current view models for the given file, creating them if necessary.
-    ''' </summary>
-    ''' <param name="file">File of which to get the view models.</param>
-    ''' <returns>An IEnumerable of view models that support the given file's model.</returns>
-    Public Function GetViewModels(file As FileViewModel) As IEnumerable(Of GenericViewModel)
-        If Not FileViewModels.ContainsKey(file) Then
-            FileViewModels.Add(file, New List(Of GenericViewModel))
-            'do something
-            For Each viewModel In From vm In CurrentPluginManager.GetRegisteredObjects(Of GenericViewModel) Where vm.SupportsObject(file.File)
-                Dim vm As GenericViewModel = ReflectionHelpers.CreateNewInstance(viewModel)
-                vm.SetPluginManager(CurrentPluginManager)
-                vm.SetModel(file.File)
-                FileViewModels(file).Add(vm)
-            Next
-        End If
-        Return FileViewModels(file)
-    End Function
-
-    ''' <summary>
     ''' Gets the current view models for the model, creating them if necessary.
     ''' </summary>
     ''' <param name="model">Model for which to get the view models.  Must be the model contained in an open file.</param>
     ''' <returns>An IEnumerable of view models that support the given model.</returns>
     Public Function GetViewModelsForModel(model As Object) As IEnumerable(Of GenericViewModel)
         Dim file = (From f In OpenFiles Where f.File Is model).First
-        Return GetViewModels(file)
+        Return file.GetViewModels(CurrentPluginManager)
     End Function
 
     ''' <summary>
@@ -483,7 +457,7 @@ Public Class IOUIManager
             End If
 
             'Add a view model for the current file if available
-            For Each item In From vm In GetViewModels(SelectedFile.File) Where action.SupportsObject(vm)
+            For Each item In From vm In SelectedFile.GetViewModels(CurrentPluginManager) Where action.SupportsObject(vm)
                 targets.Add(item)
             Next
         End If
@@ -543,7 +517,7 @@ Public Class IOUIManager
                         If Not isVisible AndAlso SelectedFile?.File IsNot Nothing Then
                             'Check to see if the action supports any view models
                             'If there are any view models that support the selected file, 
-                            isVisible = (From vm In GetViewModels(SelectedFile) Where item.SupportsObject(vm)).Any
+                            isVisible = (From vm In SelectedFile.GetViewModels(CurrentPluginManager) Where item.SupportsObject(vm)).Any
                         End If
                     End If
                 Else
