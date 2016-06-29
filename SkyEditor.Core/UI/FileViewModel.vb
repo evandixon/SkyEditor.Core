@@ -42,6 +42,7 @@ Namespace UI
                 If TypeOf _file Is INotifyModified Then
                     RemoveHandler DirectCast(_file, INotifyModified).Modified, AddressOf File_OnModified
                 End If
+                ResetViewModels()
 
                 _file = value
 
@@ -110,10 +111,42 @@ Namespace UI
                     vm.SetPluginManager(manager)
                     vm.SetModel(File)
                     ViewModels.Add(vm)
+
+                    If TypeOf vm Is ISavable Then
+                        AddHandler DirectCast(vm, ISavable).FileSaved, AddressOf File_OnSaved
+                    End If
+                    If TypeOf vm Is INotifyPropertyChanged Then
+                        AddHandler DirectCast(vm, INotifyPropertyChanged).PropertyChanged, AddressOf File_OnModified
+                    End If
+                    If TypeOf vm Is INotifyModified Then
+                        AddHandler DirectCast(vm, INotifyModified).Modified, AddressOf File_OnModified
+                    End If
                 Next
             End If
             Return ViewModels
         End Function
+
+        ''' <summary>
+        ''' Clears the current view models and removes event handlers
+        ''' </summary>
+        Private Sub ResetViewModels()
+            If ViewModels IsNot Nothing Then
+                'Remove handlers first
+                For Each item In ViewModels
+                    If TypeOf item Is ISavable Then
+                        RemoveHandler DirectCast(item, ISavable).FileSaved, AddressOf File_OnSaved
+                    End If
+                    If TypeOf item Is INotifyPropertyChanged Then
+                        RemoveHandler DirectCast(item, INotifyPropertyChanged).PropertyChanged, AddressOf File_OnModified
+                    End If
+                    If TypeOf item Is INotifyModified Then
+                        RemoveHandler DirectCast(item, INotifyModified).Modified, AddressOf File_OnModified
+                    End If
+                Next
+                ViewModels.Clear()
+                ViewModels = Nothing
+            End If
+        End Sub
 
         Protected Overridable Function OnClosed() As Task
             RaiseEvent CloseCommandExecuted(Me, New EventArgs)
