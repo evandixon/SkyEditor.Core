@@ -34,6 +34,13 @@ Public Class IOUIManager
 
 #Region "Event Handlers"
 
+    Private Sub IOUIManager_FileOpened(sender As Object, e As FileOpenedEventArguments) Handles Me.FileOpened
+        'Make sure there's an open file
+        If SelectedFile Is Nothing AndAlso OpenFiles.Count > 0 Then
+            SelectedFile = OpenFiles.First
+        End If
+    End Sub
+
     Private Sub IOUIManager_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles Me.PropertyChanged
         For Each item In RootMenuItems
             UpdateMenuItemVisibility(item)
@@ -311,38 +318,87 @@ Public Class IOUIManager
     ''' <summary>
     ''' Opens the given file
     ''' </summary>
-    ''' <param name="File">File to open</param>
+    ''' <param name="file">File to open</param>
     ''' <param name="DisposeOnClose">True to call the file's dispose method (if IDisposable) when closed.</param>
-    Public Sub OpenFile(File As Object, DisposeOnClose As Boolean)
-        If File IsNot Nothing Then
-            If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper = CreateViewModel(File)
-                OpenFiles.Add(wrapper)
-                FileDisposalSettings.Add(File, DisposeOnClose)
-                RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = File, .DisposeOnExit = DisposeOnClose})
-            End If
-            If SelectedFile Is Nothing AndAlso OpenFiles.Count > 0 Then
-                SelectedFile = OpenFiles.First
-            End If
+    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="file"/> is null.</exception>
+    Public Sub OpenFile(file As Object, DisposeOnClose As Boolean)
+        If file Is Nothing Then
+            Throw New ArgumentNullException(NameOf(file))
+        End If
+
+        If Not (From o In OpenFiles Where o.File Is file).Any Then
+            Dim wrapper = CreateViewModel(file)
+            OpenFiles.Add(wrapper)
+            FileDisposalSettings.Add(file, DisposeOnClose)
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = file, .DisposeOnExit = DisposeOnClose})
         End If
     End Sub
 
     ''' <summary>
-    ''' Opens the file
+    ''' Opens the givenfile
     ''' </summary>
-    ''' <param name="File">File to open</param>
-    ''' <param name="ParentProject">Project the file belongs to.  If the file does not belong to a project, don't use this overload.</param>
-    Public Sub OpenFile(File As Object, ParentProject As Project)
-        If File IsNot Nothing Then
-            If Not (From o In OpenFiles Where o.File Is File).Any Then
-                Dim wrapper = CreateViewModel(File)
-                OpenFiles.Add(wrapper)
-                OpenedProjectFiles.Add(File, ParentProject)
-                RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = File, .DisposeOnExit = False, .ParentProject = ParentProject})
-            End If
-            If SelectedFile Is Nothing AndAlso OpenFiles.Count > 0 Then
-                SelectedFile = OpenFiles.First
-            End If
+    ''' <param name="file">File to open</param>
+    ''' <param name="parentProject">Project the file belongs to.  If the file does not belong to a project, don't use this overload.</param>
+    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="file"/> or <paramref name="parentProject"/> is null.</exception>
+    Public Sub OpenFile(file As Object, parentProject As Project)
+        If file Is Nothing Then
+            Throw New ArgumentNullException(NameOf(file))
+        End If
+        If parentProject Is Nothing Then
+            Throw New ArgumentNullException(NameOf(parentProject))
+        End If
+
+        If Not (From o In OpenFiles Where o.File Is file).Any Then
+            Dim wrapper = CreateViewModel(file)
+            OpenFiles.Add(wrapper)
+            OpenedProjectFiles.Add(file, parentProject)
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = file, .DisposeOnExit = False, .ParentProject = parentProject})
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Opens a file from the given filename.
+    ''' </summary>
+    ''' <param name="filename">Full path of the file to open.</param>
+    ''' <param name="autoDetectSelector">Delegate function used to resolve duplicate auto-detection results.</param>
+    ''' <remarks>This overload is intended to open files on disk that are not associated with a project, automatically determining the file type.
+    ''' To open a project file, use <see cref="OpenFile(Object, Project)"/>.
+    ''' To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
+    ''' To open a file using a specific type as the model, use <see cref="OpenFile(String, TypeInfo)"/>.
+    ''' 
+    ''' When the file is closed, the underlying model will be disposed.</remarks>
+    Public Sub OpenFile(filename As String, autoDetectSelector As IOHelper.DuplicateMatchSelector)
+        Dim model = IOHelper.OpenObject(filename, autoDetectSelector, CurrentPluginManager)
+
+        If Not (From o In OpenFiles Where o.File Is model).Any Then
+            Dim wrapper = CreateViewModel(model)
+            wrapper.Filename = filename
+            OpenFiles.Add(wrapper)
+            FileDisposalSettings.Add(model, True)
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = True})
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Opens a file from the given filename.
+    ''' </summary>
+    ''' <param name="filename">Full path of the file to open.</param>
+    ''' <param name="modelType">Type of the model of the file.</param>
+    ''' <remarks>This overload is intended to open files on disk, using a specific file type, that are not associated with a project.
+    ''' To open a project file, use <see cref="OpenFile(Object, Project)"/>.
+    ''' To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
+    ''' To open a file, auto-detecting the file type, use <see cref="OpenFile(String, IOHelper.DuplicateMatchSelector)"/>.
+    ''' 
+    ''' When the file is closed, the underlying model will be disposed.</remarks>
+    Public Sub OpenFile(filename As String, modelType As TypeInfo)
+        Dim model = IOHelper.OpenFile(filename, modelType, CurrentPluginManager)
+
+        If Not (From o In OpenFiles Where o.File Is model).Any Then
+            Dim wrapper = CreateViewModel(model)
+            wrapper.Filename = filename
+            OpenFiles.Add(wrapper)
+            FileDisposalSettings.Add(model, True)
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = True})
         End If
     End Sub
 
@@ -596,6 +652,7 @@ Public Class IOUIManager
         ' TODO: uncomment the following line if Finalize() is overridden above.
         ' GC.SuppressFinalize(Me)
     End Sub
+
 #End Region
 
 End Class

@@ -27,6 +27,16 @@ Namespace UI
         End Sub
 #End Region
 
+#Region "Event Handlers"
+        Private Sub File_OnSaved(sender As Object, e As EventArgs)
+            IsFileModified = False
+        End Sub
+
+        Private Sub File_OnModified(sender As Object, e As EventArgs)
+            IsFileModified = True
+        End Sub
+#End Region
+
 #Region "Properties"
         Public Property File As Object
             Get
@@ -93,10 +103,57 @@ Namespace UI
             End Get
         End Property
 
+        Public Property Filename As String
+
         Public ReadOnly Property CloseCommand As ICommand
 
         Private Property ViewModels As List(Of GenericViewModel)
 #End Region
+
+        ''' <summary>
+        ''' Saves the current file.
+        ''' </summary>
+        ''' <param name="manager">Instance of the current plugin manager.</param>
+        Public Sub Save(manager As PluginManager)
+            Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSave(File)).FirstOrDefault
+            If saver Is Nothing Then
+                'If we can't find a saver that supports saving without a filename, use the explicit overload.
+                Save(Filename, manager)
+            Else
+                'We have a saver that works without a filename
+                saver.Save(File, manager.CurrentIOProvider)
+            End If
+            IsFileModified = False
+        End Sub
+
+        ''' <summary>
+        ''' Saves the file to the given filename.
+        ''' </summary>
+        ''' <param name="filename">Full path of the destination file.</param>
+        ''' <param name="manager">Instance of the current plugin manager.</param>
+        Public Sub Save(filename As String, manager As PluginManager)
+            Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSaveAs(File)).First
+            saver.Save(File, filename, manager.CurrentIOProvider)
+            IsFileModified = False
+        End Sub
+
+        ''' <summary>
+        ''' Determines whether <see cref="Save(PluginManager)"/> can be called.
+        ''' </summary>
+        ''' <param name="manager">Instance of the current plugin manager.</param>
+        ''' <returns>A boolean indicating if <see cref="Save(PluginManager)"/> can be called.</returns>
+        Public Function CanSave(manager As PluginManager) As Boolean
+            Return (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSave(File) OrElse (Me.Filename IsNot Nothing AndAlso s.SupportsSaveAs(File))).Any
+        End Function
+
+        ''' <summary>
+        ''' Determines whether <see cref="Save(String, PluginManager)"/> can be called.
+        ''' </summary>
+        ''' <param name="manager">Instance of the current plugin manager.</param>
+        ''' <returns>A boolean indicating if <see cref="Save(String, PluginManager)"/> can be called.</returns>
+        Public Function CanSaveAs(manager As PluginManager) As Boolean
+            Return (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSaveAs(File)).Any
+        End Function
 
         ''' <summary>
         ''' Gets the current view models for the given file, creating them if necessary.
@@ -153,12 +210,5 @@ Namespace UI
             Return Task.FromResult(0)
         End Function
 
-        Private Sub File_OnSaved(sender As Object, e As EventArgs)
-            IsFileModified = False
-        End Sub
-
-        Private Sub File_OnModified(sender As Object, e As EventArgs)
-            IsFileModified = True
-        End Sub
     End Class
 End Namespace
