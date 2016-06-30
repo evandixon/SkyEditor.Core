@@ -124,6 +124,7 @@
     <Compile Include="IO\FileTypeDetectionResult.vb" />
     <Compile Include="IO\IDirectoryTypeDetector.vb" />
     <Compile Include="IO\IFileOpener.vb" />
+    <Compile Include="IO\IFileSaver.vb" />
     <Compile Include="IO\IFileTypeDetector.vb" />
     <Compile Include="IO\IOHelper.vb" />
     <Compile Include="IO\ObjectFile.vb" />
@@ -138,6 +139,7 @@
     <Compile Include="IO\ProjectNode.vb" />
     <Compile Include="IO\ProjectRemovedEventArgs.vb" />
     <Compile Include="IO\ProjectRemovingEventArgs.vb" />
+    <Compile Include="IO\SavableFileSaver.vb" />
     <Compile Include="IO\SolutionNode.vb" />
     <Compile Include="ISettingsProvider.vb" />
     <Compile Include="Language.fr.Designer.vb">

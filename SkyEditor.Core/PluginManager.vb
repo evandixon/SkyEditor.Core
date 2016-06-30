@@ -190,12 +190,14 @@ Public Class PluginManager
         RegisterTypeRegister(GetType(AnchorableViewModel).GetTypeInfo)
         RegisterTypeRegister(GetType(GenericViewModel).GetTypeInfo)
         RegisterTypeRegister(GetType(IFileOpener).GetTypeInfo)
+        RegisterTypeRegister(GetType(IFileSaver).GetTypeInfo)
 
 
         'Load types
         RegisterType(GetType(IFileTypeDetector).GetTypeInfo, GetType(DetectableFileTypeDetector).GetTypeInfo)
         RegisterType(GetType(IFileTypeDetector).GetTypeInfo, GetType(ObjectFileDetector).GetTypeInfo)
         RegisterType(GetType(IFileOpener).GetTypeInfo, GetType(OpenableFileOpener).GetTypeInfo)
+        RegisterType(GetType(IFileSaver).GetTypeInfo, GetType(SavableFileSaver).GetTypeInfo)
         RegisterType(GetType(ExtensionType).GetTypeInfo, GetType(PluginExtensionType).GetTypeInfo)
         RegisterType(GetType(Solution).GetTypeInfo, GetType(Solution).GetTypeInfo)
         RegisterType(GetType(Project).GetTypeInfo, GetType(Project).GetTypeInfo)
