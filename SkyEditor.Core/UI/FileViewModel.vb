@@ -156,6 +156,20 @@ Namespace UI
         End Function
 
         ''' <summary>
+        ''' Gets the default extension for the file when using <see cref="Save(String, PluginManager)"/>.
+        ''' </summary>
+        ''' <param name="manager">Instance of the current plugin manager.</param>
+        ''' <returns>The default extension for the file when using <see cref="Save(String, PluginManager)"/>, or null if either the file does not support Save As or there is no default extension.</returns>
+        Public Function GetDefaultExtension(manager As PluginManager) As String
+            Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSaveAs(File)).FirstOrDefault
+            If saver Is Nothing Then
+                Return Nothing
+            Else
+                Return saver.GetDefaultExtension(File)
+            End If
+        End Function
+
+        ''' <summary>
         ''' Gets the current view models for the given file, creating them if necessary.
         ''' </summary>
         ''' <returns>An IEnumerable of view models that support the given file's model.</returns>
