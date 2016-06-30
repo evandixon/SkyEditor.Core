@@ -367,8 +367,8 @@ Public Class IOUIManager
     ''' To open a file using a specific type as the model, use <see cref="OpenFile(String, TypeInfo)"/>.
     ''' 
     ''' When the file is closed, the underlying model will be disposed.</remarks>
-    Public Sub OpenFile(filename As String, autoDetectSelector As IOHelper.DuplicateMatchSelector)
-        Dim model = IOHelper.OpenObject(filename, autoDetectSelector, CurrentPluginManager)
+    Public Async Function OpenFile(filename As String, autoDetectSelector As IOHelper.DuplicateMatchSelector) As Task
+        Dim model = Await IOHelper.OpenObject(filename, autoDetectSelector, CurrentPluginManager)
 
         If Not (From o In OpenFiles Where o.File Is model).Any Then
             Dim wrapper = CreateViewModel(model)
@@ -377,7 +377,7 @@ Public Class IOUIManager
             FileDisposalSettings.Add(model, True)
             RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = True})
         End If
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Opens a file from the given filename.
@@ -390,8 +390,8 @@ Public Class IOUIManager
     ''' To open a file, auto-detecting the file type, use <see cref="OpenFile(String, IOHelper.DuplicateMatchSelector)"/>.
     ''' 
     ''' When the file is closed, the underlying model will be disposed.</remarks>
-    Public Sub OpenFile(filename As String, modelType As TypeInfo)
-        Dim model = IOHelper.OpenFile(filename, modelType, CurrentPluginManager)
+    Public Async Function OpenFile(filename As String, modelType As TypeInfo) As Task
+        Dim model = Await IOHelper.OpenFile(filename, modelType, CurrentPluginManager)
 
         If Not (From o In OpenFiles Where o.File Is model).Any Then
             Dim wrapper = CreateViewModel(model)
@@ -400,7 +400,7 @@ Public Class IOUIManager
             FileDisposalSettings.Add(model, True)
             RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = True})
         End If
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Closes the file
