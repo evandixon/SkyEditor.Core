@@ -416,6 +416,7 @@ Public Class IOUIManager
         End If
 
         If SelectedFile IsNot Nothing Then
+            out.Add(SelectedFile)
             out.Add(SelectedFile.File)
 
             If TypeOf SelectedFile.File Is GenericViewModel AndAlso DirectCast(SelectedFile.File, GenericViewModel).Model IsNot Nothing Then
@@ -446,14 +447,14 @@ Public Class IOUIManager
 
         'Add the selected file if supported
         If SelectedFile IsNot Nothing Then
-            'Add the view model if supported
-            If action.SupportsObject(SelectedFile.File) Then
-                targets.Add(SelectedFile.File)
+            'Add the file's view model if supported
+            If action.SupportsObject(SelectedFile) Then
+                targets.Add(SelectedFile)
             End If
 
-            'Add the underlying model if supported
-            If DirectCast(SelectedFile.File, GenericViewModel).Model IsNot Nothing AndAlso action.SupportsObject(DirectCast(SelectedFile.File, GenericViewModel).Model) Then
-                targets.Add(DirectCast(SelectedFile.File, GenericViewModel).Model)
+            'Add the model if supported
+            If action.SupportsObject(SelectedFile.File) Then
+                targets.Add(SelectedFile.File)
             End If
 
             'Add a view model for the current file if available
