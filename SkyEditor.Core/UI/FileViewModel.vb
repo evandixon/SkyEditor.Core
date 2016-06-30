@@ -111,10 +111,20 @@ Namespace UI
 #End Region
 
         ''' <summary>
+        ''' Tells the view models to update the underlying model
+        ''' </summary>
+        Private Sub ForceViewModelRefresh()
+            For Each item In ViewModels
+                item.UpdateModel(File)
+            Next
+        End Sub
+
+        ''' <summary>
         ''' Saves the current file.
         ''' </summary>
         ''' <param name="manager">Instance of the current plugin manager.</param>
         Public Sub Save(manager As PluginManager)
+            ForceViewModelRefresh()
             Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSave(File)).FirstOrDefault
             If saver Is Nothing Then
                 'If we can't find a saver that supports saving without a filename, use the explicit overload.
@@ -132,6 +142,7 @@ Namespace UI
         ''' <param name="filename">Full path of the destination file.</param>
         ''' <param name="manager">Instance of the current plugin manager.</param>
         Public Sub Save(filename As String, manager As PluginManager)
+            ForceViewModelRefresh()
             Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSaveAs(File)).First
             saver.Save(File, filename, manager.CurrentIOProvider)
             IsFileModified = False

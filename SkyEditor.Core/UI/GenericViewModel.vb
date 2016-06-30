@@ -62,6 +62,14 @@ Namespace UI
         Public Overridable Sub SetModel(model As Object)
             Me.Model = model
         End Sub
+
+        ''' <summary>
+        ''' Updates the model with the view model's current state
+        ''' </summary>
+        ''' <param name="model">Model to update</param>
+        Public Overridable Sub UpdateModel(model As Object)
+
+        End Sub
     End Class
 
     Public MustInherit Class GenericViewModel(Of T)
