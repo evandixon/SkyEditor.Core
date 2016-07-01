@@ -102,6 +102,8 @@
     <Compile Include="ConsoleCommands\DummyConsoleProvider.vb" />
     <Compile Include="ConsoleCommands\IConsoleProvider.vb" />
     <Compile Include="ConsoleCommands\InstallExtension.vb" />
+    <Compile Include="ConsoleCommands\UI\ViewFileIndex.vb" />
+    <Compile Include="ConsoleCommands\UI\ViewFiles.vb" />
     <Compile Include="Extensions\ExtensionHelper.vb" />
     <Compile Include="Extensions\ExtensionInstallResult.vb" />
     <Compile Include="Extensions\ExtensionType.vb" />
