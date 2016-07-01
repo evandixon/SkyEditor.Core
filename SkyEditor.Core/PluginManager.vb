@@ -233,25 +233,25 @@ Public Class PluginManager
             Next
         End If
 
-        'Check again to see if plugin loading is enabled.
-        'It's possible the core mod does not support this, yet still enabled it anyway.
-        If enablePluginLoading Then
+        ''Check again to see if plugin loading is enabled.
+        ''It's possible the core mod does not support this, yet still enabled it anyway.
+        'If enablePluginLoading Then
 
-            'Load the logical plugins
-            RaiseEvent PluginsLoading(Me, New EventArgs)
+        'Load the logical plugins
+        RaiseEvent PluginsLoading(Me, New EventArgs)
 
-            For Each item In Plugins
-                item.Load(Me)
-            Next
+        For Each item In Plugins
+            item.Load(Me)
+        Next
 
-            'Use reflection to fill the type registry
-            LoadTypes(Core.GetType.GetTypeInfo.Assembly)
-            For Each item In Assemblies
-                LoadTypes(item)
-            Next
+        'Use reflection to fill the type registry
+        LoadTypes(Core.GetType.GetTypeInfo.Assembly)
+        For Each item In Assemblies
+            LoadTypes(item)
+        Next
 
-            RaiseEvent PluginLoadComplete(Me, New EventArgs)
-        End If
+        RaiseEvent PluginLoadComplete(Me, New EventArgs)
+        'End If
 
         'Add the core plugin so we can see it in the credits
         Plugins.Add(Core)
@@ -294,28 +294,11 @@ Public Class PluginManager
         Dim pluginTypeInfo = pluginType.GetTypeInfo
         Dim pluginAssembly = pluginTypeInfo.Assembly
 
-        If Plugins.Count > 0 Then
-            For Each item In Plugins
-                If item.GetType.Equals(pluginType) Then
-                    'Then we already have this plugin loaded and should do nothing
-                Else
-                    targetPlugin.Load(Me)
-
-                    If Not Assemblies.Contains(pluginAssembly) Then
-                        Assemblies.Add(pluginAssembly)
-                    End If
-                    LoadTypes(pluginAssembly)
-                End If
-            Next
-        Else
+        If Not (From p In Plugins Where p.GetType.Equals(pluginType)).Any Then
             targetPlugin.Load(Me)
             If Not Assemblies.Contains(pluginAssembly) Then
                 Assemblies.Add(pluginAssembly)
             End If
-            LoadTypes(pluginAssembly)
-        End If
-
-        If Not Plugins.Any(Function(p As SkyEditorPlugin) ReflectionHelpers.IsOfType(p, pluginTypeInfo)) Then
             Plugins.Add(targetPlugin)
         End If
 
