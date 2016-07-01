@@ -230,14 +230,20 @@ Namespace UI
                         'Check to see if the 
                     ElseIf ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
                         'The object control is targeting a view model
-                        'Check to see if the view model supports the model
-                        Dim potentialViewModel As GenericViewModel = (From v In Manager.CurrentIOUIManager.GetViewModelsForModel(model)
-                                                                      Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)).FirstOrDefault
-                        If potentialViewModel IsNot Nothing Then
-                            'This view model supports our model
-                            isMatch = etab.SupportsObject(potentialViewModel)
-                            viewModel = potentialViewModel
-                            If isMatch Then Exit For
+
+                        'First, check to see if there's any view models for this model (i.e., is this an open file?)
+                        Dim viewmodelsForModel = Manager.CurrentIOUIManager.GetViewModelsForModel(model)
+
+                        'If there are, check to see if the target view model supports the model
+                        If viewmodelsForModel IsNot Nothing Then
+                            Dim potentialViewModel As GenericViewModel = (From v In Manager.CurrentIOUIManager.GetViewModelsForModel(model)
+                                                                          Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)).FirstOrDefault
+                            If potentialViewModel IsNot Nothing Then
+                                'This view model supports our model
+                                isMatch = etab.SupportsObject(potentialViewModel)
+                                viewModel = potentialViewModel
+                                If isMatch Then Exit For
+                            End If
                         End If
 
                     End If

@@ -23,6 +23,11 @@ Namespace UI
             'Test expected number of views
             Dim tabs = UIHelper.GetRefreshedTabs(Model, {GetType(Object)}, CurrentPluginManager)
             Assert.AreEqual(3, tabs.Count(), 0, "Expected 3 views: directly binding to model, binding to view model binding to model, binding to interface implemented by view model binding to model")
+
+            'Ensure it works when the model isn't an open file
+            Dim model2 As New TextFile
+            tabs = UIHelper.GetRefreshedTabs(model2, {GetType(Object)}, CurrentPluginManager)
+            Assert.AreEqual(1, tabs.Count(), 0, "Incorrect number of tabs for model that's not in IOUIManager.OpenFiles.  Expected 1 view: directly binding to model")
         End Sub
     End Class
 End Namespace
