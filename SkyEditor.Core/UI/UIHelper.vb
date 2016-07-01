@@ -208,6 +208,9 @@ Namespace UI
                         If viewmodelsForModel IsNot Nothing Then
                             availableViewModels = From v In viewmodelsForModel
                                                   Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)
+
+                        ElseIf TypeOf model Is FileViewModel Then
+                            availableViewModels = DirectCast(model, FileViewModel).GetViewModels(Manager)
                         End If
 
                         If availableViewModels IsNot Nothing AndAlso availableViewModels.Any Then
@@ -233,6 +236,10 @@ Namespace UI
 
                         'First, check to see if there's any view models for this model (i.e., is this an open file?)
                         Dim viewmodelsForModel = Manager.CurrentIOUIManager.GetViewModelsForModel(model)
+
+                        If viewmodelsForModel Is Nothing AndAlso TypeOf model Is FileViewModel Then
+                            viewmodelsForModel = DirectCast(model, FileViewModel).GetViewModels(Manager)
+                        End If
 
                         'If there are, check to see if the target view model supports the model
                         If viewmodelsForModel IsNot Nothing Then
