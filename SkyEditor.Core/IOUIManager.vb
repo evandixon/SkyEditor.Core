@@ -436,11 +436,11 @@ Public Class IOUIManager
     ''' <summary>
     ''' Gets the current view models for the model, creating them if necessary.
     ''' </summary>
-    ''' <param name="model">Model for which to get the view models.  Must be the model contained in an open file.</param>
-    ''' <returns>An IEnumerable of view models that support the given model.</returns>
+    ''' <param name="model">Model for which to get the view models.</param>
+    ''' <returns>An IEnumerable of view models that support the given model, or null if the model is not an open file.</returns>
     Public Function GetViewModelsForModel(model As Object) As IEnumerable(Of GenericViewModel)
-        Dim file = (From f In OpenFiles Where f.File Is model).First
-        Return file.GetViewModels(CurrentPluginManager)
+        Dim file = (From f In OpenFiles Where f.File Is model).FirstOrDefault
+        Return file?.GetViewModels(CurrentPluginManager)
     End Function
 
     ''' <summary>

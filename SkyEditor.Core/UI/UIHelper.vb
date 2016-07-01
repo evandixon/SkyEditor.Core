@@ -201,10 +201,16 @@ Namespace UI
                         'The target is an interface.  Check to see if there's a view model that implements it.
                         'Otherwise, check the model
 
-                        Dim availableViewModels = From v In Manager.CurrentIOUIManager.GetViewModelsForModel(model)
-                                                  Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)
+                        Dim viewmodelsForModel = Manager.CurrentIOUIManager.GetViewModelsForModel(model)
 
-                        If availableViewModels.Any Then
+                        Dim availableViewModels As IEnumerable(Of GenericViewModel) = Nothing
+
+                        If viewmodelsForModel IsNot Nothing Then
+                            availableViewModels = From v In viewmodelsForModel
+                                                  Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)
+                        End If
+
+                        If availableViewModels IsNot Nothing AndAlso availableViewModels.Any Then
                             'This view model fits the critera
                             Dim first = availableViewModels.First
                             isMatch = etab.SupportsObject(first)
@@ -215,7 +221,6 @@ Namespace UI
                             isMatch = etab.SupportsObject(model)
                             If isMatch Then Exit For
                         End If
-
 
                     ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
                         'The model is the same type as the target
