@@ -201,8 +201,8 @@ Public Class PluginManager
         RegisterType(GetType(ExtensionType).GetTypeInfo, GetType(PluginExtensionType).GetTypeInfo)
         RegisterType(GetType(Solution).GetTypeInfo, GetType(Solution).GetTypeInfo)
         RegisterType(GetType(Project).GetTypeInfo, GetType(Project).GetTypeInfo)
-        RegisterType(GetType(ConsoleCommand).GetTypeInfo, GetType(ConsoleCommands.UI.ViewFiles).GetTypeInfo)
-        RegisterType(GetType(ConsoleCommand).GetTypeInfo, GetType(ConsoleCommands.UI.ViewFileIndex).GetTypeInfo)
+        RegisterType(GetType(ConsoleCommandAsync).GetTypeInfo, GetType(ConsoleCommands.UI.ViewFiles).GetTypeInfo)
+        RegisterType(GetType(ConsoleCommandAsync).GetTypeInfo, GetType(ConsoleCommands.UI.ViewFileIndex).GetTypeInfo)
 
         'Load plugins, if enabled
         Dim enablePluginLoading = Core.IsPluginLoadingEnabled
