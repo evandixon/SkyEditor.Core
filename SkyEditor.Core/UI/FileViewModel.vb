@@ -9,6 +9,7 @@ Namespace UI
     ''' </summary>
     Public Class FileViewModel
         Implements INotifyPropertyChanged
+        Implements INotifyModified
 
         Public Sub New()
             IsFileModified = False
@@ -22,6 +23,8 @@ Namespace UI
 #Region "Events"
         Public Event CloseCommandExecuted(sender As Object, e As EventArgs)
         Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+        Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
+
         Protected Sub RaisePropertyChanged(e As PropertyChangedEventArgs)
             RaiseEvent PropertyChanged(Me, e)
         End Sub
@@ -82,6 +85,8 @@ Namespace UI
 
                     'Title is dependant on this property, so notify that it changed too
                     RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Title)))
+
+                    RaiseEvent Modified(Me, New EventArgs)
                 End If
             End Set
         End Property
