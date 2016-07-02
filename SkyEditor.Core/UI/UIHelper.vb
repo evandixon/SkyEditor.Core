@@ -201,19 +201,31 @@ Namespace UI
                         'The target is an interface.  Check to see if there's a view model that implements it.
                         'Otherwise, check the model
 
+                        Manager.CurrentConsoleProvider.WriteLine($"{etab.GetType.AssemblyQualifiedName} supports an interface.")
+
                         Dim viewmodelsForModel = Manager.CurrentIOUIManager.GetViewModelsForModel(model)
 
                         Dim availableViewModels As IEnumerable(Of GenericViewModel) = Nothing
 
                         If viewmodelsForModel IsNot Nothing Then
+                            Manager.CurrentConsoleProvider.WriteLine("All view models:")
+                            For Each item In viewmodelsForModel
+                                Manager.CurrentConsoleProvider.WriteLine(item.GetType.AssemblyQualifiedName)
+                            Next
+
                             availableViewModels = From v In viewmodelsForModel
                                                   Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)
 
+                            Manager.CurrentConsoleProvider.WriteLine("Available view models:")
+                            For Each item In availableViewModels
+                                Manager.CurrentConsoleProvider.WriteLine(item.GetType.AssemblyQualifiedName)
+                            Next
                         ElseIf TypeOf model Is FileViewModel Then
                             availableViewModels = DirectCast(model, FileViewModel).GetViewModels(Manager)
                         End If
 
                         If availableViewModels IsNot Nothing AndAlso availableViewModels.Any Then
+                            Manager.CurrentConsoleProvider.WriteLine("Available view models exist")
                             'This view model fits the critera
                             Dim first = availableViewModels.First
                             isMatch = etab.SupportsObject(first)
@@ -223,6 +235,8 @@ Namespace UI
                             'The model implements this interface
                             isMatch = etab.SupportsObject(model)
                             If isMatch Then Exit For
+                        Else
+                            Manager.CurrentConsoleProvider.WriteLine("Available view models do not exist")
                         End If
 
                     ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
