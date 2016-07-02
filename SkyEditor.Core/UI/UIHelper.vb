@@ -235,7 +235,6 @@ Namespace UI
                         isMatch = etab.SupportsObject(model)
                         If isMatch Then Exit For
 
-                        'Check to see if the 
                     ElseIf ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
                         'The object control is targeting a view model
 
@@ -246,10 +245,10 @@ Namespace UI
                             viewmodelsForModel = DirectCast(model, FileViewModel).GetViewModels(Manager)
                         End If
 
-                        'If there are, check to see if the target view model supports the model
+                        'If there are, check to see if the target view supports the view model
                         If viewmodelsForModel IsNot Nothing Then
                             Dim potentialViewModel As GenericViewModel = (From v In viewmodelsForModel
-                                                                          Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)).FirstOrDefault
+                                                                          Where ReflectionHelpers.IsOfType(v, info, False)).FirstOrDefault
                             If potentialViewModel IsNot Nothing Then
                                 'This view model supports our model
                                 isMatch = etab.SupportsObject(potentialViewModel)

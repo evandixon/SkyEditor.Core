@@ -32,7 +32,7 @@ Namespace UI
             'Ensure it works on a FileViewModel that is not an open file
             Dim fvm As New FileViewModel(New TextFile)
             tabs = UIHelper.GetRefreshedTabs(fvm, {GetType(Object)}, CurrentPluginManager)
-            Assert.AreEqual(1, tabs.Count(), 0, "Incorrect number of tabs for FileViewModel that's not in IOUIManager.OpenFiles.  Expected 1 view: directly binding to view model")
+            Assert.AreEqual(2, tabs.Count(), 0, "Incorrect number of tabs for FileViewModel that's not in IOUIManager.OpenFiles.  Expected 2 views: directly binding to view model, binding to interface implemented by view model")
         End Sub
     End Class
 End Namespace
