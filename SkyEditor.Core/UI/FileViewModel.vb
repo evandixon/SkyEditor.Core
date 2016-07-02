@@ -90,7 +90,9 @@ Namespace UI
         Public Overridable ReadOnly Property Title As String
             Get
                 Dim out As String
-                If TypeOf File Is INamed Then
+                If Not String.IsNullOrEmpty(Filename) Then
+                    out = Path.GetFileName(Filename)
+                ElseIf TypeOf File Is INamed Then
                     out = DirectCast(File, INamed).Name
                 Else
                     out = ReflectionHelpers.GetTypeFriendlyName(File.GetType)
