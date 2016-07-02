@@ -301,10 +301,6 @@ Public Class PluginManager
             Plugins.Add(targetPlugin)
 
             targetPlugin.Load(Me)
-
-            CurrentConsoleProvider.WriteLine("Loaded plugin: " & pluginType.AssemblyQualifiedName)
-        Else
-            CurrentConsoleProvider.WriteLine("Plugin already exists: " & pluginType.AssemblyQualifiedName)
         End If
 
         'Mark this plugin as a dependant
@@ -368,7 +364,6 @@ Public Class PluginManager
 
         If Not TypeRegistery.ContainsKey(Type) Then
             TypeRegistery.Add(Type, New List(Of TypeInfo))
-            CurrentConsoleProvider.WriteLine("Registered register " & Type.AssemblyQualifiedName)
         End If
     End Sub
 
@@ -400,7 +395,6 @@ Public Class PluginManager
         'Duplicates make can cause minor issues
         If Not TypeRegistery(Register).Contains(Type) Then
             TypeRegistery(Register).Add(Type)
-            CurrentConsoleProvider.WriteLine("Registered type " & Type.AssemblyQualifiedName)
         End If
 
         RaiseEvent TypeRegistered(Me, New TypeRegisteredEventArgs With {.BaseType = Register, .RegisteredType = Type})
