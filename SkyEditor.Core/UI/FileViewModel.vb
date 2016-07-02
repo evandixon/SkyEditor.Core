@@ -204,9 +204,6 @@ Namespace UI
                     If TypeOf vm Is ISavable Then
                         AddHandler DirectCast(vm, ISavable).FileSaved, AddressOf File_OnSaved
                     End If
-                    If TypeOf vm Is INotifyPropertyChanged Then
-                        AddHandler DirectCast(vm, INotifyPropertyChanged).PropertyChanged, AddressOf File_OnModified
-                    End If
                     If TypeOf vm Is INotifyModified Then
                         AddHandler DirectCast(vm, INotifyModified).Modified, AddressOf File_OnModified
                     End If
@@ -224,9 +221,6 @@ Namespace UI
                 For Each item In ViewModels
                     If TypeOf item Is ISavable Then
                         RemoveHandler DirectCast(item, ISavable).FileSaved, AddressOf File_OnSaved
-                    End If
-                    If TypeOf item Is INotifyPropertyChanged Then
-                        RemoveHandler DirectCast(item, INotifyPropertyChanged).PropertyChanged, AddressOf File_OnModified
                     End If
                     If TypeOf item Is INotifyModified Then
                         RemoveHandler DirectCast(item, INotifyModified).Modified, AddressOf File_OnModified
