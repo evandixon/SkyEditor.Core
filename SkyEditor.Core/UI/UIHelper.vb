@@ -201,16 +201,22 @@ Namespace UI
                         'The target is an interface.  Check to see if there's a view model that implements it.
                         'Otherwise, check the model
 
+                        'Get the view model for the model from the IOUI mangaer
                         Dim viewmodelsForModel = Manager.CurrentIOUIManager.GetViewModelsForModel(model)
 
-                        Dim availableViewModels As IEnumerable(Of GenericViewModel) = Nothing
-
-                        If viewmodelsForModel IsNot Nothing Then
-                            availableViewModels = From v In viewmodelsForModel
-                                                  Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)
-                        ElseIf TypeOf model Is FileViewModel Then
-                            availableViewModels = DirectCast(model, FileViewModel).GetViewModels(Manager)
+                        'If there are none, and the model is a FileViewModel, get the view models that way
+                        If viewmodelsForModel Is Nothing AndAlso TypeOf model Is FileViewModel Then
+                            viewmodelsForModel = DirectCast(model, FileViewModel).GetViewModels(Manager)
                         End If
+
+                        'If we still can't find anything, set viewModelsForModel to an empty enumerable
+                        If viewmodelsForModel Is Nothing Then
+                            viewmodelsForModel = {}
+                        End If
+
+                        'Of the view models that support the model, select the ones that the current view supports
+                        Dim availableViewModels = From v In viewmodelsForModel
+                                                  Where ReflectionHelpers.IsOfType(v, info, False)
 
                         If availableViewModels IsNot Nothing AndAlso availableViewModels.Any Then
                             'This view model fits the critera
