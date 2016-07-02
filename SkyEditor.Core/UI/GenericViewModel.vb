@@ -4,6 +4,14 @@ Imports SkyEditor.Core.Utilities
 Namespace UI
     Public MustInherit Class GenericViewModel
 
+        Public Sub New()
+        End Sub
+
+        Public Sub New(model As Object, manager As PluginManager)
+            SetPluginManager(manager)
+            SetModel(model)
+        End Sub
+
         ''' <summary>
         ''' The underlying model
         ''' </summary>
@@ -74,6 +82,14 @@ Namespace UI
 
     Public MustInherit Class GenericViewModel(Of T)
         Inherits GenericViewModel
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(model As T, manager As PluginManager)
+            SetPluginManager(manager)
+            SetModel(model)
+        End Sub
 
         Public Shadows Property Model As T
             Get
