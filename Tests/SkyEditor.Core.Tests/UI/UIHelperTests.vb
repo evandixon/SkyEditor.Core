@@ -28,6 +28,11 @@ Namespace UI
             Dim model2 As New TextFile
             tabs = UIHelper.GetRefreshedTabs(model2, {GetType(Object)}, CurrentPluginManager)
             Assert.AreEqual(1, tabs.Count(), 0, "Incorrect number of tabs for model that's not in IOUIManager.OpenFiles.  Expected 1 view: directly binding to model")
+
+            'Ensure it works on a FileViewModel that is not an open file
+            Dim fvm As New FileViewModel(New TextFile)
+            tabs = UIHelper.GetRefreshedTabs(fvm, {GetType(Object)}, CurrentPluginManager)
+            Assert.AreEqual(1, tabs.Count(), 0, "Incorrect number of tabs for FileViewModel that's not in IOUIManager.OpenFiles.  Expected 1 view: directly binding to view model")
         End Sub
     End Class
 End Namespace

@@ -242,7 +242,7 @@ Namespace UI
 
                         'If there are, check to see if the target view model supports the model
                         If viewmodelsForModel IsNot Nothing Then
-                            Dim potentialViewModel As GenericViewModel = (From v In Manager.CurrentIOUIManager.GetViewModelsForModel(model)
+                            Dim potentialViewModel As GenericViewModel = (From v In viewmodelsForModel
                                                                           Where ReflectionHelpers.IsOfType(v, info, False) AndAlso v.SupportsObject(model)).FirstOrDefault
                             If potentialViewModel IsNot Nothing Then
                                 'This view model supports our model
