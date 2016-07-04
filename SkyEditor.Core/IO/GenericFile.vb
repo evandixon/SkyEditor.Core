@@ -10,6 +10,8 @@ Namespace IO
         Implements IOnDisk
         Implements ISavableAs
 
+        Private _fileLock As New Object
+
 
 #Region "Constructors"
         ''' <summary>
@@ -547,6 +549,61 @@ Namespace IO
 #End Region
 
 #Region "Data Interaction"
+
+        ''' <summary>
+        ''' Reads all the data in the file.
+        ''' </summary>
+        ''' <returns>An array of byte containing the contents of the file.</returns>
+        ''' <remarks>Not recommended for larger files.  This function is thread-safe.</remarks>
+        Public Async Function Read() As Task(Of Byte())
+            If IsThreadSafe Then
+                Return RawData
+            Else
+                Return Await Task.Run(Function() As Byte()
+                                          SyncLock _fileLock
+                                              Return RawData
+                                          End SyncLock
+                                      End Function)
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Reads a byte from the file.
+        ''' </summary>
+        ''' <param name="index">Index from which to retrieve the byte.</param>
+        ''' <returns>A byte equal to the byte at the given index in the file.</returns>
+        ''' <remarks>This function is thread-safe.</remarks>
+        Public Async Function Read(index As Long) As Task(Of Byte)
+            If IsThreadSafe Then
+                Return RawData(index)
+            Else
+                Return Await Task.Run(Function() As Byte
+                                          SyncLock _fileLock
+                                              Return RawData(index)
+                                          End SyncLock
+                                      End Function)
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Reads a range of bytes from the file.
+        ''' </summary>
+        ''' <param name="index">Index from which to retrieve the range.</param>
+        ''' <param name="length">Length of the range.</param>
+        ''' <returns>An array of byte containing the data in the requested range.</returns>
+        ''' <remarks>This function is thread-safe.</remarks>
+        Public Async Function Read(index As Long, length As Long) As Task(Of Byte())
+            If IsThreadSafe Then
+                Return RawData(index, length)
+            Else
+                Return Await Task.Run(Function() As Byte()
+                                          SyncLock _fileLock
+                                              Return RawData(index, length)
+                                          End SyncLock
+                                      End Function)
+            End If
+        End Function
+
         ''' <summary>
         ''' Reads a UTF-16 string from the file.
         ''' </summary>
