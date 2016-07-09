@@ -58,7 +58,7 @@ Namespace Processes
                 p.StartInfo.FileName = Filename
                 p.StartInfo.Arguments = Arguments
                 p.StartInfo.RedirectStandardOutput = False
-                p.StartInfo.UseShellExecute = True
+                p.StartInfo.UseShellExecute = False
                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
                 p.StartInfo.CreateNoWindow = True
                 p.StartInfo.WorkingDirectory = Path.GetDirectoryName(Filename)
@@ -67,7 +67,9 @@ Namespace Processes
                 p.Start()
 
                 'Wait for the process to close
-                Await WaitForProcess(p).ConfigureAwait(False)
+                Await Task.Run(Sub()
+                                   p.WaitForExit()
+                               End Sub).ConfigureAwait(False)
             End Using
         End Function
 
