@@ -67,7 +67,7 @@ Namespace Processes
                 p.Start()
 
                 'Wait for the process to close
-                Await WaitForProcess(p)
+                Await WaitForProcess(p).ConfigureAwait(False)
             End Using
         End Function
 
