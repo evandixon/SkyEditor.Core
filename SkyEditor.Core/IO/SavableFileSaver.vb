@@ -9,6 +9,10 @@
             Return DirectCast(model, ISavableAs).GetDefaultExtension()
         End Function
 
+        Public Function GetSupportedExtensions(model As Object) As IEnumerable(Of String) Implements IFileSaver.GetSupportedExtensions
+            Return DirectCast(model, ISavableAs).GetSupportedExtensions
+        End Function
+
         Public Function Save(model As Object, provider As IOProvider) As Task Implements IFileSaver.Save
             DirectCast(model, ISavable).Save(provider)
             Return Task.FromResult(0)

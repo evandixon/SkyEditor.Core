@@ -28,4 +28,13 @@
             Next
         Next
     End Sub
+
+    <TestMethod> Public Sub GetIOFilterTest()
+        'Extensions without "*." are expected
+        CurrentIOUIManager.RegisterIOFilter("txt", "Text Files")
+        'But it'd be nice to support the "*." anyway
+        CurrentIOUIManager.RegisterIOFilter("*.bmp", "Bitmap Images")
+        Assert.AreEqual("Supported Files (Sky Editor Solution, Text Files, Bitmap Images)|*.skysln;*.txt;*.bmp|Sky Editor Solution (*.skysln)|*.skysln|Text Files (*.txt)|*.txt|Bitmap Images (*.bmp)|*.bmp|All Files (*.*)|*.*", CurrentIOUIManager.GetIOFilter())
+        Assert.AreEqual("Text Files (*.txt)|*.txt", CurrentIOUIManager.GetIOFilter({"txt"}, False, False))
+    End Sub
 End Class

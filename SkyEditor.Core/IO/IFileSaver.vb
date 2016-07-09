@@ -41,6 +41,13 @@
         ''' <param name="model">Model of which to determine the default extension.</param>
         ''' <returns>A string representing the default extension.</returns>
         Function GetDefaultExtension(model As Object) As String
+
+        ''' <summary>
+        ''' Gets the supported extensions for the given model when using Save As.
+        ''' </summary>
+        ''' <param name="model">Model of which to determine the supported extensions.</param>
+        ''' <returns>An IEnumerable that contains every extension that can be used to save this file.</returns>
+        Function GetSupportedExtensions(model As Object) As IEnumerable(Of String)
     End Interface
 
 End Namespace

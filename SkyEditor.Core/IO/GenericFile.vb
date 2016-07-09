@@ -691,7 +691,11 @@ Namespace IO
         ''' </summary>
         ''' <returns></returns>
         Public Overridable Function GetDefaultExtension() As String Implements ISavableAs.GetDefaultExtension
-            Return ""
+            Return Nothing
+        End Function
+
+        Public Overridable Function GetSupportedExtensions() As IEnumerable(Of String) Implements ISavableAs.GetSupportedExtensions
+            Return Nothing
         End Function
 
         Public Overrides Function ToString() As String
@@ -739,6 +743,7 @@ Namespace IO
             Dispose(True)
             GC.SuppressFinalize(Me)
         End Sub
+
 #End Region
 
     End Class

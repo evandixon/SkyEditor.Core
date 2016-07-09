@@ -191,4 +191,8 @@
   <data name="SkyEditorProjects" xml:space="preserve">
     <value>Sky Editor Projects</value>
   </data>
+  <data name="SupportedFiles" xml:space="preserve">
+    <value>Supported Files</value>
+    <comment>Used in Open IO Filter</comment>
+  </data>
 </root>

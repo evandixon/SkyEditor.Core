@@ -182,13 +182,27 @@ Namespace UI
         ''' Gets the default extension for the file when using <see cref="Save(String, PluginManager)"/>.
         ''' </summary>
         ''' <param name="manager">Instance of the current plugin manager.</param>
-        ''' <returns>The default extension for the file when using <see cref="Save(String, PluginManager)"/>, or null if either the file does not support Save As or there is no default extension.</returns>
+        ''' <returns>The default extension for the file when using <see cref="Save(String, PluginManager)"/>, or null if either the file does not support Save As, or there is no default extension.</returns>
         Public Function GetDefaultExtension(manager As PluginManager) As String
             Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSaveAs(File)).FirstOrDefault
             If saver Is Nothing Then
                 Return Nothing
             Else
                 Return saver.GetDefaultExtension(File)
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Gets the supported extensions for the file when using <see cref="Save(String, PluginManager)"/>.
+        ''' </summary>
+        ''' <param name="manager">Instance of the current plugin manager.</param>
+        ''' <returns>An IEnumerable of extensions that can be used for the file when using <see cref="Save(String, PluginManager)"/>, or null if either the file does not support Save As, or there are no supported extensions.</returns>
+        Public Function GetSupportedExtensions(manager As PluginManager) As IEnumerable(Of String)
+            Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSaveAs(File)).FirstOrDefault
+            If saver Is Nothing Then
+                Return Nothing
+            Else
+                Return saver.GetSupportedExtensions(File)
             End If
         End Function
 

@@ -80,6 +80,8 @@ Public Class IOUIManager
     End Sub
 #End Region
 
+#Region "Properties"
+
     ''' <summary>
     ''' Instance of the current plugin manager.
     ''' </summary>
@@ -241,57 +243,53 @@ Public Class IOUIManager
 
     Public Property RunningTasks As ObservableCollection(Of Task)
 
+#End Region
+
 #Region "Functions"
 
 #Region "IO Filters"
+
     ''' <summary>
-    ''' Gets the IO filters in a form Open and Save file dialogs can use.
+    ''' Gets the IO filter string for use with an OpenFileDialog or a SaveFileDialog.
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function IOFiltersString(Optional Filters As Dictionary(Of String, String) = Nothing, Optional IsSaveAs As Boolean = False) As String
-        If Filters Is Nothing Then
-            Filters = IOFilters
+    ''' <param name="filters">A collection containing the extensions to put in the string.</param>
+    ''' <param name="addSupportedFilesEntry">Whether or not to add a "Supported Files" entry to the filter.</param>
+    ''' <param name="allowAllFiles">Whether or not to add an "All Files" entry to the filters.</param>
+    ''' <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
+    Public Function GetIOFilter(filters As ICollection(Of String), addSupportedFilesEntry As Boolean, allowAllFiles As Boolean) As String
+        Dim fullFilter As New StringBuilder
+        Dim usableFilters = (From i In IOFilters Where filters.Contains(i.Key)).ToDictionary(Function(x) x.Key, Function(y) y.Value)
+
+        If addSupportedFilesEntry Then
+            fullFilter.Append(My.Resources.Language.SupportedFiles & " (" &
+                                    String.Join(", ", From i In usableFilters Select i.Value) & ")|" &
+                                    String.Join(";", From i In usableFilters Select "*." & i.Key.Trim("*").Trim(".")) & "|")
         End If
-        Dim listFilter As New StringBuilder
-        Dim supportedFilterName As String = ""
-        Dim supportedFilterExt As String = ""
-        If Filters IsNot Nothing Then
-            For Each item In Filters
-                listFilter.Append(String.Format("{0} ({1})|{1}|", item.Value, item.Key))
-                supportedFilterName &= item.Value & ", "
-                supportedFilterExt &= "" & item.Key & ";"
-            Next
-            Dim out = ""
-            If Not IsSaveAs Then
-                out &= String.Format("{0} ({1})|{1}", supportedFilterName.Trim(";"), supportedFilterExt.Trim(";"))
-            End If
-            out &= "|" & listFilter.ToString & "All Files (*.*)|*.*"
-            Return out.Trim("|")
-        Else
-            Return "All Files (*.*)|*.*"
+
+        fullFilter.Append(String.Join("|", From i In usableFilters Select String.Format("{0} ({1})|{1}", i.Value, "*." & i.Key.Trim("*").Trim("."))))
+
+        If allowAllFiles Then
+            fullFilter.Append("|" & My.Resources.Language.AllFiles & " (*.*)|*.*")
         End If
+
+        Return fullFilter.ToString
     End Function
 
     ''' <summary>
-    ''' Gets the IO filters in a form the Open and Save file dialogs can use, optimized for the Save file dialog.
+    ''' Gets the IO filter string for use with an OpenFileDialog or a SaveFileDialog.
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function IOFiltersStringSaveAs(DefaultExtension As String) As String
-        Dim ext As String = DefaultExtension
-        If IOFilters.ContainsKey(ext) Then
-            Dim filters As New Dictionary(Of String, String)
-            filters.Add(ext, IOFilters(ext))
-            For Each item In IOFilters
-                If Not filters.ContainsKey(item.Key) Then
-                    filters.Add(item.Key, item.Value)
-                End If
-            Next
-            Return IOFiltersString(filters, True)
-        Else
-            Return IOFiltersString()
-        End If
+    ''' <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
+    Public Function GetIOFilter() As String
+        Return GetIOFilter(IOFilters.Keys, True, True)
+    End Function
+
+    ''' <summary>
+    ''' Gets the IO filter string for use with an OpenFileDialog or a SaveFileDialog.
+    ''' </summary>
+    ''' <param name="filters">A collection containing the extensions to put in the string.</param>
+    ''' <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
+    Public Function GetIOFilter(filters As ICollection(Of String)) As String
+        Return GetIOFilter(filters, True, True)
     End Function
 
     ''' <summary>
