@@ -12,6 +12,13 @@ Namespace UI
             SetModel(model)
         End Sub
 
+#Region "Events"
+        Public Event MenuItemRefreshRequested(sender As Object, e As EventArgs)
+        Protected Sub RequestMenuItemRefresh()
+            RaiseEvent MenuItemRefreshRequested(Me, New EventArgs)
+        End Sub
+#End Region
+
         ''' <summary>
         ''' The underlying model
         ''' </summary>

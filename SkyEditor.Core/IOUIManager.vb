@@ -47,6 +47,12 @@ Public Class IOUIManager
         Next
     End Sub
 
+    Private Sub _selectedFile_MenuItemRefreshRequested(sender As Object, e As EventArgs) Handles _selectedFile.MenuItemRefreshRequested
+        For Each item In RootMenuItems
+            UpdateMenuItemVisibility(item)
+        Next
+    End Sub
+
     Private Sub _openFiles_CollectionChanged(sender As Object, e As NotifyCollectionChangedEventArgs) Handles _openFiles.CollectionChanged
         If e.NewItems IsNot Nothing Then
             For Each item As FileViewModel In e.NewItems
@@ -123,7 +129,7 @@ Public Class IOUIManager
             End If
         End Set
     End Property
-    Dim _selectedFile As FileViewModel
+    Private WithEvents _selectedFile As FileViewModel
 
     ''' <summary>
     ''' Gets or sets the currently selected view model (Anchorable or File)

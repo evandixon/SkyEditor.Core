@@ -24,9 +24,14 @@ Namespace UI
         Public Event CloseCommandExecuted(sender As Object, e As EventArgs)
         Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
         Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
+        Public Event MenuItemRefreshRequested(sender As Object, e As EventArgs)
 
         Protected Sub RaisePropertyChanged(e As PropertyChangedEventArgs)
             RaiseEvent PropertyChanged(Me, e)
+        End Sub
+
+        Private Sub OnMenuItemRefreshRequested(sender As Object, e As EventArgs)
+            RaiseEvent MenuItemRefreshRequested(sender, e)
         End Sub
 #End Region
 
@@ -207,6 +212,7 @@ Namespace UI
                     If TypeOf vm Is INotifyModified Then
                         AddHandler DirectCast(vm, INotifyModified).Modified, AddressOf File_OnModified
                     End If
+                    AddHandler vm.MenuItemRefreshRequested, AddressOf OnMenuItemRefreshRequested
                 Next
             End If
             Return ViewModels
@@ -225,6 +231,7 @@ Namespace UI
                     If TypeOf item Is INotifyModified Then
                         RemoveHandler DirectCast(item, INotifyModified).Modified, AddressOf File_OnModified
                     End If
+                    RemoveHandler item.MenuItemRefreshRequested, AddressOf OnMenuItemRefreshRequested
                 Next
                 ViewModels.Clear()
                 ViewModels = Nothing
