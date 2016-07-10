@@ -63,9 +63,17 @@ Namespace UI
                     End If
                     ResetViewModels()
 
+                    Dim originallyNull = (_file Is Nothing)
+
                     _file = value
 
-                    IsFileModified = False
+                    If originallyNull Then
+                        'If we're loading the file, it hasn't been modified
+                        IsFileModified = False
+                    Else
+                        'If the file is being replaced, it has been modified
+                        IsFileModified = True
+                    End If
 
                     If TypeOf _file Is ISavable Then
                         AddHandler DirectCast(_file, ISavable).FileSaved, AddressOf File_OnSaved
