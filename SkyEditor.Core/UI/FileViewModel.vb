@@ -55,9 +55,6 @@ Namespace UI
                     If TypeOf _file Is ISavable Then
                         RemoveHandler DirectCast(_file, ISavable).FileSaved, AddressOf File_OnSaved
                     End If
-                    If TypeOf _file Is INotifyPropertyChanged Then
-                        RemoveHandler DirectCast(_file, INotifyPropertyChanged).PropertyChanged, AddressOf File_OnModified
-                    End If
                     If TypeOf _file Is INotifyModified Then
                         RemoveHandler DirectCast(_file, INotifyModified).Modified, AddressOf File_OnModified
                     End If
@@ -77,9 +74,6 @@ Namespace UI
 
                     If TypeOf _file Is ISavable Then
                         AddHandler DirectCast(_file, ISavable).FileSaved, AddressOf File_OnSaved
-                    End If
-                    If TypeOf _file Is INotifyPropertyChanged Then
-                        AddHandler DirectCast(_file, INotifyPropertyChanged).PropertyChanged, AddressOf File_OnModified
                     End If
                     If TypeOf _file Is INotifyModified Then
                         AddHandler DirectCast(_file, INotifyModified).Modified, AddressOf File_OnModified
