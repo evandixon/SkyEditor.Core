@@ -23,27 +23,27 @@ Namespace Utilities
             Next
         End Sub
 
-        Private Shared Function GetAssemblyDependencies(SourceAssembly As Assembly) As List(Of String)
+        Private Shared Function GetAssemblyDependencies(sourceAssembly As Assembly, devDirectory As String) As List(Of String)
             Dim out As New List(Of String)
             Dim pluginExtension As New PluginExtensionType
-            Dim devAssemblyPaths = pluginExtension.GetDevDirectory
+            Dim devAssemblyPaths = Directory.GetFiles(devDirectory)
 
             'Get the Sky Editor Plugin's resource directory
-            Dim resourceDirectory = Path.Combine(Path.GetDirectoryName(SourceAssembly.Location), Path.GetFileNameWithoutExtension(SourceAssembly.Location))
+            Dim resourceDirectory = Path.Combine(Path.GetDirectoryName(sourceAssembly.Location), Path.GetFileNameWithoutExtension(sourceAssembly.Location))
             If Directory.Exists(resourceDirectory) Then
                 out.Add(resourceDirectory)
             End If
 
             'Get regional resources
-            Dim resourcesName = Path.GetFileNameWithoutExtension(SourceAssembly.Location) & ".resources.dll"
-            For Each item In Directory.GetDirectories(Path.GetDirectoryName(SourceAssembly.Location))
+            Dim resourcesName = Path.GetFileNameWithoutExtension(sourceAssembly.Location) & ".resources.dll"
+            For Each item In Directory.GetDirectories(Path.GetDirectoryName(sourceAssembly.Location))
                 If File.Exists(Path.Combine(item, resourcesName)) Then
                     out.Add(Path.Combine(item, resourcesName))
                 End If
             Next
 
             'Look at the dependencies
-            For Each reference In SourceAssembly.GetReferencedAssemblies
+            For Each reference In sourceAssembly.GetReferencedAssemblies
                 Dim isLocal As Boolean = False
                 'Try to find the filename of this reference
                 For Each source In devAssemblyPaths
@@ -62,7 +62,7 @@ Namespace Utilities
                     Dim q = (From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = reference.FullName).FirstOrDefault
 
                     If q IsNot Nothing Then
-                        out.AddRange(GetAssemblyDependencies(q))
+                        out.AddRange(GetAssemblyDependencies(q, devDirectory))
                     Else
                         'Then this reference isn't in the app domain.
                         'Let's try to find the assembly.
@@ -70,7 +70,7 @@ Namespace Utilities
                         For Each source In devAssemblyPaths
                             Dim name = AssemblyName.GetAssemblyName(source)
                             If reference.FullName = name.FullName Then
-                                out.AddRange(GetAssemblyDependencies(Assembly.LoadFrom(source)))
+                                out.AddRange(GetAssemblyDependencies(Assembly.LoadFrom(source), devDirectory))
                             End If
                         Next
                     End If
@@ -115,7 +115,13 @@ Namespace Utilities
                 ToCopy.Add(plgAssembly.Location)
 
                 'Try to detect dependencies.
-                For Each item In GetAssemblyDependencies(plgAssembly)
+                Dim devDir As String
+                If Directory.Exists(manager.ExtensionDirectory) Then
+                    devDir = manager.ExtensionDirectory
+                Else
+                    devDir = Path.GetDirectoryName(GetType(RedistributionHelpers).Assembly.Location)
+                End If
+                For Each item In GetAssemblyDependencies(plgAssembly, devDir)
                     If Not ToCopy.Contains(item) Then
                         ToCopy.Add(item)
                     End If
