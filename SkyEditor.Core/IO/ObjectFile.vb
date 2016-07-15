@@ -7,8 +7,8 @@ Namespace IO
         Implements iNamed
         Implements IOpenableFile
         Implements ISavableAs
-        Implements iOnDisk
-        Implements iCreatableFile
+        Implements IOnDisk
+        Implements ICreatableFile
         Implements IContainer(Of T)
         Private Class JsonContainer(Of U)
             Public Property ContainedObject As U
@@ -28,7 +28,7 @@ Namespace IO
             Me.OpenFileInternal(Filename)
         End Sub
 
-        Public Sub CreateFile(Name As String) Implements iCreatableFile.CreateFile
+        Public Sub CreateFile(Name As String) Implements ICreatableFile.CreateFile
             If ReflectionHelpers.CanCreateInstance(GetType(T).GetTypeInfo) Then
                 ContainedObject = ReflectionHelpers.CreateInstance(GetType(T).GetTypeInfo)
                 _name = Name
@@ -59,11 +59,11 @@ Namespace IO
 
         Public Property ContainedTypeName As String
 
-        Public Property Filename As String Implements iOnDisk.Filename
+        Public Property Filename As String Implements IOnDisk.Filename
 
         Public Property CurrentIOProvider As IOProvider
 
-        Public ReadOnly Property Name As String Implements iNamed.Name
+        Public ReadOnly Property Name As String Implements INamed.Name
             Get
                 If String.IsNullOrEmpty(Filename) Then
                     Return _name
@@ -75,7 +75,7 @@ Namespace IO
         Dim _name As String
 #End Region
 
-#Region "iSaveableFile support"
+#Region "ISaveable support"
 
         Public Sub Save(Filename As String, provider As IOProvider) Implements ISavableAs.Save
             Dim c As New JsonContainer(Of T)
@@ -89,7 +89,7 @@ Namespace IO
             Save(Me.Filename, provider)
         End Sub
 
-        Public Event FileSaved(sender As Object, e As EventArgs) Implements iSavable.FileSaved
+        Public Event FileSaved(sender As Object, e As EventArgs) Implements ISavable.FileSaved
         Protected Sub RaiseFileSaved(sender As Object, e As EventArgs)
             RaiseEvent FileSaved(sender, e)
         End Sub
@@ -105,7 +105,11 @@ Namespace IO
         End Function
 
         Public Overridable Function GetDefaultExtension() As String Implements ISavableAs.GetDefaultExtension
-            Return ""
+            Return Nothing
+        End Function
+
+        Public Function GetSupportedExtensions() As IEnumerable(Of String) Implements ISavableAs.GetSupportedExtensions
+            Return Nothing
         End Function
     End Class
 End Namespace

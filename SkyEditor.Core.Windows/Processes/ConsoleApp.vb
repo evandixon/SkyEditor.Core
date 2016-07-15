@@ -53,6 +53,26 @@ Namespace Processes
             p.Dispose()
         End Function
 
+        Public Shared Async Function RunProgramNoOutput(Filename As String, Arguments As String) As Task
+            Using p As New Process()
+                p.StartInfo.FileName = Filename
+                p.StartInfo.Arguments = Arguments
+                p.StartInfo.RedirectStandardOutput = False
+                p.StartInfo.UseShellExecute = False
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+                p.StartInfo.CreateNoWindow = True
+                p.StartInfo.WorkingDirectory = Path.GetDirectoryName(Filename)
+
+                'Start the process
+                p.Start()
+
+                'Wait for the process to close
+                Await Task.Run(Sub()
+                                   p.WaitForExit()
+                               End Sub).ConfigureAwait(False)
+            End Using
+        End Function
+
         ''' <summary>
         ''' Waits for the given process to exit.
         ''' </summary>

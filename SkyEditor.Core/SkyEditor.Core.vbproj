@@ -102,6 +102,8 @@
     <Compile Include="ConsoleCommands\DummyConsoleProvider.vb" />
     <Compile Include="ConsoleCommands\IConsoleProvider.vb" />
     <Compile Include="ConsoleCommands\InstallExtension.vb" />
+    <Compile Include="ConsoleCommands\UI\ViewFileIndex.vb" />
+    <Compile Include="ConsoleCommands\UI\ViewFiles.vb" />
     <Compile Include="Extensions\ExtensionHelper.vb" />
     <Compile Include="Extensions\ExtensionInstallResult.vb" />
     <Compile Include="Extensions\ExtensionType.vb" />
@@ -124,6 +126,7 @@
     <Compile Include="IO\FileTypeDetectionResult.vb" />
     <Compile Include="IO\IDirectoryTypeDetector.vb" />
     <Compile Include="IO\IFileOpener.vb" />
+    <Compile Include="IO\IFileSaver.vb" />
     <Compile Include="IO\IFileTypeDetector.vb" />
     <Compile Include="IO\IOHelper.vb" />
     <Compile Include="IO\ObjectFile.vb" />
@@ -138,6 +141,7 @@
     <Compile Include="IO\ProjectNode.vb" />
     <Compile Include="IO\ProjectRemovedEventArgs.vb" />
     <Compile Include="IO\ProjectRemovingEventArgs.vb" />
+    <Compile Include="IO\SavableFileSaver.vb" />
     <Compile Include="IO\SolutionNode.vb" />
     <Compile Include="ISettingsProvider.vb" />
     <Compile Include="Language.fr.Designer.vb">
@@ -203,8 +207,8 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\11\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

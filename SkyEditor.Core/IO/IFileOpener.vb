@@ -2,7 +2,7 @@
 
 Namespace IO
     ''' <summary>
-    ''' Creates an instance of fileType from the given filename.
+    ''' Creates a model from a file
     ''' </summary>
     Public Interface IFileOpener
         ''' <summary>

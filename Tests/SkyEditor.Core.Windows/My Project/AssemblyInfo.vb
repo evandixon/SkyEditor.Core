@@ -9,16 +9,16 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("SkyEditor.Core.Windows")>
-<Assembly: AssemblyDescription("Windows implementation of certain SkyEditor.Core classes.")>
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("SkyEditor.Core.Windows")> 
-<Assembly: AssemblyCopyright("Copyright ©  2016")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("SkyEditor.Core.Windows")>
+<Assembly: AssemblyCopyright("Copyright ©  2016")>
+<Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("15fa3755-372c-4ed8-9c09-1675ba60cca5")>
+<Assembly: Guid("826633e7-6245-40bc-b750-4a36e3a1c6e7")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("4.0.3.0")>
-<Assembly: AssemblyFileVersion("4.0.3.0")>
+<Assembly: AssemblyVersion("1.0.0.0")>
+<Assembly: AssemblyFileVersion("1.0.0.0")>

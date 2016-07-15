@@ -4,6 +4,21 @@ Imports SkyEditor.Core.Utilities
 Namespace UI
     Public MustInherit Class GenericViewModel
 
+        Public Sub New()
+        End Sub
+
+        Public Sub New(model As Object, manager As PluginManager)
+            SetPluginManager(manager)
+            SetModel(model)
+        End Sub
+
+#Region "Events"
+        Public Event MenuItemRefreshRequested(sender As Object, e As EventArgs)
+        Protected Sub RequestMenuItemRefresh()
+            RaiseEvent MenuItemRefreshRequested(Me, New EventArgs)
+        End Sub
+#End Region
+
         ''' <summary>
         ''' The underlying model
         ''' </summary>
@@ -62,10 +77,26 @@ Namespace UI
         Public Overridable Sub SetModel(model As Object)
             Me.Model = model
         End Sub
+
+        ''' <summary>
+        ''' Updates the model with the view model's current state
+        ''' </summary>
+        ''' <param name="model">Model to update</param>
+        Public Overridable Sub UpdateModel(model As Object)
+
+        End Sub
     End Class
 
     Public MustInherit Class GenericViewModel(Of T)
         Inherits GenericViewModel
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(model As T, manager As PluginManager)
+            SetPluginManager(manager)
+            SetModel(model)
+        End Sub
 
         Public Shadows Property Model As T
             Get
