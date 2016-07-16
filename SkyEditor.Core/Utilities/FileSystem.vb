@@ -27,7 +27,7 @@ Namespace Utilities
                                End Sub, files)
         End Function
 
-        Public Shared Async Function DeleteDirectoryContents(DirectoryName As String, provider As IOProvider) As Task
+        Public Shared Async Function DeleteDirectoryContents(DirectoryName As String, provider As IOProvider, Optional reCreateDirectoryAfterDelete As Boolean = True) As Task
             Dim f As New AsyncFor()
 
             'Delete the files (because recursive deletes sometimes fail
@@ -45,8 +45,10 @@ Namespace Utilities
                                           End While
                                       End Sub))
 
-            'Recreate the main directory
-            provider.CreateDirectory(DirectoryName)
+            If reCreateDirectoryAfterDelete Then
+                'Recreate the main directory
+                provider.CreateDirectory(DirectoryName)
+            End If
         End Function
 
         ''' <summary>
@@ -68,8 +70,7 @@ Namespace Utilities
         ''' <returns></returns>
         Public Shared Async Function DeleteDirectory(DirectoryName As String, provider As IOProvider) As Task
             If provider.DirectoryExists(DirectoryName) Then
-                Await DeleteDirectoryContents(DirectoryName, provider)
-                provider.DeleteDirectory(DirectoryName)
+                Await DeleteDirectoryContents(DirectoryName, provider, False)
             End If
         End Function
 

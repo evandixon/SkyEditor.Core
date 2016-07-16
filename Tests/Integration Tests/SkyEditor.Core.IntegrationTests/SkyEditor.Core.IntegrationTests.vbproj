@@ -80,7 +80,10 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PluginDefinition.vb" />
+    <Compile Include="NoPluginsPluginDefinition.vb" />
+    <Compile Include="StandardPluginDefinition.vb" />
+    <Compile Include="PluginManagerTests.vb" />
+    <Compile Include="Utilities\FileSystemTests.vb" />
     <Compile Include="Utilities\RedistributionHelpers.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

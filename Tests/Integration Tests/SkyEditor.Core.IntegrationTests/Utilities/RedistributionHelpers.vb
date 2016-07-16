@@ -5,16 +5,18 @@ Imports SkyEditor.Core.Windows.ConsoleCommands
 Namespace Utilities
     <TestClass()> Public Class RedistributionHelpers
 
+        Public Const IntegrationTestCategory = "Redistribution Integration Tests"
+
         Public Property CurrentPluginManager As PluginManager
 
         <TestInitialize>
         Public Sub InitTest()
             CurrentPluginManager = New PluginManager
-            CurrentPluginManager.LoadCore(New PluginDefinition)
+            CurrentPluginManager.LoadCore(New StandardPluginDefinition)
         End Sub
 
         <TestMethod()>
-        <TestCategory(PluginDefinition.IntegrationTestCategory)>
+        <TestCategory(IntegrationTestCategory)>
         Public Sub GeneratePluginExtensions()
             Dim consoleCommand As New GeneratePluginExtensions
             consoleCommand.CurrentPluginManager = CurrentPluginManager

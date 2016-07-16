@@ -2,10 +2,8 @@
 Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.Windows.CoreMods
 
-Public Class PluginDefinition
+Public Class StandardPluginDefinition
     Inherits WindowsCoreSkyEditorPlugin
-
-    Public Const IntegrationTestCategory = "Integration Tests"
 
     Public Overrides ReadOnly Property Credits As String
         Get
