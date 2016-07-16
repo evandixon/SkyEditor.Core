@@ -23,65 +23,6 @@ Namespace Utilities
             Next
         End Sub
 
-        Private Shared Function GetAssemblyDependencies(sourceAssembly As Assembly, devDirectory As String) As List(Of String)
-            Dim out As New List(Of String)
-            Dim pluginExtension As New PluginExtensionType
-            Dim devAssemblyPaths As New List(Of String)
-            devAssemblyPaths.AddRange(Directory.GetFiles(devDirectory, "*.dll"))
-            devAssemblyPaths.AddRange(Directory.GetFiles(devDirectory, "*.exe"))
-
-            'Get the Sky Editor Plugin's resource directory
-            Dim resourceDirectory = Path.Combine(Path.GetDirectoryName(sourceAssembly.Location), Path.GetFileNameWithoutExtension(sourceAssembly.Location))
-            If Directory.Exists(resourceDirectory) Then
-                out.Add(resourceDirectory)
-            End If
-
-            'Get regional resources
-            Dim resourcesName = Path.GetFileNameWithoutExtension(sourceAssembly.Location) & ".resources.dll"
-            For Each item In Directory.GetDirectories(Path.GetDirectoryName(sourceAssembly.Location))
-                If File.Exists(Path.Combine(item, resourcesName)) Then
-                    out.Add(Path.Combine(item, resourcesName))
-                End If
-            Next
-
-            'Look at the dependencies
-            For Each reference In sourceAssembly.GetReferencedAssemblies
-                Dim isLocal As Boolean = False
-                'Try to find the filename of this reference
-                For Each source In devAssemblyPaths
-                    Dim name = AssemblyName.GetAssemblyName(source)
-                    If reference.Name = name.Name Then
-                        If Not out.Contains(source) Then
-                            out.Add(source)
-                            isLocal = True
-                            Exit For
-                        End If
-                    End If
-                Next
-
-                If isLocal Then
-                    'Try to find the references of this reference
-                    Dim q = (From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = reference.FullName).FirstOrDefault
-
-                    If q IsNot Nothing Then
-                        out.AddRange(GetAssemblyDependencies(q, devDirectory))
-                    Else
-                        'Then this reference isn't in the app domain.
-                        'Let's try to find the assembly.
-                        'Todo: it would be optimal to do this in another Appdomain, but since this assembly would be loaded if needed, there's no real harm
-                        For Each source In devAssemblyPaths
-                            Dim name = AssemblyName.GetAssemblyName(source)
-                            If reference.FullName = name.FullName Then
-                                out.AddRange(GetAssemblyDependencies(Assembly.LoadFrom(source), devDirectory))
-                            End If
-                        Next
-                    End If
-                End If
-            Next
-
-            Return out
-        End Function
-
         ''' <summary>
         ''' Packs the given plugin into a zip file.
         ''' </summary>
@@ -126,7 +67,7 @@ Namespace Utilities
                 ToCopy.Add(plgAssembly.Location)
 
                 'Try to detect dependencies.
-                For Each item In GetAssemblyDependencies(plgAssembly, devDir)
+                For Each item In WindowsReflectionHelpers.GetAssemblyDependencies(plgAssembly)
                     If Not ToCopy.Contains(item) Then
                         ToCopy.Add(item)
                     End If
