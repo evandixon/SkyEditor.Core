@@ -12,13 +12,17 @@ Namespace Extensions
         ''' The user-friendly name of the extension type.
         ''' </summary>
         ''' <returns></returns>
-        Public MustOverride ReadOnly Property Name As String Implements IExtensionCollection.Name
+        Public MustOverride Function GetName() As Task(Of String) Implements IExtensionCollection.GetName
 
         ''' <summary>
         ''' Gets or sets the directory the ExtensionType stores extensions in.
         ''' </summary>
         ''' <returns></returns>
-        Public Property RootExtensionDirectory As String
+        Public ReadOnly Property RootExtensionDirectory As String
+            Get
+                Return CurrentPluginManager.ExtensionDirectory
+            End Get
+        End Property
 
         Public Property CurrentPluginManager As PluginManager
 
@@ -88,7 +92,7 @@ Namespace Extensions
         End Function
 
         Public Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
-            Throw New NotImplementedException
+            Throw New NotSupportedException
         End Function
     End Class
 End Namespace

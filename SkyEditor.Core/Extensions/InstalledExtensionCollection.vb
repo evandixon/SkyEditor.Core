@@ -6,11 +6,9 @@ Namespace Extensions
     Public Class InstalledExtensionCollection
         Implements IExtensionCollection
 
-        Public ReadOnly Property Name As String Implements IExtensionCollection.Name
-            Get
-                Return "Installed Extensions"
-            End Get
-        End Property
+        Public Function GetName() As Task(Of String) Implements IExtensionCollection.GetName
+            Return Task.FromResult("Installed Extensions")
+        End Function
 
         Public Function GetChildCollections(manager As Core.PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
             Dim out As IEnumerable(Of IExtensionCollection) = manager.GetRegisteredObjects(Of ExtensionType)

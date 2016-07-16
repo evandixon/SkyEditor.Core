@@ -71,6 +71,15 @@
   <ItemGroup>
     <Compile Include="ConsoleCommands\DistPrep.vb" />
     <Compile Include="ConsoleCommands\GeneratePluginExtensions.vb" />
+    <Compile Include="Extensions\Online\OnlineExtensionCollection.vb" />
+    <Compile Include="Extensions\Online\OnlineExtensionInfo.vb" />
+    <Compile Include="Extensions\Online\RootCollectionResponse.vb" />
+    <Compile Include="SettingNames.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SettingNames.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsExtension.vb" />
     <Compile Include="Utilities\AssemblyReflectionManager.vb" />
     <Compile Include="Utilities\AssemblyReflectionProxy.vb" />
     <Compile Include="CoreMods\ConsoleCoreMod.vb" />
@@ -117,6 +126,11 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingNames.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>SettingNames.Designer.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

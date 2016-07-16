@@ -8,11 +8,9 @@ Namespace Extensions
     Public Class PluginExtensionType
         Inherits ExtensionType
 
-        Public Overrides ReadOnly Property Name As String
-            Get
-                Return "Plugins"
-            End Get
-        End Property
+        Public Overrides Function GetName() As Task(Of String)
+            Return Task.FromResult("Plugins")
+        End Function
 
         Protected Overrides ReadOnly Property InternalName As String
             Get
