@@ -23,4 +23,10 @@ Public Class StandardPluginDefinition
         End Get
     End Property
 
+    Public Overrides Sub Load(manager As PluginManager)
+        MyBase.Load(manager)
+
+        manager.LoadRequiredPlugin(New SkyEditor.Core.Tests.TestComponents.TestCoreMod, Me)
+    End Sub
+
 End Class

@@ -20,7 +20,7 @@ Namespace Utilities
         Public Sub GeneratePluginExtensions()
             Dim consoleCommand As New GeneratePluginExtensions
             consoleCommand.CurrentPluginManager = CurrentPluginManager
-            consoleCommand.MainAsync({}).Wait()
+            consoleCommand.MainAsync({"-dependant"}).Wait()
 
             'Todo: assert
         End Sub

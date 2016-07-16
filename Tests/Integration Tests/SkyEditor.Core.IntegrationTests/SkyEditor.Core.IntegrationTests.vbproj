@@ -129,6 +129,10 @@
       <Project>{6f869961-8d92-4fb1-9680-a1d5c6938350}</Project>
       <Name>SkyEditor.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\SkyEditor.Core.Tests\SkyEditor.Core.Tests.vbproj">
+      <Project>{2a654374-1ace-4907-8416-9c31d13deed8}</Project>
+      <Name>SkyEditor.Core.Tests</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
