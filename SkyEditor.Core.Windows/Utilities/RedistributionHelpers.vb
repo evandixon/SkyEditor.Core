@@ -26,7 +26,9 @@ Namespace Utilities
         Private Shared Function GetAssemblyDependencies(sourceAssembly As Assembly, devDirectory As String) As List(Of String)
             Dim out As New List(Of String)
             Dim pluginExtension As New PluginExtensionType
-            Dim devAssemblyPaths = Directory.GetFiles(devDirectory)
+            Dim devAssemblyPaths As New List(Of String)
+            devAssemblyPaths.AddRange(Directory.GetFiles(devDirectory, "*.dll"))
+            devAssemblyPaths.AddRange(Directory.GetFiles(devDirectory, "*.exe"))
 
             'Get the Sky Editor Plugin's resource directory
             Dim resourceDirectory = Path.Combine(Path.GetDirectoryName(sourceAssembly.Location), Path.GetFileNameWithoutExtension(sourceAssembly.Location))
@@ -89,6 +91,14 @@ Namespace Utilities
         Public Shared Async Function PackPlugins(Plugins As IEnumerable(Of SkyEditorPlugin), DestinationFilename As String, Info As ExtensionInfo, manager As PluginManager) As Task
             Dim tempDir = Path.Combine(Environment.CurrentDirectory, "PackageTemp" & Guid.NewGuid.ToString)
             Dim ToCopy As New List(Of String)
+
+            Dim devDir As String
+            If Directory.Exists(manager.ExtensionDirectory) Then
+                devDir = manager.ExtensionDirectory
+            Else
+                devDir = Path.GetDirectoryName(GetType(RedistributionHelpers).Assembly.Location)
+            End If
+
             For Each plugin In Plugins
                 Dim plgAssembly = plugin.GetType.Assembly
                 Dim filename = Path.GetFileNameWithoutExtension(plgAssembly.Location)
@@ -115,12 +125,6 @@ Namespace Utilities
                 ToCopy.Add(plgAssembly.Location)
 
                 'Try to detect dependencies.
-                Dim devDir As String
-                If Directory.Exists(manager.ExtensionDirectory) Then
-                    devDir = manager.ExtensionDirectory
-                Else
-                    devDir = Path.GetDirectoryName(GetType(RedistributionHelpers).Assembly.Location)
-                End If
                 For Each item In GetAssemblyDependencies(plgAssembly, devDir)
                     If Not ToCopy.Contains(item) Then
                         ToCopy.Add(item)
@@ -132,7 +136,11 @@ Namespace Utilities
             Await Core.Utilities.FileSystem.ReCreateDirectory(tempDir, manager.CurrentIOProvider)
             For Each filePath In ToCopy
                 If File.Exists(filePath) Then
-                    File.Copy(filePath, filePath.Replace(Path.GetDirectoryName(filePath), tempDir), True)
+                    Dim dest = filePath.Replace(devDir, tempDir)
+                    If Not Directory.Exists(Path.GetDirectoryName(dest)) Then
+                        Directory.CreateDirectory(Path.GetDirectoryName(dest))
+                    End If
+                    File.Copy(filePath, dest, True)
                 Else
                     'It's probably a directory.
                     If Directory.Exists(filePath) Then
