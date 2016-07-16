@@ -16,6 +16,7 @@ Public Class PluginManager
         Me.FailedPluginLoads = New List(Of String)
         Me.Assemblies = New List(Of Assembly)
         Me.DependantPlugins = New Dictionary(Of SkyEditorPlugin, List(Of SkyEditorPlugin))
+        Me.DependantPluginLoadingQueue = New Queue(Of SkyEditorPlugin)
     End Sub
 #End Region
 
@@ -41,6 +42,12 @@ Public Class PluginManager
     ''' </summary>
     ''' <returns></returns>
     Protected Property DependantPlugins As Dictionary(Of SkyEditorPlugin, List(Of SkyEditorPlugin))
+
+    ''' <summary>
+    ''' Queue of dependant plugins that need to be loaded.
+    ''' </summary>
+    ''' <returns></returns>
+    Private Property DependantPluginLoadingQueue As Queue(Of SkyEditorPlugin)
 
     ''' <summary>
     ''' Contains the assemblies that contain plugin information.
@@ -234,7 +241,8 @@ Public Class PluginManager
         Next
 
         'Load dependant plugins
-        For Each item In DependantPlugins.Keys
+        While DependantPluginLoadingQueue.Count > 0
+            Dim item = DependantPluginLoadingQueue.Dequeue
             Dim pluginType = item.GetType
             Dim pluginTypeInfo = pluginType.GetTypeInfo
             Dim pluginAssembly = pluginTypeInfo.Assembly
@@ -247,7 +255,7 @@ Public Class PluginManager
 
                 item.Load(Me)
             End If
-        Next
+        End While
 
         'Use reflection to fill the type registry
         LoadTypes(Core.GetType.GetTypeInfo.Assembly)
@@ -302,6 +310,7 @@ Public Class PluginManager
         If Not DependantPlugins(targetPlugin).Contains(dependantPlugin) Then
             DependantPlugins(targetPlugin).Add(dependantPlugin)
         End If
+        DependantPluginLoadingQueue.Enqueue(targetPlugin)
     End Sub
 
     ''' <summary>
