@@ -15,7 +15,7 @@ Public Class PluginManager
         Me.TypeInstances = New Dictionary(Of TypeInfo, Object)
         Me.FailedPluginLoads = New List(Of String)
         Me.Assemblies = New List(Of Assembly)
-        Me.DependantPlugins = New Dictionary(Of Assembly, List(Of Assembly))
+        Me.DependantPlugins = New Dictionary(Of SkyEditorPlugin, List(Of SkyEditorPlugin))
     End Sub
 #End Region
 
@@ -36,11 +36,11 @@ Public Class PluginManager
     Public Property ExtensionDirectory As String
 
     ''' <summary>
-    ''' Matches plugin assemblies (key) to assemblies that depend on that assembly (value).
-    ''' If an assembly is a key, it is manually loaded by each of the assemblies in the value.
+    ''' Matches plugins (key) to plugins that depend on that plugin (value).
+    ''' If a plugin is a key, it is manually loaded by each of the plugins in the value.
     ''' </summary>
     ''' <returns></returns>
-    Protected Property DependantPlugins As Dictionary(Of Assembly, List(Of Assembly))
+    Protected Property DependantPlugins As Dictionary(Of SkyEditorPlugin, List(Of SkyEditorPlugin))
 
     ''' <summary>
     ''' Contains the assemblies that contain plugin information.
@@ -152,24 +152,18 @@ Public Class PluginManager
         CurrentIOUIManager = Core.GetIOUIManager(Me)
 
         'Delete files and directories scheduled for deletion
-        Dim deleteTasks As New List(Of Task)
         '-Files
         For Each item In CurrentSettingsProvider.GetFilesScheduledForDeletion
-            'This doesn't really need to be asynchronous, but since the directory deletes are async, why not?
-            deleteTasks.Add(Task.Run(New Action(Sub()
-                                                    FileSystem.DeleteFile(item, CurrentIOProvider)
-                                                    CurrentSettingsProvider.UncheduleFileForDeletion(item)
-                                                End Sub)))
+            FileSystem.DeleteFile(item, CurrentIOProvider)
+            CurrentSettingsProvider.UncheduleFileForDeletion(item)
+            CurrentSettingsProvider.Save(CurrentIOProvider)
         Next
         '-Directories
         For Each item In CurrentSettingsProvider.GetDirectoriesScheduledForDeletion
-            deleteTasks.Add(Task.Run(Async Function() As Task
-                                         Await FileSystem.DeleteDirectory(item, CurrentIOProvider)
-                                         CurrentSettingsProvider.UncheduleDirectoryForDeletion(item)
-                                     End Function))
+            Await FileSystem.DeleteDirectory(item, CurrentIOProvider).ConfigureAwait(False)
+            CurrentSettingsProvider.UncheduleDirectoryForDeletion(item)
+            CurrentSettingsProvider.Save(CurrentIOProvider)
         Next
-
-        Await Task.WhenAll(deleteTasks)
 
         'Load the provided core
         Me.CoreModAssembly = Core.GetType.GetTypeInfo.Assembly
@@ -178,31 +172,30 @@ Public Class PluginManager
         ExtensionDirectory = Core.GetExtensionDirectory
 
         'Load type registers
-        RegisterTypeRegister(GetType(ExtensionType).GetTypeInfo)
-        RegisterTypeRegister(GetType(Solution).GetTypeInfo)
-        RegisterTypeRegister(GetType(Project).GetTypeInfo)
-        RegisterTypeRegister(GetType(ICreatableFile).GetTypeInfo)
-        RegisterTypeRegister(GetType(IOpenableFile).GetTypeInfo)
-        RegisterTypeRegister(GetType(IDetectableFileType).GetTypeInfo)
-        RegisterTypeRegister(GetType(IDirectoryTypeDetector).GetTypeInfo)
-        RegisterTypeRegister(GetType(IFileTypeDetector).GetTypeInfo)
-        RegisterTypeRegister(GetType(MenuAction).GetTypeInfo)
-        RegisterTypeRegister(GetType(AnchorableViewModel).GetTypeInfo)
-        RegisterTypeRegister(GetType(GenericViewModel).GetTypeInfo)
-        RegisterTypeRegister(GetType(IFileOpener).GetTypeInfo)
-        RegisterTypeRegister(GetType(IFileSaver).GetTypeInfo)
-
+        RegisterTypeRegister(Of ExtensionType)()
+        RegisterTypeRegister(Of Solution)()
+        RegisterTypeRegister(Of Project)()
+        RegisterTypeRegister(Of ICreatableFile)()
+        RegisterTypeRegister(Of IOpenableFile)()
+        RegisterTypeRegister(Of IDetectableFileType)()
+        RegisterTypeRegister(Of IDirectoryTypeDetector)()
+        RegisterTypeRegister(Of IFileTypeDetector)()
+        RegisterTypeRegister(Of MenuAction)()
+        RegisterTypeRegister(Of AnchorableViewModel)()
+        RegisterTypeRegister(Of GenericViewModel)()
+        RegisterTypeRegister(Of IFileOpener)()
+        RegisterTypeRegister(Of IFileSaver)()
 
         'Load types
-        RegisterType(GetType(IFileTypeDetector).GetTypeInfo, GetType(DetectableFileTypeDetector).GetTypeInfo)
-        RegisterType(GetType(IFileTypeDetector).GetTypeInfo, GetType(ObjectFileDetector).GetTypeInfo)
-        RegisterType(GetType(IFileOpener).GetTypeInfo, GetType(OpenableFileOpener).GetTypeInfo)
-        RegisterType(GetType(IFileSaver).GetTypeInfo, GetType(SavableFileSaver).GetTypeInfo)
-        RegisterType(GetType(ExtensionType).GetTypeInfo, GetType(PluginExtensionType).GetTypeInfo)
-        RegisterType(GetType(Solution).GetTypeInfo, GetType(Solution).GetTypeInfo)
-        RegisterType(GetType(Project).GetTypeInfo, GetType(Project).GetTypeInfo)
-        RegisterType(GetType(ConsoleCommandAsync).GetTypeInfo, GetType(ConsoleCommands.UI.ViewFiles).GetTypeInfo)
-        RegisterType(GetType(ConsoleCommandAsync).GetTypeInfo, GetType(ConsoleCommands.UI.ViewFileIndex).GetTypeInfo)
+        RegisterType(Of IFileTypeDetector, DetectableFileTypeDetector)()
+        RegisterType(Of IFileTypeDetector, ObjectFileDetector)()
+        RegisterType(Of IFileOpener, OpenableFileOpener)()
+        RegisterType(Of IFileSaver, SavableFileSaver)()
+        RegisterType(Of ExtensionType, PluginExtensionType)()
+        RegisterType(Of Solution, Solution)()
+        RegisterType(Of Project, Project)()
+        RegisterType(Of ConsoleCommandAsync, ConsoleCommands.UI.ViewFiles)()
+        RegisterType(Of ConsoleCommandAsync, ConsoleCommands.UI.ViewFileIndex)()
 
         'Load plugins, if enabled
         Dim enablePluginLoading = Core.IsPluginLoadingEnabled
@@ -233,15 +226,27 @@ Public Class PluginManager
             Next
         End If
 
-        ''Check again to see if plugin loading is enabled.
-        ''It's possible the core mod does not support this, yet still enabled it anyway.
-        'If enablePluginLoading Then
-
         'Load the logical plugins
         RaiseEvent PluginsLoading(Me, New EventArgs)
 
         For Each item In Plugins
             item.Load(Me)
+        Next
+
+        'Load dependant plugins
+        For Each item In DependantPlugins.Keys
+            Dim pluginType = item.GetType
+            Dim pluginTypeInfo = pluginType.GetTypeInfo
+            Dim pluginAssembly = pluginTypeInfo.Assembly
+
+            If Not (From p In Plugins Where p.GetType.Equals(pluginType)).Any Then
+                If Not Assemblies.Contains(pluginAssembly) Then
+                    Assemblies.Add(pluginAssembly)
+                End If
+                Plugins.Add(item)
+
+                item.Load(Me)
+            End If
         Next
 
         'Use reflection to fill the type registry
@@ -251,11 +256,9 @@ Public Class PluginManager
         Next
 
         RaiseEvent PluginLoadComplete(Me, New EventArgs)
-        'End If
 
         'Add the core plugin so we can see it in the credits
         Plugins.Add(Core)
-
     End Function
 
     ''' <summary>
@@ -290,26 +293,14 @@ Public Class PluginManager
     ''' <param name="targetPlugin">The plugin to load.</param>
     ''' <param name="dependantPlugin">The plugin that requires the load.</param>
     Public Overridable Sub LoadRequiredPlugin(targetPlugin As SkyEditorPlugin, dependantPlugin As SkyEditorPlugin)
-        Dim pluginType = targetPlugin.GetType
-        Dim pluginTypeInfo = pluginType.GetTypeInfo
-        Dim pluginAssembly = pluginTypeInfo.Assembly
-
-        If Not (From p In Plugins Where p.GetType.Equals(pluginType)).Any Then
-            If Not Assemblies.Contains(pluginAssembly) Then
-                Assemblies.Add(pluginAssembly)
-            End If
-            Plugins.Add(targetPlugin)
-
-            targetPlugin.Load(Me)
-        End If
-
-        'Mark this plugin as a dependant
-        If Not DependantPlugins.ContainsKey(pluginAssembly) Then
-            DependantPlugins.Add(pluginAssembly, New List(Of Assembly))
+        'Mark this plugin as a dependant, will be loaded by plugin engine later
+        'Because loading takes place in a For Each loop iterating through Plugins, we cannot load plugins here, because that would change the collection.
+        If Not DependantPlugins.ContainsKey(targetPlugin) Then
+            DependantPlugins.Add(targetPlugin, New List(Of SkyEditorPlugin))
         End If
         Dim caller = dependantPlugin.GetType.GetTypeInfo.Assembly
-        If Not DependantPlugins(pluginAssembly).Contains(caller) Then
-            DependantPlugins(pluginAssembly).Add(caller)
+        If Not DependantPlugins(targetPlugin).Contains(dependantPlugin) Then
+            DependantPlugins(targetPlugin).Add(dependantPlugin)
         End If
     End Sub
 
@@ -344,7 +335,7 @@ Public Class PluginManager
     ''' <param name="Assembly">Assembly in question</param>
     ''' <returns></returns>
     Public Function IsAssemblyDependant(Assembly As Assembly) As Boolean
-        Return DependantPlugins.ContainsKey(Assembly)
+        Return DependantPlugins.Keys.Where(Function(x) x.GetType.GetTypeInfo.Assembly.Equals(Assembly)).Any()
     End Function
 
 #End Region
@@ -352,19 +343,26 @@ Public Class PluginManager
 #Region "Registration"
     ''' <summary>
     ''' Adds the given type to the type registry.
-    ''' After plugins are loaded, any type that inherits or implements the given Type can be easily found.
-    ''' 
-    ''' If the type is already in the type registry, nothing will be done.
     ''' </summary>
-    ''' <param name="Type"></param>
-    Public Sub RegisterTypeRegister(Type As TypeInfo)
-        If Type Is Nothing Then
-            Throw New ArgumentNullException(NameOf(Type))
+    ''' <param name="type">Type of the type register.</param>
+    ''' <remarks>After plugins are loaded, any type that inherits or implements the given Type can be easily found.
+    ''' If the type is already in the type registry, nothing will be done.</remarks>
+    Public Sub RegisterTypeRegister(type As TypeInfo)
+        If type Is Nothing Then
+            Throw New ArgumentNullException(NameOf(type))
         End If
 
-        If Not TypeRegistery.ContainsKey(Type) Then
-            TypeRegistery.Add(Type, New List(Of TypeInfo))
+        If Not TypeRegistery.ContainsKey(type) Then
+            TypeRegistery.Add(type, New List(Of TypeInfo))
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Adds the given type to the type register.
+    ''' </summary>
+    ''' <typeparam name="T">Type of the type register.</typeparam>
+    Public Sub RegisterTypeRegister(Of T)()
+        RegisterTypeRegister(GetType(T).GetTypeInfo)
     End Sub
 
 
@@ -401,12 +399,21 @@ Public Class PluginManager
     End Sub
 
     ''' <summary>
-    ''' Registers the given Type in the type registry.
+    ''' Registers the given type in the type registry.
     ''' </summary>
-    ''' <typeparam name="T">The base type or interface that the given Type inherits or implements.</typeparam>
+    ''' <typeparam name="R">The base type or interface that the given Type inherits or implements.</typeparam>
     ''' <param name="type">The type to register.</param>
-    Public Sub RegisterType(Of T)(type As TypeInfo)
-        RegisterType(GetType(T).GetTypeInfo, type)
+    Public Sub RegisterType(Of R)(type As TypeInfo)
+        RegisterType(GetType(R).GetTypeInfo, type)
+    End Sub
+
+    ''' <summary>
+    ''' Registers the given type in the type registry.
+    ''' </summary>
+    ''' <typeparam name="R">The base type or interface that the given type inherits or implements.</typeparam>
+    ''' <typeparam name="T">The type to register.</typeparam>
+    Public Sub RegisterType(Of R, T)()
+        RegisterType(GetType(R).GetTypeInfo, GetType(T).GetTypeInfo)
     End Sub
 
 #End Region
