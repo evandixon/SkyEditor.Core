@@ -261,8 +261,7 @@ Public Class IOUIManager
         Dim usableFilters = (From i In IOFilters Where filters.Contains(i.Key)).ToDictionary(Function(x) x.Key, Function(y) y.Value)
 
         If addSupportedFilesEntry Then
-            fullFilter.Append(My.Resources.Language.SupportedFiles & " (" &
-                                    String.Join(", ", From i In usableFilters Select i.Value) & ")|" &
+            fullFilter.Append(My.Resources.Language.SupportedFiles & "|" &
                                     String.Join(";", From i In usableFilters Select "*." & i.Key.Trim("*").Trim(".")) & "|")
         End If
 
