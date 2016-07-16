@@ -195,4 +195,8 @@
     <value>Supported Files</value>
     <comment>Used in Open IO Filter</comment>
   </data>
+  <data name="UnknownFileRegisterTemplate" xml:space="preserve">
+    <value>{0} Files</value>
+    <comment>Display name for IO filters that aren't registered.  {0} will be replaced by the upper case of the extension.</comment>
+  </data>
 </root>
