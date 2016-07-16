@@ -19,14 +19,7 @@ Namespace Utilties
             Try
                 Directory.CreateDirectory("TestDirectory")
                 File.WriteAllText(Path.Combine("TestDirectory", "test.txt"), "Test file")
-
-                If Not Directory.Exists("TestDirectory") Then
-                    Assert.Inconclusive("Failed to create test directory.")
-                End If
-
-                If Not File.Exists(Path.Combine("TestDirectory", "test.txt")) Then
-                    Assert.Inconclusive("Failed to create test file.")
-                End If
+                Directory.CreateDirectory(Path.Combine("TestDirectory", "Test2"))
             Catch ex As Exception
                 Assert.Inconclusive("Error creating test directory or file.  Exception message: " & ex.ToString)
             End Try
