@@ -50,7 +50,7 @@ Namespace Utilities
                 'Try to find the filename of this reference
                 For Each source In devAssemblyPaths
                     Dim name = AssemblyName.GetAssemblyName(source)
-                    If reference.FullName = name.FullName Then
+                    If reference.Name = name.Name Then
                         If Not out.Contains(source) Then
                             out.Add(source)
                             isLocal = True
@@ -93,8 +93,9 @@ Namespace Utilities
             Dim ToCopy As New List(Of String)
 
             Dim devDir As String
-            If Directory.Exists(manager.ExtensionDirectory) Then
-                devDir = manager.ExtensionDirectory
+            'Todo: replace Path.Combine(manager.ExtensionDirectory, "Plugins", "Development") with something not hard coded
+            If Directory.Exists(Path.Combine(manager.ExtensionDirectory, "Plugins", "Development")) Then
+                devDir = Path.Combine(manager.ExtensionDirectory, "Plugins", "Development")
             Else
                 devDir = Path.GetDirectoryName(GetType(RedistributionHelpers).Assembly.Location)
             End If
@@ -140,7 +141,9 @@ Namespace Utilities
                     If Not Directory.Exists(Path.GetDirectoryName(dest)) Then
                         Directory.CreateDirectory(Path.GetDirectoryName(dest))
                     End If
-                    File.Copy(filePath, dest, True)
+                    If filePath <> dest Then
+                        File.Copy(filePath, dest, True)
+                    End If
                 Else
                     'It's probably a directory.
                     If Directory.Exists(filePath) Then
