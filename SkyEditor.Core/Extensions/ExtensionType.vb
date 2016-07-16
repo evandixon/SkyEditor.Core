@@ -36,12 +36,10 @@ Namespace Extensions
             Return Path.Combine(RootExtensionDirectory, InternalName, extensionID.ToString)
         End Function
 
-        ''' <summary>
-        ''' Lists the extensions that are currently installed.
-        ''' </summary>
-        ''' <returns></returns>
-        Public Overridable Function GetInstalledExtensions(manager As Core.PluginManager) As IEnumerable(Of ExtensionInfo) Implements IExtensionCollection.GetExtensions
+        Public Overridable Function GetInstalledExtensions(manager As PluginManager) As IEnumerable(Of ExtensionInfo)
             Dim out As New List(Of ExtensionInfo)
+
+            'Todo: cache this so paging works more efficiently
             If manager.CurrentIOProvider.DirectoryExists(Path.Combine(RootExtensionDirectory, InternalName)) Then
                 For Each item In manager.CurrentIOProvider.GetDirectories(Path.Combine(RootExtensionDirectory, InternalName), True)
                     If manager.CurrentIOProvider.FileExists(Path.Combine(item, "info.skyext")) Then
@@ -51,7 +49,20 @@ Namespace Extensions
                     End If
                 Next
             End If
+
             Return out
+        End Function
+
+        ''' <summary>
+        ''' Lists the extensions that are currently installed.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overridable Function GetInstalledExtensions(skip As Integer, take As Integer, manager As PluginManager) As Task(Of IEnumerable(Of ExtensionInfo)) Implements IExtensionCollection.GetExtensions
+            Return Task.FromResult(GetInstalledExtensions(manager).Skip(skip).Take(take))
+        End Function
+
+        Public Function GetExtensionCount(manager As Core.PluginManager) As Task(Of Integer) Implements IExtensionCollection.GetExtensionCount
+            Return Task.FromResult(GetInstalledExtensions(manager).Count())
         End Function
 
         Private Function InstallExtension(extensionID As Guid) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
@@ -76,8 +87,8 @@ Namespace Extensions
             Return Task.FromResult(ExtensionUninstallResult.Success)
         End Function
 
-        Private Function GetChildCollections(manager As Core.PluginManager) As IEnumerable(Of IExtensionCollection) Implements IExtensionCollection.GetChildCollections
-            Return {}
+        Public Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
+            Throw New NotImplementedException
         End Function
     End Class
 End Namespace

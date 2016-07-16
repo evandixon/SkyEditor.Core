@@ -55,9 +55,9 @@ Namespace Extensions
             Return result
         End Function
 
-        Public Shared Function GetExtensions(extensionType As Type, manager As PluginManager) As IEnumerable(Of ExtensionInfo)
+        Public Shared Function GetExtensions(extensionType As Type, skip As Integer, take As Integer, manager As PluginManager) As IEnumerable(Of ExtensionInfo)
             Dim bank As IExtensionCollection = ReflectionHelpers.CreateInstance(extensionType.GetTypeInfo)
-            Return bank.GetExtensions(manager)
+            Return bank.GetExtensions(skip, take, manager)
         End Function
     End Class
 End Namespace
