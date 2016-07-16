@@ -153,13 +153,13 @@ Public Class PluginManager
 
         'Delete files and directories scheduled for deletion
         '-Files
-        For Each item In CurrentSettingsProvider.GetFilesScheduledForDeletion
+        For Each item In CurrentSettingsProvider.GetFilesScheduledForDeletion.ToList() 'Create a new list because the original is continually modified
             FileSystem.DeleteFile(item, CurrentIOProvider)
             CurrentSettingsProvider.UncheduleFileForDeletion(item)
             CurrentSettingsProvider.Save(CurrentIOProvider)
         Next
         '-Directories
-        For Each item In CurrentSettingsProvider.GetDirectoriesScheduledForDeletion
+        For Each item In CurrentSettingsProvider.GetDirectoriesScheduledForDeletion.ToList()
             Await FileSystem.DeleteDirectory(item, CurrentIOProvider).ConfigureAwait(False)
             CurrentSettingsProvider.UncheduleDirectoryForDeletion(item)
             CurrentSettingsProvider.Save(CurrentIOProvider)
