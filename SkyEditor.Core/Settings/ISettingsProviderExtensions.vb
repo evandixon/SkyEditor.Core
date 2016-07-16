@@ -1,4 +1,6 @@
-﻿Namespace Settings
+﻿Imports SkyEditor.Core.IO
+
+Namespace Settings
     Public Module ISettingsProviderExtensions
 
         ''' <summary>
@@ -87,15 +89,17 @@
         ''' Schedules a directory for deletion upon the next PluginManager load.
         ''' </summary>
         ''' <param name="path">Full path of the directory to be deleted.</param>
-        <Extension> Sub ScheduleDirectoryForDeletion(provider As ISettingsProvider, path As String)
-            Dim setting As IList(Of String) = provider.GetSetting(My.Resources.SettingNames.DirectoriesForDeletion)
+        ''' <param name="provider">Instance of the current IO Provider.</param>
+        <Extension> Sub ScheduleDirectoryForDeletion(settingsProvider As ISettingsProvider, path As String, provider As IOProvider)
+            Dim setting As IList(Of String) = settingsProvider.GetSetting(My.Resources.SettingNames.DirectoriesForDeletion)
 
             If setting Is Nothing OrElse TypeOf setting IsNot IList(Of String) Then
                 setting = New List(Of String)
             End If
 
             setting.Add(path)
-            provider.SetSetting(My.Resources.SettingNames.DirectoriesForDeletion, setting)
+            settingsProvider.SetSetting(My.Resources.SettingNames.DirectoriesForDeletion, setting)
+            settingsProvider.Save(provider)
         End Sub
 
         ''' <summary>
