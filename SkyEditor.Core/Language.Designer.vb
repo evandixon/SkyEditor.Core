@@ -280,5 +280,14 @@ Namespace My.Resources
                 Return ResourceManager.GetString("SupportedFiles", resourceCulture)
             End Get
         End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to {0} Files.
+        '''</summary>
+        Friend Shared ReadOnly Property UnknownFileRegisterTemplate() As String
+            Get
+                Return ResourceManager.GetString("UnknownFileRegisterTemplate", resourceCulture)
+            End Get
+        End Property
     End Class
 End Namespace

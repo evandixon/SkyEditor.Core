@@ -34,7 +34,9 @@
         CurrentIOUIManager.RegisterIOFilter("txt", "Text Files")
         'But it'd be nice to support the "*." anyway
         CurrentIOUIManager.RegisterIOFilter("*.bmp", "Bitmap Images")
-        Assert.AreEqual("Supported Files (Sky Editor Solution, Text Files, Bitmap Images)|*.skysln;*.txt;*.bmp|Sky Editor Solution (*.skysln)|*.skysln|Text Files (*.txt)|*.txt|Bitmap Images (*.bmp)|*.bmp|All Files (*.*)|*.*", CurrentIOUIManager.GetIOFilter())
+
+        Assert.AreEqual("Supported Files|*.skysln;*.txt;*.bmp|Sky Editor Solution (*.skysln)|*.skysln|Text Files (*.txt)|*.txt|Bitmap Images (*.bmp)|*.bmp|All Files (*.*)|*.*", CurrentIOUIManager.GetIOFilter())
         Assert.AreEqual("Text Files (*.txt)|*.txt", CurrentIOUIManager.GetIOFilter({"txt"}, False, False))
+        Assert.AreEqual("SAV Files (*.sav)|*.sav", CurrentIOUIManager.GetIOFilter({"sav"}, False, False))
     End Sub
 End Class

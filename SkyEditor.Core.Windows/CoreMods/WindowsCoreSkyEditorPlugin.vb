@@ -40,7 +40,12 @@ Namespace CoreMods
             Else
                 'If we didn't, then load it
                 If WindowsReflectionHelpers.IsSupportedPlugin(assemblyPath) Then
-                    Return Assembly.LoadFrom(assemblyPath)
+                    Dim loadedAssembly = Assembly.LoadFrom(assemblyPath)
+
+                    'Relying on the side effect of this function to load all dependant assemblies into the current app domain
+                    WindowsReflectionHelpers.GetAssemblyDependencies(loadedAssembly)
+
+                    Return loadedAssembly
                 Else
                     Return Nothing
                 End If

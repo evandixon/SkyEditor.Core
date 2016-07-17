@@ -12,13 +12,17 @@ Namespace Extensions
         ''' The user-friendly name of the extension type.
         ''' </summary>
         ''' <returns></returns>
-        Public MustOverride ReadOnly Property Name As String Implements IExtensionCollection.Name
+        Public MustOverride Function GetName() As Task(Of String) Implements IExtensionCollection.GetName
 
         ''' <summary>
         ''' Gets or sets the directory the ExtensionType stores extensions in.
         ''' </summary>
         ''' <returns></returns>
-        Public Property RootExtensionDirectory As String
+        Public ReadOnly Property RootExtensionDirectory As String
+            Get
+                Return CurrentPluginManager.ExtensionDirectory
+            End Get
+        End Property
 
         Public Property CurrentPluginManager As PluginManager
 
@@ -36,12 +40,10 @@ Namespace Extensions
             Return Path.Combine(RootExtensionDirectory, InternalName, extensionID.ToString)
         End Function
 
-        ''' <summary>
-        ''' Lists the extensions that are currently installed.
-        ''' </summary>
-        ''' <returns></returns>
-        Public Overridable Function GetInstalledExtensions(manager As Core.PluginManager) As IEnumerable(Of ExtensionInfo) Implements IExtensionCollection.GetExtensions
+        Public Overridable Function GetInstalledExtensions(manager As PluginManager) As IEnumerable(Of ExtensionInfo)
             Dim out As New List(Of ExtensionInfo)
+
+            'Todo: cache this so paging works more efficiently
             If manager.CurrentIOProvider.DirectoryExists(Path.Combine(RootExtensionDirectory, InternalName)) Then
                 For Each item In manager.CurrentIOProvider.GetDirectories(Path.Combine(RootExtensionDirectory, InternalName), True)
                     If manager.CurrentIOProvider.FileExists(Path.Combine(item, "info.skyext")) Then
@@ -51,10 +53,23 @@ Namespace Extensions
                     End If
                 Next
             End If
+
             Return out
         End Function
 
-        Private Function InstallExtension(extensionID As Guid) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        ''' <summary>
+        ''' Lists the extensions that are currently installed.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Overridable Function GetInstalledExtensions(skip As Integer, take As Integer, manager As PluginManager) As Task(Of IEnumerable(Of ExtensionInfo)) Implements IExtensionCollection.GetExtensions
+            Return Task.FromResult(GetInstalledExtensions(manager).Skip(skip).Take(take))
+        End Function
+
+        Public Function GetExtensionCount(manager As Core.PluginManager) As Task(Of Integer) Implements IExtensionCollection.GetExtensionCount
+            Return Task.FromResult(GetInstalledExtensions(manager).Count())
+        End Function
+
+        Private Function InstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             Throw New NotSupportedException("This IExtensionCollection lists extensions that are currently installed, not ones that can be installed, so this cannnot install extensions.")
         End Function
 
@@ -71,13 +86,13 @@ Namespace Extensions
         ''' Uninstalls the given extension.
         ''' </summary>
         ''' <param name="extensionID">ID of the extension to uninstall</param>
-        Public Overridable Function UninstallExtension(extensionID As Guid) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
+        Public Overridable Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
             CurrentPluginManager.CurrentIOProvider.DeleteDirectory(GetExtensionDirectory(extensionID))
             Return Task.FromResult(ExtensionUninstallResult.Success)
         End Function
 
-        Private Function GetChildCollections(manager As Core.PluginManager) As IEnumerable(Of IExtensionCollection) Implements IExtensionCollection.GetChildCollections
-            Return {}
+        Public Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
+            Throw New NotSupportedException
         End Function
     End Class
 End Namespace

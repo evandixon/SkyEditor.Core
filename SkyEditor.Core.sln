@@ -15,6 +15,10 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.Tests", "Tes
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.Windows.Tests", "Tests\SkyEditor.Core.Windows\SkyEditor.Core.Windows.Tests.vbproj", "{532420A1-B8E4-456F-9791-A18EC9F1597D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration Tests", "Integration Tests", "{13B1C7DF-44CA-457D-99A4-6AB56656C845}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.IntegrationTests", "Tests\Integration Tests\SkyEditor.Core.IntegrationTests\SkyEditor.Core.IntegrationTests.vbproj", "{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,7 +32,6 @@ Global
 		{C50D6A95-2497-465C-BFC5-3EB1E382E8E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C50D6A95-2497-465C-BFC5-3EB1E382E8E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C50D6A95-2497-465C-BFC5-3EB1E382E8E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C50D6A95-2497-465C-BFC5-3EB1E382E8E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -40,7 +43,9 @@ Global
 		{532420A1-B8E4-456F-9791-A18EC9F1597D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{532420A1-B8E4-456F-9791-A18EC9F1597D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{532420A1-B8E4-456F-9791-A18EC9F1597D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{532420A1-B8E4-456F-9791-A18EC9F1597D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,5 +53,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{2A654374-1ACE-4907-8416-9C31D13DEED8} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
 		{532420A1-B8E4-456F-9791-A18EC9F1597D} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
+		{13B1C7DF-44CA-457D-99A4-6AB56656C845} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
+		{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0} = {13B1C7DF-44CA-457D-99A4-6AB56656C845}
 	EndGlobalSection
 EndGlobal

@@ -27,7 +27,7 @@ Namespace TestComponents
             Return {GetType(TextFile).GetTypeInfo}
         End Function
 
-        Public Function IsBackupControl(Obj As Object) As Boolean Implements IObjectControl.IsBackupControl
+        Public Overridable Function IsBackupControl(Obj As Object) As Boolean Implements IObjectControl.IsBackupControl
             Return False
         End Function
 
