@@ -86,7 +86,7 @@ Namespace Extensions
 
         Public Shared Async Function UninstallExtension(extensionTypeName As String, extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult)
             Dim bank As ExtensionType = GetExtensionBank(extensionTypeName, manager)
-            Return Await bank.UninstallExtension(extensionID)
+            Return Await bank.UninstallExtension(extensionID, manager)
         End Function
 
         Public Shared Function GetExtensions(extensionTypeName As String, skip As Integer, take As Integer, manager As PluginManager) As IEnumerable(Of ExtensionInfo)

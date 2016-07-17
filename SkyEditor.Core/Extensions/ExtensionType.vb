@@ -69,7 +69,7 @@ Namespace Extensions
             Return Task.FromResult(GetInstalledExtensions(manager).Count())
         End Function
 
-        Private Function InstallExtension(extensionID As Guid) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Private Function InstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             Throw New NotSupportedException("This IExtensionCollection lists extensions that are currently installed, not ones that can be installed, so this cannnot install extensions.")
         End Function
 
@@ -86,7 +86,7 @@ Namespace Extensions
         ''' Uninstalls the given extension.
         ''' </summary>
         ''' <param name="extensionID">ID of the extension to uninstall</param>
-        Public Overridable Function UninstallExtension(extensionID As Guid) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
+        Public Overridable Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
             CurrentPluginManager.CurrentIOProvider.DeleteDirectory(GetExtensionDirectory(extensionID))
             Return Task.FromResult(ExtensionUninstallResult.Success)
         End Function

@@ -14,7 +14,6 @@ Namespace Extensions
             Dim out As IEnumerable(Of IExtensionCollection) = manager.GetRegisteredObjects(Of ExtensionType)
             For Each item As ExtensionType In out
                 item.CurrentPluginManager = manager
-                item.RootExtensionDirectory = manager.ExtensionDirectory
             Next
             Return Task.FromResult(out)
         End Function
@@ -28,11 +27,11 @@ Namespace Extensions
             Return Task.FromResult(info.AsEnumerable)
         End Function
 
-        Public Function InstallExtension(extensionID As Guid) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Public Function InstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             Throw New NotSupportedException
         End Function
 
-        Public Function UninstallExtension(extensionID As Guid) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
+        Public Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
             Throw New NotSupportedException
         End Function
     End Class

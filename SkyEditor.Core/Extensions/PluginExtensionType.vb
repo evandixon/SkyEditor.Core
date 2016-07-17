@@ -76,7 +76,7 @@ Namespace Extensions
         ''' Uninstalls the given extension.
         ''' </summary>
         ''' <param name="extensionID">ID of the extension to uninstall</param>
-        Public Overrides Function UninstallExtension(extensionID As Guid) As Task(Of ExtensionUninstallResult)
+        Public Overrides Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult)
             CurrentPluginManager.CurrentSettingsProvider.ScheduleDirectoryForDeletion(GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentIOProvider)
             Return Task.FromResult(ExtensionUninstallResult.RestartRequired)
         End Function

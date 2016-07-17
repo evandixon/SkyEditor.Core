@@ -208,7 +208,7 @@ Public Class PluginManager
         Dim enablePluginLoading = Core.IsPluginLoadingEnabled
         If enablePluginLoading Then
             'Get the paths of all plugins to be loaded
-            Dim supportedPlugins = GetPluginPaths(ExtensionDirectory)
+            Dim supportedPlugins = GetPluginPaths()
 
             'Load the plugin assemblies
             For Each item In supportedPlugins
@@ -272,16 +272,14 @@ Public Class PluginManager
     ''' <summary>
     ''' Gets the paths of available plugin assemblies.
     ''' </summary>
-    ''' <param name="extensionDirectory">Directory in which extensions are stored.</param>
     ''' <returns></returns>
-    Protected Function GetPluginPaths(extensionDirectory As String) As List(Of String)
+    Protected Function GetPluginPaths() As List(Of String)
         'Start loading plugins
         Dim supportedPlugins As New List(Of String)
 
         'Look at the plugin extensions to find plugins.
         Dim pluginExtType As New PluginExtensionType
         pluginExtType.CurrentPluginManager = Me
-        pluginExtType.RootExtensionDirectory = extensionDirectory
         For Each item In pluginExtType.GetInstalledExtensions(Me)
             Dim extAssemblies As New List(Of String)
             For Each file In item.ExtensionFiles
