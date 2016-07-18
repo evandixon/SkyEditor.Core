@@ -10,7 +10,7 @@
     <description>Windows implementation of certain classes for SkyEditor.Core</description>
     <copyright>Copyright 2016</copyright>
     <dependencies>
-      <dependency id="SkyEditor.Core" version="$version$" />
+      <dependency id="SkyEditor.Core" />
     </dependencies>
   </metadata>
 </package>
