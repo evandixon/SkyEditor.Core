@@ -27,13 +27,13 @@ Namespace Utilities
                                End Sub, files)
         End Function
 
-        Public Shared Async Function DeleteDirectoryContents(DirectoryName As String, provider As IOProvider) As Task
+        Public Shared Async Function DeleteDirectoryContents(DirectoryName As String, provider As IOProvider, Optional reCreateDirectoryAfterDelete As Boolean = True) As Task
             Dim f As New AsyncFor()
 
-            'Delete the files (because recursive deletes sometimes fail
-            Await f.RunForEach(Sub(Item As String)
-                                   provider.DeleteFile(Item)
-                               End Sub, provider.GetFiles(DirectoryName, "*", False))
+            ''Delete the files (because recursive deletes sometimes fail
+            'Await f.RunForEach(Sub(Item As String)
+            '                       provider.DeleteFile(Item)
+            '                   End Sub, provider.GetFiles(DirectoryName, "*", False))
 
             'Delete the main directory (to delete all child directories)
             provider.DeleteDirectory(DirectoryName)
@@ -43,10 +43,12 @@ Namespace Utilities
                                           While provider.DirectoryExists(DirectoryName)
                                               'Block
                                           End While
-                                      End Sub))
+                                      End Sub)).ConfigureAwait(False)
 
-            'Recreate the main directory
-            provider.CreateDirectory(DirectoryName)
+            If reCreateDirectoryAfterDelete Then
+                'Recreate the main directory
+                provider.CreateDirectory(DirectoryName)
+            End If
         End Function
 
         ''' <summary>
@@ -68,8 +70,7 @@ Namespace Utilities
         ''' <returns></returns>
         Public Shared Async Function DeleteDirectory(DirectoryName As String, provider As IOProvider) As Task
             If provider.DirectoryExists(DirectoryName) Then
-                Await DeleteDirectoryContents(DirectoryName, provider)
-                provider.DeleteDirectory(DirectoryName)
+                Await DeleteDirectoryContents(DirectoryName, provider, False).ConfigureAwait(False)
             End If
         End Function
 

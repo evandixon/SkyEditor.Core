@@ -12,7 +12,7 @@ Namespace ConsoleCommands
             With CurrentPluginManager.CurrentIOProvider
                 For Each item In CurrentPluginManager.Plugins
                     Dim a = item.GetType.GetTypeInfo.Assembly
-                    If Not CurrentPluginManager.IsAssemblyDependant(a) Then
+                    If (Not CurrentPluginManager.IsAssemblyDependant(a)) OrElse Arguments.Contains("-dependant") Then
                         Dim info As New ExtensionInfo
                         info.Name = item.PluginName
                         info.Author = item.PluginAuthor

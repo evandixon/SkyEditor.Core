@@ -257,12 +257,17 @@ Public Class IOUIManager
     ''' <param name="allowAllFiles">Whether or not to add an "All Files" entry to the filters.</param>
     ''' <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
     Public Function GetIOFilter(filters As ICollection(Of String), addSupportedFilesEntry As Boolean, allowAllFiles As Boolean) As String
+        'Register any unregistered filters
+        For Each item In (From f In filters Where Not IOFilters.ContainsKey(f))
+            IOFilters.Add(item, String.Format(My.Resources.Language.UnknownFileRegisterTemplate, item.Trim("*").Trim(".").ToUpper))
+        Next
+
+        'Generate the IO Filter string
         Dim fullFilter As New StringBuilder
         Dim usableFilters = (From i In IOFilters Where filters.Contains(i.Key)).ToDictionary(Function(x) x.Key, Function(y) y.Value)
 
         If addSupportedFilesEntry Then
-            fullFilter.Append(My.Resources.Language.SupportedFiles & " (" &
-                                    String.Join(", ", From i In usableFilters Select i.Value) & ")|" &
+            fullFilter.Append(My.Resources.Language.SupportedFiles & "|" &
                                     String.Join(";", From i In usableFilters Select "*." & i.Key.Trim("*").Trim(".")) & "|")
         End If
 

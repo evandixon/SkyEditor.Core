@@ -8,11 +8,9 @@ Namespace Extensions
     Public Class PluginExtensionType
         Inherits ExtensionType
 
-        Public Overrides ReadOnly Property Name As String
-            Get
-                Return "Plugins"
-            End Get
-        End Property
+        Public Overrides Function GetName() As Task(Of String)
+            Return Task.FromResult("Plugins")
+        End Function
 
         Protected Overrides ReadOnly Property InternalName As String
             Get
@@ -78,8 +76,8 @@ Namespace Extensions
         ''' Uninstalls the given extension.
         ''' </summary>
         ''' <param name="extensionID">ID of the extension to uninstall</param>
-        Public Overrides Function UninstallExtension(extensionID As Guid) As Task(Of ExtensionUninstallResult)
-            CurrentPluginManager.CurrentSettingsProvider.ScheduleDirectoryForDeletion(Path.Combine(RootExtensionDirectory, extensionID.ToString))
+        Public Overrides Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult)
+            CurrentPluginManager.CurrentSettingsProvider.ScheduleDirectoryForDeletion(GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentIOProvider)
             Return Task.FromResult(ExtensionUninstallResult.RestartRequired)
         End Function
 

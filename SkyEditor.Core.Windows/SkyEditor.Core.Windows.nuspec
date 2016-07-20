@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>SkyEditor.Core.Windows</id>
+    <version>$version$</version>
+    <title>SkyEditor.Core.Windows</title>
+    <authors>evandixon</authors>
+    <owners>evandixon</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Windows implementation of certain classes for SkyEditor.Core</description>
+    <copyright>Copyright 2016</copyright>
+    <dependencies>
+      <dependency id="SkyEditor.Core" />
+    </dependencies>
+  </metadata>
+</package>
