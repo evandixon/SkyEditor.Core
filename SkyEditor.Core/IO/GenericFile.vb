@@ -634,7 +634,7 @@ Namespace IO
             Else
                 Dim buffer(length) As Byte
                 FileReader.Seek(index, SeekOrigin.Begin)
-                Await FileReader.ReadAsync(buffer, 0, length).ConfigureAwait(False)
+                Await FileReader.ReadAsync(buffer, 0, length).ConfigureAwait(True)
                 Await destination.WriteAsync(buffer, 0, length)
             End If
         End Function
