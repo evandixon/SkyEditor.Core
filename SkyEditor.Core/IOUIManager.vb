@@ -457,7 +457,7 @@ Public Class IOUIManager
     ''' </summary>
     ''' <param name="File">File of which to get the parent project.  Must be an open file, otherwise the function will return Nothing.</param>
     ''' <returns></returns>
-    Public Function GetOpenedFileProject(File As FileViewModel) As Project
+    Public Function GetProjectOfOpenFile(File As FileViewModel) As Project
         If Me.OpenedProjectFiles.ContainsKey(File) Then
             Return Me.OpenedProjectFiles(File)
         Else
@@ -470,7 +470,7 @@ Public Class IOUIManager
     ''' </summary>
     ''' <param name="model">Model of which to get the parent project.  Must be an open file, otherwise the function will return Nothing.</param>
     ''' <returns></returns>
-    Public Function GetOpenFileProject(model As Object) As Project
+    Public Function GetProjectOfOpenFile(model As Object) As Project
         Return Me.OpenedProjectFiles.Where(Function(x) x.Key.File Is model).Select(Function(x) x.Value).FirstOrDefault
     End Function
 
