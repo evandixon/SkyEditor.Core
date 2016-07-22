@@ -605,6 +605,41 @@ Namespace IO
         End Function
 
         ''' <summary>
+        ''' Copies data into the given stream.
+        ''' </summary>
+        ''' <param name="destination">Stream to which to copy data.</param>
+        ''' <param name="index">Index of the data to start reading from the <see cref="GenericFile"/>.</param>
+        ''' <param name="length">Number of bytes to copy into the destination stream.</param>
+        ''' <exception cref="ArgumentNullException">Thrown if <paramref name="destination"/> is null.</exception>
+        ''' <remarks>Currently, the data of size <paramref name="length"/> is buffered in memory, and will error if there is insufficient memory.</remarks>
+        Public Async Function CopyTo(destination As Stream, index As Long, length As Long) As Task
+            If IsThreadSafe Then
+                Await CopyToInternal(destination, index, length).ConfigureAwait(False)
+            Else
+                Await Task.Run(Sub()
+                                   SyncLock _fileLock
+                                       CopyToInternal(destination, index, length).Wait()
+                                   End SyncLock
+                               End Sub).ConfigureAwait(False)
+            End If
+        End Function
+
+        Private Async Function CopyToInternal(destination As Stream, index As Long, length As Long) As Task
+            If destination Is Nothing Then
+                Throw New ArgumentNullException(NameOf(destination))
+            End If
+
+            If InMemoryFile IsNot Nothing Then
+                Await destination.WriteAsync(InMemoryFile, index, length).ConfigureAwait(False)
+            Else
+                Dim buffer(length) As Byte
+                FileReader.Seek(index, SeekOrigin.Begin)
+                Await FileReader.ReadAsync(buffer, 0, length).ConfigureAwait(False)
+                Await destination.WriteAsync(buffer, 0, length)
+            End If
+        End Function
+
+        ''' <summary>
         ''' Reads a UTF-16 string from the file.
         ''' </summary>
         ''' <param name="Offset">Location of the string in the file.</param>
