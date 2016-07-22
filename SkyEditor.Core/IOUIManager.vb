@@ -344,7 +344,7 @@ Public Class IOUIManager
     End Sub
 
     ''' <summary>
-    ''' Opens the givenfile
+    ''' Opens the given file
     ''' </summary>
     ''' <param name="model">File to open</param>
     ''' <param name="parentProject">Project the file belongs to.  If the file does not belong to a project, don't use this overload.</param>
@@ -359,8 +359,8 @@ Public Class IOUIManager
 
         If Not (From o In OpenFiles Where o.File Is model).Any Then
             Dim wrapper = CreateViewModel(model)
-            OpenFiles.Add(wrapper)
             OpenedProjectFiles.Add(wrapper, parentProject)
+            OpenFiles.Add(wrapper)
             RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = False, .ParentProject = parentProject})
         End If
     End Sub
@@ -427,6 +427,10 @@ Public Class IOUIManager
                 SelectedFile = Nothing
             End If
 
+            If OpenedProjectFiles.ContainsKey(file) Then
+                OpenedProjectFiles.Remove(file)
+            End If
+
             Dim didDispose As Boolean = False
             If FileDisposalSettings.ContainsKey(file.File) Then
                 If FileDisposalSettings(file.File) Then
@@ -437,6 +441,7 @@ Public Class IOUIManager
                 End If
                 FileDisposalSettings.Remove(file.File)
             End If
+
             RaiseEvent FileClosed(Me, New FileClosedEventArgs With {.File = file.File, .Disposed = didDispose})
         End If
     End Sub
