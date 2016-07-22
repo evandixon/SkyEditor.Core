@@ -470,7 +470,7 @@ Public Class IOUIManager
     ''' </summary>
     ''' <param name="model">Model of which to get the parent project.  Must be an open file, otherwise the function will return Nothing.</param>
     ''' <returns></returns>
-    Public Function GetProjectOfOpenFile(model As Object) As Project
+    Public Function GetProjectOfOpenModel(model As Object) As Project
         Return Me.OpenedProjectFiles.Where(Function(x) x.Key.File Is model).Select(Function(x) x.Value).FirstOrDefault
     End Function
 
