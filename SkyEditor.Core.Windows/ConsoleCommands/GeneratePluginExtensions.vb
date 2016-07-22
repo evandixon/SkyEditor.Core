@@ -21,7 +21,7 @@ Namespace ConsoleCommands
                         If Not .DirectoryExists(Path.GetDirectoryName(workingPath)) Then
                             .CreateDirectory(Path.GetDirectoryName(workingPath))
                         End If
-                        Await RedistributionHelpers.PackPlugins({item}, workingPath, info, CurrentPluginManager)
+                        Await RedistributionHelpers.PackPlugins({item}, workingPath, info, CurrentPluginManager).ConfigureAwait(False)
                     End If
                 Next
             End With

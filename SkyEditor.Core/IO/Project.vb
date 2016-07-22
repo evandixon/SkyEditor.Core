@@ -276,7 +276,7 @@ Namespace IO
         ''' <param name="Path">Path to look for a file.</param>
         ''' <returns></returns>
         Public Async Function GetFileByPath(Path As String, manager As PluginManager, duplicateMatchSelector As IOHelper.DuplicateMatchSelector) As Task(Of Object)
-            Return Await GetProjectItemByPath(Path)?.GetFile(manager, duplicateMatchSelector)
+            Return Await (GetProjectItemByPath(Path)?.GetFile(manager, duplicateMatchSelector)).ConfigureAwait(False)
         End Function
 
         ''' <summary>
@@ -440,7 +440,7 @@ Namespace IO
         End Function
 
         Public Overridable Async Function AddExistingFile(ParentProjectPath As String, FilePath As String, provider As IOProvider) As Task
-            Await AddExistingFile(RootNode, ParentProjectPath, FilePath, provider)
+            Await AddExistingFile(RootNode, ParentProjectPath, FilePath, provider).ConfigureAwait(False)
         End Function
 
         Protected Overridable Async Function AddExistingFile(rootProjectNode As ProjectNode, projectPath As String, FilePath As String, provider As IOProvider) As Task
@@ -460,7 +460,7 @@ Namespace IO
                                                   If Not source.Replace("\", "/").ToLower = dest.Replace("\", "/").ToLower Then
                                                       provider.CopyFile(FilePath, dest)
                                                   End If
-                                              End Sub))
+                                              End Sub)).ConfigureAwait(False)
 
                     projItem.Name = Path.GetFileName(projItem.Filename)
                     item.Children.Add(projItem)
@@ -479,7 +479,7 @@ Namespace IO
                 If Not String.IsNullOrEmpty(item.ParentPath) Then
                     CreateDirectory(newRoot, item.ParentPath)
                 End If
-                Await AddExistingFile(newRoot, item.ParentPath, item.ActualFilename, provider)
+                Await AddExistingFile(newRoot, item.ParentPath, item.ActualFilename, provider).ConfigureAwait(False)
             Next
             RootNode.Children = newRoot.Children
         End Function

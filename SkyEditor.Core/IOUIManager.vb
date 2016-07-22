@@ -16,7 +16,7 @@ Public Class IOUIManager
     Public Sub New(manager As PluginManager)
         Me.CurrentPluginManager = manager
         Me.CurrentSolution = Nothing
-        Me.OpenedProjectFiles = New Dictionary(Of Object, Project)
+        Me.OpenedProjectFiles = New Dictionary(Of FileViewModel, Project)
         Me.FileDisposalSettings = New Dictionary(Of Object, Boolean)
         Me.OpenFiles = New ObservableCollection(Of FileViewModel)
         Me.RunningTasks = New ObservableCollection(Of Task)
@@ -377,7 +377,7 @@ Public Class IOUIManager
     ''' 
     ''' When the file is closed, the underlying model will be disposed.</remarks>
     Public Async Function OpenFile(filename As String, autoDetectSelector As IOHelper.DuplicateMatchSelector) As Task
-        Dim model = Await IOHelper.OpenObject(filename, autoDetectSelector, CurrentPluginManager)
+        Dim model = Await IOHelper.OpenObject(filename, autoDetectSelector, CurrentPluginManager).ConfigureAwait(False)
 
         If Not (From o In OpenFiles Where o.File Is model).Any Then
             Dim wrapper = CreateViewModel(model)
@@ -400,7 +400,7 @@ Public Class IOUIManager
     ''' 
     ''' When the file is closed, the underlying model will be disposed.</remarks>
     Public Async Function OpenFile(filename As String, modelType As TypeInfo) As Task
-        Dim model = Await IOHelper.OpenFile(filename, modelType, CurrentPluginManager)
+        Dim model = Await IOHelper.OpenFile(filename, modelType, CurrentPluginManager).ConfigureAwait(False)
 
         If Not (From o In OpenFiles Where o.File Is model).Any Then
             Dim wrapper = CreateViewModel(model)
@@ -547,7 +547,7 @@ Public Class IOUIManager
     ''' <param name="task">Task to keep track of.</param>
     Public Sub LogTask(task As Task)
         Dim watchTask = Task.Run(Async Function() As Task
-                                     Await task
+                                     Await task.ConfigureAwait(False)
                                      RemoveTask(task)
                                  End Function)
     End Sub

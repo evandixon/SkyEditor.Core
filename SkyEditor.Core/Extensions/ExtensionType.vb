@@ -78,7 +78,7 @@ Namespace Extensions
         ''' </summary>
         ''' <param name="TempDir">Temporary directory that contains the extension's files.</param>
         Public Overridable Async Function InstallExtension(extensionID As Guid, TempDir As String) As Task(Of ExtensionInstallResult)
-            Await Core.Utilities.FileSystem.CopyDirectory(TempDir, GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentIOProvider)
+            Await Core.Utilities.FileSystem.CopyDirectory(TempDir, GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentIOProvider).ConfigureAwait(False)
             Return ExtensionInstallResult.Success
         End Function
 

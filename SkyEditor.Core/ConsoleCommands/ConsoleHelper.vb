@@ -34,7 +34,7 @@
                     Next
                     Dim command = (From c In AllCommands Where String.Compare(c.Key, cmd, StringComparison.CurrentCultureIgnoreCase) = 0 Select c.Value).FirstOrDefault '(cmd).MainAsync(args.ToArray)
                     Try
-                        Await command.MainAsync(args.ToArray)
+                        Await command.MainAsync(args.ToArray).ConfigureAwait(False)
                     Catch ex As Exception
                         Console.WriteLine(ex.ToString)
                     End Try

@@ -140,7 +140,7 @@ Namespace IO
 
         Public Async Function CreateChildProject(name As String, type As Type, manager As PluginManager) As Task
             If CanCreateChildProject() Then
-                Await ParentSolution.CreateProject(GetCurrentPath, name, type, manager)
+                Await ParentSolution.CreateProject(GetCurrentPath, name, type, manager).ConfigureAwait(False)
             End If
         End Function
 

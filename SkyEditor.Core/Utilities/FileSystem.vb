@@ -24,7 +24,7 @@ Namespace Utilities
             Await f.RunForEach(Sub(path As String)
                                    Dim dest = path.Replace(sourceDirectory, destinationDirectory)
                                    provider.CopyFile(path, dest)
-                               End Sub, files)
+                               End Sub, files).ConfigureAwait(False)
         End Function
 
         Public Shared Async Function DeleteDirectoryContents(DirectoryName As String, provider As IOProvider, Optional reCreateDirectoryAfterDelete As Boolean = True) As Task
@@ -57,7 +57,7 @@ Namespace Utilities
         ''' <returns></returns>
         Public Shared Async Function ReCreateDirectory(DirectoryName As String, provider As IOProvider) As Task
             If provider.DirectoryExists(DirectoryName) Then
-                Await DeleteDirectoryContents(DirectoryName, provider)
+                Await DeleteDirectoryContents(DirectoryName, provider).ConfigureAwait(False)
             Else
                 provider.CreateDirectory(DirectoryName)
             End If

@@ -12,10 +12,10 @@ Namespace IO
             Dim f As New Utilities.AsyncFor
             f.RunSynchronously = Not File.IsThreadSafe
             Await f.RunForEach(Async Function(detectable As IDetectableFileType) As Task
-                                   If Await detectable.IsOfType(File) Then
+                                   If Await detectable.IsOfType(File).ConfigureAwait(False) Then
                                        matches.Enqueue(New FileTypeDetectionResult With {.FileType = detectable.GetType.GetTypeInfo, .MatchChance = 0.5})
                                    End If
-                               End Function, Manager.GetRegisteredObjects(Of IDetectableFileType))
+                               End Function, Manager.GetRegisteredObjects(Of IDetectableFileType)).ConfigureAwait(False)
             Return matches
         End Function
     End Class

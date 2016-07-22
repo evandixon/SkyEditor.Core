@@ -48,7 +48,7 @@ Namespace Processes
             p.BeginOutputReadLine()
 
             'Wait for the process to close
-            Await WaitForProcess(p)
+            Await WaitForProcess(p).ConfigureAwait(False)
 
             p.Dispose()
         End Function
@@ -247,7 +247,7 @@ Namespace Processes
                                           If Not Status = ProcessStatus.Stopped Then
                                               _p.WaitForExit()
                                           End If
-                                      End Sub))
+                                      End Sub)).ConfigureAwait(False)
         End Function
 #End Region
 

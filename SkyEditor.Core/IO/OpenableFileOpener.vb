@@ -10,7 +10,7 @@ Namespace IO
 
         Public Async Function OpenFile(fileType As TypeInfo, filename As String, provider As IOProvider) As Task(Of Object) Implements IFileOpener.OpenFile
             Dim file As IOpenableFile = ReflectionHelpers.CreateInstance(fileType)
-            Await file.OpenFile(filename, provider)
+            Await file.OpenFile(filename, provider).ConfigureAwait(False)
             Return file
         End Function
 

@@ -13,7 +13,7 @@
 #Region "Constructors"
         Public Sub New()
             BatchSize = Integer.MaxValue
-            RunningTasks = New List(Of Task)
+            RunningTasks = New List(Of ConfiguredTaskAwaitable)
         End Sub
         <Obsolete> Public Sub New(ProgressMessage As String)
             Me.New
@@ -38,7 +38,7 @@
         ''' The currently running tasks.
         ''' </summary>
         ''' <returns></returns>
-        Private Property RunningTasks As List(Of Task)
+        Private Property RunningTasks As List(Of ConfiguredTaskAwaitable)
 
         ''' <summary>
         ''' The total number of tasks to run.
@@ -88,7 +88,7 @@
                     Dim tTask = Task.Run(Async Function() As Task
                                              Await DelegateFunction(item)
                                              System.Threading.Interlocked.Increment(CompletedTasks)
-                                         End Function)
+                                         End Function).ConfigureAwait(False)
 
                     'Either wait for it or move on
                     If RunSynchronously Then
@@ -103,7 +103,7 @@
 
                         'Remove completed tasks
                         For count = RunningTasks.Count - 1 To 0 Step -1
-                            If RunningTasks(count).IsCompleted Then
+                            If RunningTasks(count).GetAwaiter.IsCompleted Then
                                 RunningTasks.RemoveAt(count)
                             End If
                         Next
@@ -148,7 +148,7 @@
                     Dim tTask = Task.Run(Async Function() As Task
                                              Await DelegateFunction(item)
                                              System.Threading.Interlocked.Increment(CompletedTasks)
-                                         End Function)
+                                         End Function).ConfigureAwait(False)
 
                     'Increment for the next run
                     i += StepCount
@@ -167,7 +167,7 @@
 
                         'Remove completed tasks
                         For count = RunningTasks.Count - 1 To 0 Step -1
-                            If RunningTasks(count).IsCompleted Then
+                            If RunningTasks(count).GetAwaiter.IsCompleted Then
                                 RunningTasks.RemoveAt(count)
                             End If
                         Next
