@@ -166,7 +166,7 @@ Public Class IOUIManager
     ''' Matches opened files to their parent projects
     ''' </summary>
     ''' <returns></returns>
-    Private Property OpenedProjectFiles As Dictionary(Of Object, Project)
+    Private Property OpenedProjectFiles As Dictionary(Of FileViewModel, Project)
 
     ''' <summary>
     ''' Dictionary of (Extension, Friendly Name) used in the Open and Save file dialogs.
@@ -457,13 +457,23 @@ Public Class IOUIManager
     ''' </summary>
     ''' <param name="File">File of which to get the parent project.  Must be an open file, otherwise the function will return Nothing.</param>
     ''' <returns></returns>
-    Public Function GetOpenedFileProject(File As Object) As Project
+    Public Function GetOpenedFileProject(File As FileViewModel) As Project
         If Me.OpenedProjectFiles.ContainsKey(File) Then
             Return Me.OpenedProjectFiles(File)
         Else
             Return Nothing
         End If
     End Function
+
+    ''' <summary>
+    ''' Returns the file's parent project, if it exists.
+    ''' </summary>
+    ''' <param name="model">Model of which to get the parent project.  Must be an open file, otherwise the function will return Nothing.</param>
+    ''' <returns></returns>
+    Public Function GetOpenFileProject(model As Object) As Project
+        Return Me.OpenedProjectFiles.Where(Function(x) x.Key.File Is model).Select(Function(x) x.Value).FirstOrDefault
+    End Function
+
 
     ''' <summary>
     ''' Gets the possible targets for a menu action.
