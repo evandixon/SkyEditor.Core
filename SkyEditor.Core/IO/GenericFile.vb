@@ -563,7 +563,7 @@ Namespace IO
                                           SyncLock _fileLock
                                               Return RawData
                                           End SyncLock
-                                      End Function).ConfigureAwait(False)
+                                      End Function)
             End If
         End Function
 
@@ -581,7 +581,7 @@ Namespace IO
                                           SyncLock _fileLock
                                               Return RawData(index)
                                           End SyncLock
-                                      End Function).ConfigureAwait(False)
+                                      End Function)
             End If
         End Function
 
@@ -600,7 +600,7 @@ Namespace IO
                                           SyncLock _fileLock
                                               Return RawData(index, length)
                                           End SyncLock
-                                      End Function).ConfigureAwait(False)
+                                      End Function)
             End If
         End Function
 
