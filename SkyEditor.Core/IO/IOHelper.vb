@@ -85,7 +85,7 @@ Namespace IO
             End If
 
             If ReflectionHelpers.CanCreateInstance(FileType) Then
-                Return Await openers.First.OpenFile(FileType, Filename, Manager.CurrentIOProvider).ConfigureAwait(False)
+                Return Await openers.First.OpenFile(FileType, Filename, Manager.CurrentIOProvider)
             Else
                 Throw New ArgumentException(My.Resources.Language.ErrorTypeNoDefaultConstructor, NameOf(FileType))
             End If
@@ -113,8 +113,8 @@ Namespace IO
                 'Open the file for detection
                 Dim g As New GenericFile(manager.CurrentIOProvider)
                 g.IsReadOnly = True
-                Await g.OpenFile(path, manager.CurrentIOProvider).ConfigureAwait(False)
-                Return Await OpenFile(g, duplicateFileTypeSelector, manager).ConfigureAwait(False)
+                Await g.OpenFile(path, manager.CurrentIOProvider)
+                Return Await OpenFile(g, duplicateFileTypeSelector, manager)
             Else
                 'Open the directory
                 If manager.CurrentIOProvider.DirectoryExists(path) Then
@@ -143,7 +143,7 @@ Namespace IO
                 Throw New ArgumentNullException(NameOf(manager))
             End If
 
-            Dim type = Await GetFileType(File, duplicateFileTypeSelector, manager).ConfigureAwait(False)
+            Dim type = Await GetFileType(File, duplicateFileTypeSelector, manager)
             Dim openers = (From o In manager.GetRegisteredObjects(Of IFileOpener) Where o.SupportsType(type))
             If type Is Nothing OrElse Not openers.Any Then
                 'There is no class we found that can model this file.
@@ -151,10 +151,10 @@ Namespace IO
                 Dim filename = File.OriginalFilename
                 File.Dispose()
                 Dim g As New GenericFile
-                Await g.OpenFile(File.OriginalFilename, manager.CurrentIOProvider).ConfigureAwait(False)
+                Await g.OpenFile(File.OriginalFilename, manager.CurrentIOProvider)
                 Return g
             Else
-                Return Await openers.First.OpenFile(type, File.OriginalFilename, manager.CurrentIOProvider).ConfigureAwait(False)
+                Return Await openers.First.OpenFile(type, File.OriginalFilename, manager.CurrentIOProvider)
             End If
         End Function
 
@@ -182,7 +182,7 @@ Namespace IO
                 Return Nothing
             Else
                 Dim out As IOpenableFile = ReflectionHelpers.CreateInstance(type)
-                Await out.OpenFile(path, manager.CurrentIOProvider).ConfigureAwait(False)
+                Await out.OpenFile(path, manager.CurrentIOProvider)
                 Return out
             End If
         End Function
@@ -213,7 +213,7 @@ Namespace IO
 
                 'However, the file isn't necessarily thread-safe, so if it isn't, we only want to run one detection task at a time.
                 If Not File.IsThreadSafe Then
-                    Await detectTask.ConfigureAwait(False)
+                    Await detectTask
                 End If
             Next
 
