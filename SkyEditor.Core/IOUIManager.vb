@@ -327,41 +327,41 @@ Public Class IOUIManager
     ''' <summary>
     ''' Opens the given file
     ''' </summary>
-    ''' <param name="file">File to open</param>
+    ''' <param name="model">Model to open</param>
     ''' <param name="DisposeOnClose">True to call the file's dispose method (if IDisposable) when closed.</param>
-    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="file"/> is null.</exception>
-    Public Sub OpenFile(file As Object, DisposeOnClose As Boolean)
-        If file Is Nothing Then
-            Throw New ArgumentNullException(NameOf(file))
+    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> is null.</exception>
+    Public Sub OpenFile(model As Object, DisposeOnClose As Boolean)
+        If model Is Nothing Then
+            Throw New ArgumentNullException(NameOf(model))
         End If
 
-        If Not (From o In OpenFiles Where o.File Is file).Any Then
-            Dim wrapper = CreateViewModel(file)
+        If Not (From o In OpenFiles Where o.File Is model).Any Then
+            Dim wrapper = CreateViewModel(model)
             OpenFiles.Add(wrapper)
-            FileDisposalSettings.Add(file, DisposeOnClose)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = file, .DisposeOnExit = DisposeOnClose})
+            FileDisposalSettings.Add(model, DisposeOnClose)
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = DisposeOnClose})
         End If
     End Sub
 
     ''' <summary>
     ''' Opens the givenfile
     ''' </summary>
-    ''' <param name="file">File to open</param>
+    ''' <param name="model">File to open</param>
     ''' <param name="parentProject">Project the file belongs to.  If the file does not belong to a project, don't use this overload.</param>
-    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="file"/> or <paramref name="parentProject"/> is null.</exception>
-    Public Sub OpenFile(file As Object, parentProject As Project)
-        If file Is Nothing Then
-            Throw New ArgumentNullException(NameOf(file))
+    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> or <paramref name="parentProject"/> is null.</exception>
+    Public Sub OpenFile(model As Object, parentProject As Project)
+        If model Is Nothing Then
+            Throw New ArgumentNullException(NameOf(model))
         End If
         If parentProject Is Nothing Then
             Throw New ArgumentNullException(NameOf(parentProject))
         End If
 
-        If Not (From o In OpenFiles Where o.File Is file).Any Then
-            Dim wrapper = CreateViewModel(file)
+        If Not (From o In OpenFiles Where o.File Is model).Any Then
+            Dim wrapper = CreateViewModel(model)
             OpenFiles.Add(wrapper)
-            OpenedProjectFiles.Add(file, parentProject)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = file, .DisposeOnExit = False, .ParentProject = parentProject})
+            OpenedProjectFiles.Add(wrapper, parentProject)
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = False, .ParentProject = parentProject})
         End If
     End Sub
 
