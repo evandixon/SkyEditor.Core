@@ -334,7 +334,7 @@ Namespace IO
                     RaiseEvent Modified(Me, New EventArgs)
                     Await Task.Run(Sub()
                                        RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.ParentPath = ParentPath, .Project = p})
-                                   End Sub).ConfigureAwait(False)
+                                   End Sub)
                 Else
                     'There's already a project here
                     Throw New ProjectAlreadyExistsException("A project with the name """ & ProjectName & """ already exists in the given path: " & ParentPath)
@@ -419,7 +419,7 @@ Namespace IO
         End Function
 
         Public Overridable Async Function Build() As Task
-            Await Build(GetProjectsToBuild).ConfigureAwait(False)
+            Await Build(GetProjectsToBuild)
         End Function
 
         Public Overridable Async Function Build(projects As IEnumerable(Of Project)) As Task
@@ -439,7 +439,7 @@ Namespace IO
                 'If this project has not been built
                 If Not toBuild(key) Then
                     'Then build the project, but build its dependencies first
-                    Await BuildProjects(toBuild, key).ConfigureAwait(False)
+                    Await BuildProjects(toBuild, key)
                 End If
             Next
 
@@ -451,13 +451,13 @@ Namespace IO
             For Each item In From p In CurrentProject.GetReferences(Me) Where p.CanBuild
                 buildTasks.Add(BuildProjects(ToBuild, item))
             Next
-            Await Task.WhenAll(buildTasks).ConfigureAwait(False)
+            Await Task.WhenAll(buildTasks)
 
             If Not ToBuild(CurrentProject) Then
                 'Todo: make sure we won't get here twice, with all the async stuff going on
                 ToBuild(CurrentProject) = True
                 UpdateBuildLoadingStatus(ToBuild)
-                Await CurrentProject.Build.ConfigureAwait(False)
+                Await CurrentProject.Build
             End If
         End Function
 
