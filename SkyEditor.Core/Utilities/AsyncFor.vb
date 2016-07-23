@@ -13,7 +13,7 @@
 #Region "Constructors"
         Public Sub New()
             BatchSize = Integer.MaxValue
-            RunningTasks = New List(Of ConfiguredTaskAwaitable)
+            RunningTasks = New List(Of Task)
         End Sub
         <Obsolete> Public Sub New(ProgressMessage As String)
             Me.New
@@ -38,7 +38,7 @@
         ''' The currently running tasks.
         ''' </summary>
         ''' <returns></returns>
-        Private Property RunningTasks As List(Of ConfiguredTaskAwaitable)
+        Private Property RunningTasks As List(Of Task)
 
         ''' <summary>
         ''' The total number of tasks to run.
@@ -88,7 +88,7 @@
                     Dim tTask = Task.Run(Async Function() As Task
                                              Await DelegateFunction(item)
                                              System.Threading.Interlocked.Increment(CompletedTasks)
-                                         End Function).ConfigureAwait(False)
+                                         End Function)
 
                     'Either wait for it or move on
                     If RunSynchronously Then
@@ -148,7 +148,7 @@
                     Dim tTask = Task.Run(Async Function() As Task
                                              Await DelegateFunction(item)
                                              System.Threading.Interlocked.Increment(CompletedTasks)
-                                         End Function).ConfigureAwait(False)
+                                         End Function)
 
                     'Increment for the next run
                     i += StepCount
