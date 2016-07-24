@@ -5,8 +5,7 @@ Imports SkyEditor.Core.Utilities
 
 Namespace IO
     Public Class Solution
-        Implements INotifyModified
-        Implements IDisposable
+        Inherits ProjectBase
 
 #Region "Child Classes"
         Private Class SolutionFile
@@ -55,64 +54,18 @@ Namespace IO
             Root = New SolutionNode(Me, Nothing)
         End Sub
 
-
-        ''' <summary>
-        ''' Name of the solution
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property Name As String
-
-        ''' <summary>
-        ''' Full path of the solution file
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property Filename As String
-
-        ''' <summary>
-        ''' The solution settings
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property Settings As SettingsProvider
-
-        ''' <summary>
-        ''' Gets or sets an individual setting in the project's settings.
-        ''' </summary>
-        ''' <param name="SettingName"></param>
-        ''' <returns></returns>
-        Protected Property Setting(SettingName As String) As Object
-            Get
-                Return Settings.GetSetting(SettingName)
-            End Get
-            Set(value As Object)
-                Settings.SetSetting(SettingName, value)
-            End Set
-        End Property
-
         ''' <summary>
         ''' The root of the solution's logical heiarchy.
         ''' </summary>
         ''' <returns></returns>
-        Public Property Root As SolutionNode
-
-        ''' <summary>
-        ''' Gets or sets whether or not there are unsaved changes
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property UnsavedChanges As Boolean
+        Public Shadows Property Root As SolutionNode
             Get
-                Return _unsavedChanges
+                Return MyBase.Root
             End Get
-            Set(value As Boolean)
-                _unsavedChanges = value
-                If value Then
-                    RaiseEvent Modified(Me, New EventArgs)
-                End If
+            Set(value As SolutionNode)
+                MyBase.Root = value
             End Set
         End Property
-        Dim _unsavedChanges As Boolean
-
-        Public Property CurrentPluginManager As PluginManager
-
 
 #Region "Events"
         ''' <summary>
@@ -124,12 +77,9 @@ Namespace IO
         ''' Raised when the solution has been created.
         ''' </summary>
         Public Event Created(sender As Object, e As EventArgs)
-        Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
         Public Event SolutionBuildStarted(sender As Object, e As EventArgs)
         Public Event SolutionBuildProgressed(sender As Object, e As BuildProgressedEventArgs)
         Public Event SolutionBuildCompleted(sender As Object, e As EventArgs)
-        Public Event DirectoryCreated(sender As Object, e As DirectoryCreatedEventArgs)
-        Public Event DirectoryDeleted(sender As Object, e As DirectoryDeletedEventArgs)
         Public Event ProjectAdded(sender As Object, e As ProjectAddedEventArgs)
         Public Event ProjectRemoving(sender As Object, e As ProjectRemovingEventArgs)
         Public Event ProjectRemoved(sender As Object, e As ProjectRemovedEventArgs)
@@ -146,7 +96,6 @@ Namespace IO
 
         Private Sub Project_Modified(sender As Object, e As EventArgs)
             UnsavedChanges = True
-            RaiseEvent Modified(Me, New EventArgs)
         End Sub
 
         ''' <summary>
@@ -185,8 +134,8 @@ Namespace IO
                 End If
             End If
 
-            If node.IsDirectory = False AndAlso node.Project IsNot Nothing Then
-                output.Add(node.Project)
+            If node.IsDirectory = False AndAlso node.Item IsNot Nothing AndAlso TypeOf node.Item Is Project Then
+                output.Add(node.Item)
             End If
 
             Return output
@@ -277,51 +226,8 @@ Namespace IO
         ''' <param name="Path">Path to look for a project.</param>
         ''' <returns></returns>
         Public Function GetProjectByPath(Path As String) As Project
-            Return GetSolutionItemByPath(Path)?.Project
+            Return GetSolutionItemByPath(Path)?.Item
         End Function
-
-        ''' <summary>
-        ''' Creates a directory at the given location if it does not exist.
-        ''' </summary>
-        ''' <param name="Path">Path to put the new directory in.</param>
-        ''' <param name="DirectoryName">Name of the new directory.</param>
-        Public Overridable Sub CreateDirectory(Path As String, DirectoryName As String)
-            Dim item = GetSolutionItemByPath(Path)
-            If item IsNot Nothing Then
-                Dim q = (From c In item.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = DirectoryName.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = True).FirstOrDefault
-                If q Is Nothing Then
-                    item.Children.Add(New SolutionNode(Me, item) With {.Name = DirectoryName})
-                    RaiseEvent DirectoryCreated(Me, New DirectoryCreatedEventArgs With {.DirectoryName = DirectoryName, .ParentPath = Path, .FullPath = Path & "/" & DirectoryName})
-                Else
-                    'There's already a directory here.
-                    'Do nothing.
-                End If
-            Else
-                Throw New DirectoryNotFoundException("Cannot create a solution directory at the given path: " & Path)
-            End If
-        End Sub
-
-        ''' <summary>
-        ''' Deletes the directory at the given path, and disposes of everything inside it.
-        ''' Unless overridden, and contained projects will remain on the hard drive.
-        ''' </summary>
-        ''' <param name="Path"></param>
-        Public Overridable Sub DeleteDirectory(Path As String)
-            Dim pathParts = Path.Replace("\", "/").TrimStart("/").Split("/")
-            Dim parentPath As New Text.StringBuilder
-            For count = 0 To pathParts.Length - 2
-                parentPath.Append(pathParts(count))
-                parentPath.Append("/")
-            Next
-            Dim parentPathString = parentPath.ToString.TrimEnd("/")
-            Dim parent = GetSolutionItemByPath(parentPathString)
-            Dim child = (From c In parent.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = pathParts.Last.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = True Select DirectCast(c, SolutionNode)).FirstOrDefault
-            If child IsNot Nothing Then
-                parent.Children.Remove(child)
-                child.Dispose()
-                RaiseEvent DirectoryDeleted(Me, New DirectoryDeletedEventArgs With {.DirectoryName = pathParts.Last, .ParentPath = parentPathString, .FullPath = Path})
-            End If
-        End Sub
 
         Public Overridable Async Function CreateProject(ParentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager) As Task
             Dim item = GetSolutionItemByPath(ParentPath)
@@ -329,9 +235,9 @@ Namespace IO
                 Dim q = (From c In item.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = ProjectName.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False).FirstOrDefault
                 If q Is Nothing Then
                     Dim p = Project.CreateProject(Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType, Me, manager)
-                    item.Children.Add(New SolutionNode(Me, item) With {.Name = ProjectName, .Project = p})
+                    item.Children.Add(New SolutionNode(Me, item) With {.Name = ProjectName, .Item = p})
                     AddHandler p.Modified, AddressOf Project_Modified
-                    RaiseEvent Modified(Me, New EventArgs)
+                    UnsavedChanges = True
                     Await Task.Run(Sub()
                                        RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.ParentPath = ParentPath, .Project = p})
                                    End Sub)
@@ -351,9 +257,9 @@ Namespace IO
                 Dim q = (From c In item.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = p.Name.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False).FirstOrDefault
                 If q Is Nothing Then
                     'Dim p = Project.CreateProject(IO.Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType)
-                    item.Children.Add(New SolutionNode(Me, item) With {.Name = p.Name, .Project = p})
+                    item.Children.Add(New SolutionNode(Me, item) With {.Name = p.Name, .Item = p})
                     AddHandler p.Modified, AddressOf Project_Modified
-                    RaiseEvent Modified(Me, New EventArgs)
+                    UnsavedChanges = True
                     RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.ParentPath = ParentPath, .Project = p})
                 Else
                     'There's already a project here
@@ -375,34 +281,15 @@ Namespace IO
             Dim parent = GetSolutionItemByPath(parentPathString)
             Dim child = (From c In parent.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = pathParts.Last.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False Select DirectCast(c, SolutionNode)).FirstOrDefault
             If child IsNot Nothing Then
-                RaiseEvent ProjectRemoving(Me, New ProjectRemovingEventArgs With {.Project = child.Project})
-                RemoveHandler child.Project.Modified, AddressOf Project_Modified
-                RaiseEvent Modified(Me, New EventArgs)
+                RaiseEvent ProjectRemoving(Me, New ProjectRemovingEventArgs With {.Project = child.Item})
+                RemoveHandler child.Item.Modified, AddressOf Project_Modified
+                UnsavedChanges = True
                 parent.Children.Remove(child)
                 child.Dispose()
                 RaiseEvent ProjectRemoved(Me, New ProjectRemovedEventArgs With {.DirectoryName = pathParts.Last, .ParentPath = parentPathString, .FullPath = ProjectPath})
             End If
         End Sub
 #End Region
-
-#Region "Can do X"
-        ''' <summary>
-        ''' Returns whether or not a directory can be made inside the given path.
-        ''' </summary>
-        ''' <param name="Path">Path to put the directory.</param>
-        ''' <returns></returns>
-        Public Overridable Function CanCreateDirectory(Path As String) As Boolean
-            Return (GetSolutionItemByPath(Path) IsNot Nothing)
-        End Function
-
-        ''' <summary>
-        ''' Returns whether or not the directory at the given path can be deleted.
-        ''' </summary>
-        ''' <param name="Path"></param>
-        ''' <returns></returns>
-        Public Overridable Function CanDeleteDirectory(Path As String) As Boolean
-            Return (GetSolutionItemByPath(Path) IsNot Nothing)
-        End Function
 
         Public Overridable Function CanCreateProject(Path As String) As Boolean
             Return CanCreateDirectory(Path)
@@ -411,7 +298,6 @@ Namespace IO
         Public Overridable Function CanDeleteProject(ProjectPath As String) As Boolean
             Return (GetSolutionItemByPath(ProjectPath) IsNot Nothing)
         End Function
-#End Region
 
 #Region "Building"
         Public Overridable Function GetProjectsToBuild() As IEnumerable(Of Project)
@@ -604,10 +490,10 @@ Namespace IO
                     Dim newNode As New SolutionNode(Me, current)
                     newNode.Name = projectPath.Last
                     If item.Value IsNot Nothing Then
-                        newNode.Project = Project.OpenProjectFile(Path.Combine(Path.GetDirectoryName(Filename), item.Value.Replace("/", "\").TrimStart("\")), Me, manager)
-                        AddHandler newNode.Project.Modified, AddressOf Project_Modified
+                        newNode.Item = Project.OpenProjectFile(Path.Combine(Path.GetDirectoryName(Filename), item.Value.Replace("/", "\").TrimStart("\")), Me, manager)
+                        AddHandler newNode.Item.Modified, AddressOf Project_Modified
                     Else
-                        newNode.Project = Nothing
+                        newNode.Item = Nothing
                     End If
                     current.Children.Add(newNode)
                 Else
@@ -636,7 +522,7 @@ Namespace IO
             If Not ProjectNode.IsDirectory Then
                 'If it's a project
                 Dim out As New Dictionary(Of String, String)
-                out.Add(CurrentPath, ProjectNode.Project.Filename.Replace(Path.GetDirectoryName(Filename), ""))
+                out.Add(CurrentPath, ProjectNode.Item.Filename.Replace(Path.GetDirectoryName(Filename), ""))
                 Return out
             ElseIf ProjectNode.IsDirectory AndAlso ProjectNode.Children.Count = 0 AndAlso Not CurrentPath = "" Then
                 'If it's a directory with no children
@@ -658,40 +544,6 @@ Namespace IO
 
 #End Region
 
-#Region "IDisposable Support"
-        Private disposedValue As Boolean ' To detect redundant calls
-
-        ' IDisposable
-        Protected Overridable Sub Dispose(disposing As Boolean)
-            If Not Me.disposedValue Then
-                If disposing Then
-                    ' TODO: dispose managed state (managed objects).
-                    If Root IsNot Nothing Then
-                        Root.Dispose()
-                    End If
-                End If
-
-                ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
-                ' TODO: set large fields to null.
-            End If
-            Me.disposedValue = True
-        End Sub
-
-        ' TODO: override Finalize() only if Dispose(disposing As Boolean) above has code to free unmanaged resources.
-        'Protected Overrides Sub Finalize()
-        '    ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-        '    Dispose(False)
-        '    MyBase.Finalize()
-        'End Sub
-
-        ' This code added by Visual Basic to correctly implement the disposable pattern.
-        Public Sub Dispose() Implements IDisposable.Dispose
-            ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-            Dispose(True)
-            ' TODO: uncomment the following line if Finalize() is overridden above.
-            ' GC.SuppressFinalize(Me)
-        End Sub
-#End Region
     End Class
 End Namespace
 

@@ -1,5 +1,5 @@
 ﻿Namespace IO
-    Public Class DirectoryCreatedEventArgs
+    <Obsolete> Public Class DirectoryCreatedEventArgs
         Inherits EventArgs
         ''' <summary>
         ''' Name of the directory that was created.

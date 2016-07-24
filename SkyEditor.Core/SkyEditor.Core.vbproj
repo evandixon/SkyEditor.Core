@@ -135,11 +135,13 @@
     <Compile Include="IO\OpenableFileOpener.vb" />
     <Compile Include="IO\Project.vb" />
     <Compile Include="IO\ProjectAddedEventArgs.vb" />
+    <Compile Include="IO\ProjectBase.vb" />
     <Compile Include="IO\ProjectBuildStatusChanged.vb" />
     <Compile Include="IO\ProjectDirectoryCreatedEventArgs.vb" />
     <Compile Include="IO\ProjectFileAddedEventArgs.vb" />
     <Compile Include="IO\ProjectFileRemovedEventArgs.vb" />
     <Compile Include="IO\ProjectNode.vb" />
+    <Compile Include="IO\ProjectNodeBase.vb" />
     <Compile Include="IO\ProjectRemovedEventArgs.vb" />
     <Compile Include="IO\ProjectRemovingEventArgs.vb" />
     <Compile Include="IO\SavableFileSaver.vb" />
@@ -172,7 +174,6 @@
     <Compile Include="IO\IDetectableFileType.vb" />
     <Compile Include="IO\INotifyModified.vb" />
     <Compile Include="Utilities\INamed.vb" />
-    <Compile Include="UI\IHiearchyItem.vb" />
     <Compile Include="UI\IObjectControl.vb" />
     <Compile Include="IO\IOnDisk.vb" />
     <Compile Include="IO\IOpenableFile.vb" />

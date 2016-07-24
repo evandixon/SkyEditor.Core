@@ -102,11 +102,11 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Directory.
+        '''  Looks up a localized string similar to [Directory].
         '''</summary>
-        Friend Shared ReadOnly Property Directory() As String
+        Friend Shared ReadOnly Property DirectoryPrefix() As String
             Get
-                Return ResourceManager.GetString("Directory", resourceCulture)
+                Return ResourceManager.GetString("DirectoryPrefix", resourceCulture)
             End Get
         End Property
         
@@ -161,6 +161,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property ErrorNoSaveFilename() As String
             Get
                 Return ResourceManager.GetString("ErrorNoSaveFilename", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to The root node of the project should not be null..
+        '''</summary>
+        Friend Shared ReadOnly Property ErrorProjectNullRoot() As String
+            Get
+                Return ResourceManager.GetString("ErrorProjectNullRoot", resourceCulture)
             End Get
         End Property
         
@@ -255,11 +264,11 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Project.
+        '''  Looks up a localized string similar to [Project].
         '''</summary>
-        Friend Shared ReadOnly Property Project() As String
+        Friend Shared ReadOnly Property ProjectPrefix() As String
             Get
-                Return ResourceManager.GetString("Project", resourceCulture)
+                Return ResourceManager.GetString("ProjectPrefix", resourceCulture)
             End Get
         End Property
         

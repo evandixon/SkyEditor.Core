@@ -3,13 +3,11 @@ Imports SkyEditor.Core.Utilities
 
 Namespace IO
     Public Class Project
-        Implements INotifyPropertyChanged
-        Implements INotifyModified
-        Implements IDisposable
+        Inherits ProjectBase
         Implements ISavable
 
         Public Sub New()
-            RootNode = New ProjectNode(Me, Nothing)
+            Root = New ProjectNode(Me, Nothing)
             Settings = New SettingsProvider
         End Sub
 
@@ -71,68 +69,18 @@ Namespace IO
         ''' <param name="e"></param>
         Public Event ProjectOpened(sender As Object, e As EventArgs)
         Public Event FileSaved(sender As Object, e As EventArgs) Implements ISavable.FileSaved
-        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
-        Public Event BuildStatusChanged(sender As Object, e As ProjectBuildStatusChanged)
-        Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
-        Public Event DirectoryCreated(sender As Object, e As DirectoryCreatedEventArgs)
-        Public Event DirectoryDeleted(sender As Object, e As DirectoryDeletedEventArgs)
         Public Event FileAdded(sender As Object, e As ProjectFileAddedEventArgs)
         Public Event FileRemoved(sender As Object, e As ProjectFileRemovedEventArgs)
 #End Region
 
-        Private Sub _rootNode_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles _rootNode.PropertyChanged
-            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(RootNode)))
-        End Sub
-
-#Region "Properties"
         Public Property ParentSolution As Solution
 
-        ''' <summary>
-        ''' Name of the project
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property Name As String
-
-        ''' <summary>
-        ''' Full path of the project file
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property Filename As String
-
-        ''' <summary>
-        ''' The root node of the logical project heiarchy
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property RootNode As ProjectNode
+        Public Shadows Property Root As ProjectNode
             Get
-                Return _rootNode
+                Return MyBase.Root
             End Get
             Set(value As ProjectNode)
-                If _rootNode IsNot value Then
-                    _rootNode = value
-                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(RootNode)))
-                End If
-            End Set
-        End Property
-        Private WithEvents _rootNode As ProjectNode
-
-        ''' <summary>
-        ''' The project's settings
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property Settings As SettingsProvider
-
-        ''' <summary>
-        ''' Gets or sets an individual setting in the project's settings.
-        ''' </summary>
-        ''' <param name="SettingName"></param>
-        ''' <returns></returns>
-        Protected Property Setting(SettingName As String) As Object
-            Get
-                Return Settings.GetSetting(SettingName)
-            End Get
-            Set(value As Object)
-                Settings.SetSetting(SettingName, value)
+                MyBase.Root = value
             End Set
         End Property
 
@@ -152,53 +100,6 @@ Namespace IO
             End Set
         End Property
 
-        ''' <summary>
-        ''' The progress of the current project's build.
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property BuildProgress As Single
-            Get
-                Return _buildProgress
-            End Get
-            Set(value As Single)
-                _buildProgress = value
-                RaiseEvent BuildStatusChanged(Me, New ProjectBuildStatusChanged With {.Progress = BuildProgress, .StatusMessage = BuildStatusMessage})
-                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(BuildProgress)))
-            End Set
-        End Property
-        Private _buildProgress As Single
-
-        ''' <summary>
-        ''' The current task in the current project's build.
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property BuildStatusMessage As String
-            Get
-                Return _buildStatusMessage
-            End Get
-            Set(value As String)
-                _buildStatusMessage = value
-                RaiseEvent BuildStatusChanged(Me, New ProjectBuildStatusChanged With {.Progress = BuildProgress, .StatusMessage = BuildStatusMessage})
-                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(BuildStatusMessage)))
-            End Set
-        End Property
-        Private _buildStatusMessage As String
-
-        Public Property IsBuildProgressIndeterminate As Boolean
-            Get
-                Return _isBuildProgressIndeterminate
-            End Get
-            Set(value As Boolean)
-                _isBuildProgressIndeterminate = value
-                RaiseEvent BuildStatusChanged(Me, New ProjectBuildStatusChanged With {.Progress = BuildProgress, .StatusMessage = BuildStatusMessage})
-                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsBuildProgressIndeterminate)))
-            End Set
-        End Property
-        Dim _isBuildProgressIndeterminate As Boolean
-
-        Public Property CurrentPluginManager As PluginManager
-#End Region
-
 #Region "Functions"
         ''' <summary>
         ''' Gets the solution items at the given logical path in the solution.
@@ -207,11 +108,11 @@ Namespace IO
         ''' <returns></returns>
         Public Function GetDirectoryContents(Path As String) As IEnumerable(Of ProjectNode)
             If Path Is Nothing OrElse Path = String.Empty Then
-                Return From c In RootNode.Children Order By c.Name
+                Return From c In Root.Children Order By c.Name
             Else
                 Dim pathArray = Path.Replace("\", "/").Split("/")
 
-                Dim current As ProjectNode = RootNode
+                Dim current As ProjectNode = Root
                 Dim index As Integer = 0
                 For count = 0 To pathArray.Length - 1
                     current = (From i In current.Children Where i.Name.ToLower = pathArray(index).ToLower Select i).FirstOrDefault
@@ -230,7 +131,7 @@ Namespace IO
         ''' <param name="ItemPath">Path to look for a project item.</param>
         ''' <returns></returns>
         Public Function GetProjectItemByPath(ItemPath As String) As ProjectNode
-            Return GetProjectItemByPath(RootNode, ItemPath)
+            Return GetProjectItemByPath(Root, ItemPath)
         End Function
 
         ''' <summary>
@@ -278,107 +179,6 @@ Namespace IO
         Public Async Function GetFileByPath(Path As String, manager As PluginManager, duplicateMatchSelector As IOHelper.DuplicateMatchSelector) As Task(Of Object)
             Return Await (GetProjectItemByPath(Path)?.GetFile(manager, duplicateMatchSelector))
         End Function
-
-        ''' <summary>
-        ''' Returns whether or not a directory can be made inside the given path.
-        ''' </summary>
-        ''' <param name="Path">Path to put the directory.</param>
-        ''' <returns></returns>
-        Public Overridable Function CanCreateDirectory(Path As String) As Boolean
-            Return (GetProjectItemByPath(Path) IsNot Nothing)
-        End Function
-
-        ''' <summary>
-        ''' Creates a directory at the given location if it does not exist.
-        ''' </summary>
-        ''' <param name="Path">Path to put the new directory in.</param>
-        ''' <param name="DirectoryName">Name of the new directory.</param>
-        Public Overridable Sub CreateDirectory(Path As String, DirectoryName As String)
-            CreateDirectory(RootNode, Path, DirectoryName)
-        End Sub
-
-        ''' <summary>
-        ''' Creates a directory at the given location if it does not exist.
-        ''' </summary>
-        ''' <param name="Path">Path to put the new directory in.</param>
-        ''' <param name="DirectoryName">Name of the new directory.</param>
-        Public Overridable Sub CreateDirectory(rootNode As ProjectNode, Path As String, DirectoryName As String)
-            Dim item = GetProjectItemByPath(rootNode, Path)
-            If item Is Nothing Then
-                'Throw New IO.DirectoryNotFoundException("Cannot create a solution directory at the given path: " & Path)
-                Dim pathParts = Path.Replace("\", "/").TrimStart("/").Split("/")
-                Dim parentPath As New Text.StringBuilder
-                For count = 0 To pathParts.Length - 2
-                    parentPath.Append(pathParts(count))
-                    parentPath.Append("/")
-                Next
-                Dim parentPathString = parentPath.ToString.TrimEnd("/")
-                CreateDirectory(rootNode, parentPathString, pathParts.Last)
-                item = GetProjectItemByPath(rootNode, Path)
-            End If
-            Dim q = (From c In item.Children Where TypeOf c Is ProjectNode AndAlso c.Name.ToLower = DirectoryName.ToLower AndAlso DirectCast(c, ProjectNode).IsDirectory = True).FirstOrDefault
-            If q Is Nothing Then
-                item.Children.Add(New ProjectNode(Me, item) With {.Name = DirectoryName})
-                RaiseEvent DirectoryCreated(Me, New DirectoryCreatedEventArgs With {.DirectoryName = DirectoryName, .ParentPath = Path, .FullPath = Path & "/" & DirectoryName})
-            Else
-                'There's already a directory here.
-                'Do nothing.
-            End If
-        End Sub
-
-        ''' <summary>
-        ''' Creates a directory with the given full path.
-        ''' </summary>
-        ''' <param name="FullPath"></param>
-        Public Overridable Sub CreateDirectory(FullPath As String)
-            CreateDirectory(RootNode, FullPath)
-        End Sub
-
-        ''' <summary>
-        ''' Creates a directory with the given full path.
-        ''' </summary>
-        ''' <param name="FullPath"></param>
-        Public Overridable Sub CreateDirectory(rootNode As ProjectNode, FullPath As String)
-            Dim pathParts = FullPath.Replace("\", "/").TrimStart("/").Split("/")
-            Dim parentPath As New Text.StringBuilder
-            For count = 0 To pathParts.Length - 2
-                parentPath.Append(pathParts(count))
-                parentPath.Append("/")
-            Next
-            Dim parentPathString = parentPath.ToString.TrimEnd("/")
-            CreateDirectory(rootNode, parentPathString, pathParts.Last)
-        End Sub
-
-        ''' <summary>
-        ''' Returns whether or not the directory at the given path can be deleted.
-        ''' </summary>
-        ''' <param name="Path"></param>
-        ''' <returns></returns>
-        Public Overridable Function CanDeleteDirectory(Path As String) As Boolean
-            Return (GetProjectItemByPath(Path) IsNot Nothing)
-        End Function
-
-        ''' <summary>
-        ''' Deletes the directory at the given path, and disposes of everything inside it.
-        ''' Unless overridden, and contained projects will remain on the hard drive.
-        ''' </summary>
-        ''' <param name="Path"></param>
-        Public Overridable Sub DeleteDirectory(Path As String)
-            Dim pathParts = Path.Replace("\", "/").TrimStart("/").Split("/")
-            Dim parentPath As New Text.StringBuilder
-            For count = 0 To pathParts.Length - 2
-                parentPath.Append(pathParts(count))
-                parentPath.Append("/")
-            Next
-            Dim parentPathString = parentPath.ToString.TrimEnd("/")
-            Dim parent = GetProjectItemByPath(parentPathString)
-            Dim child = (From c In parent.Children Where TypeOf c Is ProjectNode AndAlso c.Name.ToLower = pathParts.Last.ToLower AndAlso DirectCast(c, ProjectNode).IsDirectory = True Select DirectCast(c, ProjectNode)).FirstOrDefault
-            If child IsNot Nothing Then
-                parent.Children.Remove(child)
-                child.Dispose()
-                RaiseEvent DirectoryDeleted(Me, New DirectoryDeletedEventArgs With {.DirectoryName = pathParts.Last, .ParentPath = parentPathString, .FullPath = Path})
-            End If
-        End Sub
 
         Public Overridable Function CanCreateFile(Path As String) As Boolean
             Return CanCreateDirectory(Path)
@@ -440,7 +240,7 @@ Namespace IO
         End Function
 
         Public Overridable Async Function AddExistingFile(ParentProjectPath As String, FilePath As String, provider As IOProvider) As Task
-            Await AddExistingFile(RootNode, ParentProjectPath, FilePath, provider)
+            Await AddExistingFile(Root, ParentProjectPath, FilePath, provider)
         End Function
 
         Protected Overridable Async Function AddExistingFile(rootProjectNode As ProjectNode, projectPath As String, FilePath As String, provider As IOProvider) As Task
@@ -481,7 +281,7 @@ Namespace IO
                 End If
                 Await AddExistingFile(newRoot, item.ParentPath, item.ActualFilename, provider)
             Next
-            RootNode.Children = newRoot.Children
+            Root.Children = newRoot.Children
         End Function
 
         Public Overridable Function CanDeleteFile(FilePath As String) As Boolean
@@ -670,7 +470,7 @@ Namespace IO
             'Load Files
             For Each item In File.Files
                 Dim path = item.Key.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = Me.RootNode
+                Dim current = Me.Root
                 'Create the directory nodes
                 For count = 0 To path.Length - 2
                     'Try to get the directory node we're looking for
@@ -697,7 +497,7 @@ Namespace IO
                     newNode.Name = path.Last
                     If item.Value IsNot Nothing Then
                         newNode.Filename = item.Value.Filename 'IO.Path.Combine(IO.Path.GetDirectoryName(Me.Filename), item.Value.Filename.Replace("/", "\").TrimStart("\"))
-                        newNode.AssemblyQualifiedTypeName = item.Value.AssemblyQualifiedTypeName
+                        newNode.FileAssemblyQualifiedTypeName = item.Value.AssemblyQualifiedTypeName
                     Else
                         newNode.Filename = Nothing
                     End If
@@ -720,7 +520,7 @@ Namespace IO
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName
             file.Name = Me.Name
             file.InternalSettings = Me.Settings.Serialize
-            file.Files = GetProjectDictionary(RootNode, "")
+            file.Files = GetProjectDictionary(Root, "")
             Json.SerializeToFile(Filename, file, provider)
             RaiseEvent FileSaved(Me, New EventArgs)
         End Sub
@@ -729,7 +529,7 @@ Namespace IO
             If Not ProjectNode.IsDirectory Then
                 'It's a file
                 Dim out As New Dictionary(Of String, FileValue)
-                out.Add(CurrentPath, New FileValue With {.Filename = ProjectNode.Filename.Replace(Path.GetDirectoryName(Filename), ""), .AssemblyQualifiedTypeName = ProjectNode.AssemblyQualifiedTypeName})
+                out.Add(CurrentPath, New FileValue With {.Filename = ProjectNode.Filename.Replace(Path.GetDirectoryName(Filename), ""), .AssemblyQualifiedTypeName = ProjectNode.FileAssemblyQualifiedTypeName})
                 Return out
             ElseIf ProjectNode.IsDirectory AndAlso ProjectNode.Children.Count = 0 AndAlso Not CurrentPath = "" Then
                 'It's a directory with no children
@@ -750,39 +550,6 @@ Namespace IO
         End Function
 #End Region
 
-
-#Region "IDisposable Support"
-        Private disposedValue As Boolean ' To detect redundant calls
-
-        ' IDisposable
-        Protected Overridable Sub Dispose(disposing As Boolean)
-            If Not Me.disposedValue Then
-                If disposing Then
-                    ' TODO: dispose managed state (managed objects).
-                End If
-
-                ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
-                ' TODO: set large fields to null.
-            End If
-            Me.disposedValue = True
-        End Sub
-
-        ' TODO: override Finalize() only if Dispose(disposing As Boolean) above has code to free unmanaged resources.
-        'Protected Overrides Sub Finalize()
-        '    ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-        '    Dispose(False)
-        '    MyBase.Finalize()
-        'End Sub
-
-        ' This code added by Visual Basic to correctly implement the disposable pattern.
-        Public Sub Dispose() Implements IDisposable.Dispose
-            ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-            Dispose(True)
-            ' TODO: uncomment the following line if Finalize() is overridden above.
-            ' GC.SuppressFinalize(Me)
-        End Sub
-
-#End Region
     End Class
 End Namespace
 
