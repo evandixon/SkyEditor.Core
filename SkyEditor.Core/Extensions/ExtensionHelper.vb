@@ -56,7 +56,7 @@ Namespace Extensions
             Dim tempDir = provider.GetTempDirectory
 
             'Ensure it contains no files
-            Await Core.Utilities.FileSystem.ReCreateDirectory(tempDir, provider)
+            Await Core.Utilities.FileSystem.ReCreateDirectory(tempDir, provider).ConfigureAwait(False)
 
             'Extract the given zip file to it
             Core.Utilities.Zip.Unzip(extensionZipPath, tempDir)
@@ -72,21 +72,21 @@ Namespace Extensions
                 If extType Is Nothing Then
                     result = ExtensionInstallResult.UnsupportedFormat
                 Else
-                    result = Await extType.InstallExtension(info.ID, tempDir)
+                    result = Await extType.InstallExtension(info.ID, tempDir).ConfigureAwait(False)
                 End If
             Else
                 result = ExtensionInstallResult.InvalidFormat
             End If
 
             'Cleanup
-            Await Core.Utilities.FileSystem.DeleteDirectory(tempDir, provider)
+            Await Core.Utilities.FileSystem.DeleteDirectory(tempDir, provider).ConfigureAwait(False)
 
             Return result
         End Function
 
         Public Shared Async Function UninstallExtension(extensionTypeName As String, extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult)
             Dim bank As ExtensionType = GetExtensionBank(extensionTypeName, manager)
-            Return Await bank.UninstallExtension(extensionID, manager)
+            Return Await bank.UninstallExtension(extensionID, manager).ConfigureAwait(False)
         End Function
 
         Public Shared Function GetExtensions(extensionTypeName As String, skip As Integer, take As Integer, manager As PluginManager) As IEnumerable(Of ExtensionInfo)

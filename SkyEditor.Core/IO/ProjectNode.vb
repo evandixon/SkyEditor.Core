@@ -103,13 +103,13 @@ Namespace IO
             If File Is Nothing Then
                 Dim f = GetFilename()
                 If String.IsNullOrEmpty(AssemblyQualifiedTypeName) Then
-                    Return Await IOHelper.OpenObject(f, duplicateMatchSelector, manager)
+                    Return Await IOHelper.OpenObject(f, duplicateMatchSelector, manager).ConfigureAwait(False)
                 Else
                     Dim t = ReflectionHelpers.GetTypeByName(AssemblyQualifiedTypeName, manager)
                     If t Is Nothing Then
-                        Return Await IOHelper.OpenObject(f, duplicateMatchSelector, manager)
+                        Return Await IOHelper.OpenObject(f, duplicateMatchSelector, manager).ConfigureAwait(False)
                     Else
-                        Return IOHelper.OpenFile(f, t, manager)
+                        Return Await IOHelper.OpenFile(f, t, manager).ConfigureAwait(False)
                     End If
                 End If
             Else

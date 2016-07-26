@@ -220,19 +220,25 @@ Namespace UI
             If ViewModels Is Nothing Then
                 ViewModels = New List(Of GenericViewModel)
                 'do something
-                For Each viewModel In From vm In manager.GetRegisteredObjects(Of GenericViewModel) Where vm.SupportsObject(File)
-                    Dim vm As GenericViewModel = ReflectionHelpers.CreateNewInstance(viewModel)
-                    vm.SetPluginManager(manager)
-                    vm.SetModel(File)
-                    ViewModels.Add(vm)
+                Dim allViewModels = manager.GetRegisteredObjects(Of GenericViewModel)
+                For Each viewModel As GenericViewModel In allViewModels
+                    If viewModel.CurrentPluginManager Is Nothing Then
+                        viewModel.SetPluginManager(manager)
+                    End If
+                    If viewModel.SupportsObject(File) Then
+                        Dim vm As GenericViewModel = ReflectionHelpers.CreateNewInstance(viewModel)
+                        vm.SetPluginManager(manager)
+                        vm.SetModel(File)
+                        ViewModels.Add(vm)
 
-                    If TypeOf vm Is ISavable Then
-                        AddHandler DirectCast(vm, ISavable).FileSaved, AddressOf File_OnSaved
+                        If TypeOf vm Is ISavable Then
+                            AddHandler DirectCast(vm, ISavable).FileSaved, AddressOf File_OnSaved
+                        End If
+                        If TypeOf vm Is INotifyModified Then
+                            AddHandler DirectCast(vm, INotifyModified).Modified, AddressOf File_OnModified
+                        End If
+                        AddHandler vm.MenuItemRefreshRequested, AddressOf OnMenuItemRefreshRequested
                     End If
-                    If TypeOf vm Is INotifyModified Then
-                        AddHandler DirectCast(vm, INotifyModified).Modified, AddressOf File_OnModified
-                    End If
-                    AddHandler vm.MenuItemRefreshRequested, AddressOf OnMenuItemRefreshRequested
                 Next
             End If
             Return ViewModels

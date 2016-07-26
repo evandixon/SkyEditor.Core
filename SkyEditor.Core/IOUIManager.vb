@@ -16,7 +16,7 @@ Public Class IOUIManager
     Public Sub New(manager As PluginManager)
         Me.CurrentPluginManager = manager
         Me.CurrentSolution = Nothing
-        Me.OpenedProjectFiles = New Dictionary(Of Object, Project)
+        Me.OpenedProjectFiles = New Dictionary(Of FileViewModel, Project)
         Me.FileDisposalSettings = New Dictionary(Of Object, Boolean)
         Me.OpenFiles = New ObservableCollection(Of FileViewModel)
         Me.RunningTasks = New ObservableCollection(Of Task)
@@ -166,7 +166,7 @@ Public Class IOUIManager
     ''' Matches opened files to their parent projects
     ''' </summary>
     ''' <returns></returns>
-    Private Property OpenedProjectFiles As Dictionary(Of Object, Project)
+    Private Property OpenedProjectFiles As Dictionary(Of FileViewModel, Project)
 
     ''' <summary>
     ''' Dictionary of (Extension, Friendly Name) used in the Open and Save file dialogs.
@@ -327,41 +327,41 @@ Public Class IOUIManager
     ''' <summary>
     ''' Opens the given file
     ''' </summary>
-    ''' <param name="file">File to open</param>
+    ''' <param name="model">Model to open</param>
     ''' <param name="DisposeOnClose">True to call the file's dispose method (if IDisposable) when closed.</param>
-    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="file"/> is null.</exception>
-    Public Sub OpenFile(file As Object, DisposeOnClose As Boolean)
-        If file Is Nothing Then
-            Throw New ArgumentNullException(NameOf(file))
+    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> is null.</exception>
+    Public Sub OpenFile(model As Object, DisposeOnClose As Boolean)
+        If model Is Nothing Then
+            Throw New ArgumentNullException(NameOf(model))
         End If
 
-        If Not (From o In OpenFiles Where o.File Is file).Any Then
-            Dim wrapper = CreateViewModel(file)
+        If Not (From o In OpenFiles Where o.File Is model).Any Then
+            Dim wrapper = CreateViewModel(model)
             OpenFiles.Add(wrapper)
-            FileDisposalSettings.Add(file, DisposeOnClose)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = file, .DisposeOnExit = DisposeOnClose})
+            FileDisposalSettings.Add(model, DisposeOnClose)
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = DisposeOnClose})
         End If
     End Sub
 
     ''' <summary>
-    ''' Opens the givenfile
+    ''' Opens the given file
     ''' </summary>
-    ''' <param name="file">File to open</param>
+    ''' <param name="model">File to open</param>
     ''' <param name="parentProject">Project the file belongs to.  If the file does not belong to a project, don't use this overload.</param>
-    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="file"/> or <paramref name="parentProject"/> is null.</exception>
-    Public Sub OpenFile(file As Object, parentProject As Project)
-        If file Is Nothing Then
-            Throw New ArgumentNullException(NameOf(file))
+    ''' <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> or <paramref name="parentProject"/> is null.</exception>
+    Public Sub OpenFile(model As Object, parentProject As Project)
+        If model Is Nothing Then
+            Throw New ArgumentNullException(NameOf(model))
         End If
         If parentProject Is Nothing Then
             Throw New ArgumentNullException(NameOf(parentProject))
         End If
 
-        If Not (From o In OpenFiles Where o.File Is file).Any Then
-            Dim wrapper = CreateViewModel(file)
+        If Not (From o In OpenFiles Where o.File Is model).Any Then
+            Dim wrapper = CreateViewModel(model)
+            OpenedProjectFiles.Add(wrapper, parentProject)
             OpenFiles.Add(wrapper)
-            OpenedProjectFiles.Add(file, parentProject)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = file, .DisposeOnExit = False, .ParentProject = parentProject})
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = False, .ParentProject = parentProject})
         End If
     End Sub
 
@@ -427,6 +427,10 @@ Public Class IOUIManager
                 SelectedFile = Nothing
             End If
 
+            If OpenedProjectFiles.ContainsKey(file) Then
+                OpenedProjectFiles.Remove(file)
+            End If
+
             Dim didDispose As Boolean = False
             If FileDisposalSettings.ContainsKey(file.File) Then
                 If FileDisposalSettings(file.File) Then
@@ -437,6 +441,7 @@ Public Class IOUIManager
                 End If
                 FileDisposalSettings.Remove(file.File)
             End If
+
             RaiseEvent FileClosed(Me, New FileClosedEventArgs With {.File = file.File, .Disposed = didDispose})
         End If
     End Sub
@@ -457,13 +462,23 @@ Public Class IOUIManager
     ''' </summary>
     ''' <param name="File">File of which to get the parent project.  Must be an open file, otherwise the function will return Nothing.</param>
     ''' <returns></returns>
-    Public Function GetOpenedFileProject(File As Object) As Project
+    Public Function GetProjectOfOpenFile(File As FileViewModel) As Project
         If Me.OpenedProjectFiles.ContainsKey(File) Then
             Return Me.OpenedProjectFiles(File)
         Else
             Return Nothing
         End If
     End Function
+
+    ''' <summary>
+    ''' Returns the file's parent project, if it exists.
+    ''' </summary>
+    ''' <param name="model">Model of which to get the parent project.  Must be an open file, otherwise the function will return Nothing.</param>
+    ''' <returns></returns>
+    Public Function GetProjectOfOpenModel(model As Object) As Project
+        Return Me.OpenedProjectFiles.Where(Function(x) x.Key.File Is model).Select(Function(x) x.Value).FirstOrDefault
+    End Function
+
 
     ''' <summary>
     ''' Gets the possible targets for a menu action.

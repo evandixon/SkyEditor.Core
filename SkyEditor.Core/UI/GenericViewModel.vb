@@ -28,7 +28,7 @@ Namespace UI
         ''' Instance of the current plugin manager
         ''' </summary>
         ''' <returns></returns>
-        Public Overridable Property CurrentPluginManager As Object
+        Public Overridable Property CurrentPluginManager As PluginManager
 
         ''' <summary>
         ''' Returns an IEnumerable of every type that the view model is programmed to handle.

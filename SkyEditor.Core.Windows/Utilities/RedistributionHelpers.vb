@@ -75,7 +75,7 @@ Namespace Utilities
             Next
 
             'Copy temporary files
-            Await Core.Utilities.FileSystem.ReCreateDirectory(tempDir, manager.CurrentIOProvider)
+            Await Core.Utilities.FileSystem.ReCreateDirectory(tempDir, manager.CurrentIOProvider).ConfigureAwait(False)
             For Each filePath In ToCopy
                 If File.Exists(filePath) Then
                     Dim dest = filePath.Replace(devDir, tempDir)
@@ -88,7 +88,7 @@ Namespace Utilities
                 Else
                     'It's probably a directory.
                     If Directory.Exists(filePath) Then
-                        Await Core.Utilities.FileSystem.CopyDirectory(filePath, filePath.Replace(Path.GetDirectoryName(filePath), tempDir), manager.CurrentIOProvider)
+                        Await Core.Utilities.FileSystem.CopyDirectory(filePath, filePath.Replace(Path.GetDirectoryName(filePath), tempDir), manager.CurrentIOProvider).ConfigureAwait(False)
                         'Else
                         'Guess not.  Do nothing.
                     End If
@@ -105,7 +105,7 @@ Namespace Utilities
 
             'Then zip it
             Core.Utilities.Zip.Zip(tempDir, DestinationFilename)
-            Await Core.Utilities.FileSystem.DeleteDirectory(tempDir, manager.CurrentIOProvider)
+            Await Core.Utilities.FileSystem.DeleteDirectory(tempDir, manager.CurrentIOProvider).ConfigureAwait(False)
         End Function
 
         ''' <summary>

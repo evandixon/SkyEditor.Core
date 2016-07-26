@@ -103,7 +103,7 @@
 
                         'Remove completed tasks
                         For count = RunningTasks.Count - 1 To 0 Step -1
-                            If RunningTasks(count).IsCompleted Then
+                            If RunningTasks(count).GetAwaiter.IsCompleted Then
                                 RunningTasks.RemoveAt(count)
                             End If
                         Next
@@ -167,7 +167,7 @@
 
                         'Remove completed tasks
                         For count = RunningTasks.Count - 1 To 0 Step -1
-                            If RunningTasks(count).IsCompleted Then
+                            If RunningTasks(count).GetAwaiter.IsCompleted Then
                                 RunningTasks.RemoveAt(count)
                             End If
                         Next

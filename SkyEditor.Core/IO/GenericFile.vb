@@ -605,6 +605,41 @@ Namespace IO
         End Function
 
         ''' <summary>
+        ''' Copies data into the given stream.
+        ''' </summary>
+        ''' <param name="destination">Stream to which to copy data.</param>
+        ''' <param name="index">Index of the data to start reading from the <see cref="GenericFile"/>.</param>
+        ''' <param name="length">Number of bytes to copy into the destination stream.</param>
+        ''' <exception cref="ArgumentNullException">Thrown if <paramref name="destination"/> is null.</exception>
+        ''' <remarks>Currently, the data of size <paramref name="length"/> is buffered in memory, and will error if there is insufficient memory.
+        ''' 
+        ''' To avoid threading issues, this function will synchronously block using SyncLock until the operation is complete.</remarks>
+        Public Sub CopyTo(destination As Stream, index As Long, length As Long)
+            If IsThreadSafe Then
+                CopyToInternal(destination, index, length)
+            Else
+                SyncLock _fileLock
+                    CopyToInternal(destination, index, length)
+                End SyncLock
+            End If
+        End Sub
+
+        Private Sub CopyToInternal(destination As Stream, index As Long, length As Long)
+            If destination Is Nothing Then
+                Throw New ArgumentNullException(NameOf(destination))
+            End If
+
+            If InMemoryFile IsNot Nothing Then
+                destination.Write(InMemoryFile, index, length)
+            Else
+                Dim buffer(length) As Byte
+                FileReader.Seek(index, SeekOrigin.Begin)
+                FileReader.Read(buffer, 0, length)
+                destination.Write(buffer, 0, length)
+            End If
+        End Sub
+
+        ''' <summary>
         ''' Reads a UTF-16 string from the file.
         ''' </summary>
         ''' <param name="Offset">Location of the string in the file.</param>

@@ -27,7 +27,7 @@ Namespace Extensions.Online
 
         Private Async Function GetResponse() As Task(Of RootCollectionResponse)
             If _response Is Nothing Then
-                _response = Json.Deserialize(Of RootCollectionResponse)(Await Client.DownloadStringTaskAsync(New Uri(RootEndpoint)))
+                _response = Json.Deserialize(Of RootCollectionResponse)(Await Client.DownloadStringTaskAsync(New Uri(RootEndpoint)).ConfigureAwait(False))
             End If
             Return _response
         End Function
@@ -35,7 +35,7 @@ Namespace Extensions.Online
 
         Public Async Function GetName() As Task(Of String) Implements IExtensionCollection.GetName
             If String.IsNullOrEmpty(_name) Then
-                _name = (Await GetResponse()).Name
+                _name = (Await GetResponse.ConfigureAwait(False)).Name
             End If
             Return _name
         End Function
@@ -43,7 +43,7 @@ Namespace Extensions.Online
 
         Public Async Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
             If _childCollections Is Nothing Then
-                For Each item In (Await GetResponse()).ChildCollectionEndpoints
+                For Each item In (Await GetResponse.ConfigureAwait(False)).ChildCollectionEndpoints
                     If Not item = RootEndpoint Then
                         _childCollections.Add(New OnlineExtensionCollection(item))
                     End If
@@ -55,14 +55,14 @@ Namespace Extensions.Online
 
         Public Async Function GetExtensionCount(manager As PluginManager) As Task(Of Integer) Implements IExtensionCollection.GetExtensionCount
             If Not _extensionCount.HasValue Then
-                _extensionCount = (Await GetResponse()).ExtensionCount
+                _extensionCount = (Await GetResponse.ConfigureAwait(False)).ExtensionCount
             End If
             Return _extensionCount
         End Function
         Dim _extensionCount As Integer?
 
         Public Async Function GetExtensions(skip As Integer, take As Integer, manager As PluginManager) As Task(Of IEnumerable(Of ExtensionInfo)) Implements IExtensionCollection.GetExtensions
-            Dim responseRaw = Await Client.DownloadStringTaskAsync((Await GetResponse()).GetExtensionListEndpoint & $"?skip={skip}&take={take}")
+            Dim responseRaw = Await Client.DownloadStringTaskAsync((Await GetResponse.ConfigureAwait(False)).GetExtensionListEndpoint & $"?skip={skip}&take={take}")
             Dim response = Json.Deserialize(Of List(Of OnlineExtensionInfo))(responseRaw)
 
             Dim i As Integer = skip
@@ -83,10 +83,10 @@ Namespace Extensions.Online
         Public Async Function InstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             'Download zip
             Dim tempName = manager.CurrentIOProvider.GetTempFilename
-            Await Client.DownloadFileTaskAsync((Await GetResponse()).DownloadExtensionEndpoint & $"?id={extensionID}", tempName)
+            Await Client.DownloadFileTaskAsync((Await GetResponse.ConfigureAwait(False)).DownloadExtensionEndpoint & $"?id={extensionID}", tempName)
 
             'Install
-            Dim result = Await ExtensionHelper.InstallExtensionZip(tempName, manager)
+            Dim result = Await ExtensionHelper.InstallExtensionZip(tempName, manager).ConfigureAwait(False)
 
             'Clean up
             manager.CurrentIOProvider.DeleteFile(tempName)

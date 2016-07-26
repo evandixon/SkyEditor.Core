@@ -19,7 +19,7 @@ Namespace Extensions
         End Property
 
         Public Overrides Async Function InstallExtension(extensionID As Guid, TempDir As String) As Task(Of ExtensionInstallResult)
-            Await MyBase.InstallExtension(extensionID, TempDir)
+            Await MyBase.InstallExtension(extensionID, TempDir).ConfigureAwait(False)
             Return ExtensionInstallResult.RestartRequired
         End Function
 
