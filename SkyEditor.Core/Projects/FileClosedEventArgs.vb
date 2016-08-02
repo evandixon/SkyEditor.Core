@@ -1,4 +1,4 @@
-﻿Namespace IO
+﻿Namespace Projects
     Public Class FileClosedEventArgs
         Inherits EventArgs
         Public Property File As Object

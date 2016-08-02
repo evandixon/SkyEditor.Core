@@ -1,4 +1,4 @@
-﻿Namespace IO
+﻿Namespace Projects
     Public Class ProjectFileAddedEventArgs
         Inherits EventArgs
         Public Property ParentPath As String

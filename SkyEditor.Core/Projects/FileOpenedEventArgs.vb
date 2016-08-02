@@ -1,5 +1,5 @@
 ﻿
-Namespace IO
+Namespace Projects
     Public Class FileOpenedEventArguments
         Inherits EventArgs
         Public Property File As Object

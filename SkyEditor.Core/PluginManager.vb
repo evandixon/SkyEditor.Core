@@ -5,6 +5,7 @@ Imports SkyEditor.Core.Utilities
 Imports SkyEditor.Core.Settings
 Imports SkyEditor.Core.Extensions
 Imports SkyEditor.Core.ConsoleCommands
+Imports SkyEditor.Core.Projects
 
 Public Class PluginManager
     Implements IDisposable

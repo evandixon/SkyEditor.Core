@@ -1,8 +1,9 @@
 ﻿Imports System.Reflection
+Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.UI
 Imports SkyEditor.Core.Utilities
 
-Namespace IO
+Namespace Projects
     Public Class ProjectNode
         Inherits ProjectNodeBase
 

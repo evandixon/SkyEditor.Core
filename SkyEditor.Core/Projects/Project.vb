@@ -1,7 +1,8 @@
 ﻿Imports System.Reflection
+Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.Utilities
 
-Namespace IO
+Namespace Projects
     Public Class Project
         Inherits ProjectBase
         Implements ISavable
@@ -217,7 +218,7 @@ Namespace IO
                     Throw New Exception("A file with the given already exists in the given path: " & ParentPath)
                 End If
             Else
-                Throw New IO.DirectoryNotFoundException("Cannot create a file at the given path: " & ParentPath)
+                Throw New DirectoryNotFoundException("Cannot create a file at the given path: " & ParentPath)
             End If
         End Sub
 

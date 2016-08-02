@@ -1,4 +1,4 @@
-﻿Namespace IO
+﻿Namespace Projects
     Public Class ProjectDirectoryCreatedEventArgs
         Inherits EventArgs
         Public Property Directory As String

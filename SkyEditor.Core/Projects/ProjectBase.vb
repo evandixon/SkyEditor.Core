@@ -1,4 +1,6 @@
-﻿Namespace IO
+﻿Imports SkyEditor.Core.IO
+
+Namespace Projects
     ''' <summary>
     ''' Defines the common functionality of both projects and solutions.
     ''' </summary>

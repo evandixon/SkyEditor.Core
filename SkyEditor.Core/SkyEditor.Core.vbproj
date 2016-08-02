@@ -114,16 +114,15 @@
     <Compile Include="Extensions\InstalledExtensionCollection.vb" />
     <Compile Include="Extensions\PluginExtensionType.vb" />
     <Compile Include="IOUIManager.vb" />
-    <Compile Include="IO\BuildProgressedEventArgs.vb" />
+    <Compile Include="Projects\BuildProgressedEventArgs.vb" />
     <Compile Include="IO\DetectableFileTypeDetector.vb" />
-    <Compile Include="IO\DirectoryCreatedEventArgs.vb" />
-    <Compile Include="IO\DirectoryDeletedEventArgs.vb" />
-    <Compile Include="IO\DirectoryNotFoundException.vb" />
+    <Compile Include="Projects\DirectoryDeletedEventArgs.vb" />
+    <Compile Include="Projects\DirectoryNotFoundException.vb" />
     <Compile Include="IO\DirectoryTypeDetectionResult.vb" />
-    <Compile Include="IO\FileClosedEventArgs.vb" />
-    <Compile Include="IO\FileClosingEventArgs.vb" />
-    <Compile Include="IO\FileOpenedEventArgs.vb" />
-    <Compile Include="IO\FileRemovedEventArgs.vb" />
+    <Compile Include="Projects\FileClosedEventArgs.vb" />
+    <Compile Include="Projects\FileClosingEventArgs.vb" />
+    <Compile Include="Projects\FileOpenedEventArgs.vb" />
+    <Compile Include="Projects\FileRemovedEventArgs.vb" />
     <Compile Include="IO\FileTypeDetectionResult.vb" />
     <Compile Include="IO\IDirectoryTypeDetector.vb" />
     <Compile Include="IO\IFileOpener.vb" />
@@ -133,19 +132,19 @@
     <Compile Include="IO\ObjectFile.vb" />
     <Compile Include="IO\ObjectFileDetector.vb" />
     <Compile Include="IO\OpenableFileOpener.vb" />
-    <Compile Include="IO\Project.vb" />
-    <Compile Include="IO\ProjectAddedEventArgs.vb" />
-    <Compile Include="IO\ProjectBase.vb" />
-    <Compile Include="IO\ProjectBuildStatusChanged.vb" />
-    <Compile Include="IO\ProjectDirectoryCreatedEventArgs.vb" />
-    <Compile Include="IO\ProjectFileAddedEventArgs.vb" />
-    <Compile Include="IO\ProjectFileRemovedEventArgs.vb" />
-    <Compile Include="IO\ProjectNode.vb" />
-    <Compile Include="IO\ProjectNodeBase.vb" />
-    <Compile Include="IO\ProjectRemovedEventArgs.vb" />
-    <Compile Include="IO\ProjectRemovingEventArgs.vb" />
+    <Compile Include="Projects\Project.vb" />
+    <Compile Include="Projects\ProjectAddedEventArgs.vb" />
+    <Compile Include="Projects\ProjectBase.vb" />
+    <Compile Include="Projects\ProjectBuildStatusChanged.vb" />
+    <Compile Include="Projects\ProjectDirectoryCreatedEventArgs.vb" />
+    <Compile Include="Projects\ProjectFileAddedEventArgs.vb" />
+    <Compile Include="Projects\ProjectFileRemovedEventArgs.vb" />
+    <Compile Include="Projects\ProjectNode.vb" />
+    <Compile Include="Projects\ProjectNodeBase.vb" />
+    <Compile Include="Projects\ProjectRemovedEventArgs.vb" />
+    <Compile Include="Projects\ProjectRemovingEventArgs.vb" />
     <Compile Include="IO\SavableFileSaver.vb" />
-    <Compile Include="IO\SolutionNode.vb" />
+    <Compile Include="Projects\SolutionNode.vb" />
     <Compile Include="ISettingsProvider.vb" />
     <Compile Include="Language.fr.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -159,7 +158,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SettingNames.resx</DependentUpon>
     </Compile>
-    <Compile Include="IO\Solution.vb" />
+    <Compile Include="Projects\Solution.vb" />
     <Compile Include="UI\ActionMenuItem.vb" />
     <Compile Include="UI\AnchorableViewModel.vb" />
     <Compile Include="UI\FileViewModel.vb" />

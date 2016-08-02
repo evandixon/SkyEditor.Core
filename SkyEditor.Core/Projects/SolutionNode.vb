@@ -1,7 +1,7 @@
 ﻿Imports System.Reflection
 Imports SkyEditor.Core.UI
 
-Namespace IO
+Namespace Projects
     ''' <summary>
     ''' Models a node in the solution's logical heiarchy.
     ''' </summary>

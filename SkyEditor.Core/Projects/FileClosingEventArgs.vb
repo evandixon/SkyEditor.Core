@@ -1,6 +1,6 @@
 ﻿Imports SkyEditor.Core.UI
 
-Namespace IO
+Namespace Projects
     Public Class FileClosingEventArgs
         Public Property Cancel As Boolean
         Public Property File As FileViewModel

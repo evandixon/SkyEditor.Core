@@ -1,6 +1,6 @@
 ﻿Imports SkyEditor.Core.Utilities
 
-Namespace IO
+Namespace Projects
     ''' <summary>
     ''' Defines the common functionality of the nodes of both projects and solutions.
     ''' </summary>

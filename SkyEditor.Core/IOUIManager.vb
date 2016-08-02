@@ -6,6 +6,7 @@ Imports SkyEditor.Core.Utilities
 Imports SkyEditor.Core.Settings
 Imports System.Windows.Input
 Imports System.Collections.Specialized
+Imports SkyEditor.Core.Projects
 ''' <summary>
 ''' Class that manages open files, solutions, and projects, and helps with the UI display them.
 ''' </summary>
