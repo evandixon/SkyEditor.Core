@@ -1,4 +1,4 @@
-﻿Namespace IO
+﻿Namespace Projects
     Public Class ProjectBuildStatusChanged
         Inherits BuildProgressedEventArgs
 

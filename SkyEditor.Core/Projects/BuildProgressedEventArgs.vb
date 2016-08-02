@@ -1,4 +1,4 @@
-﻿Namespace IO
+﻿Namespace Projects
     Public Class BuildProgressedEventArgs
         Inherits EventArgs
         Public Property Progress As Single

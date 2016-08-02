@@ -129,8 +129,8 @@
   <data name="ConsoleUnknownCommand" xml:space="preserve">
     <value>Unknown command "{0}".</value>
   </data>
-  <data name="Directory" xml:space="preserve">
-    <value>Directory</value>
+  <data name="DirectoryPrefix" xml:space="preserve">
+    <value>[Directory]</value>
   </data>
   <data name="ErrorAsyncForInfiniteLoop" xml:space="preserve">
     <value>StepCount cannot be 0.</value>
@@ -151,6 +151,9 @@
   <data name="ErrorNoSaveFilename" xml:space="preserve">
     <value>Using GenericFile.Save() requires GenericFile.OriginalFilename to not be null.</value>
     <comment>Message for an exception that's thrown when using GenericFile.Save() when the file doesn't have an original filename.</comment>
+  </data>
+  <data name="ErrorProjectNullRoot" xml:space="preserve">
+    <value>The root node of the project should not be null.</value>
   </data>
   <data name="ErrorSanityNoMax" xml:space="preserve">
     <value>Sanity check failed.  Out of a list of non-zero length, no item exists that equals the max item.</value>
@@ -185,8 +188,8 @@
   <data name="PluginDevExtVersion" xml:space="preserve">
     <value>0.0</value>
   </data>
-  <data name="Project" xml:space="preserve">
-    <value>Project</value>
+  <data name="ProjectPrefix" xml:space="preserve">
+    <value>[Project]</value>
   </data>
   <data name="SkyEditorProjects" xml:space="preserve">
     <value>Sky Editor Projects</value>
