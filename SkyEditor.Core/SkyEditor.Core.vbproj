@@ -116,6 +116,7 @@
     <Compile Include="IOUIManager.vb" />
     <Compile Include="Projects\BuildProgressedEventArgs.vb" />
     <Compile Include="IO\DetectableFileTypeDetector.vb" />
+    <Compile Include="Projects\BuildStatus.vb" />
     <Compile Include="Projects\DirectoryDeletedEventArgs.vb" />
     <Compile Include="Projects\DirectoryNotFoundException.vb" />
     <Compile Include="IO\DirectoryTypeDetectionResult.vb" />
@@ -136,6 +137,7 @@
     <Compile Include="Projects\ProjectAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectBase.vb" />
     <Compile Include="Projects\ProjectBuildStatusChanged.vb" />
+    <Compile Include="Projects\ProjectCircularReferenceException.vb" />
     <Compile Include="Projects\ProjectDirectoryCreatedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileRemovedEventArgs.vb" />

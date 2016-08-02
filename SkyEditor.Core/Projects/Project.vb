@@ -306,14 +306,6 @@ Namespace Projects
             End If
         End Sub
 
-        Public Overridable Function Build() As Task
-            Return Task.FromResult(0)
-        End Function
-
-        Public Overridable Function CanBuild() As Boolean
-            Return False
-        End Function
-
         Public Overridable Function GetRootDirectory() As String
             Return Path.GetDirectoryName(Me.Filename)
         End Function

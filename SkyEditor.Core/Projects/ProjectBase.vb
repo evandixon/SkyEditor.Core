@@ -92,6 +92,16 @@ Namespace Projects
         End Property
         Private WithEvents _root As ProjectNodeBase
 
+#End Region
+
+#Region "Build"
+
+        ''' <summary>
+        ''' Gets or sets the status of the project's current build.
+        ''' </summary>
+        ''' <returns>The status of the project's current build.</returns>
+        Public Property BuildStatus As BuildStatus
+
         ''' <summary>
         ''' Gets or sets the progress of the current project's build.
         ''' </summary>
@@ -145,6 +155,50 @@ Namespace Projects
             End Set
         End Property
         Dim _isBuildProgressIndeterminate As Boolean
+
+        ''' <summary>
+        ''' Gets whether or not a build is currently running.
+        ''' </summary>
+        ''' <returns>A boolean indicating whether or not the <see cref="BuildStatus"/> indicates a running build.</returns>
+        Public Function IsBuilding() As Boolean
+            Return BuildStatus = BuildStatus.Building OrElse BuildStatus = BuildStatus.Canceling
+        End Function
+
+        ''' <summary>
+        ''' Gets whether or not a build cancelation has been requested.
+        ''' </summary>
+        ''' <returns>A boolean indicating whether or not the <see cref="BuildStatus"/> indicates the build should be canceled.</returns>
+        Public Function IsCancelRequested() As Boolean
+            Return BuildStatus = BuildStatus.Canceling
+        End Function
+
+        ''' <summary>
+        ''' Starts a new build, if one is not already running.
+        ''' </summary>
+        Public Overridable Function StartBuild() As Task
+            If Not IsBuilding() Then
+                BuildStatus = BuildStatus.Done
+            End If
+            Return Task.FromResult(0)
+        End Function
+
+        ''' <summary>
+        ''' Requests that the current build be canceled.
+        ''' </summary>
+        ''' <remarks>This only requests that the build be canceled.  It is up to the implementation of the current project whether or not the build actaully stops.</remarks>
+        Public Overridable Sub CancelBuild()
+            If IsBuilding() Then
+                BuildStatus = BuildStatus.Canceling
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Gets whether or not a build can be run.
+        ''' </summary>
+        ''' <returns>A boolean indicating whether or not a build can be started.</returns>
+        Public Overridable Function CanBuild() As Boolean
+            Return Not IsBuilding()
+        End Function
 #End Region
 
         ''' <summary>

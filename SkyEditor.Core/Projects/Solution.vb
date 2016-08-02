@@ -301,12 +301,34 @@ Namespace Projects
         End Function
 
 #Region "Building"
+
+        ''' <summary>
+        ''' Cancels the solution's build, and the builds of any child projects.
+        ''' </summary>
+        Public Overrides Sub CancelBuild()
+            'Cancel the solution's build
+            MyBase.CancelBuild()
+
+            'Cancel any projects that are building
+            For Each item In GetAllProjects()
+                If item.IsBuilding Then
+                    item.CancelBuild()
+                End If
+            Next
+        End Sub
+
+        Public Overrides Function CanBuild() As Boolean
+            Return Not IsBuilding()
+        End Function
+
         Public Overridable Function GetProjectsToBuild() As IEnumerable(Of Project)
             Return From p In Me.GetAllProjects Where p.CanBuild
         End Function
 
-        Public Overridable Async Function Build() As Task
-            Await Build(GetProjectsToBuild)
+        Public Overrides Async Function StartBuild() As Task
+            If Not IsBuilding() AndAlso CanBuild() Then
+                Await Build(GetProjectsToBuild)
+            End If
         End Function
 
         Public Overridable Async Function Build(projects As IEnumerable(Of Project)) As Task
@@ -315,13 +337,19 @@ Namespace Projects
 
             For Each item In projects
                 If Not item.HasCircularReferences(Me) Then
+                    'Stop if the build has been canceled.
+                    If IsCancelRequested() Then Exit Function
+
                     toBuild.Add(item, False)
                 Else
-                    Throw New Exception("Circular reference detected")
+                    Throw New ProjectCircularReferenceException
                 End If
             Next
 
             For count = 0 To toBuild.Keys.Count - 1
+                'Stop if the build has been canceled.
+                If IsCancelRequested() Then Exit Function
+
                 Dim key = toBuild.Keys(count)
                 'If this project has not been built
                 If Not toBuild(key) Then
@@ -336,6 +364,10 @@ Namespace Projects
         Private Async Function BuildProjects(ToBuild As Dictionary(Of Project, Boolean), CurrentProject As Project) As Task
             Dim buildTasks As New List(Of Task)
             For Each item In From p In CurrentProject.GetReferences(Me) Where p.CanBuild
+                'Stop if the build has been canceled.
+                If IsCancelRequested() Then Exit Function
+
+                'Start building this project
                 buildTasks.Add(BuildProjects(ToBuild, item))
             Next
             Await Task.WhenAll(buildTasks)
@@ -344,7 +376,7 @@ Namespace Projects
                 'Todo: make sure we won't get here twice, with all the async stuff going on
                 ToBuild(CurrentProject) = True
                 UpdateBuildLoadingStatus(ToBuild)
-                Await CurrentProject.Build
+                Await CurrentProject.StartBuild
             End If
         End Function
 
