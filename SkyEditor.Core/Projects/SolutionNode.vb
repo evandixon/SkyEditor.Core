@@ -23,6 +23,16 @@ Namespace Projects
             End Set
         End Property
 
+        Public Overrides ReadOnly Property Prefix As String
+            Get
+                If IsDirectory Then
+                    Return My.Resources.Language.DirectoryPrefix
+                Else
+                    Return My.Resources.Language.ProjectPrefix
+                End If
+            End Get
+        End Property
+
         Public Overrides Function CreateChildDirectory(directoryName As String) As ProjectNodeBase
             If CanCreateChildDirectory() Then
                 Dim node As New SolutionNode(ParentProject, Me)

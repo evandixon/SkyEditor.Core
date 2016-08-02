@@ -39,6 +39,16 @@ Namespace Projects
             End Get
         End Property
 
+        Public Overrides ReadOnly Property Prefix As String
+            Get
+                If IsDirectory Then
+                    Return My.Resources.Language.DirectoryPrefix
+                Else
+                    Return String.Empty
+                End If
+            End Get
+        End Property
+
         ''' <summary>
         ''' Gets the file at this node, opening it if it hasn't already been.
         ''' </summary>

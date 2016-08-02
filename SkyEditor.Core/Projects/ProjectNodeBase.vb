@@ -46,6 +46,12 @@ Namespace Projects
         Dim _name As String
 
         ''' <summary>
+        ''' Gets the prefix of the node
+        ''' </summary>
+        ''' <returns>A string representing the prefix of the node.  (e.g. "[Directory]" or "[Project]")</returns>
+        Public MustOverride ReadOnly Property Prefix As String
+
+        ''' <summary>
         ''' Gets the <see cref="ProjectBase"/> of which the current <see cref="ProjectNodeBase"/> is a child.
         ''' </summary>
         Public Overridable ReadOnly Property ParentProject As ProjectBase
