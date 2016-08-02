@@ -101,6 +101,14 @@ Namespace Projects
         ''' </summary>
         ''' <returns>The status of the project's current build.</returns>
         Public Property BuildStatus As BuildStatus
+            Get
+                Return _buildStatus
+            End Get
+            Protected Set(value As BuildStatus)
+                _buildStatus = value
+            End Set
+        End Property
+        Dim _buildStatus As BuildStatus
 
         ''' <summary>
         ''' Gets or sets the progress of the current project's build.
@@ -173,9 +181,9 @@ Namespace Projects
         End Function
 
         ''' <summary>
-        ''' Starts a new build, if one is not already running.
+        ''' Builds the project, the project is not already building.
         ''' </summary>
-        Public Overridable Function StartBuild() As Task
+        Public Overridable Function Build() As Task
             If Not IsBuilding() Then
                 BuildStatus = BuildStatus.Done
             End If

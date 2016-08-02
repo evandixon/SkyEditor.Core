@@ -325,13 +325,13 @@ Namespace Projects
             Return From p In Me.GetAllProjects Where p.CanBuild
         End Function
 
-        Public Overrides Async Function StartBuild() As Task
+        Public Overrides Async Function Build() As Task
             If Not IsBuilding() AndAlso CanBuild() Then
                 Await Build(GetProjectsToBuild)
             End If
         End Function
 
-        Public Overridable Async Function Build(projects As IEnumerable(Of Project)) As Task
+        Public Overridable Overloads Async Function Build(projects As IEnumerable(Of Project)) As Task
             RaiseEvent SolutionBuildStarted(Me, New EventArgs)
             Dim toBuild As New Dictionary(Of Project, Boolean)
 
@@ -376,7 +376,7 @@ Namespace Projects
                 'Todo: make sure we won't get here twice, with all the async stuff going on
                 ToBuild(CurrentProject) = True
                 UpdateBuildLoadingStatus(ToBuild)
-                Await CurrentProject.StartBuild
+                Await CurrentProject.Build
             End If
         End Function
 
