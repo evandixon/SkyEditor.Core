@@ -86,6 +86,7 @@ Namespace Projects
             End Get
             Set(value As ProjectNodeBase)
                 If _root IsNot value Then
+                    _root = value
                     RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Root)))
                 End If
             End Set
