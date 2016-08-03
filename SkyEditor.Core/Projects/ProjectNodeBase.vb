@@ -33,10 +33,8 @@ Namespace Projects
                     Return _name
                 ElseIf TypeOf Item Is ProjectBase Then
                     Return DirectCast(Item, ProjectBase).Name
-                ElseIf TypeOf Item Is INamed Then
-                    Return DirectCast(Item, INamed).Name
                 Else
-                    Return String.Empty
+                    Return _name
                 End If
             End Get
             Set(value As String)
@@ -72,12 +70,12 @@ Namespace Projects
         ''' <remarks>If the current node has no children, the children of <see cref="Item"/> will be used instead, if <see cref="Item"/> is a <see cref="ProjectBase"/>.</remarks>
         Public Overridable Property Children As ICollection(Of ProjectNodeBase)
             Get
-                If _children IsNot Nothing Then
+                If _children IsNot Nothing AndAlso _children.Count > 0 Then
                     Return _children
                 ElseIf TypeOf Item Is ProjectBase Then
                     Return DirectCast(Item, ProjectBase).Root.Children
                 Else
-                    Return {}
+                    Return _children
                 End If
             End Get
             Set(value As ICollection(Of ProjectNodeBase))
