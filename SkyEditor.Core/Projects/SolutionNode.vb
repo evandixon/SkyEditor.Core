@@ -11,7 +11,6 @@ Namespace Projects
 
         Public Sub New(parentSolution As Solution, parentNode As SolutionNode)
             MyBase.New(parentSolution, parentNode)
-            Children = New ObservableCollection(Of ProjectNodeBase)
         End Sub
 
         Public Shadows Property Item As Project

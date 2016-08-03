@@ -31,6 +31,8 @@ Namespace Projects
             Get
                 If IsDirectory Then
                     Return _name
+                ElseIf TypeOf Item Is ProjectBase Then
+                    Return DirectCast(Item, ProjectBase).Name
                 ElseIf TypeOf Item Is INamed Then
                     Return DirectCast(Item, INamed).Name
                 Else
@@ -38,7 +40,7 @@ Namespace Projects
                 End If
             End Get
             Set(value As String)
-                If Name <> value Then
+                If _name <> value Then
                     _name = value
                     RaisePropertyChanged(Me, NameOf(Name))
                 End If

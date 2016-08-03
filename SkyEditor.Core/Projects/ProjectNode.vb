@@ -9,7 +9,6 @@ Namespace Projects
 
         Public Sub New(project As Project, parentNode As ProjectNode)
             MyBase.New(project, parentNode)
-            Me.Children = New ObservableCollection(Of ProjectNodeBase)
         End Sub
 
         Public Sub New(Project As Project, parentNode As ProjectNode, File As Object)
