@@ -12,6 +12,7 @@ Namespace Projects
         Public Sub New(project As ProjectBase, parentNode As ProjectNodeBase)
             Me.ParentProject = project
             Me.ParentNode = parentNode
+            Children = New ObservableCollection(Of ProjectNodeBase)
         End Sub
 
         Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
