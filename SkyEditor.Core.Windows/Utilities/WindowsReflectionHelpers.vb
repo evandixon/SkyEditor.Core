@@ -109,7 +109,7 @@ Namespace Utilities
                         For Each source In devAssemblyPaths
                             Dim name = AssemblyName.GetAssemblyName(source)
                             If reference.FullName = name.FullName Then
-                                out.AddRange(GetAssemblyDependencies(Assembly.LoadFrom(source)))
+                                out.AddRange(GetAssemblyDependencies(LoadAssembly(source)))
                             End If
                         Next
                     End If
@@ -117,6 +117,35 @@ Namespace Utilities
             Next
 
             Return out
+        End Function
+
+        ''' <summary>
+        ''' Loads the assembly at the given path, if there's not another version in the AppDomain
+        ''' </summary>
+        ''' <param name="assemblyPath">Path of the assembly to load</param>
+        ''' <returns>The assembly at the given path, or another assembly with the same full name.</returns>
+        ''' <remarks>If the target assembly is a different version of an already loaded assembly, one that's already loaded will be returned instead.</remarks>
+        Public Shared Function LoadAssembly(assemblyPath As String) As Assembly
+            'First, check to see if we already loaded it
+            Dim name As AssemblyName = AssemblyName.GetAssemblyName(assemblyPath)
+            Dim q1 = From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = name.FullName
+
+            If q1.Any Then
+                'If we did, then there's no point in loading it again.  In some cases, it could cause more problems
+                Return q1.First
+            Else
+                'If we didn't, then load it
+                If WindowsReflectionHelpers.IsSupportedPlugin(assemblyPath) Then
+                    Dim loadedAssembly = Assembly.LoadFrom(assemblyPath)
+
+                    'Relying on the side effect of this function to load all dependant assemblies into the current app domain
+                    WindowsReflectionHelpers.GetAssemblyDependencies(loadedAssembly)
+
+                    Return loadedAssembly
+                Else
+                    Return Nothing
+                End If
+            End If
         End Function
     End Class
 End Namespace

@@ -30,26 +30,7 @@ Namespace CoreMods
         End Function
 
         Public Overrides Function LoadAssembly(assemblyPath As String) As Assembly
-            'First, check to see if we already loaded it
-            Dim name As AssemblyName = AssemblyName.GetAssemblyName(assemblyPath)
-            Dim q1 = From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = name.FullName
-
-            If q1.Any Then
-                'If we did, then there's no point in loading it again.  In some cases, it could cause more problems
-                Return q1.First
-            Else
-                'If we didn't, then load it
-                If WindowsReflectionHelpers.IsSupportedPlugin(assemblyPath) Then
-                    Dim loadedAssembly = Assembly.LoadFrom(assemblyPath)
-
-                    'Relying on the side effect of this function to load all dependant assemblies into the current app domain
-                    WindowsReflectionHelpers.GetAssemblyDependencies(loadedAssembly)
-
-                    Return loadedAssembly
-                Else
-                    Return Nothing
-                End If
-            End If
+            Return WindowsReflectionHelpers.LoadAssembly(assemblyPath)
         End Function
 
         Public Overrides Function GetSettingsProvider(manager As SkyEditor.Core.PluginManager) As ISettingsProvider
