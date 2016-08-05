@@ -80,7 +80,7 @@ Namespace Extensions.Online
             Return response
         End Function
 
-        Public Async Function InstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Public Async Function InstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             'Download zip
             Dim tempName = manager.CurrentIOProvider.GetTempFilename
             Await Client.DownloadFileTaskAsync((Await GetResponse.ConfigureAwait(False)).DownloadExtensionEndpoint & $"?id={extensionID}", tempName)
@@ -94,7 +94,7 @@ Namespace Extensions.Online
             Return result
         End Function
 
-        Public Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
+        Public Function UninstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
             Dim typeName As String = (From c In CachedInfo.Values Where c.ID = extensionID Select c.ExtensionTypeName).First
             Return ExtensionHelper.UninstallExtension(typeName, extensionID, manager)
         End Function

@@ -18,7 +18,7 @@ Namespace Extensions
             End Get
         End Property
 
-        Public Overrides Async Function InstallExtension(extensionID As Guid, TempDir As String) As Task(Of ExtensionInstallResult)
+        Public Overrides Async Function InstallExtension(extensionID As String, TempDir As String) As Task(Of ExtensionInstallResult)
             Await MyBase.InstallExtension(extensionID, TempDir).ConfigureAwait(False)
             Return ExtensionInstallResult.RestartRequired
         End Function
@@ -29,8 +29,8 @@ Namespace Extensions
         ''' <param name="extensionID">ID of the extension for which to get the directory.</param>
         ''' <returns></returns>
         ''' <remarks>If the extensionID is an empty Guid, returns the plugin development directory.</remarks>
-        Public Overrides Function GetExtensionDirectory(extensionID As Guid) As String
-            If extensionID = Guid.Empty Then
+        Public Overrides Function GetExtensionDirectory(extensionID As String) As String
+            If extensionID = Guid.Empty.ToString Then
                 Return GetDevDirectory()
             Else
                 Return MyBase.GetExtensionDirectory(extensionID)
@@ -52,7 +52,7 @@ Namespace Extensions
                 'Load the development plugins
                 Dim devDir = Path.Combine(RootExtensionDirectory, InternalName, "Development")
                 Dim info As New ExtensionInfo
-                info.ID = Guid.Empty
+                info.ID = Guid.Empty.ToString
                 info.Name = My.Resources.Language.PluginDevExtName
                 info.Description = My.Resources.Language.PluginDevExtDescription
                 info.Author = My.Resources.Language.PluginDevExtAuthor
@@ -76,7 +76,7 @@ Namespace Extensions
         ''' Uninstalls the given extension.
         ''' </summary>
         ''' <param name="extensionID">ID of the extension to uninstall</param>
-        Public Overrides Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult)
+        Public Overrides Function UninstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionUninstallResult)
             CurrentPluginManager.CurrentSettingsProvider.ScheduleDirectoryForDeletion(GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentIOProvider)
             Return Task.FromResult(ExtensionUninstallResult.RestartRequired)
         End Function
