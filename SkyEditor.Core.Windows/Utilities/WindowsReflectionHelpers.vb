@@ -109,7 +109,10 @@ Namespace Utilities
                         For Each source In devAssemblyPaths
                             Dim name = AssemblyName.GetAssemblyName(source)
                             If reference.FullName = name.FullName Then
-                                out.AddRange(GetAssemblyDependencies(LoadAssembly(source)))
+                                Dim a = LoadAssembly(source)
+                                If a IsNot Nothing Then
+                                    out.AddRange(GetAssemblyDependencies(a))
+                                End If
                             End If
                         Next
                     End If
