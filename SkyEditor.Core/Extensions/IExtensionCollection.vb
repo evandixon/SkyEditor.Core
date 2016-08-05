@@ -7,7 +7,7 @@ Namespace Extensions
         Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection))
         Function GetExtensions(skip As Integer, take As Integer, manager As PluginManager) As Task(Of IEnumerable(Of ExtensionInfo))
         Function GetExtensionCount(manager As PluginManager) As Task(Of Integer)
-        Function InstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionInstallResult)
+        Function InstallExtension(extensionID As String, version As String, manager As PluginManager) As Task(Of ExtensionInstallResult)
         Function UninstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionUninstallResult)
     End Interface
 End Namespace

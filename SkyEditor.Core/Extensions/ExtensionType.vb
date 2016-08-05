@@ -69,7 +69,7 @@ Namespace Extensions
             Return Task.FromResult(GetInstalledExtensions(manager).Count())
         End Function
 
-        Private Function InstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Private Function InstallExtension(extensionID As String, version As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             Throw New NotSupportedException("This IExtensionCollection lists extensions that are currently installed, not ones that can be installed, so this cannnot install extensions.")
         End Function
 

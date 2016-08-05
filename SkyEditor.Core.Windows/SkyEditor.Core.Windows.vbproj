@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="ConsoleCommands\DistPrep.vb" />
     <Compile Include="ConsoleCommands\GeneratePluginExtensions.vb" />
+    <Compile Include="Extensions\Online\ExtensionCollectionModel.vb" />
     <Compile Include="Extensions\Online\OnlineExtensionCollection.vb" />
     <Compile Include="Extensions\Online\OnlineExtensionInfo.vb" />
     <Compile Include="Extensions\Online\RootCollectionResponse.vb" />

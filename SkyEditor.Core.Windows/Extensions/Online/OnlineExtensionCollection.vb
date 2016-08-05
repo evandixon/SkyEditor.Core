@@ -13,21 +13,35 @@ Namespace Extensions.Online
         ''' Creates a new instance of <see cref="OnlineExtensionCollection"/>.
         ''' </summary>
         ''' <param name="rootEndpoint">The root endpoint for connecting to the collection.</param>
+        ''' <remarks>The api expects something like the following endpoints:
+        ''' api/ExtensionCollection
+        ''' api/ExtensionCollection/5
+        ''' The endpoint name can vary, but the "/&lt;parentCollectionID&gt;" part must hold true.</remarks>
         Public Sub New(rootEndpoint As String)
             Client = New Net.WebClient
             rootEndpoint = rootEndpoint
             CachedInfo = New Dictionary(Of Integer, OnlineExtensionInfo)
         End Sub
 
+        Public Sub New(rootEndpoint As String, parentCollectionId As Integer)
+            Me.New(rootEndpoint)
+            Me.ParentCollectionId = parentCollectionId
+        End Sub
+
         Private Property Client As Net.WebClient
         Private Property RootEndpoint As String
+        Private Property ParentCollectionId As Integer?
         Private Property GetExtensionsEndpoint As String
         Private Property CachedInfo As Dictionary(Of Integer, OnlineExtensionInfo)
 
 
         Private Async Function GetResponse() As Task(Of RootCollectionResponse)
             If _response Is Nothing Then
-                _response = Json.Deserialize(Of RootCollectionResponse)(Await Client.DownloadStringTaskAsync(New Uri(RootEndpoint)).ConfigureAwait(False))
+                Dim endpoint = RootEndpoint
+                If ParentCollectionId.HasValue Then
+                    endpoint &= "/" & ParentCollectionId.Value
+                End If
+                _response = Json.Deserialize(Of RootCollectionResponse)(Await Client.DownloadStringTaskAsync(New Uri(endpoint)).ConfigureAwait(False))
             End If
             Return _response
         End Function
@@ -43,10 +57,8 @@ Namespace Extensions.Online
 
         Public Async Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
             If _childCollections Is Nothing Then
-                For Each item In (Await GetResponse.ConfigureAwait(False)).ChildCollectionEndpoints
-                    If Not item = RootEndpoint Then
-                        _childCollections.Add(New OnlineExtensionCollection(item))
-                    End If
+                For Each item In (Await GetResponse.ConfigureAwait(False)).ChildCollections
+                    _childCollections.Add(New OnlineExtensionCollection(Me.RootEndpoint, item.ID))
                 Next
             End If
             Return _childCollections
@@ -62,7 +74,7 @@ Namespace Extensions.Online
         Dim _extensionCount As Integer?
 
         Public Async Function GetExtensions(skip As Integer, take As Integer, manager As PluginManager) As Task(Of IEnumerable(Of ExtensionInfo)) Implements IExtensionCollection.GetExtensions
-            Dim responseRaw = Await Client.DownloadStringTaskAsync((Await GetResponse.ConfigureAwait(False)).GetExtensionListEndpoint & $"?skip={skip}&take={take}")
+            Dim responseRaw = Await Client.DownloadStringTaskAsync((Await GetResponse.ConfigureAwait(False)).GetExtensionListEndpoint & $"/{skip}/{take}")
             Dim response = Json.Deserialize(Of List(Of OnlineExtensionInfo))(responseRaw)
 
             Dim i As Integer = skip
@@ -80,10 +92,10 @@ Namespace Extensions.Online
             Return response
         End Function
 
-        Public Async Function InstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Public Async Function InstallExtension(extensionID As String, version As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             'Download zip
             Dim tempName = manager.CurrentIOProvider.GetTempFilename
-            Await Client.DownloadFileTaskAsync((Await GetResponse.ConfigureAwait(False)).DownloadExtensionEndpoint & $"?id={extensionID}", tempName)
+            Await Client.DownloadFileTaskAsync((Await GetResponse.ConfigureAwait(False)).DownloadExtensionEndpoint & $"/{extensionID}/{version}", tempName)
 
             'Install
             Dim result = Await ExtensionHelper.InstallExtensionZip(tempName, manager).ConfigureAwait(False)

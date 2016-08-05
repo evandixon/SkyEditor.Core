@@ -27,7 +27,7 @@ Namespace Extensions
             Return Task.FromResult(info.AsEnumerable)
         End Function
 
-        Public Function InstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Public Function InstallExtension(extensionID As String, version As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             Throw New NotSupportedException
         End Function
 
