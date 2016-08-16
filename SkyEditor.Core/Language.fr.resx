@@ -117,11 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllFiles" xml:space="preserve">
+    <value>Tous Les Fichiers</value>
+  </data>
+  <data name="BuildProgress" xml:space="preserve">
+    <value>Les Progrès De La Construction</value>
+  </data>
   <data name="ConsoleAvailableCommands" xml:space="preserve">
     <value>Les commandes suivantes sont disponibles:</value>
   </data>
   <data name="ConsoleUnknownCommand" xml:space="preserve">
     <value>Commande Inconue: "{0}"</value>
+  </data>
+  <data name="DirectoryPrefix" xml:space="preserve">
+    <value>[Dossier] </value>
   </data>
   <data name="Failed" xml:space="preserve">
     <value>Échoué</value>
