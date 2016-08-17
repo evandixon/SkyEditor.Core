@@ -69,6 +69,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Windows\Utilities\Json.vb" />
     <Compile Include="Windows\ConsoleCommands\DistPrep.vb" />
     <Compile Include="Windows\ConsoleCommands\GeneratePluginExtensions.vb" />
     <Compile Include="Windows\Extensions\Online\ExtensionCollectionModel.vb" />
