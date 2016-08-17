@@ -3,7 +3,7 @@
 Imports System.IO
 Imports System.Reflection
 
-Namespace Utilities
+Namespace Windows.Utilities
     Public Class AssemblyReflectionProxy
         Inherits MarshalByRefObject
 

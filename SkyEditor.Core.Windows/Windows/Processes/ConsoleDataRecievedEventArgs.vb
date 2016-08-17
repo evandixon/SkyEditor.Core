@@ -1,4 +1,4 @@
-﻿Namespace Processes
+﻿Namespace Windows.Processes
     Public Class ConsoleDataRecievedEventArgs
         Inherits EventArgs
         Public Property Line As String

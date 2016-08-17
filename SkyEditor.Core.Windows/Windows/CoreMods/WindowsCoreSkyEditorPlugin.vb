@@ -4,7 +4,7 @@ Imports SkyEditor.Core.Windows.ConsoleCommands
 Imports SkyEditor.Core.Windows.Providers
 Imports SkyEditor.Core.Windows.Utilities
 
-Namespace CoreMods
+Namespace Windows.CoreMods
     Public MustInherit Class WindowsCoreSkyEditorPlugin
         Inherits CoreSkyEditorPlugin
 

@@ -1,4 +1,4 @@
-﻿Namespace Extensions.Online
+﻿Namespace Windows.Extensions.Online
     Public Class RootCollectionResponse
         Public Property Name As String
         Public Property ChildCollections As List(Of ExtensionCollectionModel)

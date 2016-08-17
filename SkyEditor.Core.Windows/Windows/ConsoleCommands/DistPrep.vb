@@ -1,7 +1,7 @@
 ﻿Imports SkyEditor.Core.ConsoleCommands
 Imports SkyEditor.Core.Windows.Utilities
 
-Namespace ConsoleCommands
+Namespace Windows.ConsoleCommands
     Public Class DistPrep
         Inherits ConsoleCommand
 

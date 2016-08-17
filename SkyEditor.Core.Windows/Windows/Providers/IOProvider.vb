@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports Microsoft.VisualBasic.Devices
 
-Namespace Providers
+Namespace Windows.Providers
     Public Class WindowsIOProvider
         Inherits SkyEditor.Core.IO.IOProvider
 

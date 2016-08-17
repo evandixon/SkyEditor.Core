@@ -1,4 +1,4 @@
-﻿Namespace Processes
+﻿Namespace Windows.Processes
     Public Enum ProcessStatus
         None
         Starting

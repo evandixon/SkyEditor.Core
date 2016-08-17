@@ -1,6 +1,6 @@
 ﻿Imports SkyEditor.Core.Extensions
 
-Namespace Extensions.Online
+Namespace Windows.Extensions.Online
     Public Class OnlineExtensionInfo
         Inherits ExtensionInfo
         Public Property AvailableVersions As List(Of String)

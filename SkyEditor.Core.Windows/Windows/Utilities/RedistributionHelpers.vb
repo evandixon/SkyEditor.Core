@@ -7,7 +7,7 @@ Imports SkyEditor.Core.Extensions
 Imports SkyEditor.Core.Utilities
 Imports SkyEditor.Core.Windows
 
-Namespace Utilities
+Namespace Windows.Utilities
 
     'Legacy code to deal with the old manor of handling plugins, some of which will still be used for plugin development.
     Public Class RedistributionHelpers

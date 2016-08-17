@@ -1,7 +1,7 @@
 ﻿'From http://www.codeproject.com/Articles/453778/Loading-Assemblies-from-Anywhere-into-a-New-AppDom
 Imports System.Reflection
 
-Namespace Utilities
+Namespace Windows.Utilities
     Public Class AssemblyReflectionManager
         Implements IDisposable
 

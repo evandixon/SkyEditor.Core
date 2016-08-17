@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8238A6A2-76AF-4741-8564-D1D2A4B067BB}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SkyEditor.Core.Windows</RootNamespace>
+    <RootNamespace>SkyEditor.Core</RootNamespace>
     <AssemblyName>SkyEditor.Core.Windows</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
@@ -69,36 +69,36 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleCommands\DistPrep.vb" />
-    <Compile Include="ConsoleCommands\GeneratePluginExtensions.vb" />
-    <Compile Include="Extensions\Online\ExtensionCollectionModel.vb" />
-    <Compile Include="Extensions\Online\OnlineExtensionCollection.vb" />
-    <Compile Include="Extensions\Online\OnlineExtensionInfo.vb" />
-    <Compile Include="Extensions\Online\RootCollectionResponse.vb" />
-    <Compile Include="SettingNames.Designer.vb">
+    <Compile Include="Windows\ConsoleCommands\DistPrep.vb" />
+    <Compile Include="Windows\ConsoleCommands\GeneratePluginExtensions.vb" />
+    <Compile Include="Windows\Extensions\Online\ExtensionCollectionModel.vb" />
+    <Compile Include="Windows\Extensions\Online\OnlineExtensionCollection.vb" />
+    <Compile Include="Windows\Extensions\Online\OnlineExtensionInfo.vb" />
+    <Compile Include="Windows\Extensions\Online\RootCollectionResponse.vb" />
+    <Compile Include="Windows\SettingNames.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SettingNames.resx</DependentUpon>
     </Compile>
-    <Compile Include="SettingsExtension.vb" />
-    <Compile Include="Utilities\AssemblyReflectionManager.vb" />
-    <Compile Include="Utilities\AssemblyReflectionProxy.vb" />
-    <Compile Include="CoreMods\ConsoleCoreMod.vb" />
-    <Compile Include="Internal\ConsoleManager.vb" />
-    <Compile Include="Processes\ConsoleApp.vb" />
-    <Compile Include="EnvironmentPaths.vb" />
-    <Compile Include="Language.Designer.vb">
+    <Compile Include="Windows\SettingsExtension.vb" />
+    <Compile Include="Windows\Utilities\AssemblyReflectionManager.vb" />
+    <Compile Include="Windows\Utilities\AssemblyReflectionProxy.vb" />
+    <Compile Include="Windows\CoreMods\ConsoleCoreMod.vb" />
+    <Compile Include="Windows\Internal\ConsoleManager.vb" />
+    <Compile Include="Windows\Processes\ConsoleApp.vb" />
+    <Compile Include="Windows\EnvironmentPaths.vb" />
+    <Compile Include="Windows\Language.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Language.resx</DependentUpon>
     </Compile>
-    <Compile Include="Processes\ConsoleDataRecievedEventArgs.vb" />
-    <Compile Include="Processes\ServerStatus.vb" />
-    <Compile Include="Processes\StatusChangedEventArgs.vb" />
-    <Compile Include="Utilities\RedistributionHelpers.vb" />
-    <Compile Include="Providers\WindowsConsoleProvider.vb" />
-    <Compile Include="CoreMods\WindowsCoreSkyEditorPlugin.vb" />
-    <Compile Include="Providers\IOProvider.vb" />
+    <Compile Include="Windows\Processes\ConsoleDataRecievedEventArgs.vb" />
+    <Compile Include="Windows\Processes\ServerStatus.vb" />
+    <Compile Include="Windows\Processes\StatusChangedEventArgs.vb" />
+    <Compile Include="Windows\Utilities\RedistributionHelpers.vb" />
+    <Compile Include="Windows\Providers\WindowsConsoleProvider.vb" />
+    <Compile Include="Windows\CoreMods\WindowsCoreSkyEditorPlugin.vb" />
+    <Compile Include="Windows\Providers\IOProvider.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -114,10 +114,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Utilities\WindowsReflectionHelpers.vb" />
+    <Compile Include="Windows\Utilities\WindowsReflectionHelpers.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Language.resx">
+    <EmbeddedResource Include="Windows\Language.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Language.Designer.vb</LastGenOutput>
@@ -128,7 +128,7 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SettingNames.resx">
+    <EmbeddedResource Include="Windows\SettingNames.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>SettingNames.Designer.vb</LastGenOutput>

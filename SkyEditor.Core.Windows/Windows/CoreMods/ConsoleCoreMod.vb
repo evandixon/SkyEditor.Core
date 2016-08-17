@@ -1,4 +1,4 @@
-﻿Namespace CoreMods
+﻿Namespace Windows.CoreMods
     Public Class ConsoleCoreMod
         Inherits WindowsCoreSkyEditorPlugin
 

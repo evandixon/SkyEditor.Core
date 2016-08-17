@@ -2,7 +2,7 @@
 Imports SkyEditor.Core.Extensions
 Imports SkyEditor.Core.Utilities
 
-Namespace Extensions.Online
+Namespace Windows.Extensions.Online
     ''' <summary>
     ''' A collection of extensions stored online.
     ''' </summary>

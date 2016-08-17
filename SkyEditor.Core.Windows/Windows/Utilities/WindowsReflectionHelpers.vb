@@ -4,7 +4,7 @@ Imports SkyEditor.Core
 Imports SkyEditor.Core.Extensions
 Imports SkyEditor.Core.Utilities
 
-Namespace Utilities
+Namespace Windows.Utilities
     Public Class WindowsReflectionHelpers
 
         Public Shared Function IsSupportedPlugin(filename As String) As Boolean

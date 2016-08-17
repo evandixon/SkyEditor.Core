@@ -2,7 +2,7 @@
 Imports System.IO
 Imports System.Text
 
-Namespace Processes
+Namespace Windows.Processes
     Public Class ConsoleApp
         Implements IDisposable
 

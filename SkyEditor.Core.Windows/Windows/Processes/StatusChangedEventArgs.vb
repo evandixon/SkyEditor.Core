@@ -1,4 +1,4 @@
-﻿Namespace Processes
+﻿Namespace Windows.Processes
     Public Class StatusChangedEventArgs
         Inherits EventArgs
         Public Property OldStatus As ProcessStatus

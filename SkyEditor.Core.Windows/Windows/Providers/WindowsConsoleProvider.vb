@@ -1,6 +1,6 @@
 ﻿Imports SkyEditor.Core.ConsoleCommands
 
-Namespace Providers
+Namespace Windows.Providers
     Public Class WindowsConsoleProvider
         Implements IConsoleProvider
 
