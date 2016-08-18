@@ -7,7 +7,11 @@ Imports SkyEditor.Core.Utilities
 
 Namespace Extensions
     Public Class ExtensionHelper
-        Implements iNamed
+        Implements INamed
+
+        Shared Sub New()
+            ExtensionBanks = New Dictionary(Of String, ExtensionType)
+        End Sub
 
         Public ReadOnly Property Name As String Implements iNamed.Name
             Get
