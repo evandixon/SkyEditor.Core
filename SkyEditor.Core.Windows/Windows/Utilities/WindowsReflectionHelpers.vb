@@ -131,7 +131,7 @@ Namespace Windows.Utilities
         Public Shared Function LoadAssembly(assemblyPath As String) As Assembly
             'First, check to see if we already loaded it
             Dim name As AssemblyName = AssemblyName.GetAssemblyName(assemblyPath)
-            Dim q1 = From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = name.FullName
+            Dim q1 = From a In AppDomain.CurrentDomain.GetAssemblies Where a.GetName.Name = name.Name
 
             If q1.Any Then
                 'If we did, then there's no point in loading it again.  In some cases, it could cause more problems
