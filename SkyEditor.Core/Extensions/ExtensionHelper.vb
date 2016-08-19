@@ -52,6 +52,21 @@ Namespace Extensions
             End If
         End Function
 
+        ''' <summary>
+        ''' Installs all extension zips at the root of the extension directory.  Intended to be run before plugins are loaded.
+        ''' </summary>
+        ''' <param name="extensionDirectory"></param>
+        ''' <param name="manager"></param>
+        ''' <returns></returns>
+        Public Shared Async Function InstallPendingExtensions(extensionDirectory As String, manager As PluginManager) As Task
+            For Each item In manager.CurrentIOProvider.GetFiles(extensionDirectory, "*.zip", True)
+                Dim result = Await InstallExtensionZip(extensionDirectory, manager)
+                If result = ExtensionInstallResult.Success OrElse result = ExtensionInstallResult.RestartRequired Then
+                    manager.CurrentIOProvider.DeleteFile(item)
+                End If
+            Next
+        End Function
+
         Public Shared Async Function InstallExtensionZip(extensionZipPath As String, manager As PluginManager) As Task(Of ExtensionInstallResult)
             Dim provider = manager.CurrentIOProvider
             Dim result As ExtensionInstallResult

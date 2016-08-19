@@ -152,6 +152,11 @@ Public Class PluginManager
     ''' Loads the given Core plugin, and any other available plugins, if supported by the platform.
     ''' </summary>
     ''' <param name="Core">Core to load</param>
+    ''' <remarks>
+    ''' Misc things this function does:
+    ''' - Delete files scheduled for deletion
+    ''' - Install pending extensions
+    ''' </remarks>
     Public Overridable Async Function LoadCore(Core As CoreSkyEditorPlugin) As Task
         'Load providers
         CurrentIOProvider = Core.GetIOProvider
@@ -173,11 +178,13 @@ Public Class PluginManager
             CurrentSettingsProvider.Save(CurrentIOProvider)
         Next
 
+        'Install any pending extensions
+        ExtensionDirectory = Core.GetExtensionDirectory
+        Await ExtensionHelper.InstallPendingExtensions(ExtensionDirectory, Me)
+
         'Load the provided core
         Me.CoreModAssembly = Core.GetType.GetTypeInfo.Assembly
         Core.Load(Me)
-
-        ExtensionDirectory = Core.GetExtensionDirectory
 
         'Load type registers
         RegisterTypeRegister(Of ExtensionType)()
