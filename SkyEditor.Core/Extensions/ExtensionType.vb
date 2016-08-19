@@ -91,8 +91,8 @@ Namespace Extensions
             Return Task.FromResult(ExtensionUninstallResult.Success)
         End Function
 
-        Public Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
-            Throw New NotSupportedException
+        Public Overridable Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
+            Return Task.FromResult(New List(Of IExtensionCollection)({New PluginExtensionType}).AsEnumerable)
         End Function
     End Class
 End Namespace

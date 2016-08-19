@@ -81,6 +81,10 @@ Namespace Extensions
             Return Task.FromResult(ExtensionUninstallResult.RestartRequired)
         End Function
 
+        Public Overrides Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection))
+            Return Task.FromResult((New List(Of IExtensionCollection)).AsEnumerable)
+        End Function
+
     End Class
 
 End Namespace
