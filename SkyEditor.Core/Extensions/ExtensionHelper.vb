@@ -59,12 +59,14 @@ Namespace Extensions
         ''' <param name="manager"></param>
         ''' <returns></returns>
         Public Shared Async Function InstallPendingExtensions(extensionDirectory As String, manager As PluginManager) As Task
-            For Each item In manager.CurrentIOProvider.GetFiles(extensionDirectory, "*.zip", True)
-                Dim result = Await InstallExtensionZip(extensionDirectory, manager)
-                If result = ExtensionInstallResult.Success OrElse result = ExtensionInstallResult.RestartRequired Then
-                    manager.CurrentIOProvider.DeleteFile(item)
-                End If
-            Next
+            If manager.CurrentIOProvider.DirectoryExists(extensionDirectory) Then
+                For Each item In manager.CurrentIOProvider.GetFiles(extensionDirectory, "*.zip", True)
+                    Dim result = Await InstallExtensionZip(extensionDirectory, manager)
+                    If result = ExtensionInstallResult.Success OrElse result = ExtensionInstallResult.RestartRequired Then
+                        manager.CurrentIOProvider.DeleteFile(item)
+                    End If
+                Next
+            End If
         End Function
 
         Public Shared Async Function InstallExtensionZip(extensionZipPath As String, manager As PluginManager) As Task(Of ExtensionInstallResult)
