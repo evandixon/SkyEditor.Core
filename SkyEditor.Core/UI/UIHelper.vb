@@ -202,7 +202,8 @@ Namespace UI
             Dim availableTabs = (From viewModel In viewModels
                                  From view In GetObjectControls(Manager)
                                  Where RequestedTabTypes.Any(Function(x) ReflectionHelpers.IsOfType(view, x.GetTypeInfo)) AndAlso
-                                  (view.SupportsObject(viewModel))
+                                     view.GetSupportedTypes.Any(Function(x) ReflectionHelpers.IsOfType(viewModel.GetType.GetTypeInfo, x.GetTypeInfo)) AndAlso
+                                     view.SupportsObject(viewModel)
                                  Order By view.GetSortOrder(modelType, True))
 
             Dim realTabs = availableTabs.Where(Function(x) Not x.view.IsBackupControl)
