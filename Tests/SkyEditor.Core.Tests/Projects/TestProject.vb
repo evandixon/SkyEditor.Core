@@ -26,6 +26,9 @@ Namespace Projects
                                            'Block
                                        Case BuildStatus.Failed
                                            Exit While
+                                       Case BuildStatus.Canceled
+                                           'Then a race condition has occurred.
+                                           'Will be handled in the next loop.
                                        Case Else
                                            Assert.Fail("Invalid build status: " & BuildStatus.ToString)
                                    End Select
