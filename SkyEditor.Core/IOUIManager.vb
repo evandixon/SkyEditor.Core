@@ -625,7 +625,7 @@ Public Class IOUIManager
 
     Public Sub ShowAnchorable(model As AnchorableViewModel)
         Dim targetType = model.GetType
-        If Not (From m In AnchorableViewModels Where ReflectionHelpers.IsOfType(m, targetType.GetTypeInfo, False)).Any Then
+        If Not (From m In AnchorableViewModels Where ReflectionHelpers.IsOfType(m, targetType.GetTypeInfo)).Any Then
             model.CurrentIOUIManager = Me
             AnchorableViewModels.Add(model)
         End If

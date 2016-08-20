@@ -41,7 +41,7 @@ Namespace UI
         Public Overridable Function SupportsObject(Obj As Object) As Boolean
             Dim currentType = Obj.GetType.GetTypeInfo
             Return GetSupportedTypes.Any(Function(x As TypeInfo) As Boolean
-                                             Return ReflectionHelpers.IsOfType(currentType, x, False)
+                                             Return ReflectionHelpers.IsOfType(currentType, x)
                                          End Function)
         End Function
 
