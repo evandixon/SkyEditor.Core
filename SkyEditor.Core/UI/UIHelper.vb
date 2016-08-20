@@ -183,7 +183,7 @@ Namespace UI
             Dim objControls As List(Of IObjectControl) = GetObjectControls(Manager)
 
             For Each etab In (From e In objControls Where RequestedTabTypes.Any(Function(t As Type) As Boolean
-                                                                                    Return ReflectionHelpers.IsOfType(e, t.GetTypeInfo, False)
+                                                                                    Return ReflectionHelpers.IsOfType(e, t.GetTypeInfo)
                                                                                 End Function)
                               Order By e.GetSortOrder(modelType.AsType, True) Ascending)
 
@@ -216,7 +216,7 @@ Namespace UI
 
                         'Of the view models that support the model, select the ones that the current view supports
                         Dim availableViewModels = From v In viewmodelsForModel
-                                                  Where ReflectionHelpers.IsOfType(v, info, False)
+                                                  Where ReflectionHelpers.IsOfType(v, info)
 
                         If availableViewModels IsNot Nothing AndAlso availableViewModels.Any Then
                             'This view model fits the critera
@@ -224,18 +224,18 @@ Namespace UI
                             isMatch = etab.SupportsObject(first)
                             viewModel = first
                             If isMatch Then Exit For
-                        ElseIf ReflectionHelpers.IsOfType(model, info, True) Then
+                        ElseIf ReflectionHelpers.IsOfType(model, info) Then
                             'The model implements this interface
                             isMatch = etab.SupportsObject(model)
                             If isMatch Then Exit For
                         End If
 
-                    ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo, True) Then
+                    ElseIf ReflectionHelpers.IsOfType(model, t.GetTypeInfo) Then
                         'The model is the same type as the target
                         isMatch = etab.SupportsObject(model)
                         If isMatch Then Exit For
 
-                    ElseIf ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo, False) Then
+                    ElseIf ReflectionHelpers.IsOfType(t, GetType(GenericViewModel).GetTypeInfo) Then
                         'The object control is targeting a view model
 
                         'First, check to see if there's any view models for this model (i.e., is this an open file?)
@@ -248,7 +248,7 @@ Namespace UI
                         'If there are, check to see if the target view supports the view model
                         If viewmodelsForModel IsNot Nothing Then
                             Dim potentialViewModel As GenericViewModel = (From v In viewmodelsForModel
-                                                                          Where ReflectionHelpers.IsOfType(v, info, False)).FirstOrDefault
+                                                                          Where ReflectionHelpers.IsOfType(v, info)).FirstOrDefault
                             If potentialViewModel IsNot Nothing Then
                                 'This view model supports our model
                                 isMatch = etab.SupportsObject(potentialViewModel)
@@ -273,14 +273,6 @@ Namespace UI
                     ElseIf tab.SupportsObject(model) Then
                         'This model is what the view wants
                         tab.EditingObject = model
-                    Else
-                        'This model is a container of what the view wants
-                        For Each type In tab.GetSupportedTypes
-                            If ReflectionHelpers.IsIContainerOfType(model, type.GetTypeInfo) Then
-                                tab.EditingObject = ReflectionHelpers.GetIContainerContents(model, type)
-                                Exit For
-                            End If
-                        Next
                     End If
 
                     allTabs.Add(tab)

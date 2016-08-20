@@ -328,7 +328,7 @@ Public Class PluginManager
         For Each actualType In Item.DefinedTypes
             'Check to see if this type inherits from one we're looking for
             For Each registeredType In TypeRegistery.Keys
-                If ReflectionHelpers.IsOfType(actualType, registeredType, True) Then
+                If ReflectionHelpers.IsOfType(actualType, registeredType) Then
                     RegisterType(registeredType, actualType)
                 End If
             Next
@@ -336,7 +336,7 @@ Public Class PluginManager
             'Do the same for each interface
             For Each i In actualType.ImplementedInterfaces
                 For Each registeredType In TypeRegistery.Keys
-                    If ReflectionHelpers.IsOfType(i, registeredType, True) Then
+                    If ReflectionHelpers.IsOfType(i, registeredType) Then
                         RegisterType(registeredType, actualType)
                     End If
                 Next
