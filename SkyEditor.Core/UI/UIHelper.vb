@@ -237,7 +237,7 @@ Namespace UI
                     tab.SetPluginManager(Manager)
 
                     'Set the appropriate object
-                    tab.EditingObject = item
+                    tab.EditingObject = item.Key
 
                     newTabs.Add(tab)
                 Next
