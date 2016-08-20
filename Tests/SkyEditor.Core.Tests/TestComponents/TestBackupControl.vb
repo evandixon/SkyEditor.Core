@@ -12,7 +12,7 @@ Namespace TestComponents
             Return TypeOf Obj Is TextFile
         End Function
 
-        Public Overrides Function IsBackupControl(Obj As Object) As Boolean
+        Public Overrides Function IsBackupControl() As Boolean
             Return True
         End Function
 

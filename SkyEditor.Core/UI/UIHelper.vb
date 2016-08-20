@@ -168,11 +168,93 @@ Namespace UI
         ''' <summary>
         ''' Returns a list of iObjectControl that edit the given ObjectToEdit.
         ''' </summary>
-        ''' <param name="model">Object the iObjectControl should edit.</param>
+        ''' <param name="model">Object the IObjectControl should edit.</param>
         ''' <param name="RequestedTabTypes">Limits what types of iObjectControl should be returned.  If the iObjectControl is not of any type in this IEnumerable, it will not be used.  If empty or nothing, no constraints will be applied, which is not recommended because the iObjectControl could be made for a different environment (for example, a Windows Forms user control being used in a WPF environment).</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Shared Function GetRefreshedTabs(model As Object, RequestedTabTypes As IEnumerable(Of Type), Manager As PluginManager) As IEnumerable(Of IObjectControl)
+            If Manager.CurrentIOUIManager.GetViewModelsForModel(model)?.Any Then
+                'Use the new method
+                Return GetRefreshedTabsByViewModel(model, RequestedTabTypes, Manager)
+            Else
+                'Use the legacy method
+                Return GetRefreshedTabsByView(model, RequestedTabTypes, Manager)
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of IObjectControl that edit the given ObjectToEdit.
+        ''' </summary>
+        ''' <param name="model">Object the IObjectControl should edit.</param>
+        ''' <param name="RequestedTabTypes">Limits what types of iObjectControl should be returned.  If the iObjectControl is not of any type in this IEnumerable, it will not be used.  If empty or nothing, no constraints will be applied, which is not recommended because the iObjectControl could be made for a different environment (for example, a Windows Forms user control being used in a WPF environment).</param>
+        ''' <param name="Manager">Instance of the current plugin manager.</param>
+        ''' <returns>An IEnumerable of object controls for the given model.</returns>
+        ''' <remarks>This version of <see cref="GetRefreshedTabs(Object, IEnumerable(Of Type), PluginManager)"/> searches for view models, then finds paths to the views.</remarks>
+        Private Shared Function GetRefreshedTabsByViewModel(model As Object, RequestedTabTypes As IEnumerable(Of Type), Manager As PluginManager) As IEnumerable(Of IObjectControl)
+            Dim targetTabs As New Dictionary(Of Object, List(Of IObjectControl))
+            Dim modelType = model.GetType
+
+            Dim viewModels As New List(Of Object)
+            viewModels.AddRange(Manager.CurrentIOUIManager.GetViewModelsForModel(model))
+            viewModels.Add(model) 'We'll consider the model itself a view model, if anything can directly edit it
+
+            'Get all tabs that could be used for the model, given the RequestedTabTypes constraint
+            Dim availableTabs = (From viewModel In viewModels
+                                 From view In GetObjectControls(Manager)
+                                 Where RequestedTabTypes.Any(Function(x) ReflectionHelpers.IsOfType(view, x.GetTypeInfo)) AndAlso
+                                  (view.SupportsObject(viewModel))
+                                 Order By view.GetSortOrder(modelType, True))
+
+            Dim realTabs = availableTabs.Where(Function(x) Not x.view.IsBackupControl)
+            For Each item In realTabs
+                If Not targetTabs.ContainsKey(item.viewModel) Then
+                    targetTabs.Add(item.viewModel, New List(Of IObjectControl))
+                End If
+                targetTabs(item.viewModel).Add(item.view)
+            Next
+
+            'Find the supported backup controls
+            For Each item In availableTabs.Where(Function(x) x.view.IsBackupControl).Select(Function(x) x.viewModel).Distinct
+                If Not realTabs.Where(Function(x) x.view.SupportsObject(item)).Any Then
+                    Dim usableBackup = availableTabs.
+                                                Where(Function(x) x.view.SupportsObject(item)).
+                                                OrderByDescending(Function(x) x.view.GetSortOrder(item.GetType, True)).
+                                                FirstOrDefault
+                    If usableBackup IsNot Nothing Then
+                        If Not targetTabs.ContainsKey(item) Then
+                            targetTabs.Add(item, New List(Of IObjectControl))
+                        End If
+                        targetTabs(item).Add(usableBackup.view)
+                    End If
+                End If
+            Next
+
+            'Create new instances and set targets
+            Dim newTabs As New List(Of IObjectControl)
+            For Each item In targetTabs
+                For Each view In item.Value
+                    Dim tab As IObjectControl = ReflectionHelpers.CreateNewInstance(view)
+                    tab.SetPluginManager(Manager)
+
+                    'Set the appropriate object
+                    tab.EditingObject = item
+
+                    newTabs.Add(tab)
+                Next
+            Next
+
+            Return newTabs
+        End Function
+
+        ''' <summary>
+        ''' Returns a list of IObjectControl that edit the given ObjectToEdit.
+        ''' </summary>
+        ''' <param name="model">Object the IObjectControl should edit.</param>
+        ''' <param name="RequestedTabTypes">Limits what types of iObjectControl should be returned.  If the iObjectControl is not of any type in this IEnumerable, it will not be used.  If empty or nothing, no constraints will be applied, which is not recommended because the iObjectControl could be made for a different environment (for example, a Windows Forms user control being used in a WPF environment).</param>
+        ''' <param name="Manager">Instance of the current plugin manager.</param>
+        ''' <returns>An IEnumerable of object controls for the given model.</returns>
+        ''' <remarks>This version of <see cref="GetRefreshedTabs(Object, IEnumerable(Of Type), PluginManager)"/> searches for views, then finds paths to the model.</remarks>
+        Private Shared Function GetRefreshedTabsByView(model As Object, RequestedTabTypes As IEnumerable(Of Type), Manager As PluginManager) As IEnumerable(Of IObjectControl)
             If model Is Nothing Then
                 Throw New ArgumentNullException(NameOf(model))
             End If
@@ -284,7 +366,7 @@ Namespace UI
 
             'Sort the backup vs non-backup tabs
             For Each item In allTabs
-                If item.IsBackupControl(model) Then
+                If item.IsBackupControl() Then
                     backupTabs.Add(item)
                 Else
                     notBackup.Add(item)
