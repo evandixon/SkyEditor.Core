@@ -201,10 +201,11 @@ Namespace UI
             'Get all tabs that could be used for the model, given the RequestedTabTypes constraint
             Dim availableTabs = (From viewModel In viewModels
                                  From view In GetObjectControls(Manager)
+                                 Let viewModelSortOrder = If(TypeOf viewModel Is GenericViewModel, DirectCast(viewModel, GenericViewModel).GetSortOrder, 0)
                                  Where RequestedTabTypes.Any(Function(x) ReflectionHelpers.IsOfType(view, x.GetTypeInfo)) AndAlso
                                      view.GetSupportedTypes.Any(Function(x) ReflectionHelpers.IsOfType(viewModel.GetType.GetTypeInfo, x.GetTypeInfo)) AndAlso
                                      view.SupportsObject(viewModel)
-                                 Order By view.GetSortOrder(modelType, True))
+                                 Order By viewModelSortOrder, view.GetSortOrder(modelType, True))
 
             Dim realTabs = availableTabs.Where(Function(x) Not x.view.IsBackupControl)
             For Each item In realTabs
