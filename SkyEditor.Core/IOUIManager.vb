@@ -455,7 +455,16 @@ Public Class IOUIManager
     ''' <returns>An IEnumerable of view models that support the given model, or null if the model is not an open file.</returns>
     Public Function GetViewModelsForModel(model As Object) As IEnumerable(Of GenericViewModel)
         Dim file = (From f In OpenFiles Where f.File Is model).FirstOrDefault
-        Return file?.GetViewModels(CurrentPluginManager)
+        If file IsNot Nothing Then
+            'The file is open
+            Return file?.GetViewModels(CurrentPluginManager)
+        ElseIf TypeOf model Is FileViewModel Then
+            'The model provided is a file view model, which we can still work with
+            Return DirectCast(model, FileViewModel).GetViewModels(CurrentPluginManager)
+        Else
+            'The file is not open
+            Return Nothing
+        End If
     End Function
 
     ''' <summary>
