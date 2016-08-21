@@ -74,8 +74,13 @@ Namespace UI
         ''' </summary>
         ''' <typeparam name="T">Type of the view model of which to select.</typeparam>
         ''' <returns>Whether or not there is a view model of type <typeparamref name="T"/> for the same model.</returns>
-        Public Function HasSiblingViewModel(Of T)() As Boolean
-            Throw New NotImplementedException
+        Public Function HasSiblingViewModel(Of T As GenericViewModel)() As Boolean
+            Dim siblingViewModels = CurrentPluginManager.CurrentIOUIManager.GetViewModelsForModel(Model)
+            If siblingViewModels Is Nothing Then
+                Return False
+            Else
+                Return siblingViewModels.Any(Function(x) TypeOf x Is T)
+            End If
         End Function
 
         ''' <summary>
@@ -83,8 +88,18 @@ Namespace UI
         ''' </summary>
         ''' <typeparam name="T">Type of the view model of which to select.</typeparam>
         ''' <returns>The view model of type <typeparamref name="T"/> for the same model.</returns>
-        Public Function GetSiblingViewModel(Of T)() As T
-            Throw New NotImplementedException
+        Public Function GetSiblingViewModel(Of T As GenericViewModel)() As T
+            Dim siblingViewModels = CurrentPluginManager.CurrentIOUIManager.GetViewModelsForModel(Model)
+            If siblingViewModels Is Nothing Then
+                Throw New Exception(My.Resources.Language.ErrorCantLoadSiblingViewModels)
+            Else
+                Dim targetVM = siblingViewModels.FirstOrDefault(Function(x) TypeOf x Is T)
+                If targetVM Is Nothing Then
+                    Throw New Exception(String.Format(My.Resources.Language.ErrorNoSiblingViewModelOfType, GetType(T).FullName))
+                Else
+                    Return targetVM
+                End If
+            End If
         End Function
 
     End Class
