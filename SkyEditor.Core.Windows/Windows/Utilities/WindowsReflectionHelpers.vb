@@ -131,23 +131,70 @@ Namespace Windows.Utilities
         Public Shared Function LoadAssembly(assemblyPath As String) As Assembly
             'First, check to see if we already loaded it
             Dim name As AssemblyName = AssemblyName.GetAssemblyName(assemblyPath)
-            Dim q1 = From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = name.FullName
+            Dim q1 = From a In AppDomain.CurrentDomain.GetAssemblies Where a.GetName.Name = name.Name
 
             If q1.Any Then
                 'If we did, then there's no point in loading it again.  In some cases, it could cause more problems
                 Return q1.First
             Else
                 'If we didn't, then load it
-                If WindowsReflectionHelpers.IsSupportedPlugin(assemblyPath) Then
-                    Dim loadedAssembly = Assembly.LoadFrom(assemblyPath)
+                AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf OnAssemblyResolve
+                'AddHandler AppDomain.CurrentDomain.AssemblyLoad, AddressOf OnAssemblyLoad
 
-                    'Relying on the side effect of this function to load all dependant assemblies into the current app domain
-                    WindowsReflectionHelpers.GetAssemblyDependencies(loadedAssembly)
+                Dim loadedAssembly = Assembly.LoadFrom(assemblyPath)
 
-                    Return loadedAssembly
-                Else
-                    Return Nothing
+                'For some reason, this doesn't happen automatically for executables
+                'We need it to happen now while we have the AssemblyResolve event handled
+                For Each item In loadedAssembly.GetReferencedAssemblies
+                    Assembly.Load(item)
+                Next
+
+                RemoveHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf OnAssemblyResolve
+
+                Return loadedAssembly
+            End If
+        End Function
+
+        'Friend Shared Function OnAssemblyLoad(sender As Object, e As AssemblyLoadEventArgs) As Assembly
+
+        'End Function
+
+        Friend Shared Function OnAssemblyResolve(sender As Object, e As ResolveEventArgs) As Assembly
+            Dim loadedAssembly = (From a In AppDomain.CurrentDomain.GetAssemblies Where String.Equals(a.FullName, e.Name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault
+
+            If loadedAssembly IsNot Nothing Then
+                Return loadedAssembly
+            Else
+                Dim applicationDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly.Location)
+                Dim requestingDir As String = Nothing
+                If e.RequestingAssembly IsNot Nothing Then
+                    requestingDir = Path.GetDirectoryName(e.RequestingAssembly.Location)
                 End If
+
+                'Get filenames of all assemblies to check
+                Dim potentialAssemblyPaths As New List(Of String)
+                potentialAssemblyPaths.AddRange(Directory.GetFiles(applicationDir, "*.dll"))
+                potentialAssemblyPaths.AddRange(Directory.GetFiles(applicationDir, "*.exe"))
+
+                If Not String.IsNullOrEmpty(requestingDir) AndAlso Not requestingDir = applicationDir Then
+                    potentialAssemblyPaths.AddRange(Directory.GetFiles(requestingDir, "*.dll"))
+                    potentialAssemblyPaths.AddRange(Directory.GetFiles(requestingDir, "*.exe"))
+                End If
+
+                'Todo: don't hard-code plugin directory
+                For Each item In Directory.GetDirectories(Path.Combine(EnvironmentPaths.GetExtensionDirectory, "Plugins"))
+                    If Not item = applicationDir AndAlso Not item = requestingDir Then
+                        potentialAssemblyPaths.AddRange(Directory.GetFiles(item, "*.dll"))
+                        potentialAssemblyPaths.AddRange(Directory.GetFiles(item, "*.exe"))
+                    End If
+                Next
+
+                'Return the first assembly that has the requested name
+                Return potentialAssemblyPaths.Select(Function(x) New With {.AssemblyName = AssemblyName.GetAssemblyName(x), .Location = x}).
+                                              Where(Function(x) x.AssemblyName.FullName = e.Name).
+                                              Select(Function(x) x.Location).
+                                              Select(Function(x) Windows.Utilities.WindowsReflectionHelpers.LoadAssembly(x)).
+                                              FirstOrDefault()
             End If
         End Function
     End Class

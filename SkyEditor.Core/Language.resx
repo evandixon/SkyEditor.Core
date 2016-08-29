@@ -139,6 +139,9 @@
   <data name="ErrorCantAddFile" xml:space="preserve">
     <value>Cannot add a file at the given path: {0}</value>
   </data>
+  <data name="ErrorCantLoadSiblingViewModels" xml:space="preserve">
+    <value>Cannot load sibling view models.</value>
+  </data>
   <data name="ErrorFileOrDirDoesntExist" xml:space="preserve">
     <value>The specified path neither points to an existing file nor an existing directory.</value>
   </data>
@@ -151,6 +154,9 @@
   <data name="ErrorNoSaveFilename" xml:space="preserve">
     <value>Using GenericFile.Save() requires GenericFile.OriginalFilename to not be null.</value>
     <comment>Message for an exception that's thrown when using GenericFile.Save() when the file doesn't have an original filename.</comment>
+  </data>
+  <data name="ErrorNoSiblingViewModelOfType" xml:space="preserve">
+    <value>No sibling view model of type "{0}" could be found.</value>
   </data>
   <data name="ErrorProjectNullRoot" xml:space="preserve">
     <value>The root node of the project should not be null.</value>

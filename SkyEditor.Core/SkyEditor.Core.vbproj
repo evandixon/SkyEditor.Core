@@ -169,7 +169,6 @@
     <Compile Include="CoreSkyEditorPlugin.vb" />
     <Compile Include="SkyEditorPlugin.vb" />
     <Compile Include="IO\GenericFile.vb" />
-    <Compile Include="Utilities\IContainer.vb" />
     <Compile Include="IO\ICreatableFile.vb" />
     <Compile Include="IO\IDetectableFileType.vb" />
     <Compile Include="IO\INotifyModified.vb" />

@@ -4,6 +4,8 @@ Namespace Projects
     Public Class TestProject
         Inherits Project
 
+        Private buildStatusLock As New Object
+
         ''' <summary>
         ''' Starts a build that stays in the building status until <see cref="CompleteBuild()"/> is called.
         ''' </summary>
@@ -19,19 +21,29 @@ Namespace Projects
                                        Exit While
                                    End If
 
-                                   Select Case BuildStatus
-                                       Case BuildStatus.Done
-                                           Exit While
-                                       Case BuildStatus.Building
-                                           'Block
-                                       Case BuildStatus.Failed
-                                           Exit While
-                                       Case Else
-                                           Assert.Fail("Invalid build status: " & BuildStatus.ToString)
-                                   End Select
+                                   SyncLock buildStatusLock
+                                       Select Case BuildStatus
+                                           Case BuildStatus.Done
+                                               Exit While
+                                           Case BuildStatus.Building
+                                                'Block
+                                           Case BuildStatus.Failed
+                                               Exit While
+                                           Case BuildStatus.Canceling
+                                               'Will be handled in the next loop.
+                                           Case Else
+                                               Assert.Fail("Invalid build status: " & BuildStatus.ToString)
+                                       End Select
+                                   End SyncLock
                                End While
                            End Sub)
         End Function
+
+        Public Overrides Sub CancelBuild()
+            SyncLock buildStatusLock
+                MyBase.CancelBuild()
+            End SyncLock
+        End Sub
 
         Public Overridable Sub CompleteBuild()
             BuildStatus = BuildStatus.Done

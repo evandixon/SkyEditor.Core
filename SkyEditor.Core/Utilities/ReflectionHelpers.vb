@@ -31,9 +31,8 @@ Namespace Utilities
         ''' </summary>
         ''' <param name="obj">The object to check type equality, inheritance, or implementation.  If Obj is itself a TypeInfo, it will be checked directly, instead of checking against the type of Obj.</param>
         ''' <param name="typeToCheck">The type to check for.</param>
-        ''' <param name="checkContainer">Whether or not to check if Obj implements IContainer(Of TypeToCheck).</param>
         ''' <returns></returns>
-        Public Shared Function IsOfType(obj As Object, typeToCheck As TypeInfo, Optional checkContainer As Boolean = False) As Boolean
+        Public Shared Function IsOfType(obj As Object, typeToCheck As TypeInfo) As Boolean
             Dim Original As TypeInfo = Nothing
 
             'Check if the object we're checking is itself a TypeInfo
@@ -48,7 +47,7 @@ Namespace Utilities
             'If the original and reference types are the same, or if its base type and TypeToCheck are the same
             Dim match = Original.Equals(typeToCheck) OrElse
                                     (Original.BaseType IsNot Nothing AndAlso
-                                            IsOfType(Original.BaseType, typeToCheck, checkContainer))
+                                            IsOfType(Original.BaseType, typeToCheck))
 
             'If the above isn't true, let's check the interfaces
             If Not match Then
@@ -61,16 +60,6 @@ Namespace Utilities
                 Next
             End If
 
-            'If it's still not a match, then we know that the original type does not inherit or implement TypeToCheck.
-            'If CheckContainer, we'll check to see if the original type implements IContainer(Of TypeToCheck).
-            If Not match AndAlso checkContainer AndAlso Not Original.Equals(GetType(Object)) Then
-                If IsOfType(Original,
-                            GetType(IContainer(Of Object)).GetGenericTypeDefinition.MakeGenericType(typeToCheck.AsType).GetTypeInfo, 'Get the type definition of "IContainer(Of TypeToCheck)".
-                            False 'If this was true, then we'd be in an infinite loop, checking for "IContainer(Of IContainer(Of TypeToCheck)", "IContainer(Of IContainer(Of IContainer(Of TypeToCheck))", and so on.  The plugin management code will only handle IContainer(Of T), so we only want to check one level.
-                            ) Then
-                    match = True
-                End If
-            End If
             Return match
         End Function
 
@@ -83,31 +72,6 @@ Namespace Utilities
         Public Shared Function IsIContainerOfType(obj As Object, typeToCheck As TypeInfo) As Boolean
             Return (From t In obj.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(typeToCheck)).Any
         End Function
-
-        ''' <summary>
-        ''' Gets the contents of the given IContainer object
-        ''' </summary>
-        ''' <param name="container">Object that implements IContainer(Of containedType)</param>
-        ''' <param name="containedType">Type of the container of which to get the contents</param>
-        ''' <returns></returns>
-        Public Shared Function GetIContainerContents(container As Object, containedType As Type) As Object
-            Dim interfaceType As Type = (From t In container.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(containedType)).FirstOrDefault
-            Dim targetProperty = (From p In interfaceType?.GetTypeInfo.DeclaredProperties Where p.Name = NameOf(IContainer(Of Object).Item)).FirstOrDefault
-
-            Return targetProperty.GetValue(container)
-        End Function
-
-        ''' <summary>
-        ''' Sets the contents of the given IContainer object
-        ''' </summary>
-        ''' <param name="container">Object that implements IContainer(Of containedType)</param>
-        ''' <param name="containedType">Type of the container of which to set the contents</param>
-        Public Shared Sub SetIContainerContents(container As Object, containedType As TypeInfo, value As Object)
-            Dim interfaceType As Type = (From t In container.GetType.GetTypeInfo.ImplementedInterfaces Where t.IsConstructedGenericType AndAlso t.GenericTypeArguments.Length = 1 AndAlso t.GenericTypeArguments(0).Equals(containedType)).FirstOrDefault
-            Dim targetProperty = (From p In interfaceType?.GetTypeInfo.DeclaredProperties Where p.Name = NameOf(IContainer(Of Object).Item)).FirstOrDefault
-
-            targetProperty.SetValue(container, value)
-        End Sub
 
         ''' <summary>
         ''' Gets a type using the assembly qualified name, or null if the type can't be found

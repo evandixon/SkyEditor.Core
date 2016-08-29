@@ -41,32 +41,11 @@ Namespace UI
         Public Overridable Function SupportsObject(Obj As Object) As Boolean
             Dim currentType = Obj.GetType.GetTypeInfo
             Return GetSupportedTypes.Any(Function(x As TypeInfo) As Boolean
-                                             Return ReflectionHelpers.IsOfType(currentType, x, False)
+                                             Return ReflectionHelpers.IsOfType(currentType, x)
                                          End Function)
         End Function
 
-        ''' <summary>
-        ''' Determines whether or not this iObjectControl should be used for the given object if another control exists for it.
-        ''' If false, this will be used if SupportsObject(Obj) is true.
-        ''' If true, this will only be used if no other iObjectControl can edit the given object.
-        ''' 
-        ''' If multiple backup controls are present, GetSortOrder will be used to determine which iObjectControl is used.
-        ''' </summary>
-        ''' <param name="Obj"></param>
-        ''' <returns></returns>
-        Public Overridable Function IsBackupViewModel(Obj As Object) As Boolean
-            Return False
-        End Function
-
-        ''' <summary>
-        ''' Returns the sort order of this control when editing the given type.
-        ''' Note: The returned value is context-specific.  Higher values make a Control more likely to be used, but lower values make tabs appear higher in the list of tabs.
-        ''' Note: Negative values will result in the control not being used if there are other controls with positive values.
-        ''' </summary>
-        ''' <param name="CurrentType">Type of the EditingObject to get a sort order for.</param>
-        ''' <param name="IsTab">Whether or not the iObjectControl is registered to behave as a Tab or a Control.</param>
-        ''' <returns></returns>
-        Public Overridable Function GetSortOrder(CurrentType As Type, IsTab As Boolean) As Integer
+        Public Overridable Function GetSortOrder() As Integer
             Return 0
         End Function
 
@@ -74,6 +53,10 @@ Namespace UI
             Me.CurrentPluginManager = manager
         End Sub
 
+        ''' <summary>
+        ''' Sets the <see cref="GenericViewModel"/>'s model.
+        ''' </summary>
+        ''' <param name="model">Model to set</param>
         Public Overridable Sub SetModel(model As Object)
             Me.Model = model
         End Sub
@@ -85,6 +68,40 @@ Namespace UI
         Public Overridable Sub UpdateModel(model As Object)
 
         End Sub
+
+        ''' <summary>
+        ''' Gets whether or not a view model of the given type is loaded for the same model.
+        ''' </summary>
+        ''' <typeparam name="T">Type of the view model of which to select.</typeparam>
+        ''' <returns>Whether or not there is a view model of type <typeparamref name="T"/> for the same model.</returns>
+        Public Function HasSiblingViewModel(Of T As GenericViewModel)() As Boolean
+            Dim siblingViewModels = CurrentPluginManager.CurrentIOUIManager.GetViewModelsForModel(Model)
+            If siblingViewModels Is Nothing Then
+                Return False
+            Else
+                Return siblingViewModels.Any(Function(x) TypeOf x Is T)
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Gets a view model for the same model.
+        ''' </summary>
+        ''' <typeparam name="T">Type of the view model of which to select.</typeparam>
+        ''' <returns>The view model of type <typeparamref name="T"/> for the same model.</returns>
+        Public Function GetSiblingViewModel(Of T As GenericViewModel)() As T
+            Dim siblingViewModels = CurrentPluginManager.CurrentIOUIManager.GetViewModelsForModel(Model)
+            If siblingViewModels Is Nothing Then
+                Throw New Exception(My.Resources.Language.ErrorCantLoadSiblingViewModels)
+            Else
+                Dim targetVM = siblingViewModels.FirstOrDefault(Function(x) TypeOf x Is T)
+                If targetVM Is Nothing Then
+                    Throw New Exception(String.Format(My.Resources.Language.ErrorNoSiblingViewModelOfType, GetType(T).FullName))
+                Else
+                    Return targetVM
+                End If
+            End If
+        End Function
+
     End Class
 
     Public MustInherit Class GenericViewModel(Of T)

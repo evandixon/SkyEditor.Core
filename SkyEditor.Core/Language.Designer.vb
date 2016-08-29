@@ -129,6 +129,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Cannot load sibling view models..
+        '''</summary>
+        Friend Shared ReadOnly Property ErrorCantLoadSiblingViewModels() As String
+            Get
+                Return ResourceManager.GetString("ErrorCantLoadSiblingViewModels", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to The specified path neither points to an existing file nor an existing directory..
         '''</summary>
         Friend Shared ReadOnly Property ErrorFileOrDirDoesntExist() As String
@@ -161,6 +170,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property ErrorNoSaveFilename() As String
             Get
                 Return ResourceManager.GetString("ErrorNoSaveFilename", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to No sibling view model of type &quot;{0}&quot; could be found..
+        '''</summary>
+        Friend Shared ReadOnly Property ErrorNoSiblingViewModelOfType() As String
+            Get
+                Return ResourceManager.GetString("ErrorNoSiblingViewModelOfType", resourceCulture)
             End Get
         End Property
         

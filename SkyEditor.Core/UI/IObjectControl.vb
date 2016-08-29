@@ -55,15 +55,16 @@ Namespace UI
         Function SupportsObject(Obj As Object) As Boolean
 
         ''' <summary>
-        ''' Determines whether or not this iObjectControl should be used for the given object if another control exists for it.
-        ''' If false, this will be used if SupportsObject(Obj) is true.
-        ''' If true, this will only be used if no other iObjectControl can edit the given object.
-        ''' 
-        ''' If multiple backup controls are present, GetSortOrder will be used to determine which iObjectControl is used.
+        ''' Determines whether or not this control is a backup control.
         ''' </summary>
-        ''' <param name="Obj"></param>
-        ''' <returns></returns>
-        Function IsBackupControl(Obj As Object) As Boolean
+        ''' <returns>A boolean indicating whether or not this control is a backup control.</returns>
+        ''' <remarks>
+        ''' Determines whether or not this <see cref="IObjectControl"/> should be used for the given object if another control exists for it.
+        ''' If false, this will be used if <see cref="SupportsObject(Object)"/> is true.
+        ''' If true, this will only be used if no other <see cref="IObjectControl"/> can edit the given object.
+        ''' 
+        ''' If multiple backup controls are present, <see cref="GetSortOrder(Type, Boolean)"/> will be used to determine which <see cref="IObjectControl"/> is used.</remarks>
+        Function IsBackupControl() As Boolean
 
         ''' <summary>
         ''' Returns the sort order of this control when editing the given type.
