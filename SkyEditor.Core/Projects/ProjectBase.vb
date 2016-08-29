@@ -1,4 +1,5 @@
 ﻿Imports SkyEditor.Core.IO
+Imports SkyEditor.Core.Utilities
 
 Namespace Projects
     ''' <summary>
@@ -8,11 +9,12 @@ Namespace Projects
         Implements INotifyModified
         Implements INotifyPropertyChanged
         Implements IDisposable
+        Implements IReportProgress
 
 #Region "Events"
         Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
         Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
-        Public Event BuildStatusChanged(sender As Object, e As ProjectBuildStatusChanged)
+        Public Event BuildStatusChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
 #End Region
 
 #Region "Event Handlers"
@@ -115,14 +117,14 @@ Namespace Projects
         ''' Gets or sets the progress of the current project's build.
         ''' </summary>
         ''' <returns>A percentage indicating the progression of the build.</returns>
-        Public Property BuildProgress As Single
+        Public Property BuildProgress As Single Implements IReportProgress.Progress
             Get
                 Return _buildProgress
             End Get
             Set(value As Single)
                 If _buildProgress <> value Then
                     _buildProgress = value
-                    RaiseEvent BuildStatusChanged(Me, New ProjectBuildStatusChanged With {.Progress = BuildProgress, .StatusMessage = BuildStatusMessage})
+                    RaiseEvent BuildStatusChanged(Me, New ProgressReportedEventArgs With {.Progress = BuildProgress, .Message = BuildStatusMessage})
                     RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(BuildProgress)))
                 End If
             End Set
@@ -133,14 +135,14 @@ Namespace Projects
         ''' Gets or sets the current build message.
         ''' </summary>
         ''' <returns>A string indicating what is being done in the build.</returns>
-        Public Property BuildStatusMessage As String
+        Public Property BuildStatusMessage As String Implements IReportProgress.Message
             Get
                 Return _buildStatusMessage
             End Get
             Set(value As String)
                 If _buildStatusMessage <> value Then
                     _buildStatusMessage = value
-                    RaiseEvent BuildStatusChanged(Me, New ProjectBuildStatusChanged With {.Progress = BuildProgress, .StatusMessage = BuildStatusMessage})
+                    RaiseEvent BuildStatusChanged(Me, New ProgressReportedEventArgs With {.Progress = BuildProgress, .Message = BuildStatusMessage})
                     RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(BuildStatusMessage)))
                 End If
             End Set
@@ -151,14 +153,14 @@ Namespace Projects
         ''' Gets or sets whether or not the build progress is indeterminate.
         ''' </summary>
         ''' <returns>A boolean indicating whether or not the build progress is indeterminate.</returns>
-        Public Property IsBuildProgressIndeterminate As Boolean
+        Public Property IsBuildProgressIndeterminate As Boolean Implements IReportProgress.IsIndeterminate
             Get
                 Return _isBuildProgressIndeterminate
             End Get
             Set(value As Boolean)
                 If _isBuildProgressIndeterminate <> value Then
                     _isBuildProgressIndeterminate = value
-                    RaiseEvent BuildStatusChanged(Me, New ProjectBuildStatusChanged With {.Progress = BuildProgress, .StatusMessage = BuildStatusMessage})
+                    RaiseEvent BuildStatusChanged(Me, New ProgressReportedEventArgs With {.Progress = BuildProgress, .Message = BuildStatusMessage})
                     RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsBuildProgressIndeterminate)))
                 End If
             End Set

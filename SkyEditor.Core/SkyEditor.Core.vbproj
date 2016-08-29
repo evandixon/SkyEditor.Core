@@ -114,7 +114,6 @@
     <Compile Include="Extensions\InstalledExtensionCollection.vb" />
     <Compile Include="Extensions\PluginExtensionType.vb" />
     <Compile Include="IOUIManager.vb" />
-    <Compile Include="Projects\BuildProgressedEventArgs.vb" />
     <Compile Include="IO\DetectableFileTypeDetector.vb" />
     <Compile Include="Projects\BuildStatus.vb" />
     <Compile Include="Projects\DirectoryDeletedEventArgs.vb" />
@@ -136,7 +135,6 @@
     <Compile Include="Projects\Project.vb" />
     <Compile Include="Projects\ProjectAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectBase.vb" />
-    <Compile Include="Projects\ProjectBuildStatusChanged.vb" />
     <Compile Include="Projects\ProjectCircularReferenceException.vb" />
     <Compile Include="Projects\ProjectDirectoryCreatedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileAddedEventArgs.vb" />
@@ -166,6 +164,7 @@
     <Compile Include="UI\FileViewModel.vb" />
     <Compile Include="UI\GenericViewModel.vb" />
     <Compile Include="UI\HeaderUpdatedEventArgs.vb" />
+    <Compile Include="Utilities\IReportProgress.vb" />
     <Compile Include="Utilities\LoadingStatusChangedEventArgs.vb" />
     <Compile Include="CoreSkyEditorPlugin.vb" />
     <Compile Include="SkyEditorPlugin.vb" />
@@ -200,6 +199,7 @@
     <Compile Include="Utilities\Hex.vb" />
     <Compile Include="Utilities\IClonable.vb" />
     <Compile Include="Utilities\ParsedAssemblyQualifiedName.vb" />
+    <Compile Include="Utilities\ProgressReportedEventArgs.vb" />
     <Compile Include="Utilities\ReflectionHelpers.vb" />
     <Compile Include="Utilities\Json.vb" />
     <Compile Include="Utilities\Zip.vb" />

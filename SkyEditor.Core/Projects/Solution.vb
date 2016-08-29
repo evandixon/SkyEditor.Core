@@ -79,7 +79,6 @@ Namespace Projects
         ''' </summary>
         Public Event Created(sender As Object, e As EventArgs)
         Public Event SolutionBuildStarted(sender As Object, e As EventArgs)
-        Public Event SolutionBuildProgressed(sender As Object, e As BuildProgressedEventArgs)
         Public Event SolutionBuildCompleted(sender As Object, e As EventArgs)
         Public Event ProjectAdded(sender As Object, e As ProjectAddedEventArgs)
         Public Event ProjectRemoving(sender As Object, e As ProjectRemovingEventArgs)
@@ -382,7 +381,7 @@ Namespace Projects
 
         Private Sub UpdateBuildLoadingStatus(toBuild As Dictionary(Of Project, Boolean))
             Dim built As Integer = (From v In toBuild.Values Where v = True).Count
-            RaiseEvent SolutionBuildProgressed(Me, New BuildProgressedEventArgs With {.Progress = built / toBuild.Count})
+            Me.BuildProgress = built / toBuild.Count
         End Sub
 #End Region
 
