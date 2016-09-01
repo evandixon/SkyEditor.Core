@@ -119,6 +119,7 @@
     <Compile Include="Projects\DirectoryDeletedEventArgs.vb" />
     <Compile Include="Projects\DirectoryNotFoundException.vb" />
     <Compile Include="IO\DirectoryTypeDetectionResult.vb" />
+    <Compile Include="Projects\DirectoryStructureComparer.vb" />
     <Compile Include="Projects\FileClosedEventArgs.vb" />
     <Compile Include="Projects\FileClosingEventArgs.vb" />
     <Compile Include="Projects\FileOpenedEventArgs.vb" />
@@ -139,6 +140,7 @@
     <Compile Include="Projects\ProjectDirectoryCreatedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileRemovedEventArgs.vb" />
+    <Compile Include="Projects\ProjectFileWrapper.vb" />
     <Compile Include="Projects\ProjectNode.vb" />
     <Compile Include="Projects\ProjectNodeBase.vb" />
     <Compile Include="Projects\ProjectRemovedEventArgs.vb" />

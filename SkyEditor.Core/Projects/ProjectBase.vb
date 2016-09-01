@@ -7,20 +7,16 @@ Namespace Projects
     ''' </summary>
     Public MustInherit Class ProjectBase
         Implements INotifyModified
-        Implements INotifyPropertyChanged
         Implements IDisposable
         Implements IReportProgress
 
+        Public Sub New()
+            Items = New Dictionary(Of String, Object)
+        End Sub
+
 #Region "Events"
         Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
-        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
         Public Event BuildStatusChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
-#End Region
-
-#Region "Event Handlers"
-        Private Sub _root_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles _root.PropertyChanged
-            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Root)))
-        End Sub
 #End Region
 
 #Region "Properties"
@@ -80,20 +76,17 @@ Namespace Projects
         End Property
 
         ''' <summary>
-        ''' Gets or sets the root node of the project.
+        ''' Matches logical paths to items
         ''' </summary>
-        Public Property Root As ProjectNodeBase
-            Get
-                Return _root
-            End Get
-            Set(value As ProjectNodeBase)
-                If _root IsNot value Then
-                    _root = value
-                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Root)))
-                End If
-            End Set
-        End Property
-        Private WithEvents _root As ProjectNodeBase
+        ''' <remarks>Key: logical path; Value: Item (Projects for Solutions, Files for Projects).
+        ''' If the value is null, the path is an empty directory.
+        ''' 
+        ''' Example Paths (In form: "{Path}"/{Value})
+        ''' ""/null - Represents the root directory (not allowed)
+        ''' "Test"/null - directory
+        ''' "Test/Ing"/null - directory
+        ''' "Test/File"/[GenericFile] - File of type GenericFile, named "File", in directory "Test"</remarks>
+        Protected Property Items As Dictionary(Of String, Object)
 
 #End Region
 
@@ -125,7 +118,6 @@ Namespace Projects
                 If _buildProgress <> value Then
                     _buildProgress = value
                     RaiseEvent BuildStatusChanged(Me, New ProgressReportedEventArgs With {.Progress = BuildProgress, .Message = BuildStatusMessage})
-                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(BuildProgress)))
                 End If
             End Set
         End Property
@@ -143,7 +135,6 @@ Namespace Projects
                 If _buildStatusMessage <> value Then
                     _buildStatusMessage = value
                     RaiseEvent BuildStatusChanged(Me, New ProgressReportedEventArgs With {.Progress = BuildProgress, .Message = BuildStatusMessage})
-                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(BuildStatusMessage)))
                 End If
             End Set
         End Property
@@ -161,7 +152,6 @@ Namespace Projects
                 If _isBuildProgressIndeterminate <> value Then
                     _isBuildProgressIndeterminate = value
                     RaiseEvent BuildStatusChanged(Me, New ProgressReportedEventArgs With {.Progress = BuildProgress, .Message = BuildStatusMessage})
-                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsBuildProgressIndeterminate)))
                 End If
             End Set
         End Property
@@ -212,48 +202,86 @@ Namespace Projects
         End Function
 #End Region
 
+#Region "Logical Filesystem"
+
         ''' <summary>
-        ''' Determines whether or not a node at the given path exists.
+        ''' Standardizes a path.
         ''' </summary>
-        ''' <param name="nodePath">Path of the node to find.</param>
-        ''' <returns>A boolean indicating whether or not a node exists at the requested path.</returns>
-        Public Function NodeExists(nodePath As String) As Boolean
-            Return GetNodeOrNull(nodePath) IsNot Nothing
+        ''' <param name="path">Path to standardize.</param>
+        ''' <returns>A standardized path.</returns>
+        Protected Function FixPath(path As String) As String
+            Return path.Replace("\", "/").Trim("/")
         End Function
 
         ''' <summary>
-        ''' Determines whether or not a directory node at the given path exists.
+        ''' Gets paths and objects in the logical filesystem.
         ''' </summary>
-        ''' <param name="nodePath">Path of the directory to find.</param>
-        ''' <returns>A boolean indicating whether or not a directory node exists at the requested path.</returns>
-        Public Function DirectoryExists(nodePath As String) As Boolean
-            Dim node As ProjectNodeBase = GetNodeOrNull(nodePath)
-            Return node IsNot Nothing AndAlso node.IsDirectory
-        End Function
+        ''' <param name="path">Path of child items.</param>
+        ''' <param name="recursive">Whether or not to search child directories.</param>
+        ''' <param name="getDirectories">Whether to get files or directories.</param>
+        ''' <returns>An instance of <see cref="IEnumerable(Of KeyValuePair(Of String,Object))"/>, where each key is the full path and each value is the corresponding object, or null if the path is a directory.</returns>
+        Private Function GetItemsInternal(path As String, recursive As Boolean, getDirectories As Boolean) As IEnumerable(Of KeyValuePair(Of String, Object))
+            Dim fixedPath As String
 
-        ''' <summary>
-        ''' Gets the project node at the given path, or returns null if it cannot be found.
-        ''' </summary>
-        ''' <param name="nodePath">Path of the node to find.</param>
-        ''' <returns>The requested <see cref="ProjectNode"/>, or null if it cannot be found.</returns>
-        Public Function GetNodeOrNull(nodePath As String) As ProjectNode
-            If String.IsNullOrEmpty(nodePath) Then
-                Return Root
+            If getDirectories Then
+                fixedPath = FixPath(path).ToLowerInvariant & "/"
             Else
-                Dim pathParts = nodePath.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current As ProjectNode = Root
-                For Each item In pathParts
-                    Dim child = current.Children.Where(Function(x) x.Name.ToLower = item.ToLower).FirstOrDefault
-                    If child Is Nothing Then
-                        'The node cannot be found.
-                        current = Nothing
-                        Exit For
-                    Else
-                        current = child
-                    End If
-                Next
-                Return current
+                fixedPath = FixPath(path).ToLowerInvariant
             End If
+
+            'Given directory structure of:
+            'Test
+            'Test/Ing
+            'Blarg/Test
+            'Test/Ing/Test
+            '
+            'And an path of Test
+
+            If recursive Then
+                'Should return "Test/Ing" and "Test/Ing/Test
+                Return Items.Where(Function(x) x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
+                                       ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))).
+                            OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
+            Else
+                'Should return "Test/Ing"
+                Return Items.Where(Function(x) x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
+                                       Not x.Key.ToLowerInvariant.Replace(fixedPath, "").Replace("\", "/").Contains("/") AndAlso 'Filters anything with a slash after the parent directory
+                                       ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))).
+                             OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
+            End If
+
+        End Function
+
+        Protected Function ItemExists(path As String) As Boolean
+            Throw New NotImplementedException
+        End Function
+
+        ''' <summary>
+        ''' Gets the item at the given path.
+        ''' </summary>
+        ''' <param name="path">Path of the item.</param>
+        ''' <returns>The item at the given path, or null if there is no item at the given path.</returns>
+        Protected Function GetItem(path As String) As Object
+            Return GetItemsInternal(path, True, False).FirstOrDefault.Value
+        End Function
+
+        Protected Sub AddItem(path As String, item As Object)
+            Throw New NotImplementedException
+        End Sub
+
+#Region "Directories"
+        ''' <summary>
+        ''' Determines whether or not a directory at the given path exists.
+        ''' </summary>
+        ''' <param name="path">Path of the directory to find.</param>
+        ''' <returns>A boolean indicating whether or not a directory exists at the requested path.</returns>
+        Public Function DirectoryExists(path As String) As Boolean
+            If String.IsNullOrEmpty(path) Then
+                Throw New ArgumentNullException(NameOf(path))
+            End If
+
+            Dim pathFixed = FixPath(path)
+            Return Items.Keys.Any(Function(x) x.ToLowerInvariant = pathFixed.ToLowerInvariant)
         End Function
 
         ''' <summary>
@@ -262,8 +290,19 @@ Namespace Projects
         ''' <param name="parentPath">Path of the node in which a directory is to be created.</param>
         ''' <returns>A boolean indicating whether or not a directory is allowed to be created in the given path.</returns>
         Public Overridable Function CanCreateDirectory(parentPath As String) As Boolean
-            Return NodeExists(parentPath)
+            Return True
         End Function
+
+        ''' <summary>
+        ''' Creates a directory if it does not exist.
+        ''' </summary>
+        ''' <param name="path">Path of the new directory.</param>
+        Public Sub CreateDirectory(path As String)
+            Dim fixedPath = FixPath(path)
+            If Not DirectoryExists(fixedPath) Then
+                Items.Add(fixedPath, Nothing)
+            End If
+        End Sub
 
         ''' <summary>
         ''' Determines whether or not a directory node located at the given path is allowed to be deleted.
@@ -271,47 +310,22 @@ Namespace Projects
         ''' <param name="directoryPath">Path of the directory node to be deleted.</param>
         ''' <returns>A boolean indicating whether or not a directory is allowed to be deleted from the given path.</returns>
         Public Overridable Function CanDeleteDirectory(directoryPath As String) As Boolean
-            Return NodeExists(directoryPath)
+            Return DirectoryExists(directoryPath)
         End Function
 
         ''' <summary>
-        ''' Creates a directory if it does not exist.
+        ''' Gets the directories in the given directory.
         ''' </summary>
-        ''' <param name="path">Path of the new directory node.</param>
-        ''' <returns>The newly created directory node, or nothing if the directory cannot be created.</returns>
-        ''' <exception cref="NullReferenceException">Thrown if <see cref="Root"/> or the <see cref="ProjectNodeBase.Children"/> property of a node is null.</exception>
-        Public Function CreateDirectory(path As String) As ProjectNodeBase
-            Return CreateDirectory(Root, path)
+        ''' <param name="path">Parent directory of the requested directories.</param>
+        ''' <returns>A list of the full logical paths of the directories.</returns>
+        Public Function GetDirectories(path As String, recursive As Boolean) As IEnumerable(Of String)
+            Return GetItemsInternal(path, recursive, True).Select(Function(x) x.Key)
         End Function
 
-        ''' <summary>
-        ''' Creates a directory if it does not exist.
-        ''' </summary>
-        ''' <param name="path">Path of the new directory node.</param>
-        ''' <returns>The newly created directory node, or nothing if the directory cannot be created.</returns>
-        ''' <exception cref="NullReferenceException">Thrown if <param name="rootNode"/> or the <see cref="ProjectNodeBase.Children"/> property of a node is null.</exception>
-        Public Function CreateDirectory(rootNode As ProjectNodeBase, path As String) As ProjectNodeBase
-            If Root Is Nothing Then
-                Throw New NullReferenceException(My.Resources.Language.ErrorProjectNullRoot)
-            End If
-            Dim pathParts = path.Replace("\", "/").TrimStart("/").Split("/")
-            Dim current = Root
-            For Each item In pathParts
-                Dim child = current.Children.Where(Function(x) x.IsDirectory AndAlso x.Name.ToLower = item.ToLower).FirstOrDefault
-                If child Is Nothing Then
-                    'Directory does not exist.  Create it.
-                    current = current.CreateChildDirectory(item)
-                    If current Is Nothing Then
-                        'Directory cannot be created.  Return nothing.
-                        current = Nothing
-                        Exit For
-                    End If
-                Else
-                    current = child
-                End If
-            Next
-            Return current
-        End Function
+
+#End Region
+
+#End Region
 
 #Region "IDisposable Support"
         Private disposedValue As Boolean ' To detect redundant calls
@@ -321,9 +335,6 @@ Namespace Projects
             If Not disposedValue Then
                 If disposing Then
                     ' TODO: dispose managed state (managed objects).
-                    If Root IsNot Nothing Then
-                        Root.Dispose()
-                    End If
                 End If
 
                 ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.

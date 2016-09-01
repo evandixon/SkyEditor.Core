@@ -8,7 +8,6 @@ Namespace Projects
         Implements ISavable
 
         Public Sub New()
-            Root = New ProjectNode(Me, Nothing)
             Settings = New SettingsProvider
         End Sub
 
@@ -76,15 +75,6 @@ Namespace Projects
 
         Public Property ParentSolution As Solution
 
-        Public Shadows Property Root As ProjectNode
-            Get
-                Return MyBase.Root
-            End Get
-            Set(value As ProjectNode)
-                MyBase.Root = value
-            End Set
-        End Property
-
         ''' <summary>
         ''' List of the names of all projects in the current solution this project references.
         ''' </summary>
@@ -102,74 +92,6 @@ Namespace Projects
         End Property
 
 #Region "Functions"
-        ''' <summary>
-        ''' Gets the solution items at the given logical path in the solution.
-        ''' </summary>
-        ''' <param name="Path">Logical path to get the contents for.  Pass in String.Empty or Nothing to get the root.</param>
-        ''' <returns></returns>
-        Public Function GetDirectoryContents(Path As String) As IEnumerable(Of ProjectNode)
-            If Path Is Nothing OrElse Path = String.Empty Then
-                Return From c In Root.Children Order By c.Name
-            Else
-                Dim pathArray = Path.Replace("\", "/").Split("/")
-
-                Dim current As ProjectNode = Root
-                Dim index As Integer = 0
-                For count = 0 To pathArray.Length - 1
-                    current = (From i In current.Children Where i.Name.ToLower = pathArray(index).ToLower Select i).FirstOrDefault
-                    If current Is Nothing Then
-                        Throw New DirectoryNotFoundException("The given path does not exist in the project.")
-                    End If
-                Next
-                Return From c In current.Children Order By c.Name
-            End If
-        End Function
-
-        ''' <summary>
-        ''' Gets the project item at the given path.
-        ''' Returns Nothing if there is no project item at that path.
-        ''' </summary>
-        ''' <param name="ItemPath">Path to look for a project item.</param>
-        ''' <returns></returns>
-        Public Function GetProjectItemByPath(ItemPath As String) As ProjectNode
-            Return GetProjectItemByPath(Root, ItemPath)
-        End Function
-
-        ''' <summary>
-        ''' Gets the project item at the given path.
-        ''' Returns Nothing if there is no project item at that path.
-        ''' </summary>
-        ''' <param name="ItemPath">Path to look for a project item.</param>
-        ''' <returns></returns>
-        Public Function GetProjectItemByPath(rootNode As ProjectNode, ItemPath As String) As ProjectNode
-            If ItemPath Is Nothing OrElse ItemPath = "" Then
-                Return rootNode
-            Else
-                Dim path = ItemPath.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = rootNode
-                For count = 0 To path.Length - 2
-                    Dim i = count 'I got a warning about using an iterator variable in the line below
-                    Dim child = (From c In current.Children Where c.Name.ToLower = path(i).ToLower).FirstOrDefault
-
-                    If child Is Nothing Then
-                        Dim newNode As New ProjectNode(Me, current)
-                        'newNode.IsDirectory = True
-                        newNode.Name = path(count)
-                        current.Children.Add(newNode)
-                        current = newNode
-                    Else
-                        current = child
-                    End If
-
-                Next
-                Dim proj As ProjectNode = (From c In current.Children Where c.Name.ToLower = path.Last.ToLower).FirstOrDefault
-                If proj IsNot Nothing Then
-                    Return proj
-                Else
-                    Return Nothing
-                End If
-            End If
-        End Function
 
         ''' <summary>
         ''' Gets the file at the given path.
@@ -272,17 +194,6 @@ Namespace Projects
                     'Throw New ProjectAlreadyExistsException("A project with the name """ & ProjectName & """ already exists in the given path: " & ParentPath)
                 End If
             End If
-        End Function
-
-        Public Overridable Async Function RecreateRootWithExistingFiles(files As IEnumerable(Of AddExistingFileBatchOperation), provider As IOProvider) As Task
-            Dim newRoot As New ProjectNode(Me, Nothing)
-            For Each item In files
-                If Not String.IsNullOrEmpty(item.ParentPath) Then
-                    CreateDirectory(newRoot, item.ParentPath)
-                End If
-                Await AddExistingFile(newRoot, item.ParentPath, item.ActualFilename, provider)
-            Next
-            Root.Children = newRoot.Children
         End Function
 
         Public Overridable Function CanDeleteFile(FilePath As String) As Boolean

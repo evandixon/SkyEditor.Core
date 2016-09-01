@@ -4,7 +4,7 @@ Namespace Projects
     ''' <summary>
     ''' Defines the common functionality of the nodes of both projects and solutions.
     ''' </summary>
-    Public MustInherit Class ProjectNodeBase
+    <Obsolete> Public MustInherit Class ProjectNodeBase
         Implements IDisposable
         Implements INotifyPropertyChanged
         Implements IComparable(Of ProjectNodeBase)
@@ -13,6 +13,8 @@ Namespace Projects
             Me.ParentProject = project
             Me.ParentNode = parentNode
             Children = New ObservableCollection(Of ProjectNodeBase)
+            'Todo: populate children
+            'Todo: listen to ProjectBase's events to know when something is added or removed
         End Sub
 
         Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
@@ -70,13 +72,7 @@ Namespace Projects
         ''' <remarks>If the current node has no children, the children of <see cref="Item"/> will be used instead, if <see cref="Item"/> is a <see cref="ProjectBase"/>.</remarks>
         Public Overridable Property Children As ICollection(Of ProjectNodeBase)
             Get
-                If _children IsNot Nothing AndAlso _children.Count > 0 Then
-                    Return _children
-                ElseIf TypeOf Item Is ProjectBase Then
-                    Return DirectCast(Item, ProjectBase).Root.Children
-                Else
-                    Return _children
-                End If
+                Return _children
             End Get
             Set(value As ICollection(Of ProjectNodeBase))
                 _children = value

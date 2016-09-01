@@ -52,21 +52,7 @@ Namespace Projects
 #End Region
 
         Public Sub New()
-            Root = New SolutionNode(Me, Nothing)
         End Sub
-
-        ''' <summary>
-        ''' The root of the solution's logical heiarchy.
-        ''' </summary>
-        ''' <returns></returns>
-        Public Shadows Property Root As SolutionNode
-            Get
-                Return MyBase.Root
-            End Get
-            Set(value As SolutionNode)
-                MyBase.Root = value
-            End Set
-        End Property
 
 #Region "Events"
         ''' <summary>
@@ -117,28 +103,7 @@ Namespace Projects
         ''' </summary>
         ''' <returns></returns>
         Public Function GetAllProjects() As IEnumerable(Of Project)
-            Return GetAllProjects(Root)
-        End Function
-
-        ''' <summary>
-        ''' Gets all projects that are in the given solution node
-        ''' </summary>
-        ''' <returns></returns>
-        Public Overridable Function GetAllProjects(node As SolutionNode) As IEnumerable(Of Project)
-            Dim output As New List(Of Project)
-            If node.Children.Count > 0 Then
-                If node.IsDirectory Then
-                    For Each item In node.Children
-                        output.AddRange(GetAllProjects(item))
-                    Next
-                End If
-            End If
-
-            If node.IsDirectory = False AndAlso node.Item IsNot Nothing AndAlso TypeOf node.Item Is Project Then
-                output.Add(node.Item)
-            End If
-
-            Return output
+            Return Items.Values.Where(Function(x) TypeOf x Is Project)
         End Function
 
         ''' <summary>
@@ -161,72 +126,15 @@ Namespace Projects
         End Function
 
 #Region "Solution Logical Filesystem"
-        ''' <summary>
-        ''' Gets the solution items at the given logical path in the solution.
-        ''' </summary>
-        ''' <param name="Path">Logical path to get the contents for.  Pass in String.Empty or Nothing to get the root.</param>
-        ''' <returns></returns>
-        Public Function GetDirectoryContents(Path As String) As IEnumerable(Of SolutionNode)
-            If Path Is Nothing OrElse Path = String.Empty Then
-                Return From c In Root.Children Order By c.Name
-            Else
-                Dim pathArray = Path.Replace("\", "/").Split("/")
-
-                Dim current As SolutionNode = Root
-                Dim index As Integer = 0
-                For count = 0 To pathArray.Length - 1
-                    current = (From i In current.Children Where i.Name.ToLower = pathArray(index).ToLower Select i).FirstOrDefault
-                    If current Is Nothing Then
-                        Throw New DirectoryNotFoundException("The given path does not exist in the solution.")
-                    End If
-                Next
-                Return From c In current.Children Order By c.Name
-            End If
-        End Function
-
-        ''' <summary>
-        ''' Gets the solution item at the given path.
-        ''' Returns Nothing if there is no solution item at that path.
-        ''' </summary>
-        ''' <param name="ItemPath">Path to look for a solution item.</param>
-        ''' <returns></returns>
-        Public Function GetSolutionItemByPath(ItemPath As String) As SolutionNode
-            If ItemPath Is Nothing OrElse ItemPath = "" Then
-                Return Root
-            Else
-                Dim path = ItemPath.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = Me.Root
-                For count = 0 To path.Length - 2
-                    Dim i = count 'I got a warning about using an iterator variable in the line below
-                    Dim child = (From c In current.Children Where c.Name.ToLower = path(i).ToLower).FirstOrDefault
-
-                    If child Is Nothing Then
-                        Dim newNode As New SolutionNode(Me, current)
-                        newNode.Name = path(count)
-                        current.Children.Add(newNode)
-                        current = newNode
-                    Else
-                        current = child
-                    End If
-
-                Next
-                Dim proj As SolutionNode = (From c In current.Children Where c.Name.ToLower = path.Last.ToLower).FirstOrDefault
-                If proj IsNot Nothing Then
-                    Return proj
-                Else
-                    Return Nothing
-                End If
-            End If
-        End Function
 
         ''' <summary>
         ''' Gets the project at the given path.
         ''' Returns nothing if there is no project at that path.
         ''' </summary>
-        ''' <param name="Path">Path to look for a project.</param>
+        ''' <param name="path">Path to look for a project.</param>
         ''' <returns></returns>
-        Public Function GetProjectByPath(Path As String) As Project
-            Return GetSolutionItemByPath(Path)?.Item
+        Public Function GetProjectByPath(path As String) As Project
+            Return GetItem(path)
         End Function
 
         Public Overridable Async Function CreateProject(ParentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager) As Task
