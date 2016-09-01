@@ -6,7 +6,7 @@ Imports SkyEditor.Core.Utilities
 
 Namespace Projects
     Public Class Solution
-        Inherits ProjectBase
+        Inherits ProjectBase(Of Project)
 
 #Region "Child Classes"
         Private Class SolutionFile
@@ -137,65 +137,35 @@ Namespace Projects
             Return GetItem(path)
         End Function
 
-        Public Overridable Async Function CreateProject(ParentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager) As Task
-            Dim item = GetSolutionItemByPath(ParentPath)
-            If item IsNot Nothing Then
-                Dim q = (From c In item.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = ProjectName.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False).FirstOrDefault
-                If q Is Nothing Then
-                    Dim p = Project.CreateProject(Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType, Me, manager)
-                    item.Children.Add(New SolutionNode(Me, item) With {.Name = ProjectName, .Item = p})
-                    AddHandler p.Modified, AddressOf Project_Modified
-                    UnsavedChanges = True
-                    Await Task.Run(Sub()
-                                       RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.ParentPath = ParentPath, .Project = p})
-                                   End Sub)
-                Else
-                    'There's already a project here
-                    Throw New ProjectAlreadyExistsException("A project with the name """ & ProjectName & """ already exists in the given path: " & ParentPath)
-                End If
-            Else
-                Throw New DirectoryNotFoundException("Cannot create a project at the given path: " & ParentPath)
-            End If
-        End Function
-
-        Public Overridable Sub AddExistingProject(ParentPath As String, ProjectFilename As String, manager As PluginManager)
-            Dim item = GetSolutionItemByPath(ParentPath)
-            If item IsNot Nothing Then
-                Dim p = Project.OpenProjectFile(ProjectFilename, Me, manager)
-                Dim q = (From c In item.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = p.Name.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False).FirstOrDefault
-                If q Is Nothing Then
-                    'Dim p = Project.CreateProject(IO.Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType)
-                    item.Children.Add(New SolutionNode(Me, item) With {.Name = p.Name, .Item = p})
-                    AddHandler p.Modified, AddressOf Project_Modified
-                    UnsavedChanges = True
-                    RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.ParentPath = ParentPath, .Project = p})
-                Else
-                    'There's already a project here
-                    Throw New ProjectAlreadyExistsException("A project with the name """ & p.Name & """ already exists in the given path: " & ParentPath)
-                End If
-            Else
-                Throw New DirectoryNotFoundException("Cannot create a project at the given path: " & ParentPath)
-            End If
+        Public Overridable Sub CreateProject(parentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager)
+            Dim p = Project.CreateProject(Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType, Me, manager)
+            AddProject(FixPath(parentPath) & "/" & ProjectName, p)
         End Sub
 
-        Public Overridable Sub DeleteProject(ProjectPath As String)
-            Dim pathParts = ProjectPath.Replace("\", "/").TrimStart("/").Split("/")
-            Dim parentPath As New Text.StringBuilder
-            For count = 0 To pathParts.Length - 2
-                parentPath.Append(pathParts(count))
-                parentPath.Append("/")
-            Next
-            Dim parentPathString = parentPath.ToString.TrimEnd("/")
-            Dim parent = GetSolutionItemByPath(parentPathString)
-            Dim child = (From c In parent.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = pathParts.Last.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False Select DirectCast(c, SolutionNode)).FirstOrDefault
-            If child IsNot Nothing Then
-                RaiseEvent ProjectRemoving(Me, New ProjectRemovingEventArgs With {.Project = child.Item})
-                RemoveHandler child.Item.Modified, AddressOf Project_Modified
-                UnsavedChanges = True
-                parent.Children.Remove(child)
-                child.Dispose()
-                RaiseEvent ProjectRemoved(Me, New ProjectRemovedEventArgs With {.DirectoryName = pathParts.Last, .ParentPath = parentPathString, .FullPath = ProjectPath})
-            End If
+        ''' <summary>
+        ''' Adds the project to the solution.
+        ''' </summary>
+        ''' <param name="path">Full path of the project</param>
+        ''' <param name="project">Project to add</param>
+        Public Sub AddProject(path As String, project As Project)
+            AddItem(path, project)
+        End Sub
+
+        Public Overridable Sub AddExistingProject(parentPath As String, ProjectFilename As String, manager As PluginManager)
+            Dim p = Project.OpenProjectFile(ProjectFilename, Me, manager)
+            AddItem(FixPath(parentPath) & "/" & p.Name, p)
+        End Sub
+
+        Public Overridable Sub DeleteProject(projectPath As String)
+            Dim fixedPath = FixPath(projectPath)
+
+            Dim project = GetProjectByPath(fixedPath)
+            RaiseEvent ProjectRemoving(Me, New ProjectRemovingEventArgs With {.Project = project})
+
+            DeleteItem(fixedPath)
+            RemoveHandler project.Modified, AddressOf Project_Modified
+
+            RaiseEvent ProjectRemoved(Me, New ProjectRemovedEventArgs With {.DirectoryName = Path.GetFileName(fixedPath), .ParentPath = Path.GetDirectoryName(fixedPath), .FullPath = fixedPath})
         End Sub
 #End Region
 
@@ -203,8 +173,8 @@ Namespace Projects
             Return CanCreateDirectory(Path)
         End Function
 
-        Public Overridable Function CanDeleteProject(ProjectPath As String) As Boolean
-            Return (GetSolutionItemByPath(ProjectPath) IsNot Nothing)
+        Public Overridable Function CanDeleteProject(projectPath As String) As Boolean
+            Return ItemExists(projectPath)
         End Function
 
 #Region "Building"

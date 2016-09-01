@@ -29,6 +29,18 @@ Namespace Projects
         End Sub
 
         ''' <summary>
+        ''' Creates a new instance of <see cref="ProjectFileWrapper"/>.
+        ''' </summary>
+        ''' <param name="projectFilename">Filename of the project file.</param>
+        ''' <param name="filename">Path of the file, relative to the project directory.</param>
+        ''' <param name="file">File to contain.</param>
+        Public Sub New(projectFilename As String, filename As String, file As Object)
+            Me.New(projectFilename, filename)
+            Me.FileAssemblyQualifiedTypeName = file.GetType.AssemblyQualifiedName
+            Me.File = file
+        End Sub
+
+        ''' <summary>
         ''' The contained file.
         ''' </summary>
         ''' <returns></returns>

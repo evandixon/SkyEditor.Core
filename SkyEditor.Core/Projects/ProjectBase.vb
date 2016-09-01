@@ -5,13 +5,14 @@ Namespace Projects
     ''' <summary>
     ''' Defines the common functionality of both projects and solutions.
     ''' </summary>
-    Public MustInherit Class ProjectBase
+    ''' <typeparam name="T">Type of project items.</typeparam>
+    Public MustInherit Class ProjectBase(Of T)
         Implements INotifyModified
         Implements IDisposable
         Implements IReportProgress
 
         Public Sub New()
-            Items = New Dictionary(Of String, Object)
+            Items = New Dictionary(Of String, T)
         End Sub
 
 #Region "Events"
@@ -86,7 +87,7 @@ Namespace Projects
         ''' "Test"/null - directory
         ''' "Test/Ing"/null - directory
         ''' "Test/File"/[GenericFile] - File of type GenericFile, named "File", in directory "Test"</remarks>
-        Protected Property Items As Dictionary(Of String, Object)
+        Protected Property Items As Dictionary(Of String, T)
 
 #End Region
 
@@ -219,8 +220,8 @@ Namespace Projects
         ''' <param name="path">Path of child items.</param>
         ''' <param name="recursive">Whether or not to search child directories.</param>
         ''' <param name="getDirectories">Whether to get files or directories.</param>
-        ''' <returns>An instance of <see cref="IEnumerable(Of KeyValuePair(Of String,Object))"/>, where each key is the full path and each value is the corresponding object, or null if the path is a directory.</returns>
-        Private Function GetItemsInternal(path As String, recursive As Boolean, getDirectories As Boolean) As IEnumerable(Of KeyValuePair(Of String, Object))
+        ''' <returns>An instance of <see cref="IEnumerable(Of KeyValuePair(Of String,T))"/>, where each key is the full path and each value is the corresponding object, or null if the path is a directory.</returns>
+        Private Function GetItemsInternal(path As String, recursive As Boolean, getDirectories As Boolean) As IEnumerable(Of KeyValuePair(Of String, T))
             Dim fixedPath As String
 
             If getDirectories Then
@@ -253,7 +254,8 @@ Namespace Projects
         End Function
 
         Protected Function ItemExists(path As String) As Boolean
-            Throw New NotImplementedException
+            Dim fixedPath = FixPath(path)
+            Return Items.Any(Function(x) x.Key.ToLowerInvariant = fixedPath)
         End Function
 
         ''' <summary>
@@ -261,12 +263,26 @@ Namespace Projects
         ''' </summary>
         ''' <param name="path">Path of the item.</param>
         ''' <returns>The item at the given path, or null if there is no item at the given path.</returns>
-        Protected Function GetItem(path As String) As Object
+        Protected Function GetItem(path As String) As T
             Return GetItemsInternal(path, True, False).FirstOrDefault.Value
         End Function
 
-        Protected Sub AddItem(path As String, item As Object)
-            Throw New NotImplementedException
+        Protected Sub AddItem(path As String, item As T)
+            If ItemExists(path) Then
+                Throw New DuplicateItemException(path)
+            Else
+                Dim fixedPath = FixPath(path)
+                Items.Add(path, item)
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Deletes a directory or item at the given path.
+        ''' </summary>
+        ''' <param name="path">Path of the directory or item to delete.</param>
+        Protected Sub DeleteItem(path As String)
+            Dim fixedPath = FixPath(path)
+            Items.Remove(Items.Where(Function(x) x.Key.ToLowerInvariant = fixedPath).Select(Function(x) x.Key).FirstOrDefault)
         End Sub
 
 #Region "Directories"

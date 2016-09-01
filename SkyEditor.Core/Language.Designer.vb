@@ -111,6 +111,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Item with the same name already exists.  Path: &quot;{0}&quot;.
+        '''</summary>
+        Friend Shared ReadOnly Property DuplicateItemException() As String
+            Get
+                Return ResourceManager.GetString("DuplicateItemException", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to StepCount cannot be 0..
         '''</summary>
         Friend Shared ReadOnly Property ErrorAsyncForInfiniteLoop() As String
