@@ -4,7 +4,7 @@ Namespace Projects
     <TestClass> Public Class ProjectTests
 
 #Region "File System"
-        Public Const ProjectDirectory = "Project Base - Logical File System"
+        Public Const ProjectFileSystem = "Project Base - Logical File System"
 
         Private Property DirectoryTestProject As TestProject
 
@@ -15,7 +15,7 @@ Namespace Projects
             End If
         End Sub
 
-        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub CreateDirectory()
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub CreateDirectory()
             InitProjectDirectory()
 
             DirectoryTestProject.CreateDirectory("/Test/Ing")
@@ -26,7 +26,7 @@ Namespace Projects
             Assert.IsTrue(directories.Contains("/Test"), "Parent directory ""/Test"" not automatically created.")
         End Sub
 
-        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DirectoryExists()
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DirectoryExists()
             InitProjectDirectory()
 
             DirectoryTestProject.CreateDirectory("/Test/Ing")
@@ -35,7 +35,7 @@ Namespace Projects
             Assert.IsFalse(DirectoryTestProject.DirectoryExists("/Blarg"))
         End Sub
 
-        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DeleteDirectory()
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DeleteDirectory()
             InitProjectDirectory()
 
             DirectoryTestProject.CreateDirectory("/Test/Ing")
@@ -56,7 +56,7 @@ Namespace Projects
             Assert.AreEqual(3, directories.Count, "Incorrect number of directories")
         End Sub
 
-        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DeleteDirectoryRecursiveDirectoryDelete()
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DeleteDirectoryRecursiveDirectoryDelete()
             InitProjectDirectory()
 
             DirectoryTestProject.CreateDirectory("/Test/Ing")
@@ -77,7 +77,7 @@ Namespace Projects
             Assert.AreEqual(2, directories.Count, "Incorrect number of directories")
         End Sub
 
-        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DeleteDirectoryRecursiveItemDelete()
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DeleteDirectoryRecursiveItemDelete()
             InitProjectDirectory()
 
             DirectoryTestProject.CreateDirectory("/Test/Ing")
@@ -103,6 +103,29 @@ Namespace Projects
             Assert.AreEqual(2, directories.Count, "Incorrect number of directories")
 
             Assert.IsFalse(DirectoryTestProject.FileExists("/Test/Ing/file.txt"), "File not recursively deleted.")
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub CreateFile()
+            InitProjectDirectory()
+            DirectoryTestProject.CreateFile("/Test/Ing", "file.txt", GetType(TestCreatableFIle))
+            Assert.IsTrue(DirectoryTestProject.FileExists("/Test/Ing/file.txt"), "File not created.")
+
+            Dim directories = DirectoryTestProject.GetDirectories("", True)
+            Assert.IsTrue(directories.Contains("/Test/Ing"), "Child directory ""/Test/Ing"" not deleted.")
+            Assert.IsTrue(directories.Contains("/Test"), "Directory ""/Test"" not deleted.")
+            Assert.AreEqual(2, directories.Count, "Incorrect number of directories")
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DeleteFile()
+            InitProjectDirectory()
+            DirectoryTestProject.CreateFile("/Test/Ing", "file.txt", GetType(TestCreatableFIle))
+            If Not DirectoryTestProject.FileExists("/Test/Ing/file.txt") Then
+                Assert.Inconclusive("File not properly created.")
+            End If
+
+            DirectoryTestProject.DeleteFile("/Test/Ing/file.txt")
+
+            Assert.IsFalse(DirectoryTestProject.FileExists("/Test/Ing/file.txt"), "File not deleted.")
         End Sub
 
 
