@@ -106,6 +106,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Projects\ProjectTests.vb" />
+    <Compile Include="Projects\TestCreatableFIle.vb" />
     <Compile Include="Projects\TestProject.vb" />
     <Compile Include="TestComponents\ModelTestMenuAction.vb" />
     <Compile Include="TestComponents\TestBackupControl.vb" />

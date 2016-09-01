@@ -2,7 +2,114 @@
 
 Namespace Projects
     <TestClass> Public Class ProjectTests
-        Public Const ProjectBuild = "Project Building"
+
+#Region "File System"
+        Public Const ProjectDirectory = "Project Base - Logical File System"
+
+        Private Property DirectoryTestProject As TestProject
+
+        Private Sub InitProjectDirectory()
+            DirectoryTestProject = New TestProject
+            If DirectoryTestProject.GetDirectories("", True).Count > 0 Then
+                Assert.Inconclusive("Project already has directories")
+            End If
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub CreateDirectory()
+            InitProjectDirectory()
+
+            DirectoryTestProject.CreateDirectory("/Test/Ing")
+
+            Dim directories = DirectoryTestProject.GetDirectories("", True)
+            Assert.AreEqual(2, directories.Count, "Incorrect number of directories")
+            Assert.IsTrue(directories.Contains("/Test/Ing"), "Directory ""/Test/Ing"" not created.")
+            Assert.IsTrue(directories.Contains("/Test"), "Parent directory ""/Test"" not automatically created.")
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DirectoryExists()
+            InitProjectDirectory()
+
+            DirectoryTestProject.CreateDirectory("/Test/Ing")
+
+            Assert.IsTrue(DirectoryTestProject.DirectoryExists("/Test/Ing"))
+            Assert.IsFalse(DirectoryTestProject.DirectoryExists("/Blarg"))
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DeleteDirectory()
+            InitProjectDirectory()
+
+            DirectoryTestProject.CreateDirectory("/Test/Ing")
+            DirectoryTestProject.CreateDirectory("/Bla/rg")
+
+            If DirectoryTestProject.GetDirectories("", True).Count <> 4 Then
+                Assert.Inconclusive("Directories not created properly.")
+            End If
+
+            'Delete single directory
+            DirectoryTestProject.DeleteDirectory("/Test/Ing")
+
+            Dim directories = DirectoryTestProject.GetDirectories("", True)
+            Assert.IsFalse(directories.Contains("/Test/Ing"), "Target directory not deleted.")
+            Assert.IsTrue(directories.Contains("/Test"), "Parent directory ""/Test"" incorrectly deleted.")
+            Assert.IsTrue(directories.Contains("/Bla/rg"), "Unrelated directory ""/Test"" incorrectly deleted.")
+            Assert.IsTrue(directories.Contains("/Bla"), "Unrelated directory ""/Test"" incorrectly deleted.")
+            Assert.AreEqual(3, directories.Count, "Incorrect number of directories")
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DeleteDirectoryRecursiveDirectoryDelete()
+            InitProjectDirectory()
+
+            DirectoryTestProject.CreateDirectory("/Test/Ing")
+            DirectoryTestProject.CreateDirectory("/Bla/rg")
+
+            If DirectoryTestProject.GetDirectories("", True).Count <> 4 Then
+                Assert.Inconclusive("Directories not created properly.")
+            End If
+
+            'Delete single directory
+            DirectoryTestProject.DeleteDirectory("/Test")
+
+            Dim directories = DirectoryTestProject.GetDirectories("", True)
+            Assert.IsFalse(directories.Contains("/Test/Ing"), "Child directory ""/Test/Ing"" not deleted.")
+            Assert.IsFalse(directories.Contains("/Test"), "Directory ""/Test"" not deleted.")
+            Assert.IsTrue(directories.Contains("/Bla/rg"), "Unrelated directory ""/Test"" incorrectly deleted.")
+            Assert.IsTrue(directories.Contains("/Bla"), "Unrelated directory ""/Test"" incorrectly deleted.")
+            Assert.AreEqual(2, directories.Count, "Incorrect number of directories")
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectDirectory)> Public Sub DeleteDirectoryRecursiveItemDelete()
+            InitProjectDirectory()
+
+            DirectoryTestProject.CreateDirectory("/Test/Ing")
+            DirectoryTestProject.CreateDirectory("/Bla/rg")
+            DirectoryTestProject.CreateFile("/Test/Ing", "file.txt", GetType(TestCreatableFIle))
+
+            If Not DirectoryTestProject.FileExists("/Test/Ing/file.txt") Then
+                Assert.Inconclusive("File not properly created.")
+            End If
+
+            If DirectoryTestProject.GetDirectories("", True).Count <> 4 Then
+                Assert.Inconclusive("Directories not created properly.")
+            End If
+
+            'Delete single directory
+            DirectoryTestProject.DeleteDirectory("/Test")
+
+            Dim directories = DirectoryTestProject.GetDirectories("", True)
+            Assert.IsFalse(directories.Contains("/Test/Ing"), "Child directory ""/Test/Ing"" not deleted.")
+            Assert.IsFalse(directories.Contains("/Test"), "Directory ""/Test"" not deleted.")
+            Assert.IsTrue(directories.Contains("/Bla/rg"), "Unrelated directory ""/Test"" incorrectly deleted.")
+            Assert.IsTrue(directories.Contains("/Bla"), "Unrelated directory ""/Test"" incorrectly deleted.")
+            Assert.AreEqual(2, directories.Count, "Incorrect number of directories")
+
+            Assert.IsFalse(DirectoryTestProject.FileExists("/Test/Ing/file.txt"), "File not recursively deleted.")
+        End Sub
+
+
+#End Region
+
+#Region "Building"
+        Public Const ProjectBuild = "Project Base - Building"
 
         <TestMethod> <TestCategory(ProjectBuild)> Public Sub TestBuildSuccess()
             Dim p As New TestProject
@@ -42,6 +149,8 @@ Namespace Projects
             Assert.AreEqual(BuildStatus.Failed, p.BuildStatus, "A failed build should have the Failed status.")
             Assert.IsTrue(buildTask.IsCompleted, "The build should no longer be running.")
         End Sub
+#End Region
+
     End Class
 End Namespace
 

@@ -4,6 +4,10 @@ Namespace Projects
     Public Class TestProject
         Inherits Project
 
+        Public Sub New()
+            Me.Filename = "C:/fakepath/project.skyproj"
+        End Sub
+
         Private buildStatusLock As New Object
 
         ''' <summary>

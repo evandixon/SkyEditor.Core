@@ -83,7 +83,7 @@ Namespace Projects
         ''' If the value is null, the path is an empty directory.
         ''' 
         ''' Example Paths (In form: "{Path}"/{Value})
-        ''' ""/null - Represents the root directory (not allowed)
+        ''' ""/null - Represents the root directory
         ''' "Test"/null - directory
         ''' "Test/Ing"/null - directory
         ''' "Test/File"/[GenericFile] - File of type GenericFile, named "File", in directory "Test"</remarks>
@@ -211,7 +211,7 @@ Namespace Projects
         ''' <param name="path">Path to standardize.</param>
         ''' <returns>A standardized path.</returns>
         Protected Function FixPath(path As String) As String
-            Return path.Replace("\", "/").Trim("/")
+            Return path.Replace("\", "/").TrimEnd("/")
         End Function
 
         ''' <summary>
@@ -231,10 +231,10 @@ Namespace Projects
             End If
 
             'Given directory structure of:
-            'Test
-            'Test/Ing
-            'Blarg/Test
-            'Test/Ing/Test
+            '/Test
+            '/Test/Ing
+            '/Blarg/Test
+            '/Test/Ing/Test
             '
             'And an path of Test
 
@@ -254,7 +254,7 @@ Namespace Projects
         End Function
 
         Protected Function ItemExists(path As String) As Boolean
-            Dim fixedPath = FixPath(path)
+            Dim fixedPath = FixPath(path).ToLower
             Return Items.Any(Function(x) x.Key.ToLowerInvariant = fixedPath)
         End Function
 
@@ -277,12 +277,15 @@ Namespace Projects
         End Sub
 
         ''' <summary>
-        ''' Deletes a directory or item at the given path.
+        ''' Deletes a directory or item at the given path, if it exists.
         ''' </summary>
         ''' <param name="path">Path of the directory or item to delete.</param>
         Protected Sub DeleteItem(path As String)
-            Dim fixedPath = FixPath(path)
-            Items.Remove(Items.Where(Function(x) x.Key.ToLowerInvariant = fixedPath).Select(Function(x) x.Key).FirstOrDefault)
+            Dim fixedPath = FixPath(path).ToLowerInvariant
+            Dim toRemove = Items.Where(Function(x) x.Key.ToLowerInvariant = fixedPath).Select(Function(x) x.Key).FirstOrDefault
+            If toRemove IsNot Nothing Then
+                Items.Remove(toRemove)
+            End If
         End Sub
 
 #Region "Directories"
@@ -293,11 +296,21 @@ Namespace Projects
         ''' <returns>A boolean indicating whether or not a directory exists at the requested path.</returns>
         Public Function DirectoryExists(path As String) As Boolean
             If String.IsNullOrEmpty(path) Then
-                Throw New ArgumentNullException(NameOf(path))
+                'The root directory ("") always exists
+                Return True
+            Else
+                Dim pathFixed = FixPath(path)
+                Return Items.Keys.Any(Function(x) x.ToLowerInvariant = pathFixed.ToLowerInvariant)
             End If
+        End Function
 
-            Dim pathFixed = FixPath(path)
-            Return Items.Keys.Any(Function(x) x.ToLowerInvariant = pathFixed.ToLowerInvariant)
+        ''' <summary>
+        ''' Gets the directories in the given directory.
+        ''' </summary>
+        ''' <param name="path">Parent directory of the requested directories.</param>
+        ''' <returns>A list of the full logical paths of the directories.</returns>
+        Public Function GetDirectories(path As String, recursive As Boolean) As IEnumerable(Of String)
+            Return GetItemsInternal(path, recursive, True).Select(Function(x) x.Key)
         End Function
 
         ''' <summary>
@@ -315,6 +328,13 @@ Namespace Projects
         ''' <param name="path">Path of the new directory.</param>
         Public Sub CreateDirectory(path As String)
             Dim fixedPath = FixPath(path)
+
+            'Ensure parent directory exists
+            If Not String.IsNullOrEmpty(path) Then 'But only if this isn't the root.
+                CreateDirectory(FixPath(System.IO.Path.GetDirectoryName(path)))
+            End If
+
+            'Create directory
             If Not DirectoryExists(fixedPath) Then
                 Items.Add(fixedPath, Nothing)
             End If
@@ -330,14 +350,23 @@ Namespace Projects
         End Function
 
         ''' <summary>
-        ''' Gets the directories in the given directory.
+        ''' Deletes the directory with the given path, along with any child items.
         ''' </summary>
-        ''' <param name="path">Parent directory of the requested directories.</param>
-        ''' <returns>A list of the full logical paths of the directories.</returns>
-        Public Function GetDirectories(path As String, recursive As Boolean) As IEnumerable(Of String)
-            Return GetItemsInternal(path, recursive, True).Select(Function(x) x.Key)
-        End Function
+        ''' <param name="path"></param>
+        Public Sub DeleteDirectory(path As String)
+            'Delete items
+            For Each item In GetItemsInternal(path, True, False)
+                DeleteItem(item.Key)
+            Next
 
+            'Delete child directories
+            For Each item In GetDirectories(path, True)
+                DeleteItem(item)
+            Next
+
+            'Delete directory
+            DeleteItem(path)
+        End Sub
 
 #End Region
 

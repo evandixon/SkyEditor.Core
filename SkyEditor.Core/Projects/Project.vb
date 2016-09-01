@@ -168,6 +168,10 @@ Namespace Projects
             RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = Path.GetFileName(FilePath), .FullFilename = dest})
         End Sub
 
+        Public Function FileExists(path As String) As Boolean
+            Return ItemExists(path)
+        End Function
+
         Public Overridable Function CanDeleteFile(path As String) As Boolean
             Return ItemExists(path)
         End Function
