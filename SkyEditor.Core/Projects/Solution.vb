@@ -373,46 +373,12 @@ Namespace Projects
 
             'Load Projects
             For Each item In File.Projects
-                Dim projectPath = item.Key.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = Me.Root
-                'Create the directory nodes
-                For count = 0 To projectPath.Length - 2
-                    'Try to get the directory node we're expecting
-                    Dim i = count 'I got a warning about using an iterator variable in the line below
-                    Dim child = (From c In current.Children Where c.Name.ToLower = projectPath(i).ToLower).FirstOrDefault
-
-                    If child Is Nothing Then
-                        'Create it if it doesn't exist
-                        Dim newNode As New SolutionNode(Me, current)
-                        newNode.Name = projectPath(count)
-                        current.Children.Add(newNode)
-                        current = newNode
-                    Else
-                        'Otherwise select it
-                        current = child
-                    End If
-
-                Next
-                'Try to find the project node
-                Dim proj = (From c In current.Children Where c.Name.ToLower = projectPath.Last.ToLower).FirstOrDefault
-                If proj Is Nothing Then
-                    'If it doesn't exist, create it
-                    Dim newNode As New SolutionNode(Me, current)
-                    newNode.Name = projectPath.Last
-                    If item.Value IsNot Nothing Then
-                        newNode.Item = Project.OpenProjectFile(Path.Combine(Path.GetDirectoryName(Filename), item.Value.Replace("/", "\").TrimStart("\")), Me, manager)
-                        AddHandler newNode.Item.Modified, AddressOf Project_Modified
-                    Else
-                        newNode.Item = Nothing
-                    End If
-                    current.Children.Add(newNode)
+                If item.Value Is Nothing Then
+                    CreateDirectory(item.Key)
                 Else
-                    'If it does exist, there's already a project with the same name.
-                    'Todo: replace with better exception
-                    Throw New Exception("Duplicate project detected: " & projectPath.Last & ".")
+                    AddItem(FixPath(item.Key), Project.OpenProjectFile(Path.Combine(Path.GetDirectoryName(Filename), item.Value.Replace("/", "\").TrimStart("\")), Me, manager))
                 End If
             Next
-
         End Sub
 #End Region
 
@@ -422,34 +388,24 @@ Namespace Projects
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName
             file.Name = Me.Name
             file.InternalSettings = Me.Settings.Serialize
-            file.Projects = GetProjectDictionary(Root, "")
+            file.Projects = GetProjectDictionary()
             Json.SerializeToFile(Filename, file, provider)
             RaiseEvent FileSaved(Me, New EventArgs)
             UnsavedChanges = False
         End Sub
 
-        Private Function GetProjectDictionary(ProjectNode As SolutionNode, CurrentPath As String) As Dictionary(Of String, String)
-            If Not ProjectNode.IsDirectory Then
-                'If it's a project
-                Dim out As New Dictionary(Of String, String)
-                out.Add(CurrentPath, ProjectNode.Item.Filename.Replace(Path.GetDirectoryName(Filename), ""))
-                Return out
-            ElseIf ProjectNode.IsDirectory AndAlso ProjectNode.Children.Count = 0 AndAlso Not CurrentPath = "" Then
-                'If it's a directory with no children
-                Dim out As New Dictionary(Of String, String)
-                out.Add(CurrentPath, Nothing)
-                Return out
-            Else
-                'Otherwise, merge with a recursive call
-                Dim out As New Dictionary(Of String, String)
-                For Each item In ProjectNode.Children
-                    Dim toMerge = GetProjectDictionary(item, CurrentPath & "/" & item.Name)
-                    For Each entry In toMerge
-                        out.Add(entry.Key, entry.Value)
-                    Next
-                Next
-                Return out
-            End If
+        Private Function GetProjectDictionary() As Dictionary(Of String, String)
+            Dim out As New Dictionary(Of String, String)
+            For Each item In Me.Items
+                If item.Value Is Nothing Then
+                    'Directory
+                    out.Add(FixPath(item.Key), Nothing)
+                Else
+                    'File
+                    out.Add(FixPath(item.Key), item.Value.Filename.Replace(Path.GetDirectoryName(Filename), ""))
+                End If
+            Next
+            Return out
         End Function
 
 #End Region

@@ -4,12 +4,12 @@ Namespace Projects
     ''' <summary>
     ''' Defines the common functionality of the nodes of both projects and solutions.
     ''' </summary>
-    <Obsolete> Public MustInherit Class ProjectNodeBase
+    <Obsolete("Non-functional, only for reference in near future")> Public MustInherit Class ProjectNodeBase
         Implements IDisposable
         Implements INotifyPropertyChanged
         Implements IComparable(Of ProjectNodeBase)
 
-        Public Sub New(project As ProjectBase, parentNode As ProjectNodeBase)
+        Public Sub New(project As ProjectBase(Of Object), parentNode As ProjectNodeBase)
             Me.ParentProject = project
             Me.ParentNode = parentNode
             Children = New ObservableCollection(Of ProjectNodeBase)
@@ -33,8 +33,8 @@ Namespace Projects
             Get
                 If IsDirectory Then
                     Return _name
-                ElseIf TypeOf Item Is ProjectBase Then
-                    Return DirectCast(Item, ProjectBase).Name
+                ElseIf TypeOf Item Is ProjectBase(Of Object) Then
+                    Return DirectCast(Item, ProjectBase(Of Object)).Name
                 Else
                     Return _name
                 End If
@@ -57,7 +57,7 @@ Namespace Projects
         ''' <summary>
         ''' Gets the <see cref="ProjectBase"/> of which the current <see cref="ProjectNodeBase"/> is a child.
         ''' </summary>
-        Public Overridable ReadOnly Property ParentProject As ProjectBase
+        Public Overridable ReadOnly Property ParentProject As ProjectBase(Of Object)
 
         ''' <summary>
         ''' Gets the <see cref="ProjectNode"/> of which the current <see cref="ProjectNode"/> is a child.

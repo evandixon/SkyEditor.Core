@@ -143,12 +143,10 @@
     <Compile Include="Projects\ProjectFileAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileRemovedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileWrapper.vb" />
-    <Compile Include="Projects\ProjectNode.vb" />
     <Compile Include="Projects\ProjectNodeBase.vb" />
     <Compile Include="Projects\ProjectRemovedEventArgs.vb" />
     <Compile Include="Projects\ProjectRemovingEventArgs.vb" />
     <Compile Include="IO\SavableFileSaver.vb" />
-    <Compile Include="Projects\SolutionNode.vb" />
     <Compile Include="ISettingsProvider.vb" />
     <Compile Include="Language.fr.Designer.vb">
       <AutoGen>True</AutoGen>
