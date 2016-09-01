@@ -18,6 +18,17 @@ Namespace Projects
 #Region "Events"
         Public Event Modified(sender As Object, e As EventArgs) Implements INotifyModified.Modified
         Public Event BuildStatusChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
+
+        ''' <summary>
+        ''' Raised when a directory is created.
+        ''' </summary>
+        Public Event DirectoryCreated(sender As Object, e As DirectoryCreatedEventArgs)
+
+        ''' <summary>
+        ''' Raised when a directory is deleted.
+        ''' </summary>
+        ''' <remarks>Event will only be raised for directories that are directly requested to be deleted.  Events will not be raised for child directories or items.</remarks>
+        Public Event DirectoryDeleted(sender As Object, e As DirectoryDeletedEventArgs)
 #End Region
 
 #Region "Properties"
@@ -280,13 +291,17 @@ Namespace Projects
         ''' Deletes a directory or item at the given path, if it exists.
         ''' </summary>
         ''' <param name="path">Path of the directory or item to delete.</param>
-        Protected Sub DeleteItem(path As String)
+        ''' <returns>A boolean indicating whether or not the item was deleted.</returns>
+        Protected Function DeleteItem(path As String) As Boolean
             Dim fixedPath = FixPath(path).ToLowerInvariant
             Dim toRemove = Items.Where(Function(x) x.Key.ToLowerInvariant = fixedPath).Select(Function(x) x.Key).FirstOrDefault
             If toRemove IsNot Nothing Then
                 Items.Remove(toRemove)
+                Return True
+            Else
+                Return False
             End If
-        End Sub
+        End Function
 
 #Region "Directories"
         ''' <summary>
@@ -337,6 +352,7 @@ Namespace Projects
             'Create directory
             If Not DirectoryExists(fixedPath) Then
                 Items.Add(fixedPath, Nothing)
+                RaiseEvent DirectoryCreated(Me, New DirectoryCreatedEventArgs(fixedPath))
             End If
         End Sub
 
@@ -365,7 +381,9 @@ Namespace Projects
             Next
 
             'Delete directory
-            DeleteItem(path)
+            If DeleteItem(path) Then
+                RaiseEvent DirectoryDeleted(Me, New DirectoryDeletedEventArgs(path))
+            End If
         End Sub
 
 #End Region
