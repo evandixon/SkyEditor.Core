@@ -128,7 +128,6 @@ Namespace Projects
             Assert.IsFalse(DirectoryTestProject.FileExists("/Test/Ing/file.txt"), "File not deleted.")
         End Sub
 
-
 #End Region
 
 #Region "Building"

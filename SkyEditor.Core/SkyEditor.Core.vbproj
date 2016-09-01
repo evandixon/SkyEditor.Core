@@ -116,7 +116,6 @@
     <Compile Include="IOUIManager.vb" />
     <Compile Include="IO\DetectableFileTypeDetector.vb" />
     <Compile Include="Projects\BuildStatus.vb" />
-    <Compile Include="Projects\DirectoryDeletedEventArgs.vb" />
     <Compile Include="Projects\DirectoryNotFoundException.vb" />
     <Compile Include="IO\DirectoryTypeDetectionResult.vb" />
     <Compile Include="Projects\DirectoryStructureComparer.vb" />
@@ -124,7 +123,6 @@
     <Compile Include="Projects\FileClosedEventArgs.vb" />
     <Compile Include="Projects\FileClosingEventArgs.vb" />
     <Compile Include="Projects\FileOpenedEventArgs.vb" />
-    <Compile Include="Projects\FileRemovedEventArgs.vb" />
     <Compile Include="IO\FileTypeDetectionResult.vb" />
     <Compile Include="IO\IDirectoryTypeDetector.vb" />
     <Compile Include="IO\IFileOpener.vb" />
@@ -138,12 +136,10 @@
     <Compile Include="Projects\ProjectAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectBase.vb" />
     <Compile Include="Projects\ProjectCircularReferenceException.vb" />
-    <Compile Include="Projects\ProjectDirectoryCreatedEventArgs.vb" />
     <Compile Include="Projects\ProjectException.vb" />
     <Compile Include="Projects\ProjectFileAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileRemovedEventArgs.vb" />
     <Compile Include="Projects\ProjectFileWrapper.vb" />
-    <Compile Include="Projects\ProjectNodeBase.vb" />
     <Compile Include="Projects\ProjectRemovedEventArgs.vb" />
     <Compile Include="Projects\ProjectRemovingEventArgs.vb" />
     <Compile Include="IO\SavableFileSaver.vb" />
