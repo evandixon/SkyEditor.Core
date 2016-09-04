@@ -120,6 +120,7 @@
     <Compile Include="TestComponents\TestViewModel.vb" />
     <Compile Include="TestComponents\TextFile.vb" />
     <Compile Include="TestComponents\ViewModelTestAction.vb" />
+    <Compile Include="TestComponentTests\MemoryIOProviderTests.vb" />
     <Compile Include="UI\GeneralUITests.vb" />
     <Compile Include="UI\GenericViewModelTests.vb" />
     <Compile Include="UI\UIHelperTests.vb" />
