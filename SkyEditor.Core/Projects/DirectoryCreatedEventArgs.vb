@@ -1,5 +1,5 @@
 ﻿Namespace Projects
-    Public Class DirectoryDeletedEventArgs
+    Public Class DirectoryCreatedEventArgs
         Inherits EventArgs
 
         Public Sub New(path As String)

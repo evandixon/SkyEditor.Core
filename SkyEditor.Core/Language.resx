@@ -132,6 +132,9 @@
   <data name="DirectoryPrefix" xml:space="preserve">
     <value>[Directory]</value>
   </data>
+  <data name="DuplicateItemException" xml:space="preserve">
+    <value>Item with the same name already exists.  Path: "{0}"</value>
+  </data>
   <data name="ErrorAsyncForInfiniteLoop" xml:space="preserve">
     <value>StepCount cannot be 0.</value>
     <comment>Message for an exception that's thrown when the Step of a logical For statement is 0.</comment>

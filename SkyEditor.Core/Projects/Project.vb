@@ -4,11 +4,10 @@ Imports SkyEditor.Core.Utilities
 
 Namespace Projects
     Public Class Project
-        Inherits ProjectBase
+        Inherits ProjectBase(Of ProjectFileWrapper)
         Implements ISavable
 
         Public Sub New()
-            Root = New ProjectNode(Me, Nothing)
             Settings = New SettingsProvider
         End Sub
 
@@ -76,15 +75,6 @@ Namespace Projects
 
         Public Property ParentSolution As Solution
 
-        Public Shadows Property Root As ProjectNode
-            Get
-                Return MyBase.Root
-            End Get
-            Set(value As ProjectNode)
-                MyBase.Root = value
-            End Set
-        End Property
-
         ''' <summary>
         ''' List of the names of all projects in the current solution this project references.
         ''' </summary>
@@ -102,83 +92,15 @@ Namespace Projects
         End Property
 
 #Region "Functions"
-        ''' <summary>
-        ''' Gets the solution items at the given logical path in the solution.
-        ''' </summary>
-        ''' <param name="Path">Logical path to get the contents for.  Pass in String.Empty or Nothing to get the root.</param>
-        ''' <returns></returns>
-        Public Function GetDirectoryContents(Path As String) As IEnumerable(Of ProjectNode)
-            If Path Is Nothing OrElse Path = String.Empty Then
-                Return From c In Root.Children Order By c.Name
-            Else
-                Dim pathArray = Path.Replace("\", "/").Split("/")
-
-                Dim current As ProjectNode = Root
-                Dim index As Integer = 0
-                For count = 0 To pathArray.Length - 1
-                    current = (From i In current.Children Where i.Name.ToLower = pathArray(index).ToLower Select i).FirstOrDefault
-                    If current Is Nothing Then
-                        Throw New DirectoryNotFoundException("The given path does not exist in the project.")
-                    End If
-                Next
-                Return From c In current.Children Order By c.Name
-            End If
-        End Function
-
-        ''' <summary>
-        ''' Gets the project item at the given path.
-        ''' Returns Nothing if there is no project item at that path.
-        ''' </summary>
-        ''' <param name="ItemPath">Path to look for a project item.</param>
-        ''' <returns></returns>
-        Public Function GetProjectItemByPath(ItemPath As String) As ProjectNode
-            Return GetProjectItemByPath(Root, ItemPath)
-        End Function
-
-        ''' <summary>
-        ''' Gets the project item at the given path.
-        ''' Returns Nothing if there is no project item at that path.
-        ''' </summary>
-        ''' <param name="ItemPath">Path to look for a project item.</param>
-        ''' <returns></returns>
-        Public Function GetProjectItemByPath(rootNode As ProjectNode, ItemPath As String) As ProjectNode
-            If ItemPath Is Nothing OrElse ItemPath = "" Then
-                Return rootNode
-            Else
-                Dim path = ItemPath.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = rootNode
-                For count = 0 To path.Length - 2
-                    Dim i = count 'I got a warning about using an iterator variable in the line below
-                    Dim child = (From c In current.Children Where c.Name.ToLower = path(i).ToLower).FirstOrDefault
-
-                    If child Is Nothing Then
-                        Dim newNode As New ProjectNode(Me, current)
-                        'newNode.IsDirectory = True
-                        newNode.Name = path(count)
-                        current.Children.Add(newNode)
-                        current = newNode
-                    Else
-                        current = child
-                    End If
-
-                Next
-                Dim proj As ProjectNode = (From c In current.Children Where c.Name.ToLower = path.Last.ToLower).FirstOrDefault
-                If proj IsNot Nothing Then
-                    Return proj
-                Else
-                    Return Nothing
-                End If
-            End If
-        End Function
 
         ''' <summary>
         ''' Gets the file at the given path.
         ''' Returns nothing if there is no file at that path.
         ''' </summary>
-        ''' <param name="Path">Path to look for a file.</param>
+        ''' <param name="path">Path to look for a file.</param>
         ''' <returns></returns>
-        Public Async Function GetFileByPath(Path As String, manager As PluginManager, duplicateMatchSelector As IOHelper.DuplicateMatchSelector) As Task(Of Object)
-            Return Await (GetProjectItemByPath(Path)?.GetFile(manager, duplicateMatchSelector))
+        Public Async Function GetFileByPath(path As String, manager As PluginManager, duplicateMatchSelector As IOHelper.DuplicateMatchSelector) As Task(Of Object)
+            Return Await (GetItem(path)?.GetFile(manager, duplicateMatchSelector))
         End Function
 
         Public Overridable Function CanCreateFile(Path As String) As Boolean
@@ -197,29 +119,18 @@ Namespace Projects
             End If
         End Function
 
-        Public Overridable Sub CreateFile(ParentPath As String, FileName As String, FileType As Type)
-            Dim item = GetProjectItemByPath(ParentPath)
-            If item IsNot Nothing Then
-                FileName = FileName.Replace("\", "/").TrimStart("/")
-                Dim q = (From c In item.Children Where TypeOf c Is ProjectNode AndAlso c.Name.ToLower = FileName.ToLower AndAlso DirectCast(c, ProjectNode).IsDirectory = False).FirstOrDefault
-                If q Is Nothing Then
-                    Dim fileObj As ICreatableFile = ReflectionHelpers.CreateInstance(FileType.GetTypeInfo)
-                    fileObj.CreateFile(FileName)
-                    fileObj.Filename = Path.Combine(Path.GetDirectoryName(Me.Filename), ParentPath.Replace("/", "\").TrimStart("\"), FileName)
-
-                    Dim projItem As New ProjectNode(Me, item, fileObj)
-                    projItem.Filename = ParentPath & "/" & FileName
-                    projItem.Name = FileName
-                    item.Children.Add(projItem)
-                    RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.ParentPath = ParentPath, .File = fileObj, .Filename = FileName, .FullFilename = fileObj.Filename})
-                Else
-                    'There's already a project here
-                    'Todo: throw better exception
-                    Throw New Exception("A file with the given already exists in the given path: " & ParentPath)
-                End If
-            Else
-                Throw New DirectoryNotFoundException("Cannot create a file at the given path: " & ParentPath)
+        Public Overridable Sub CreateFile(parentPath As String, name As String, fileType As Type)
+            If Not DirectoryExists(parentPath) Then
+                CreateDirectory(parentPath)
             End If
+
+            Dim fixedPath = FixPath(parentPath)
+
+            Dim fileObj As ICreatableFile = ReflectionHelpers.CreateInstance(fileType.GetTypeInfo)
+            fileObj.CreateFile(name)
+            fileObj.Filename = Path.Combine(Path.GetDirectoryName(Me.Filename), parentPath.Replace("/", "\").TrimStart("\"), name)
+
+            AddItem(fixedPath & "/" & name, New ProjectFileWrapper(Me.Filename, fileObj.Filename, fileObj))
         End Sub
 
         Public Overridable Function IsFileSupported(ParentProjectPath As String, Filename As String)
@@ -232,78 +143,41 @@ Namespace Projects
         ''' <param name="ParentProjectPath">Directory to put the imported file.</param>
         ''' <param name="FullFilename">Full path of the file to import.</param>
         ''' <returns></returns>
-        Protected Overridable Function GetImportedFilePath(ParentProjectPath As String, FullFilename As String)
+        Protected Overridable Function GetImportedFilePath(ParentProjectPath As String, FullFilename As String) As String
             Return Path.Combine(ParentProjectPath, Path.GetFileName(FullFilename))
         End Function
 
         Public Overridable Function GetImportIOFilter(ParentProjectPath As String, manager As PluginManager) As String
-            Return "All Files (*.*)|*.*" 'manager.IOFiltersString
+            Return $"{My.Resources.Language.AllFiles} (*.*)|*.*" 'manager.IOFiltersString
         End Function
 
-        Public Overridable Async Function AddExistingFile(ParentProjectPath As String, FilePath As String, provider As IOProvider) As Task
-            Await AddExistingFile(Root, ParentProjectPath, FilePath, provider)
-        End Function
+        Public Overridable Sub AddExistingFile(parentPath As String, FilePath As String, provider As IOProvider)
+            Dim importedName = GetImportedFilePath(parentPath, FilePath)
+            Dim fixedPath = FixPath(parentPath)
 
-        Protected Overridable Async Function AddExistingFile(rootProjectNode As ProjectNode, projectPath As String, FilePath As String, provider As IOProvider) As Task
-            Dim item = GetProjectItemByPath(rootProjectNode, projectPath)
-            If item IsNot Nothing Then
-                Dim filename = Path.GetFileName(FilePath)
-                filename = filename.Replace("\", "/").TrimStart("/")
-                Dim q = (From c In item.Children Where TypeOf c Is ProjectNode AndAlso c.Name.ToLower = filename.ToLower AndAlso DirectCast(c, ProjectNode).IsDirectory = False).FirstOrDefault
-                If q Is Nothing Then
-                    Dim projItem As New ProjectNode(Me, item)
-                    projItem.Filename = GetImportedFilePath(projectPath, FilePath)
-
-                    Dim source = FilePath
-                    Dim dest = Path.Combine(Path.GetDirectoryName(Me.Filename), projItem.Filename.Replace("/", "\").TrimStart("\"))
-
-                    Await Task.Run(New Action(Sub()
-                                                  If Not source.Replace("\", "/").ToLower = dest.Replace("\", "/").ToLower Then
-                                                      provider.CopyFile(FilePath, dest)
-                                                  End If
-                                              End Sub))
-
-                    projItem.Name = Path.GetFileName(projItem.Filename)
-                    item.Children.Add(projItem)
-                    RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = projItem.Name, .FullFilename = dest})
-                Else
-                    'There's already a project here
-                    'Todo: throw exception
-                    'Throw New ProjectAlreadyExistsException("A project with the name """ & ProjectName & """ already exists in the given path: " & ParentPath)
-                End If
+            'Copy the file
+            Dim source = FilePath
+            Dim dest = Path.Combine(Path.GetDirectoryName(Me.Filename), importedName.Replace("/", "\").TrimStart("\"))
+            If Not source.Replace("\", "/").ToLower = dest.Replace("\", "/").ToLower Then
+                provider.CopyFile(FilePath, dest)
             End If
+
+            'Add the file
+            Dim wrapper As New ProjectFileWrapper(Me.Filename, importedName)
+            AddItem(fixedPath & "/" & Path.GetFileName(FilePath), wrapper)
+            RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = Path.GetFileName(FilePath), .FullFilename = dest})
+        End Sub
+
+        Public Function FileExists(path As String) As Boolean
+            Return ItemExists(path)
         End Function
 
-        Public Overridable Async Function RecreateRootWithExistingFiles(files As IEnumerable(Of AddExistingFileBatchOperation), provider As IOProvider) As Task
-            Dim newRoot As New ProjectNode(Me, Nothing)
-            For Each item In files
-                If Not String.IsNullOrEmpty(item.ParentPath) Then
-                    CreateDirectory(newRoot, item.ParentPath)
-                End If
-                Await AddExistingFile(newRoot, item.ParentPath, item.ActualFilename, provider)
-            Next
-            Root.Children = newRoot.Children
+        Public Overridable Function CanDeleteFile(path As String) As Boolean
+            Return ItemExists(path)
         End Function
 
-        Public Overridable Function CanDeleteFile(FilePath As String) As Boolean
-            Return (GetProjectItemByPath(FilePath) IsNot Nothing)
-        End Function
-
-        Public Overridable Sub DeleteFile(FilePath As String)
-            Dim pathParts = FilePath.Replace("\", "/").TrimStart("/").Split("/")
-            Dim parentPath As New Text.StringBuilder
-            For count = 0 To pathParts.Length - 2
-                parentPath.Append(pathParts(count))
-                parentPath.Append("/")
-            Next
-            Dim parentPathString = parentPath.ToString.TrimEnd("/")
-            Dim parent = GetProjectItemByPath(parentPathString)
-            Dim child = (From c In parent.Children Where TypeOf c Is ProjectNode AndAlso c.Name.ToLower = pathParts.Last.ToLower AndAlso DirectCast(c, ProjectNode).IsDirectory = False Select DirectCast(c, ProjectNode)).FirstOrDefault
-            If child IsNot Nothing Then
-                parent.Children.Remove(child)
-                child.Dispose()
-                RaiseEvent FileRemoved(Me, New ProjectFileRemovedEventArgs With {.FileName = pathParts.Last, .ParentPath = parentPathString, .FullPath = FilePath})
-            End If
+        Public Overridable Sub DeleteFile(path As String)
+            DeleteItem(path)
         End Sub
 
         Public Overridable Function GetRootDirectory() As String
@@ -462,46 +336,12 @@ Namespace Projects
 
             'Load Files
             For Each item In File.Files
-                Dim path = item.Key.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = Me.Root
-                'Create the directory nodes
-                For count = 0 To path.Length - 2
-                    'Try to get the directory node we're looking for
-                    Dim i = count 'I got a warning about using an iterator variable in the line below
-                    Dim child = (From c In current.Children Where c.Name.ToLower = path(i).ToLower).FirstOrDefault
-
-                    If child Is Nothing Then
-                        'Create it if it doesn't exist
-                        Dim newNode As New ProjectNode(Me, current)
-                        newNode.Name = path(count)
-                        current.Children.Add(newNode)
-                        current = newNode
-                    Else
-                        'Select it otherwise
-                        current = child
-                    End If
-
-                Next
-                'Create the file node
-                Dim proj = (From c In current.Children Where c.Name.ToLower = path.Last.ToLower).FirstOrDefault
-                If proj Is Nothing Then
-                    'If it doesn't exist, create it
-                    Dim newNode As New ProjectNode(Me, current)
-                    newNode.Name = path.Last
-                    If item.Value IsNot Nothing Then
-                        newNode.Filename = item.Value.Filename 'IO.Path.Combine(IO.Path.GetDirectoryName(Me.Filename), item.Value.Filename.Replace("/", "\").TrimStart("\"))
-                        newNode.FileAssemblyQualifiedTypeName = item.Value.AssemblyQualifiedTypeName
-                    Else
-                        newNode.Filename = Nothing
-                    End If
-                    current.Children.Add(newNode)
+                If item.Value Is Nothing Then
+                    CreateDirectory(item.Key)
                 Else
-                    'If it does exist, there's already a file with the same name.
-                    'Todo: replace with better exception
-                    Throw New Exception("Duplicate file detected: " & path.Last & ".")
+                    AddItem(FixPath(item.Key), New ProjectFileWrapper(Me.Filename, item.Value.Filename, item.Value.AssemblyQualifiedTypeName))
                 End If
             Next
-
             RaiseEvent ProjectOpened(Me, New EventArgs)
         End Sub
 #End Region
@@ -513,33 +353,23 @@ Namespace Projects
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName
             file.Name = Me.Name
             file.InternalSettings = Me.Settings.Serialize
-            file.Files = GetProjectDictionary(Root, "")
+            file.Files = GetProjectDictionary()
             Json.SerializeToFile(Filename, file, provider)
             RaiseEvent FileSaved(Me, New EventArgs)
         End Sub
 
-        Private Function GetProjectDictionary(ProjectNode As ProjectNode, CurrentPath As String) As Dictionary(Of String, FileValue)
-            If Not ProjectNode.IsDirectory Then
-                'It's a file
-                Dim out As New Dictionary(Of String, FileValue)
-                out.Add(CurrentPath, New FileValue With {.Filename = ProjectNode.Filename.Replace(Path.GetDirectoryName(Filename), ""), .AssemblyQualifiedTypeName = ProjectNode.FileAssemblyQualifiedTypeName})
-                Return out
-            ElseIf ProjectNode.IsDirectory AndAlso ProjectNode.Children.Count = 0 AndAlso Not CurrentPath = "" Then
-                'It's a directory with no children
-                Dim out As New Dictionary(Of String, FileValue)
-                out.Add(CurrentPath, Nothing)
-                Return out
-            Else
-                'Otherwise, merge with a recursive call
-                Dim out As New Dictionary(Of String, FileValue)
-                For Each item In ProjectNode.Children
-                    Dim toMerge = GetProjectDictionary(item, CurrentPath & "/" & item.Name)
-                    For Each entry In toMerge
-                        out.Add(entry.Key, entry.Value)
-                    Next
-                Next
-                Return out
-            End If
+        Private Function GetProjectDictionary() As Dictionary(Of String, FileValue)
+            Dim out As New Dictionary(Of String, FileValue)
+            For Each item In Me.Items
+                If item.Value Is Nothing Then
+                    'Directory
+                    out.Add(FixPath(item.Key), Nothing)
+                Else
+                    'File
+                    out.Add(FixPath(item.Key), New FileValue With {.Filename = item.Value.Filename.Replace(Path.GetDirectoryName(Filename), ""), .AssemblyQualifiedTypeName = item.Value.FileAssemblyQualifiedTypeName})
+                End If
+            Next
+            Return out
         End Function
 #End Region
 

@@ -6,7 +6,7 @@ Imports SkyEditor.Core.Utilities
 
 Namespace Projects
     Public Class Solution
-        Inherits ProjectBase
+        Inherits ProjectBase(Of Project)
 
 #Region "Child Classes"
         Private Class SolutionFile
@@ -52,21 +52,7 @@ Namespace Projects
 #End Region
 
         Public Sub New()
-            Root = New SolutionNode(Me, Nothing)
         End Sub
-
-        ''' <summary>
-        ''' The root of the solution's logical heiarchy.
-        ''' </summary>
-        ''' <returns></returns>
-        Public Shadows Property Root As SolutionNode
-            Get
-                Return MyBase.Root
-            End Get
-            Set(value As SolutionNode)
-                MyBase.Root = value
-            End Set
-        End Property
 
 #Region "Events"
         ''' <summary>
@@ -117,28 +103,7 @@ Namespace Projects
         ''' </summary>
         ''' <returns></returns>
         Public Function GetAllProjects() As IEnumerable(Of Project)
-            Return GetAllProjects(Root)
-        End Function
-
-        ''' <summary>
-        ''' Gets all projects that are in the given solution node
-        ''' </summary>
-        ''' <returns></returns>
-        Public Overridable Function GetAllProjects(node As SolutionNode) As IEnumerable(Of Project)
-            Dim output As New List(Of Project)
-            If node.Children.Count > 0 Then
-                If node.IsDirectory Then
-                    For Each item In node.Children
-                        output.AddRange(GetAllProjects(item))
-                    Next
-                End If
-            End If
-
-            If node.IsDirectory = False AndAlso node.Item IsNot Nothing AndAlso TypeOf node.Item Is Project Then
-                output.Add(node.Item)
-            End If
-
-            Return output
+            Return Items.Values.Where(Function(x) TypeOf x Is Project)
         End Function
 
         ''' <summary>
@@ -161,133 +126,46 @@ Namespace Projects
         End Function
 
 #Region "Solution Logical Filesystem"
-        ''' <summary>
-        ''' Gets the solution items at the given logical path in the solution.
-        ''' </summary>
-        ''' <param name="Path">Logical path to get the contents for.  Pass in String.Empty or Nothing to get the root.</param>
-        ''' <returns></returns>
-        Public Function GetDirectoryContents(Path As String) As IEnumerable(Of SolutionNode)
-            If Path Is Nothing OrElse Path = String.Empty Then
-                Return From c In Root.Children Order By c.Name
-            Else
-                Dim pathArray = Path.Replace("\", "/").Split("/")
-
-                Dim current As SolutionNode = Root
-                Dim index As Integer = 0
-                For count = 0 To pathArray.Length - 1
-                    current = (From i In current.Children Where i.Name.ToLower = pathArray(index).ToLower Select i).FirstOrDefault
-                    If current Is Nothing Then
-                        Throw New DirectoryNotFoundException("The given path does not exist in the solution.")
-                    End If
-                Next
-                Return From c In current.Children Order By c.Name
-            End If
-        End Function
-
-        ''' <summary>
-        ''' Gets the solution item at the given path.
-        ''' Returns Nothing if there is no solution item at that path.
-        ''' </summary>
-        ''' <param name="ItemPath">Path to look for a solution item.</param>
-        ''' <returns></returns>
-        Public Function GetSolutionItemByPath(ItemPath As String) As SolutionNode
-            If ItemPath Is Nothing OrElse ItemPath = "" Then
-                Return Root
-            Else
-                Dim path = ItemPath.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = Me.Root
-                For count = 0 To path.Length - 2
-                    Dim i = count 'I got a warning about using an iterator variable in the line below
-                    Dim child = (From c In current.Children Where c.Name.ToLower = path(i).ToLower).FirstOrDefault
-
-                    If child Is Nothing Then
-                        Dim newNode As New SolutionNode(Me, current)
-                        newNode.Name = path(count)
-                        current.Children.Add(newNode)
-                        current = newNode
-                    Else
-                        current = child
-                    End If
-
-                Next
-                Dim proj As SolutionNode = (From c In current.Children Where c.Name.ToLower = path.Last.ToLower).FirstOrDefault
-                If proj IsNot Nothing Then
-                    Return proj
-                Else
-                    Return Nothing
-                End If
-            End If
-        End Function
 
         ''' <summary>
         ''' Gets the project at the given path.
         ''' Returns nothing if there is no project at that path.
         ''' </summary>
-        ''' <param name="Path">Path to look for a project.</param>
+        ''' <param name="path">Path to look for a project.</param>
         ''' <returns></returns>
-        Public Function GetProjectByPath(Path As String) As Project
-            Return GetSolutionItemByPath(Path)?.Item
+        Public Function GetProjectByPath(path As String) As Project
+            Return GetItem(path)
         End Function
 
-        Public Overridable Async Function CreateProject(ParentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager) As Task
-            Dim item = GetSolutionItemByPath(ParentPath)
-            If item IsNot Nothing Then
-                Dim q = (From c In item.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = ProjectName.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False).FirstOrDefault
-                If q Is Nothing Then
-                    Dim p = Project.CreateProject(Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType, Me, manager)
-                    item.Children.Add(New SolutionNode(Me, item) With {.Name = ProjectName, .Item = p})
-                    AddHandler p.Modified, AddressOf Project_Modified
-                    UnsavedChanges = True
-                    Await Task.Run(Sub()
-                                       RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.ParentPath = ParentPath, .Project = p})
-                                   End Sub)
-                Else
-                    'There's already a project here
-                    Throw New ProjectAlreadyExistsException("A project with the name """ & ProjectName & """ already exists in the given path: " & ParentPath)
-                End If
-            Else
-                Throw New DirectoryNotFoundException("Cannot create a project at the given path: " & ParentPath)
-            End If
-        End Function
-
-        Public Overridable Sub AddExistingProject(ParentPath As String, ProjectFilename As String, manager As PluginManager)
-            Dim item = GetSolutionItemByPath(ParentPath)
-            If item IsNot Nothing Then
-                Dim p = Project.OpenProjectFile(ProjectFilename, Me, manager)
-                Dim q = (From c In item.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = p.Name.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False).FirstOrDefault
-                If q Is Nothing Then
-                    'Dim p = Project.CreateProject(IO.Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType)
-                    item.Children.Add(New SolutionNode(Me, item) With {.Name = p.Name, .Item = p})
-                    AddHandler p.Modified, AddressOf Project_Modified
-                    UnsavedChanges = True
-                    RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.ParentPath = ParentPath, .Project = p})
-                Else
-                    'There's already a project here
-                    Throw New ProjectAlreadyExistsException("A project with the name """ & p.Name & """ already exists in the given path: " & ParentPath)
-                End If
-            Else
-                Throw New DirectoryNotFoundException("Cannot create a project at the given path: " & ParentPath)
-            End If
+        Public Overridable Sub CreateProject(parentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager)
+            Dim p = Project.CreateProject(Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType, Me, manager)
+            AddProject(FixPath(parentPath) & "/" & ProjectName, p)
         End Sub
 
-        Public Overridable Sub DeleteProject(ProjectPath As String)
-            Dim pathParts = ProjectPath.Replace("\", "/").TrimStart("/").Split("/")
-            Dim parentPath As New Text.StringBuilder
-            For count = 0 To pathParts.Length - 2
-                parentPath.Append(pathParts(count))
-                parentPath.Append("/")
-            Next
-            Dim parentPathString = parentPath.ToString.TrimEnd("/")
-            Dim parent = GetSolutionItemByPath(parentPathString)
-            Dim child = (From c In parent.Children Where TypeOf c Is SolutionNode AndAlso c.Name.ToLower = pathParts.Last.ToLower AndAlso DirectCast(c, SolutionNode).IsDirectory = False Select DirectCast(c, SolutionNode)).FirstOrDefault
-            If child IsNot Nothing Then
-                RaiseEvent ProjectRemoving(Me, New ProjectRemovingEventArgs With {.Project = child.Item})
-                RemoveHandler child.Item.Modified, AddressOf Project_Modified
-                UnsavedChanges = True
-                parent.Children.Remove(child)
-                child.Dispose()
-                RaiseEvent ProjectRemoved(Me, New ProjectRemovedEventArgs With {.DirectoryName = pathParts.Last, .ParentPath = parentPathString, .FullPath = ProjectPath})
-            End If
+        ''' <summary>
+        ''' Adds the project to the solution.
+        ''' </summary>
+        ''' <param name="path">Full path of the project</param>
+        ''' <param name="project">Project to add</param>
+        Public Sub AddProject(path As String, project As Project)
+            AddItem(path, project)
+        End Sub
+
+        Public Overridable Sub AddExistingProject(parentPath As String, ProjectFilename As String, manager As PluginManager)
+            Dim p = Project.OpenProjectFile(ProjectFilename, Me, manager)
+            AddItem(FixPath(parentPath) & "/" & p.Name, p)
+        End Sub
+
+        Public Overridable Sub DeleteProject(projectPath As String)
+            Dim fixedPath = FixPath(projectPath)
+
+            Dim project = GetProjectByPath(fixedPath)
+            RaiseEvent ProjectRemoving(Me, New ProjectRemovingEventArgs With {.Project = project})
+
+            DeleteItem(fixedPath)
+            RemoveHandler project.Modified, AddressOf Project_Modified
+
+            RaiseEvent ProjectRemoved(Me, New ProjectRemovedEventArgs With {.DirectoryName = Path.GetFileName(fixedPath), .ParentPath = Path.GetDirectoryName(fixedPath), .FullPath = fixedPath})
         End Sub
 #End Region
 
@@ -295,8 +173,8 @@ Namespace Projects
             Return CanCreateDirectory(Path)
         End Function
 
-        Public Overridable Function CanDeleteProject(ProjectPath As String) As Boolean
-            Return (GetSolutionItemByPath(ProjectPath) IsNot Nothing)
+        Public Overridable Function CanDeleteProject(projectPath As String) As Boolean
+            Return ItemExists(projectPath)
         End Function
 
 #Region "Building"
@@ -495,46 +373,12 @@ Namespace Projects
 
             'Load Projects
             For Each item In File.Projects
-                Dim projectPath = item.Key.Replace("\", "/").TrimStart("/").Split("/")
-                Dim current = Me.Root
-                'Create the directory nodes
-                For count = 0 To projectPath.Length - 2
-                    'Try to get the directory node we're expecting
-                    Dim i = count 'I got a warning about using an iterator variable in the line below
-                    Dim child = (From c In current.Children Where c.Name.ToLower = projectPath(i).ToLower).FirstOrDefault
-
-                    If child Is Nothing Then
-                        'Create it if it doesn't exist
-                        Dim newNode As New SolutionNode(Me, current)
-                        newNode.Name = projectPath(count)
-                        current.Children.Add(newNode)
-                        current = newNode
-                    Else
-                        'Otherwise select it
-                        current = child
-                    End If
-
-                Next
-                'Try to find the project node
-                Dim proj = (From c In current.Children Where c.Name.ToLower = projectPath.Last.ToLower).FirstOrDefault
-                If proj Is Nothing Then
-                    'If it doesn't exist, create it
-                    Dim newNode As New SolutionNode(Me, current)
-                    newNode.Name = projectPath.Last
-                    If item.Value IsNot Nothing Then
-                        newNode.Item = Project.OpenProjectFile(Path.Combine(Path.GetDirectoryName(Filename), item.Value.Replace("/", "\").TrimStart("\")), Me, manager)
-                        AddHandler newNode.Item.Modified, AddressOf Project_Modified
-                    Else
-                        newNode.Item = Nothing
-                    End If
-                    current.Children.Add(newNode)
+                If item.Value Is Nothing Then
+                    CreateDirectory(item.Key)
                 Else
-                    'If it does exist, there's already a project with the same name.
-                    'Todo: replace with better exception
-                    Throw New Exception("Duplicate project detected: " & projectPath.Last & ".")
+                    AddItem(FixPath(item.Key), Project.OpenProjectFile(Path.Combine(Path.GetDirectoryName(Filename), item.Value.Replace("/", "\").TrimStart("\")), Me, manager))
                 End If
             Next
-
         End Sub
 #End Region
 
@@ -544,34 +388,24 @@ Namespace Projects
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName
             file.Name = Me.Name
             file.InternalSettings = Me.Settings.Serialize
-            file.Projects = GetProjectDictionary(Root, "")
+            file.Projects = GetProjectDictionary()
             Json.SerializeToFile(Filename, file, provider)
             RaiseEvent FileSaved(Me, New EventArgs)
             UnsavedChanges = False
         End Sub
 
-        Private Function GetProjectDictionary(ProjectNode As SolutionNode, CurrentPath As String) As Dictionary(Of String, String)
-            If Not ProjectNode.IsDirectory Then
-                'If it's a project
-                Dim out As New Dictionary(Of String, String)
-                out.Add(CurrentPath, ProjectNode.Item.Filename.Replace(Path.GetDirectoryName(Filename), ""))
-                Return out
-            ElseIf ProjectNode.IsDirectory AndAlso ProjectNode.Children.Count = 0 AndAlso Not CurrentPath = "" Then
-                'If it's a directory with no children
-                Dim out As New Dictionary(Of String, String)
-                out.Add(CurrentPath, Nothing)
-                Return out
-            Else
-                'Otherwise, merge with a recursive call
-                Dim out As New Dictionary(Of String, String)
-                For Each item In ProjectNode.Children
-                    Dim toMerge = GetProjectDictionary(item, CurrentPath & "/" & item.Name)
-                    For Each entry In toMerge
-                        out.Add(entry.Key, entry.Value)
-                    Next
-                Next
-                Return out
-            End If
+        Private Function GetProjectDictionary() As Dictionary(Of String, String)
+            Dim out As New Dictionary(Of String, String)
+            For Each item In Me.Items
+                If item.Value Is Nothing Then
+                    'Directory
+                    out.Add(FixPath(item.Key), Nothing)
+                Else
+                    'File
+                    out.Add(FixPath(item.Key), item.Value.Filename.Replace(Path.GetDirectoryName(Filename), ""))
+                End If
+            Next
+            Return out
         End Function
 
 #End Region
