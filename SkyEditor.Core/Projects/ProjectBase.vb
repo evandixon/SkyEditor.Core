@@ -111,7 +111,7 @@ Namespace Projects
 
         'While it would work to simply make Items protected, a function has the context that the result is calculated.
         'ProjectBase(Of T) will shadow this function to return a different object type (for low-level access during saving), so this context is beneficial.
-        Protected Function GetItems() As Dictionary(Of String, Object)
+        Protected Function GetItemDictionary() As Dictionary(Of String, Object)
             Return Items
         End Function
 
@@ -277,6 +277,10 @@ Namespace Projects
                              OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
             End If
 
+        End Function
+
+        Public Function GetItems(path As String, recursive As Boolean) As Dictionary(Of String, Object)
+            Return GetItemsInternal(path, recursive, False).ToDictionary(Function(x) x.Key, Function(y) y.Value)
         End Function
 
         Protected Function ItemExists(path As String) As Boolean
@@ -450,7 +454,7 @@ Namespace Projects
         Inherits ProjectBase
 
         Protected Shadows Function GetItems() As Dictionary(Of String, T)
-            Return MyBase.GetItems.ToDictionary(Function(x) x.Key, Function(y) DirectCast(y.Value, T))
+            Return MyBase.GetItemDictionary.ToDictionary(Function(x) x.Key, Function(y) DirectCast(y.Value, T))
         End Function
 
         ''' <summary>
