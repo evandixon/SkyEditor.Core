@@ -103,6 +103,15 @@ Namespace Projects
             Return Await (GetItem(path)?.GetFile(manager, duplicateMatchSelector))
         End Function
 
+        ''' <summary>
+        ''' Gets the filename of the file at the given project path.
+        ''' </summary>
+        ''' <param name="path">Path of the project file of which to get the physical filename.</param>
+        ''' <returns>The physical filename of the project file.</returns>
+        Public Function GetFilename(path As String) As String
+            Return GetItem(path).GetFilename
+        End Function
+
         Public Overridable Function CanCreateFile(Path As String) As Boolean
             Return CanCreateDirectory(Path)
         End Function
