@@ -134,6 +134,8 @@
     <Compile Include="IO\ObjectFile.vb" />
     <Compile Include="IO\ObjectFileDetector.vb" />
     <Compile Include="IO\OpenableFileOpener.vb" />
+    <Compile Include="Projects\ItemAddedEventArgs.vb" />
+    <Compile Include="Projects\ItemRemovedEventArgs.vb" />
     <Compile Include="Projects\Project.vb" />
     <Compile Include="Projects\ProjectAddedEventArgs.vb" />
     <Compile Include="Projects\ProjectBase.vb" />

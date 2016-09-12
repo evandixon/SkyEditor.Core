@@ -28,6 +28,16 @@ Namespace Projects
         ''' </summary>
         ''' <remarks>Event will only be raised for directories that are directly requested to be deleted.  Events will not be raised for child directories or items.</remarks>
         Public Event DirectoryDeleted(sender As Object, e As DirectoryDeletedEventArgs)
+
+        ''' <summary>
+        ''' Raised when an item, such as a file or a project, has been added.
+        ''' </summary>
+        Public Event ItemAdded(sender As Object, e As ItemAddedEventArgs)
+
+        ''' <summary>
+        ''' Raised when an item, such as a file or a project, has been added.
+        ''' </summary>
+        Public Event ItemRemoved(sender As Object, e As ItemRemovedEventArgs)
 #End Region
 
 #Region "Properties"
@@ -288,7 +298,8 @@ Namespace Projects
                 Throw New DuplicateItemException(path)
             Else
                 Dim fixedPath = FixPath(path)
-                Items.Add(path, item)
+                Items.Add(fixedPath, item)
+                RaiseEvent ItemAdded(Me, New ItemAddedEventArgs With {.FullPath = fixedPath})
             End If
         End Sub
 
@@ -298,10 +309,12 @@ Namespace Projects
         ''' <param name="path">Path of the directory or item to delete.</param>
         ''' <returns>A boolean indicating whether or not the item was deleted.</returns>
         Protected Function DeleteItem(path As String) As Boolean
-            Dim fixedPath = FixPath(path).ToLowerInvariant
-            Dim toRemove = Items.Where(Function(x) x.Key.ToLowerInvariant = fixedPath).Select(Function(x) x.Key).FirstOrDefault
+            Dim fixedPath = FixPath(path)
+            Dim fixedPathLower = fixedPath.ToLowerInvariant
+            Dim toRemove = Items.Where(Function(x) x.Key.ToLowerInvariant = fixedPathLower).Select(Function(x) x.Key).FirstOrDefault
             If toRemove IsNot Nothing Then
                 Items.Remove(toRemove)
+                RaiseEvent ItemRemoved(Me, New ItemRemovedEventArgs With {.FullPath = fixedPath})
                 Return True
             Else
                 Return False
