@@ -103,7 +103,7 @@ Namespace Projects
         ''' </summary>
         ''' <returns></returns>
         Public Function GetAllProjects() As IEnumerable(Of Project)
-            Return Items.Values.Where(Function(x) TypeOf x Is Project)
+            Return GetItems.Values.Where(Function(x) TypeOf x Is Project)
         End Function
 
         ''' <summary>
@@ -388,15 +388,16 @@ Namespace Projects
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName
             file.Name = Me.Name
             file.InternalSettings = Me.Settings.Serialize
-            file.Projects = GetProjectDictionary()
+            file.Projects = GetSolutionDictionary()
             Json.SerializeToFile(Filename, file, provider)
             RaiseEvent FileSaved(Me, New EventArgs)
             UnsavedChanges = False
         End Sub
 
-        Private Function GetProjectDictionary() As Dictionary(Of String, String)
+        Private Function GetSolutionDictionary() As Dictionary(Of String, String)
             Dim out As New Dictionary(Of String, String)
-            For Each item In Me.Items
+            For Each item In GetItems()
+
                 If item.Value Is Nothing Then
                     'Directory
                     out.Add(FixPath(item.Key), Nothing)

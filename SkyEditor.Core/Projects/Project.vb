@@ -360,7 +360,7 @@ Namespace Projects
 
         Private Function GetProjectDictionary() As Dictionary(Of String, FileValue)
             Dim out As New Dictionary(Of String, FileValue)
-            For Each item In Me.Items
+            For Each item In Me.GetItems
                 If item.Value Is Nothing Then
                     'Directory
                     out.Add(FixPath(item.Key), Nothing)

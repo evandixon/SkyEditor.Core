@@ -5,14 +5,13 @@ Namespace Projects
     ''' <summary>
     ''' Defines the common functionality of both projects and solutions.
     ''' </summary>
-    ''' <typeparam name="T">Type of project items.</typeparam>
-    Public MustInherit Class ProjectBase(Of T)
+    Public MustInherit Class ProjectBase
         Implements INotifyModified
         Implements IDisposable
         Implements IReportProgress
 
         Public Sub New()
-            Items = New Dictionary(Of String, T)
+            Items = New Dictionary(Of String, Object)
         End Sub
 
 #Region "Events"
@@ -98,7 +97,13 @@ Namespace Projects
         ''' "Test"/null - directory
         ''' "Test/Ing"/null - directory
         ''' "Test/File"/[GenericFile] - File of type GenericFile, named "File", in directory "Test"</remarks>
-        Protected Property Items As Dictionary(Of String, T)
+        Private Property Items As Dictionary(Of String, Object)
+
+        'While it would work to simply make Items protected, a function has the context that the result is calculated.
+        'ProjectBase(Of T) will shadow this function to return a different object type (for low-level access during saving), so this context is beneficial.
+        Protected Function GetItems() As Dictionary(Of String, Object)
+            Return Items
+        End Function
 
 #End Region
 
@@ -232,7 +237,7 @@ Namespace Projects
         ''' <param name="recursive">Whether or not to search child directories.</param>
         ''' <param name="getDirectories">Whether to get files or directories.</param>
         ''' <returns>An instance of <see cref="IEnumerable(Of KeyValuePair(Of String,T))"/>, where each key is the full path and each value is the corresponding object, or null if the path is a directory.</returns>
-        Private Function GetItemsInternal(path As String, recursive As Boolean, getDirectories As Boolean) As IEnumerable(Of KeyValuePair(Of String, T))
+        Private Function GetItemsInternal(path As String, recursive As Boolean, getDirectories As Boolean) As IEnumerable(Of KeyValuePair(Of String, Object))
             Dim fixedPath As String
 
             If getDirectories Then
@@ -274,11 +279,11 @@ Namespace Projects
         ''' </summary>
         ''' <param name="path">Path of the item.</param>
         ''' <returns>The item at the given path, or null if there is no item at the given path.</returns>
-        Protected Function GetItem(path As String) As T
+        Protected Function GetItem(path As String) As Object
             Return GetItemsInternal(path, True, False).FirstOrDefault.Value
         End Function
 
-        Protected Sub AddItem(path As String, item As T)
+        Protected Sub AddItem(path As String, item As Object)
             If ItemExists(path) Then
                 Throw New DuplicateItemException(path)
             Else
@@ -422,6 +427,33 @@ Namespace Projects
         End Sub
 #End Region
 
+    End Class
+
+    ''' <summary>
+    ''' Defines the common functionality of both projects and solutions.
+    ''' </summary>
+    ''' <typeparam name="T">Type of project items.</typeparam>
+    Public MustInherit Class ProjectBase(Of T)
+        Inherits ProjectBase
+
+        Protected Shadows Function GetItems() As Dictionary(Of String, T)
+            Return MyBase.GetItems.ToDictionary(Function(x) x.Key, Function(y) DirectCast(y.Value, T))
+        End Function
+
+        ''' <summary>
+        ''' Gets the item at the given path.
+        ''' </summary>
+        ''' <param name="path">Path of the item.</param>
+        ''' <returns>The item at the given path, or null if there is no item at the given path.</returns>
+        Protected Shadows Function GetItem(path As String) As T
+            'Todo: add more safety here.
+            'Chances are the item will always be of type T, but it's possible that it won't be.
+            Return MyBase.GetItem(path)
+        End Function
+
+        Protected Shadows Sub AddItem(path As String, item As T)
+            MyBase.AddItem(path, item)
+        End Sub
     End Class
 
 End Namespace
