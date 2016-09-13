@@ -3,10 +3,10 @@
         Inherits EventArgs
 
         ''' <summary>
-        ''' Path of the solution folder to which the project was added
+        ''' Path of the project in the solution
         ''' </summary>
         ''' <returns></returns>
-        Public Property ParentPath As String
+        Public Property Path As String
 
         ''' <summary>
         ''' The project that was added

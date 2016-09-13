@@ -137,11 +137,6 @@ Namespace Projects
             Return GetItem(path)
         End Function
 
-        Public Overridable Sub CreateProject(parentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager)
-            Dim p = Project.CreateProject(Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType, Me, manager)
-            AddProject(FixPath(parentPath) & "/" & ProjectName, p)
-        End Sub
-
         ''' <summary>
         ''' Adds the project to the solution.
         ''' </summary>
@@ -149,11 +144,17 @@ Namespace Projects
         ''' <param name="project">Project to add</param>
         Public Sub AddProject(path As String, project As Project)
             AddItem(path, project)
+            RaiseEvent ProjectAdded(Me, New ProjectAddedEventArgs With {.Path = path, .Project = project})
+        End Sub
+
+        Public Overridable Sub CreateProject(parentPath As String, ProjectName As String, ProjectType As Type, manager As PluginManager)
+            Dim p = Project.CreateProject(Path.GetDirectoryName(Me.Filename), ProjectName, ProjectType, Me, manager)
+            AddProject(FixPath(parentPath) & "/" & ProjectName, p)
         End Sub
 
         Public Overridable Sub AddExistingProject(parentPath As String, ProjectFilename As String, manager As PluginManager)
             Dim p = Project.OpenProjectFile(ProjectFilename, Me, manager)
-            AddItem(FixPath(parentPath) & "/" & p.Name, p)
+            AddProject(FixPath(parentPath) & "/" & p.Name, p)
         End Sub
 
         Public Overridable Sub DeleteProject(projectPath As String)
