@@ -332,13 +332,9 @@ Namespace Projects
         ''' <param name="path">Path of the directory to find.</param>
         ''' <returns>A boolean indicating whether or not a directory exists at the requested path.</returns>
         Public Function DirectoryExists(path As String) As Boolean
-            If String.IsNullOrEmpty(path) Then
-                'The root directory ("") always exists
-                Return True
-            Else
-                Dim pathFixed = FixPath(path)
-                Return Items.Keys.Any(Function(x) x.ToLowerInvariant = pathFixed.ToLowerInvariant)
-            End If
+            Dim pathFixed = FixPath(path)
+            Return String.IsNullOrEmpty(pathFixed) OrElse 'Root directory ("") should always exist
+                Items.Keys.Any(Function(x) x.ToLowerInvariant = pathFixed.ToLowerInvariant) 'Check to see if directory exists
         End Function
 
         ''' <summary>

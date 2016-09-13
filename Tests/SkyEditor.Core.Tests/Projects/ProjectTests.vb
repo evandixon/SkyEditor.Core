@@ -35,6 +35,13 @@ Namespace Projects
             Assert.IsFalse(DirectoryTestProject.DirectoryExists("/Blarg"))
         End Sub
 
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DirectoryRoot()
+            InitProjectDirectory()
+
+            Assert.IsTrue(DirectoryTestProject.DirectoryExists(""), "Root directory """" should exist.")
+            Assert.IsTrue(DirectoryTestProject.DirectoryExists("/"), "Root directory ""/"" should exist; slash should not matter.")
+        End Sub
+
         <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DeleteDirectory()
             InitProjectDirectory()
 
