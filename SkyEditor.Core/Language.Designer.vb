@@ -102,15 +102,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to [Directory].
-        '''</summary>
-        Friend Shared ReadOnly Property DirectoryPrefix() As String
-            Get
-                Return ResourceManager.GetString("DirectoryPrefix", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized string similar to Item with the same name already exists.  Path: &quot;{0}&quot;.
         '''</summary>
         Friend Shared ReadOnly Property DuplicateItemException() As String
@@ -287,15 +278,6 @@ Namespace My.Resources
         Friend Shared ReadOnly Property PluginDevExtVersion() As String
             Get
                 Return ResourceManager.GetString("PluginDevExtVersion", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized string similar to [Project].
-        '''</summary>
-        Friend Shared ReadOnly Property ProjectPrefix() As String
-            Get
-                Return ResourceManager.GetString("ProjectPrefix", resourceCulture)
             End Get
         End Property
         

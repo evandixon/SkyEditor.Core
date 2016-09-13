@@ -129,9 +129,6 @@
   <data name="ConsoleUnknownCommand" xml:space="preserve">
     <value>Unknown command "{0}".</value>
   </data>
-  <data name="DirectoryPrefix" xml:space="preserve">
-    <value>[Directory]</value>
-  </data>
   <data name="DuplicateItemException" xml:space="preserve">
     <value>Item with the same name already exists.  Path: "{0}"</value>
   </data>
@@ -196,9 +193,6 @@
   </data>
   <data name="PluginDevExtVersion" xml:space="preserve">
     <value>0.0</value>
-  </data>
-  <data name="ProjectPrefix" xml:space="preserve">
-    <value>[Project]</value>
   </data>
   <data name="SkyEditorProjects" xml:space="preserve">
     <value>Sky Editor Projects</value>
