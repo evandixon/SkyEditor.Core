@@ -135,6 +135,17 @@ Namespace Projects
             Assert.IsFalse(DirectoryTestProject.FileExists("/Test/Ing/file.txt"), "File not deleted.")
         End Sub
 
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub GetDirectories()
+            InitProjectDirectory()
+
+            DirectoryTestProject.CreateDirectory("/Test/Ing")
+
+            Dim directories = DirectoryTestProject.GetDirectories("/Test", True)
+            Assert.AreEqual(1, directories.Count, "Incorrect number of directories")
+            Assert.IsTrue(directories.Contains("/Test/Ing"), "Directory ""/Test/Ing"" not created.")
+            Assert.IsFalse(directories.Contains("/Test"), "Parent directory ""/Test"" not automatically created.")
+        End Sub
+
         <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub GetItems()
             InitProjectDirectory()
             DirectoryTestProject.CreateFile("/Test/Ing", "file.txt", GetType(TestCreatableFIle))

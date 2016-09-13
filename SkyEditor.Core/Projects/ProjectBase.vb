@@ -261,6 +261,7 @@ Namespace Projects
             If recursive Then
                 'Should return "Test/Ing" and "Test/Ing/Test
                 Return Items.Where(Function(x) x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
+                                        Not x.Key.ToLowerInvariant = fixedPath AndAlso 'Filters the same direcctory (/Test is not a child of /Test)
                                        ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))).
                             OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
             Else
@@ -274,7 +275,8 @@ Namespace Projects
                                        End If
 
                                        Return x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
-                                            Not relativePath.Contains("/") AndAlso 'Filters anything with a slash after the parent directory
+                                            Not x.Key.ToLowerInvariant = fixedPath AndAlso 'Filters the same direcctory (/Test is not a child of /Test)
+                                            Not relativePath.Contains("/") AndAlso 'Filters anything with a slash after the parent directory                                            
                                             ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))
                                    End Function).
                              OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
