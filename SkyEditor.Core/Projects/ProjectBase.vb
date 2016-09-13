@@ -248,13 +248,7 @@ Namespace Projects
         ''' <param name="getDirectories">Whether to get files or directories.</param>
         ''' <returns>An instance of <see cref="IEnumerable(Of KeyValuePair(Of String,T))"/>, where each key is the full path and each value is the corresponding object, or null if the path is a directory.</returns>
         Private Function GetItemsInternal(path As String, recursive As Boolean, getDirectories As Boolean) As IEnumerable(Of KeyValuePair(Of String, Object))
-            Dim fixedPath As String
-
-            If getDirectories Then
-                fixedPath = FixPath(path).ToLowerInvariant & "/"
-            Else
-                fixedPath = FixPath(path).ToLowerInvariant
-            End If
+            Dim fixedPath As String = FixPath(path).ToLowerInvariant
 
             'Given directory structure of:
             '/Test
@@ -272,7 +266,7 @@ Namespace Projects
             Else
                 'Should return "Test/Ing"
                 Return Items.Where(Function(x) x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
-                                       Not x.Key.ToLowerInvariant.Replace(fixedPath, "").Replace("\", "/").Contains("/") AndAlso 'Filters anything with a slash after the parent directory
+                                       Not x.Key.ToLowerInvariant.Replace(fixedPath, "").Replace("\", "/").TrimStart("/").Contains("/") AndAlso 'Filters anything with a slash after the parent directory
                                        ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))).
                              OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
             End If

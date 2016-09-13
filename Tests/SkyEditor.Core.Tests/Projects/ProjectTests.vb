@@ -135,6 +135,33 @@ Namespace Projects
             Assert.IsFalse(DirectoryTestProject.FileExists("/Test/Ing/file.txt"), "File not deleted.")
         End Sub
 
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub GetItems()
+            InitProjectDirectory()
+            DirectoryTestProject.CreateFile("/Test/Ing", "file.txt", GetType(TestCreatableFIle))
+            If Not DirectoryTestProject.FileExists("/Test/Ing/file.txt") Then
+                Assert.Inconclusive("File not properly created.")
+            End If
+
+            Dim items = DirectoryTestProject.GetItems("/Test/Ing", True)
+            Assert.IsTrue(items.ContainsKey("/Test/Ing/file.txt"), "Child directory ""/Test/Ing"" not returned.")
+            Assert.AreEqual(1, items.Count, "Incorrect number of files")
+
+            Assert.IsTrue(items.Keys.ToArray.SequenceEqual(DirectoryTestProject.GetItems("", True).Keys.ToArray), "Failed to get all items when using the root.")
+        End Sub
+
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub GetItemsNonRecursive()
+            InitProjectDirectory()
+            DirectoryTestProject.CreateFile("/Test/Ing", "file.txt", GetType(TestCreatableFIle))
+            DirectoryTestProject.CreateFile("/Test", "file.txt", GetType(TestCreatableFIle))
+            If Not DirectoryTestProject.FileExists("/Test/file.txt") OrElse Not DirectoryTestProject.FileExists("/Test/Ing/file.txt") Then
+                Assert.Inconclusive("Test data not properly created.")
+            End If
+
+            Dim items = DirectoryTestProject.GetItems("/Test", False)
+            Assert.IsTrue(items.ContainsKey("/Test/file.txt"), "Child directory ""/Test/Ing"" not returned.")
+            Assert.AreEqual(1, items.Count, "Incorrect number of files")
+        End Sub
+
 #End Region
 
 #Region "Building"
