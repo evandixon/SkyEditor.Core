@@ -265,9 +265,18 @@ Namespace Projects
                             OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
             Else
                 'Should return "Test/Ing"
-                Return Items.Where(Function(x) x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
-                                       Not x.Key.ToLowerInvariant.Replace(fixedPath, "").Replace("\", "/").TrimStart("/").Contains("/") AndAlso 'Filters anything with a slash after the parent directory
-                                       ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))).
+                Return Items.Where(Function(x)
+                                       Dim relativePath As String
+                                       If String.IsNullOrEmpty(fixedPath) Then
+                                           relativePath = x.Key.ToLowerInvariant.Replace("\", "/").TrimStart("/")
+                                       Else
+                                           relativePath = x.Key.ToLowerInvariant.Replace(fixedPath, "").Replace("\", "/").TrimStart("/")
+                                       End If
+
+                                       Return x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
+                                            Not relativePath.Contains("/") AndAlso 'Filters anything with a slash after the parent directory
+                                            ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))
+                                   End Function).
                              OrderBy(Function(x) x.Key, New DirectoryStructureComparer)
             End If
 

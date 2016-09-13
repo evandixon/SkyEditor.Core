@@ -162,6 +162,19 @@ Namespace Projects
             Assert.AreEqual(1, items.Count, "Incorrect number of files")
         End Sub
 
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub GetItemsNonRecursiveFromRoot()
+            InitProjectDirectory()
+            DirectoryTestProject.CreateFile("/Test/Ing", "file.txt", GetType(TestCreatableFIle))
+            DirectoryTestProject.CreateFile("", "file.txt", GetType(TestCreatableFIle))
+            If Not DirectoryTestProject.FileExists("/file.txt") OrElse Not DirectoryTestProject.FileExists("/Test/Ing/file.txt") Then
+                Assert.Inconclusive("Test data not properly created.")
+            End If
+
+            Dim items = DirectoryTestProject.GetItems("", False)
+            Assert.IsTrue(items.ContainsKey("/file.txt"), "Child directory ""/Test/Ing"" not returned.")
+            Assert.AreEqual(1, items.Count, "Incorrect number of files")
+        End Sub
+
 #End Region
 
 #Region "Building"
