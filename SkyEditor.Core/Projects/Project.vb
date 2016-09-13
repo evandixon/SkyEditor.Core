@@ -142,22 +142,23 @@ Namespace Projects
         End Function
 
         ''' <summary>
-        ''' 
+        ''' Gets the project path of the imported file.
         ''' </summary>
-        ''' <param name="ParentProjectPath">Directory to put the imported file.</param>
-        ''' <param name="FullFilename">Full path of the file to import.</param>
+        ''' <param name="parentProjectPath">Directory to put the imported file.</param>
+        ''' <param name="filename">Full path of the file to import.</param>
         ''' <returns></returns>
-        Protected Overridable Function GetImportedFilePath(ParentProjectPath As String, FullFilename As String) As String
-            Return Path.Combine(ParentProjectPath, Path.GetFileName(FullFilename))
+        Protected Overridable Function GetImportedFilePath(parentProjectPath As String, filename As String) As String
+            Return FixPath(Path.Combine(parentProjectPath, Path.GetFileName(filename)))
         End Function
 
         Public Overridable Function GetImportIOFilter(ParentProjectPath As String, manager As PluginManager) As String
             Return $"{My.Resources.Language.AllFiles} (*.*)|*.*" 'manager.IOFiltersString
         End Function
 
+
         Public Overridable Sub AddExistingFile(parentPath As String, FilePath As String, provider As IOProvider)
+            Dim fixedParentPath = FixPath(parentPath)
             Dim importedName = GetImportedFilePath(parentPath, FilePath)
-            Dim fixedPath = FixPath(parentPath)
 
             'Copy the file
             Dim source = FilePath
@@ -167,8 +168,9 @@ Namespace Projects
             End If
 
             'Add the file
-            Dim wrapper As New ProjectFileWrapper(Me.Filename, importedName)
-            AddItem(fixedPath & "/" & Path.GetFileName(FilePath), wrapper)
+            Dim relativePath = dest.Replace(Path.GetDirectoryName(Me.Filename), "").Replace("\", "/").TrimStart("/")
+            Dim wrapper As New ProjectFileWrapper(Me.Filename, relativePath)
+            AddItem(importedName, wrapper)
             RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = Path.GetFileName(FilePath), .FullFilename = dest})
         End Sub
 
