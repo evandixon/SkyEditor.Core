@@ -35,6 +35,14 @@ Namespace Projects
             Assert.IsFalse(DirectoryTestProject.DirectoryExists("/Blarg"))
         End Sub
 
+        <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DirectoryExistsNotFile()
+            InitProjectDirectory()
+
+            DirectoryTestProject.CreateFile("", "file.txt", GetType(TestCreatableFIle))
+
+            Assert.IsFalse(DirectoryTestProject.DirectoryExists("/file.txt"), "/file.txt is not a directory.")
+        End Sub
+
         <TestMethod> <TestCategory(ProjectFileSystem)> Public Sub DirectoryRoot()
             InitProjectDirectory()
 
@@ -185,6 +193,7 @@ Namespace Projects
             Assert.IsTrue(items.ContainsKey("/file.txt"), "Child directory ""/Test/Ing"" not returned.")
             Assert.AreEqual(1, items.Count, "Incorrect number of files")
         End Sub
+
 
 #End Region
 

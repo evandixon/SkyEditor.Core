@@ -339,7 +339,7 @@ Namespace Projects
         Public Function DirectoryExists(path As String) As Boolean
             Dim pathFixed = FixPath(path)
             Return String.IsNullOrEmpty(pathFixed) OrElse 'Root directory ("") should always exist
-                Items.Keys.Any(Function(x) x.ToLowerInvariant = pathFixed.ToLowerInvariant) 'Check to see if directory exists
+                Items.Any(Function(x) x.Key.ToLowerInvariant = pathFixed.ToLowerInvariant AndAlso x.Value Is Nothing) 'Check to see if directory exists
         End Function
 
         ''' <summary>
