@@ -299,7 +299,8 @@ Namespace Projects
         ''' <param name="path">Path of the item.</param>
         ''' <returns>The item at the given path, or null if there is no item at the given path.</returns>
         Protected Function GetItem(path As String) As Object
-            Return GetItemsInternal(path, True, False).FirstOrDefault.Value
+            Dim fixedPathLower = FixPath(path).ToLowerInvariant
+            Return Items.Where(Function(x) x.Key.ToLowerInvariant = fixedPathLower).FirstOrDefault.Value
         End Function
 
         Protected Sub AddItem(path As String, item As Object)
