@@ -129,9 +129,6 @@
   <data name="ConsoleUnknownCommand" xml:space="preserve">
     <value>Commande Inconue: "{0}"</value>
   </data>
-  <data name="DirectoryPrefix" xml:space="preserve">
-    <value>[Dossier] </value>
-  </data>
   <data name="Failed" xml:space="preserve">
     <value>Échoué</value>
   </data>
@@ -146,9 +143,6 @@
   </data>
   <data name="PluginDevExtDescription" xml:space="preserve">
     <value>Tous les plugins qui sont dans le dossier développement.</value>
-  </data>
-  <data name="ProjectPrefix" xml:space="preserve">
-    <value>[Projet]</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Prêt</value>

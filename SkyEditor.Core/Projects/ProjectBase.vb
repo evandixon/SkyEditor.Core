@@ -307,6 +307,11 @@ Namespace Projects
             If ItemExists(path) Then
                 Throw New DuplicateItemException(path)
             Else
+                Dim parentDirectory = FixPath(System.IO.Path.GetDirectoryName(path))
+                If Not String.IsNullOrEmpty(parentDirectory) AndAlso Not DirectoryExists(parentDirectory) Then
+                    CreateDirectory(parentDirectory)
+                End If
+
                 Dim fixedPath = FixPath(path)
                 Items.Add(fixedPath, item)
                 RaiseEvent ItemAdded(Me, New ItemAddedEventArgs With {.FullPath = fixedPath})

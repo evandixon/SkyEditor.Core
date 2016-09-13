@@ -54,11 +54,6 @@ Namespace Projects
             End Sub
         End Class
 
-        Public Class AddExistingFileBatchOperation
-            Public Property ParentPath As String
-            Public Property ActualFilename As String
-        End Class
-
 #End Region
 
 #Region "Events"
