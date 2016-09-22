@@ -25,10 +25,10 @@ Public Class IOUIManager
 
         'Progress Reporting
         Me.RunningProgressReportables = New List(Of IReportProgress)
-        Me.LoadingMessage = My.Resources.Language.Ready
-        Me.LoadingProgress = 0
-        Me.IsLoadingIndeterminate = False
-        Me.IsLoadingCompleted = True
+        _loadingMessage = My.Resources.Language.Ready
+        _loadingProgress = 0
+        _isLoadingIndeterminate = False
+        _isLoadingComplete = True
     End Sub
 
 #Region "Events"
