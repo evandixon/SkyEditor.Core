@@ -134,6 +134,10 @@ Namespace Projects
             End Get
             Protected Set(value As BuildStatus)
                 _buildStatus = value
+
+                If IsBuildCompleted Then
+                    RaiseEvent BuildCompleted(Me, New EventArgs)
+                End If
             End Set
         End Property
         Dim _buildStatus As BuildStatus
