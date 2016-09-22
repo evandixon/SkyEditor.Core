@@ -13,6 +13,7 @@ Imports SkyEditor.Core.Projects
 Public Class IOUIManager
     Implements IDisposable
     Implements INotifyPropertyChanged
+    Implements IReportProgress
 
     Public Sub New(manager As PluginManager)
         Me.CurrentPluginManager = manager
@@ -20,8 +21,10 @@ Public Class IOUIManager
         Me.OpenedProjectFiles = New Dictionary(Of FileViewModel, Project)
         Me.FileDisposalSettings = New Dictionary(Of Object, Boolean)
         Me.OpenFiles = New ObservableCollection(Of FileViewModel)
-        Me.RunningTasks = New ObservableCollection(Of Task)
         Me.AnchorableViewModels = New ObservableCollection(Of AnchorableViewModel)
+
+        'Progress Reporting
+        Me.RunningProgressReportables = New List(Of IReportProgress)
     End Sub
 
 #Region "Events"
@@ -242,7 +245,155 @@ Public Class IOUIManager
     End Property
     Dim _rootMenuItems As ObservableCollection(Of ActionMenuItem)
 
-    Public Property RunningTasks As ObservableCollection(Of Task)
+#End Region
+
+#Region "Task Watching"
+
+    Private Class TaskProgressReporterWrapper
+        Implements IReportProgress
+
+        Public Sub New(task As Task)
+            IsCompleted = task.IsCompleted
+            IsIndeterminate = True
+            Message = My.Resources.Language.Loading
+            Progress = 0
+        End Sub
+
+        Public Sub New(task As Task, loadingMessage As String)
+            IsCompleted = task.IsCompleted
+            IsIndeterminate = True
+            Message = loadingMessage
+            Progress = 0
+        End Sub
+
+        Public Property InnerTask As Task
+
+        Public Property IsCompleted As Boolean Implements IReportProgress.IsCompleted
+
+        Public Property IsIndeterminate As Boolean Implements IReportProgress.IsIndeterminate
+
+        Public Property Message As String Implements IReportProgress.Message
+
+        Public Property Progress As Single Implements IReportProgress.Progress
+
+        Public Event Completed(sender As Object, e As EventArgs) Implements IReportProgress.Completed
+        Public Event ProgressChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
+
+        Public Async Sub Start()
+            Await InnerTask
+            IsCompleted = True
+            RaiseEvent Completed(Me, New EventArgs)
+        End Sub
+
+    End Class
+
+
+    Public Event LoadingProgressChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
+    Public Event LoadingProgressCompleted(sender As Object, e As EventArgs) Implements IReportProgress.Completed
+
+    Private LoadingStatusLock As Object
+    Private RunningReporatablesLock As Object
+
+    Private Property RunningProgressReportables As List(Of IReportProgress)
+
+    Public Property LoadingProgress As Single Implements IReportProgress.Progress
+
+    Public Property LoadingMessage As String Implements IReportProgress.Message
+
+    Public Property IsLoadingIndeterminate As Boolean Implements IReportProgress.IsIndeterminate
+
+    Public Property IsLoadingCompleted As Boolean Implements IReportProgress.IsCompleted
+
+    ''' <summary>
+    ''' Adds the given <paramref name="task"/> to the list of currently loading tasks.
+    ''' </summary>
+    ''' <param name="task"><see cref="Task"/> to add to the loading list.</param>
+    ''' <remarks>This overload will never show determinate progress.</remarks>
+    Public Sub ShowLoading(task As Task)
+        Dim wrapper As New TaskProgressReporterWrapper(task)
+        wrapper.Start()
+        ShowLoading(task)
+    End Sub
+
+    ''' <summary>
+    ''' Adds the given <paramref name="task"/> to the list of currently loading tasks.
+    ''' </summary>
+    ''' <param name="task"><see cref="Task"/> to add to the loading list.</param>
+    ''' <param name="loadingMessage">User-friendly loading message.  Usually what the task is doing.</param>
+    ''' <remarks>This overload will never show determinate progress.</remarks>
+    Public Sub ShowLoading(task As Task, loadingMessage As String)
+        Dim wrapper As New TaskProgressReporterWrapper(task, loadingMessage)
+        wrapper.Start()
+        ShowLoading(task)
+    End Sub
+
+    ''' <summary>
+    ''' Adds the given <paramref name="task"/> to the list of currently loading tasks.
+    ''' </summary>
+    ''' <param name="task"><see cref="IReportProgress"/> to add to the loading list.</param>
+    Public Sub ShowLoading(task As IReportProgress)
+        AddHandler task.Completed, AddressOf OnLoadingTaskCompleted
+        AddHandler task.ProgressChanged, AddressOf OnLoadingTaskProgressed
+
+        IsLoadingCompleted = False
+
+        SyncLock RunningReporatablesLock
+            RunningProgressReportables.Add(task)
+        End SyncLock
+
+        UpdateLoadingStatus()
+    End Sub
+
+    Private Sub UpdateLoadingStatus()
+        SyncLock LoadingStatusLock
+            SyncLock RunningReporatablesLock
+                'Update progress and determinancy
+                If RunningProgressReportables.Any(Function(x) x.IsIndeterminate) Then
+                    IsLoadingIndeterminate = True
+                Else
+                    IsLoadingIndeterminate = False
+                    LoadingProgress = RunningProgressReportables.Select(Function(x) x.Progress).Aggregate(Function(x, y) x * y)
+                End If
+
+                'Update message
+                If RunningProgressReportables.Count > 1 Then
+                    LoadingMessage = My.Resources.Language.Loading
+                ElseIf RunningProgressReportables.Count = 0 Then
+                    LoadingMessage = My.Resources.Language.Ready
+                Else
+                    LoadingMessage = RunningProgressReportables.First.Message
+                End If
+            End SyncLock
+        End SyncLock
+
+        RaiseEvent LoadingProgressChanged(Me, New ProgressReportedEventArgs With {.IsIndeterminate = IsLoadingIndeterminate, .Message = LoadingMessage, .Progress = LoadingProgress})
+    End Sub
+
+    Private Sub CleanupCompletedTasks()
+        SyncLock RunningReporatablesLock
+            Dim completedReportables = RunningProgressReportables.Where(Function(x) x.IsCompleted)
+            For Each item In completedReportables
+                RemoveHandler item.Completed, AddressOf OnLoadingTaskCompleted
+                RemoveHandler item.ProgressChanged, AddressOf OnLoadingTaskProgressed
+                RunningProgressReportables.Remove(item)
+            Next
+
+            If RunningProgressReportables.Count = 0 Then
+                IsLoadingCompleted = True
+                RaiseEvent LoadingProgressCompleted(Me, New EventArgs)
+            End If
+        End SyncLock
+
+        UpdateLoadingStatus()
+    End Sub
+
+    Private Sub OnLoadingTaskCompleted(sender As Object, e As EventArgs)
+        CleanupCompletedTasks()
+    End Sub
+
+    Private Sub OnLoadingTaskProgressed(sender As Object, e As ProgressReportedEventArgs)
+        UpdateLoadingStatus()
+    End Sub
 
 #End Region
 
@@ -555,21 +706,6 @@ Public Class IOUIManager
 
         Return targets
     End Function
-
-    ''' <summary>
-    ''' Lets the IOUIManager keep track of the current task
-    ''' </summary>
-    ''' <param name="task">Task to keep track of.</param>
-    Public Sub LogTask(task As Task)
-        Dim watchTask = Task.Run(Async Function() As Task
-                                     Await task
-                                     RemoveTask(task)
-                                 End Function)
-    End Sub
-
-    Private Sub RemoveTask(task As Task)
-        RunningTasks.Remove(task)
-    End Sub
 
     ''' <summary>
     ''' Updates the visibility for the given menu item and its children, and returns the updated visibility

@@ -38,6 +38,11 @@ Namespace Projects
         ''' Raised when an item, such as a file or a project, has been added.
         ''' </summary>
         Public Event ItemRemoved(sender As Object, e As ItemRemovedEventArgs)
+
+        ''' <summary>
+        ''' Raised when building is complete.
+        ''' </summary>
+        Public Event BuildCompleted(sender As Object, e As EventArgs) Implements IReportProgress.Completed
 #End Region
 
 #Region "Properties"
@@ -183,6 +188,16 @@ Namespace Projects
             End Set
         End Property
         Dim _isBuildProgressIndeterminate As Boolean
+
+        ''' <summary>
+        ''' Whether or not a build has completed.
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property IsBuildCompleted As Boolean Implements IReportProgress.IsCompleted
+            Get
+                Return BuildStatus = BuildStatus.Done OrElse BuildStatus = BuildStatus.Canceled
+            End Get
+        End Property
 
         ''' <summary>
         ''' Gets whether or not a build is currently running.

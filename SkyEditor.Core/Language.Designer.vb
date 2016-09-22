@@ -246,6 +246,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Loading....
+        '''</summary>
+        Friend Shared ReadOnly Property Loading() As String
+            Get
+                Return ResourceManager.GetString("Loading", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to You!.
         '''</summary>
         Friend Shared ReadOnly Property PluginDevExtAuthor() As String
@@ -278,6 +287,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property PluginDevExtVersion() As String
             Get
                 Return ResourceManager.GetString("PluginDevExtVersion", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Ready.
+        '''</summary>
+        Friend Shared ReadOnly Property Ready() As String
+            Get
+                Return ResourceManager.GetString("Ready", resourceCulture)
             End Get
         End Property
         
