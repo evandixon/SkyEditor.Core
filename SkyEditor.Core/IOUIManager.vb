@@ -297,12 +297,56 @@ Public Class IOUIManager
     Private Property RunningProgressReportables As List(Of IReportProgress)
 
     Public Property LoadingProgress As Single Implements IReportProgress.Progress
+        Get
+            Return _loadingProgress
+        End Get
+        Set(value As Single)
+            If _loadingProgress <> value Then
+                _loadingProgress = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(LoadingProgress)))
+            End If
+        End Set
+    End Property
+    Dim _loadingProgress As Single
 
     Public Property LoadingMessage As String Implements IReportProgress.Message
+        Get
+            Return _loadingMessage
+        End Get
+        Set(value As String)
+            If _loadingMessage <> value Then
+                _loadingMessage = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(LoadingMessage)))
+            End If
+        End Set
+    End Property
+    Dim _loadingMessage As String
 
     Public Property IsLoadingIndeterminate As Boolean Implements IReportProgress.IsIndeterminate
+        Get
+            Return _isLoadingIndeterminate
+        End Get
+        Set(value As Boolean)
+            If _isLoadingIndeterminate <> value Then
+                _isLoadingIndeterminate = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsLoadingIndeterminate)))
+            End If
+        End Set
+    End Property
+    Dim _isLoadingIndeterminate As Boolean
 
     Public Property IsLoadingCompleted As Boolean Implements IReportProgress.IsCompleted
+        Get
+            Return _isLoadingComplete
+        End Get
+        Set(value As Boolean)
+            If _isLoadingComplete <> value Then
+                _isLoadingComplete = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsLoadingCompleted)))
+            End If
+        End Set
+    End Property
+    Dim _isLoadingComplete As Boolean
 
     ''' <summary>
     ''' Adds the given <paramref name="task"/> to the list of currently loading tasks.
