@@ -261,6 +261,7 @@ Public Class IOUIManager
             IsIndeterminate = True
             Message = My.Resources.Language.Loading
             Progress = 0
+            InnerTask = task
         End Sub
 
         Public Sub New(task As Task, loadingMessage As String)
@@ -268,6 +269,7 @@ Public Class IOUIManager
             IsIndeterminate = True
             Message = loadingMessage
             Progress = 0
+            InnerTask = task
         End Sub
 
         Public Property InnerTask As Task
