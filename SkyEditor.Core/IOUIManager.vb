@@ -402,7 +402,15 @@ Public Class IOUIManager
                     IsLoadingIndeterminate = True
                 Else
                     IsLoadingIndeterminate = False
-                    LoadingProgress = RunningProgressReportables.Select(Function(x) x.Progress).Aggregate(Function(x, y) x * y)
+                    Dim runningCount = RunningProgressReportables.Count
+                    If runningCount = 1 Then
+                        LoadingProgress = RunningProgressReportables.First.Progress
+                    ElseIf runningCount = 0 Then
+                        'Should be unreachable.
+                        LoadingProgress = 0
+                    Else
+                        LoadingProgress = RunningProgressReportables.Select(Function(x) x.Progress).Aggregate(Function(x, y) x * y)
+                    End If
                 End If
 
                 'Update message
@@ -421,7 +429,7 @@ Public Class IOUIManager
 
     Private Sub CleanupCompletedTasks()
         SyncLock RunningReporatablesLock
-            Dim completedReportables = RunningProgressReportables.Where(Function(x) x.IsCompleted)
+            Dim completedReportables = RunningProgressReportables.Where(Function(x) x.IsCompleted).ToList
             For Each item In completedReportables
                 RemoveHandler item.Completed, AddressOf OnLoadingTaskCompleted
                 RemoveHandler item.ProgressChanged, AddressOf OnLoadingTaskProgressed
