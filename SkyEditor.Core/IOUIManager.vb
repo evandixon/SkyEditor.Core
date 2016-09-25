@@ -297,8 +297,8 @@ Public Class IOUIManager
     Public Event LoadingProgressChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
     Public Event LoadingProgressCompleted(sender As Object, e As EventArgs) Implements IReportProgress.Completed
 
-    Private LoadingStatusLock As Object
-    Private RunningReporatablesLock As Object
+    Private LoadingStatusLock As New Object
+    Private RunningReporatablesLock As New Object
 
     Private Property RunningProgressReportables As List(Of IReportProgress)
 
@@ -362,7 +362,7 @@ Public Class IOUIManager
     Public Sub ShowLoading(task As Task)
         Dim wrapper As New TaskProgressReporterWrapper(task)
         wrapper.Start()
-        ShowLoading(task)
+        ShowLoading(wrapper)
     End Sub
 
     ''' <summary>
@@ -374,7 +374,7 @@ Public Class IOUIManager
     Public Sub ShowLoading(task As Task, loadingMessage As String)
         Dim wrapper As New TaskProgressReporterWrapper(task, loadingMessage)
         wrapper.Start()
-        ShowLoading(task)
+        ShowLoading(wrapper)
     End Sub
 
     ''' <summary>
