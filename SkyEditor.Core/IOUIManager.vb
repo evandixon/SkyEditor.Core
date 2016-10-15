@@ -297,8 +297,8 @@ Public Class IOUIManager
     Public Event LoadingProgressChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
     Public Event LoadingProgressCompleted(sender As Object, e As EventArgs) Implements IReportProgress.Completed
 
-    Private LoadingStatusLock As Object
-    Private RunningReporatablesLock As Object
+    Private LoadingStatusLock As New Object
+    Private RunningReporatablesLock As New Object
 
     Private Property RunningProgressReportables As List(Of IReportProgress)
 
@@ -362,7 +362,7 @@ Public Class IOUIManager
     Public Sub ShowLoading(task As Task)
         Dim wrapper As New TaskProgressReporterWrapper(task)
         wrapper.Start()
-        ShowLoading(task)
+        ShowLoading(wrapper)
     End Sub
 
     ''' <summary>
@@ -374,7 +374,7 @@ Public Class IOUIManager
     Public Sub ShowLoading(task As Task, loadingMessage As String)
         Dim wrapper As New TaskProgressReporterWrapper(task, loadingMessage)
         wrapper.Start()
-        ShowLoading(task)
+        ShowLoading(wrapper)
     End Sub
 
     ''' <summary>
@@ -402,7 +402,15 @@ Public Class IOUIManager
                     IsLoadingIndeterminate = True
                 Else
                     IsLoadingIndeterminate = False
-                    LoadingProgress = RunningProgressReportables.Select(Function(x) x.Progress).Aggregate(Function(x, y) x * y)
+                    Dim runningCount = RunningProgressReportables.Count
+                    If runningCount = 1 Then
+                        LoadingProgress = RunningProgressReportables.First.Progress
+                    ElseIf runningCount = 0 Then
+                        'Should be unreachable.
+                        LoadingProgress = 0
+                    Else
+                        LoadingProgress = RunningProgressReportables.Select(Function(x) x.Progress).Aggregate(Function(x, y) x * y)
+                    End If
                 End If
 
                 'Update message
@@ -421,7 +429,7 @@ Public Class IOUIManager
 
     Private Sub CleanupCompletedTasks()
         SyncLock RunningReporatablesLock
-            Dim completedReportables = RunningProgressReportables.Where(Function(x) x.IsCompleted)
+            Dim completedReportables = RunningProgressReportables.Where(Function(x) x.IsCompleted).ToList
             For Each item In completedReportables
                 RemoveHandler item.Completed, AddressOf OnLoadingTaskCompleted
                 RemoveHandler item.ProgressChanged, AddressOf OnLoadingTaskProgressed
