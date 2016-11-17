@@ -6,12 +6,14 @@ Imports SkyEditor.Core.Utilities
 Imports SkyEditor.Core.Settings
 Imports System.Windows.Input
 Imports System.Collections.Specialized
+Imports SkyEditor.Core.Projects
 ''' <summary>
 ''' Class that manages open files, solutions, and projects, and helps with the UI display them.
 ''' </summary>
 Public Class IOUIManager
     Implements IDisposable
     Implements INotifyPropertyChanged
+    Implements IReportProgress
 
     Public Sub New(manager As PluginManager)
         Me.CurrentPluginManager = manager
@@ -19,8 +21,14 @@ Public Class IOUIManager
         Me.OpenedProjectFiles = New Dictionary(Of FileViewModel, Project)
         Me.FileDisposalSettings = New Dictionary(Of Object, Boolean)
         Me.OpenFiles = New ObservableCollection(Of FileViewModel)
-        Me.RunningTasks = New ObservableCollection(Of Task)
         Me.AnchorableViewModels = New ObservableCollection(Of AnchorableViewModel)
+
+        'Progress Reporting
+        Me.RunningProgressReportables = New List(Of IReportProgress)
+        _loadingMessage = My.Resources.Language.Ready
+        _loadingProgress = 0
+        _isLoadingIndeterminate = False
+        _isLoadingComplete = True
     End Sub
 
 #Region "Events"
@@ -241,7 +249,209 @@ Public Class IOUIManager
     End Property
     Dim _rootMenuItems As ObservableCollection(Of ActionMenuItem)
 
-    Public Property RunningTasks As ObservableCollection(Of Task)
+#End Region
+
+#Region "Task Watching"
+
+    Private Class TaskProgressReporterWrapper
+        Implements IReportProgress
+
+        Public Sub New(task As Task)
+            IsCompleted = task.IsCompleted
+            IsIndeterminate = True
+            Message = My.Resources.Language.Loading
+            Progress = 0
+            InnerTask = task
+        End Sub
+
+        Public Sub New(task As Task, loadingMessage As String)
+            IsCompleted = task.IsCompleted
+            IsIndeterminate = True
+            Message = loadingMessage
+            Progress = 0
+            InnerTask = task
+        End Sub
+
+        Public Property InnerTask As Task
+
+        Public Property IsCompleted As Boolean Implements IReportProgress.IsCompleted
+
+        Public Property IsIndeterminate As Boolean Implements IReportProgress.IsIndeterminate
+
+        Public Property Message As String Implements IReportProgress.Message
+
+        Public Property Progress As Single Implements IReportProgress.Progress
+
+        Public Event Completed(sender As Object, e As EventArgs) Implements IReportProgress.Completed
+        Public Event ProgressChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
+
+        Public Async Sub Start()
+            Await InnerTask
+            IsCompleted = True
+            RaiseEvent Completed(Me, New EventArgs)
+        End Sub
+
+    End Class
+
+
+    Public Event LoadingProgressChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
+    Public Event LoadingProgressCompleted(sender As Object, e As EventArgs) Implements IReportProgress.Completed
+
+    Private LoadingStatusLock As New Object
+    Private RunningReporatablesLock As New Object
+
+    Private Property RunningProgressReportables As List(Of IReportProgress)
+
+    Public Property LoadingProgress As Single Implements IReportProgress.Progress
+        Get
+            Return _loadingProgress
+        End Get
+        Set(value As Single)
+            If _loadingProgress <> value Then
+                _loadingProgress = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(LoadingProgress)))
+            End If
+        End Set
+    End Property
+    Dim _loadingProgress As Single
+
+    Public Property LoadingMessage As String Implements IReportProgress.Message
+        Get
+            Return _loadingMessage
+        End Get
+        Set(value As String)
+            If _loadingMessage <> value Then
+                _loadingMessage = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(LoadingMessage)))
+            End If
+        End Set
+    End Property
+    Dim _loadingMessage As String
+
+    Public Property IsLoadingIndeterminate As Boolean Implements IReportProgress.IsIndeterminate
+        Get
+            Return _isLoadingIndeterminate
+        End Get
+        Set(value As Boolean)
+            If _isLoadingIndeterminate <> value Then
+                _isLoadingIndeterminate = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsLoadingIndeterminate)))
+            End If
+        End Set
+    End Property
+    Dim _isLoadingIndeterminate As Boolean
+
+    Public Property IsLoadingCompleted As Boolean Implements IReportProgress.IsCompleted
+        Get
+            Return _isLoadingComplete
+        End Get
+        Set(value As Boolean)
+            If _isLoadingComplete <> value Then
+                _isLoadingComplete = value
+                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsLoadingCompleted)))
+            End If
+        End Set
+    End Property
+    Dim _isLoadingComplete As Boolean
+
+    ''' <summary>
+    ''' Adds the given <paramref name="task"/> to the list of currently loading tasks.
+    ''' </summary>
+    ''' <param name="task"><see cref="Task"/> to add to the loading list.</param>
+    ''' <remarks>This overload will never show determinate progress.</remarks>
+    Public Sub ShowLoading(task As Task)
+        Dim wrapper As New TaskProgressReporterWrapper(task)
+        wrapper.Start()
+        ShowLoading(wrapper)
+    End Sub
+
+    ''' <summary>
+    ''' Adds the given <paramref name="task"/> to the list of currently loading tasks.
+    ''' </summary>
+    ''' <param name="task"><see cref="Task"/> to add to the loading list.</param>
+    ''' <param name="loadingMessage">User-friendly loading message.  Usually what the task is doing.</param>
+    ''' <remarks>This overload will never show determinate progress.</remarks>
+    Public Sub ShowLoading(task As Task, loadingMessage As String)
+        Dim wrapper As New TaskProgressReporterWrapper(task, loadingMessage)
+        wrapper.Start()
+        ShowLoading(wrapper)
+    End Sub
+
+    ''' <summary>
+    ''' Adds the given <paramref name="task"/> to the list of currently loading tasks.
+    ''' </summary>
+    ''' <param name="task"><see cref="IReportProgress"/> to add to the loading list.</param>
+    Public Sub ShowLoading(task As IReportProgress)
+        AddHandler task.Completed, AddressOf OnLoadingTaskCompleted
+        AddHandler task.ProgressChanged, AddressOf OnLoadingTaskProgressed
+
+        IsLoadingCompleted = False
+
+        SyncLock RunningReporatablesLock
+            RunningProgressReportables.Add(task)
+        End SyncLock
+
+        UpdateLoadingStatus()
+    End Sub
+
+    Private Sub UpdateLoadingStatus()
+        SyncLock LoadingStatusLock
+            SyncLock RunningReporatablesLock
+                'Update progress and determinancy
+                If RunningProgressReportables.Any(Function(x) x.IsIndeterminate) Then
+                    IsLoadingIndeterminate = True
+                Else
+                    IsLoadingIndeterminate = False
+                    Dim runningCount = RunningProgressReportables.Count
+                    If runningCount = 1 Then
+                        LoadingProgress = RunningProgressReportables.First.Progress
+                    ElseIf runningCount = 0 Then
+                        'Should be unreachable.
+                        LoadingProgress = 0
+                    Else
+                        LoadingProgress = RunningProgressReportables.Select(Function(x) x.Progress).Aggregate(Function(x, y) x * y)
+                    End If
+                End If
+
+                'Update message
+                If RunningProgressReportables.Count > 1 Then
+                    LoadingMessage = My.Resources.Language.Loading
+                ElseIf RunningProgressReportables.Count = 0 Then
+                    LoadingMessage = My.Resources.Language.Ready
+                Else
+                    LoadingMessage = RunningProgressReportables.First.Message
+                End If
+            End SyncLock
+        End SyncLock
+
+        RaiseEvent LoadingProgressChanged(Me, New ProgressReportedEventArgs With {.IsIndeterminate = IsLoadingIndeterminate, .Message = LoadingMessage, .Progress = LoadingProgress})
+    End Sub
+
+    Private Sub CleanupCompletedTasks()
+        SyncLock RunningReporatablesLock
+            Dim completedReportables = RunningProgressReportables.Where(Function(x) x.IsCompleted).ToList
+            For Each item In completedReportables
+                RemoveHandler item.Completed, AddressOf OnLoadingTaskCompleted
+                RemoveHandler item.ProgressChanged, AddressOf OnLoadingTaskProgressed
+                RunningProgressReportables.Remove(item)
+            Next
+
+            If RunningProgressReportables.Count = 0 Then
+                IsLoadingCompleted = True
+                RaiseEvent LoadingProgressCompleted(Me, New EventArgs)
+            End If
+        End SyncLock
+
+        UpdateLoadingStatus()
+    End Sub
+
+    Private Sub OnLoadingTaskCompleted(sender As Object, e As EventArgs)
+        CleanupCompletedTasks()
+    End Sub
+
+    Private Sub OnLoadingTaskProgressed(sender As Object, e As ProgressReportedEventArgs)
+        UpdateLoadingStatus()
+    End Sub
 
 #End Region
 
@@ -454,7 +664,16 @@ Public Class IOUIManager
     ''' <returns>An IEnumerable of view models that support the given model, or null if the model is not an open file.</returns>
     Public Function GetViewModelsForModel(model As Object) As IEnumerable(Of GenericViewModel)
         Dim file = (From f In OpenFiles Where f.File Is model).FirstOrDefault
-        Return file?.GetViewModels(CurrentPluginManager)
+        If file IsNot Nothing Then
+            'The file is open
+            Return file?.GetViewModels(CurrentPluginManager)
+        ElseIf TypeOf model Is FileViewModel Then
+            'The model provided is a file view model, which we can still work with
+            Return DirectCast(model, FileViewModel).GetViewModels(CurrentPluginManager)
+        Else
+            'The file is not open
+            Return Nothing
+        End If
     End Function
 
     ''' <summary>
@@ -547,21 +766,6 @@ Public Class IOUIManager
     End Function
 
     ''' <summary>
-    ''' Lets the IOUIManager keep track of the current task
-    ''' </summary>
-    ''' <param name="task">Task to keep track of.</param>
-    Public Sub LogTask(task As Task)
-        Dim watchTask = Task.Run(Async Function() As Task
-                                     Await task
-                                     RemoveTask(task)
-                                 End Function)
-    End Sub
-
-    Private Sub RemoveTask(task As Task)
-        RunningTasks.Remove(task)
-    End Sub
-
-    ''' <summary>
     ''' Updates the visibility for the given menu item and its children, and returns the updated visibility
     ''' </summary>
     ''' <param name="menuItem"></param>
@@ -624,7 +828,7 @@ Public Class IOUIManager
 
     Public Sub ShowAnchorable(model As AnchorableViewModel)
         Dim targetType = model.GetType
-        If Not (From m In AnchorableViewModels Where ReflectionHelpers.IsOfType(m, targetType.GetTypeInfo, False)).Any Then
+        If Not (From m In AnchorableViewModels Where ReflectionHelpers.IsOfType(m, targetType.GetTypeInfo)).Any Then
             model.CurrentIOUIManager = Me
             AnchorableViewModels.Add(model)
         End If

@@ -402,7 +402,7 @@ Namespace IO
                     Throw New IOException(My.Resources.Language.ErrorWrittenReadonly)
                 End If
                 If EnableInMemoryLoad Then
-                    ReDim Preserve InMemoryFile(value - 1)
+                    Array.Resize(InMemoryFile, value)
                 Else
                     FileReader.SetLength(value)
                 End If

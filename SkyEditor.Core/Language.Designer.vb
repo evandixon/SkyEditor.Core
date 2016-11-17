@@ -102,11 +102,11 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Directory.
+        '''  Looks up a localized string similar to Item with the same name already exists.  Path: &quot;{0}&quot;.
         '''</summary>
-        Friend Shared ReadOnly Property Directory() As String
+        Friend Shared ReadOnly Property DuplicateItemException() As String
             Get
-                Return ResourceManager.GetString("Directory", resourceCulture)
+                Return ResourceManager.GetString("DuplicateItemException", resourceCulture)
             End Get
         End Property
         
@@ -125,6 +125,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property ErrorCantAddFile() As String
             Get
                 Return ResourceManager.GetString("ErrorCantAddFile", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Cannot load sibling view models..
+        '''</summary>
+        Friend Shared ReadOnly Property ErrorCantLoadSiblingViewModels() As String
+            Get
+                Return ResourceManager.GetString("ErrorCantLoadSiblingViewModels", resourceCulture)
             End Get
         End Property
         
@@ -161,6 +170,24 @@ Namespace My.Resources
         Friend Shared ReadOnly Property ErrorNoSaveFilename() As String
             Get
                 Return ResourceManager.GetString("ErrorNoSaveFilename", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to No sibling view model of type &quot;{0}&quot; could be found..
+        '''</summary>
+        Friend Shared ReadOnly Property ErrorNoSiblingViewModelOfType() As String
+            Get
+                Return ResourceManager.GetString("ErrorNoSiblingViewModelOfType", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to The root node of the project should not be null..
+        '''</summary>
+        Friend Shared ReadOnly Property ErrorProjectNullRoot() As String
+            Get
+                Return ResourceManager.GetString("ErrorProjectNullRoot", resourceCulture)
             End Get
         End Property
         
@@ -219,6 +246,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Loading....
+        '''</summary>
+        Friend Shared ReadOnly Property Loading() As String
+            Get
+                Return ResourceManager.GetString("Loading", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to You!.
         '''</summary>
         Friend Shared ReadOnly Property PluginDevExtAuthor() As String
@@ -255,11 +291,11 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Project.
+        '''  Looks up a localized string similar to Ready.
         '''</summary>
-        Friend Shared ReadOnly Property Project() As String
+        Friend Shared ReadOnly Property Ready() As String
             Get
-                Return ResourceManager.GetString("Project", resourceCulture)
+                Return ResourceManager.GetString("Ready", resourceCulture)
             End Get
         End Property
         

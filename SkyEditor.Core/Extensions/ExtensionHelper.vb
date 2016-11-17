@@ -7,7 +7,11 @@ Imports SkyEditor.Core.Utilities
 
 Namespace Extensions
     Public Class ExtensionHelper
-        Implements iNamed
+        Implements INamed
+
+        Shared Sub New()
+            ExtensionBanks = New Dictionary(Of String, ExtensionType)
+        End Sub
 
         Public ReadOnly Property Name As String Implements iNamed.Name
             Get
@@ -48,6 +52,23 @@ Namespace Extensions
             End If
         End Function
 
+        ''' <summary>
+        ''' Installs all extension zips at the root of the extension directory.  Intended to be run before plugins are loaded.
+        ''' </summary>
+        ''' <param name="extensionDirectory"></param>
+        ''' <param name="manager"></param>
+        ''' <returns></returns>
+        Public Shared Async Function InstallPendingExtensions(extensionDirectory As String, manager As PluginManager) As Task
+            If manager.CurrentIOProvider.DirectoryExists(extensionDirectory) Then
+                For Each item In manager.CurrentIOProvider.GetFiles(extensionDirectory, "*.zip", True)
+                    Dim result = Await InstallExtensionZip(item, manager)
+                    If result = ExtensionInstallResult.Success OrElse result = ExtensionInstallResult.RestartRequired Then
+                        manager.CurrentIOProvider.DeleteFile(item)
+                    End If
+                Next
+            End If
+        End Function
+
         Public Shared Async Function InstallExtensionZip(extensionZipPath As String, manager As PluginManager) As Task(Of ExtensionInstallResult)
             Dim provider = manager.CurrentIOProvider
             Dim result As ExtensionInstallResult
@@ -84,7 +105,7 @@ Namespace Extensions
             Return result
         End Function
 
-        Public Shared Async Function UninstallExtension(extensionTypeName As String, extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult)
+        Public Shared Async Function UninstallExtension(extensionTypeName As String, extensionID As String, manager As PluginManager) As Task(Of ExtensionUninstallResult)
             Dim bank As ExtensionType = GetExtensionBank(extensionTypeName, manager)
             Return Await bank.UninstallExtension(extensionID, manager).ConfigureAwait(False)
         End Function

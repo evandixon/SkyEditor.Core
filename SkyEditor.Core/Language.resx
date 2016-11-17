@@ -129,8 +129,8 @@
   <data name="ConsoleUnknownCommand" xml:space="preserve">
     <value>Unknown command "{0}".</value>
   </data>
-  <data name="Directory" xml:space="preserve">
-    <value>Directory</value>
+  <data name="DuplicateItemException" xml:space="preserve">
+    <value>Item with the same name already exists.  Path: "{0}"</value>
   </data>
   <data name="ErrorAsyncForInfiniteLoop" xml:space="preserve">
     <value>StepCount cannot be 0.</value>
@@ -138,6 +138,9 @@
   </data>
   <data name="ErrorCantAddFile" xml:space="preserve">
     <value>Cannot add a file at the given path: {0}</value>
+  </data>
+  <data name="ErrorCantLoadSiblingViewModels" xml:space="preserve">
+    <value>Cannot load sibling view models.</value>
   </data>
   <data name="ErrorFileOrDirDoesntExist" xml:space="preserve">
     <value>The specified path neither points to an existing file nor an existing directory.</value>
@@ -151,6 +154,12 @@
   <data name="ErrorNoSaveFilename" xml:space="preserve">
     <value>Using GenericFile.Save() requires GenericFile.OriginalFilename to not be null.</value>
     <comment>Message for an exception that's thrown when using GenericFile.Save() when the file doesn't have an original filename.</comment>
+  </data>
+  <data name="ErrorNoSiblingViewModelOfType" xml:space="preserve">
+    <value>No sibling view model of type "{0}" could be found.</value>
+  </data>
+  <data name="ErrorProjectNullRoot" xml:space="preserve">
+    <value>The root node of the project should not be null.</value>
   </data>
   <data name="ErrorSanityNoMax" xml:space="preserve">
     <value>Sanity check failed.  Out of a list of non-zero length, no item exists that equals the max item.</value>
@@ -173,6 +182,9 @@
   <data name="File" xml:space="preserve">
     <value>File</value>
   </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
   <data name="PluginDevExtAuthor" xml:space="preserve">
     <value>You!</value>
   </data>
@@ -185,8 +197,8 @@
   <data name="PluginDevExtVersion" xml:space="preserve">
     <value>0.0</value>
   </data>
-  <data name="Project" xml:space="preserve">
-    <value>Project</value>
+  <data name="Ready" xml:space="preserve">
+    <value>Ready</value>
   </data>
   <data name="SkyEditorProjects" xml:space="preserve">
     <value>Sky Editor Projects</value>

@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllFiles" xml:space="preserve">
+    <value>Tous Les Fichiers</value>
+  </data>
+  <data name="BuildProgress" xml:space="preserve">
+    <value>Les Progrès De La Construction</value>
+  </data>
   <data name="ConsoleAvailableCommands" xml:space="preserve">
     <value>Les commandes suivantes sont disponibles:</value>
   </data>
@@ -126,13 +132,30 @@
   <data name="Failed" xml:space="preserve">
     <value>Échoué</value>
   </data>
+  <data name="File" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
   <data name="GenericLoadingXofY" xml:space="preserve">
     <value>{0} ({1} sur {2})</value>
+  </data>
+  <data name="PluginDevExtAuthor" xml:space="preserve">
+    <value>Toi!</value>
+  </data>
+  <data name="PluginDevExtDescription" xml:space="preserve">
+    <value>Tous les plugins qui sont dans le dossier développement.</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Prêt</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Paramètres</value>
+  </data>
+  <data name="SupportedFiles" xml:space="preserve">
+    <value>Fichiers Supportés</value>
+    <comment>Used in Open IO Filter</comment>
+  </data>
+  <data name="UnknownFileRegisterTemplate" xml:space="preserve">
+    <value>Fichiers {0}</value>
+    <comment>Display name for IO filters that aren't registered.  {0} will be replaced by the upper case of the extension.</comment>
   </data>
 </root>

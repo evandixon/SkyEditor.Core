@@ -36,8 +36,8 @@ Namespace Extensions
             End Get
         End Property
 
-        Public Overridable Function GetExtensionDirectory(extensionID As Guid) As String
-            Return Path.Combine(RootExtensionDirectory, InternalName, extensionID.ToString)
+        Public Overridable Function GetExtensionDirectory(extensionID As String) As String
+            Return Path.Combine(RootExtensionDirectory, InternalName, extensionID)
         End Function
 
         Public Overridable Function GetInstalledExtensions(manager As PluginManager) As IEnumerable(Of ExtensionInfo)
@@ -69,7 +69,7 @@ Namespace Extensions
             Return Task.FromResult(GetInstalledExtensions(manager).Count())
         End Function
 
-        Private Function InstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Private Function InstallExtension(extensionID As String, version As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             Throw New NotSupportedException("This IExtensionCollection lists extensions that are currently installed, not ones that can be installed, so this cannnot install extensions.")
         End Function
 
@@ -77,7 +77,7 @@ Namespace Extensions
         ''' Installs the extension that's stored in the given directory.
         ''' </summary>
         ''' <param name="TempDir">Temporary directory that contains the extension's files.</param>
-        Public Overridable Async Function InstallExtension(extensionID As Guid, TempDir As String) As Task(Of ExtensionInstallResult)
+        Public Overridable Async Function InstallExtension(extensionID As String, TempDir As String) As Task(Of ExtensionInstallResult)
             Await Core.Utilities.FileSystem.CopyDirectory(TempDir, GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentIOProvider).ConfigureAwait(False)
             Return ExtensionInstallResult.Success
         End Function
@@ -86,13 +86,13 @@ Namespace Extensions
         ''' Uninstalls the given extension.
         ''' </summary>
         ''' <param name="extensionID">ID of the extension to uninstall</param>
-        Public Overridable Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
+        Public Overridable Function UninstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
             CurrentPluginManager.CurrentIOProvider.DeleteDirectory(GetExtensionDirectory(extensionID))
             Return Task.FromResult(ExtensionUninstallResult.Success)
         End Function
 
-        Public Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
-            Throw New NotSupportedException
+        Public Overridable Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
+            Return Task.FromResult(New List(Of IExtensionCollection)({New PluginExtensionType}).AsEnumerable)
         End Function
     End Class
 End Namespace

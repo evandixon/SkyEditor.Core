@@ -10,7 +10,7 @@ Namespace Extensions
             Return Task.FromResult("Installed Extensions")
         End Function
 
-        Public Function GetChildCollections(manager As Core.PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
+        Public Function GetChildCollections(manager As PluginManager) As Task(Of IEnumerable(Of IExtensionCollection)) Implements IExtensionCollection.GetChildCollections
             Dim out As IEnumerable(Of IExtensionCollection) = manager.GetRegisteredObjects(Of ExtensionType)
             For Each item As ExtensionType In out
                 item.CurrentPluginManager = manager
@@ -22,16 +22,16 @@ Namespace Extensions
             Return Task.FromResult(0)
         End Function
 
-        Public Function GetExtensions(skip As Integer, take As Integer, manager As Core.PluginManager) As Task(Of IEnumerable(Of ExtensionInfo)) Implements IExtensionCollection.GetExtensions
+        Public Function GetExtensions(skip As Integer, take As Integer, manager As PluginManager) As Task(Of IEnumerable(Of ExtensionInfo)) Implements IExtensionCollection.GetExtensions
             Dim info As ExtensionInfo() = {}
             Return Task.FromResult(info.AsEnumerable)
         End Function
 
-        Public Function InstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
+        Public Function InstallExtension(extensionID As String, version As String, manager As PluginManager) As Task(Of ExtensionInstallResult) Implements IExtensionCollection.InstallExtension
             Throw New NotSupportedException
         End Function
 
-        Public Function UninstallExtension(extensionID As Guid, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
+        Public Function UninstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionUninstallResult) Implements IExtensionCollection.UninstallExtension
             Throw New NotSupportedException
         End Function
     End Class

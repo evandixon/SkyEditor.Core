@@ -5,6 +5,7 @@ Imports SkyEditor.Core.Utilities
 Imports SkyEditor.Core.Settings
 Imports SkyEditor.Core.Extensions
 Imports SkyEditor.Core.ConsoleCommands
+Imports SkyEditor.Core.Projects
 
 Public Class PluginManager
     Implements IDisposable
@@ -151,6 +152,11 @@ Public Class PluginManager
     ''' Loads the given Core plugin, and any other available plugins, if supported by the platform.
     ''' </summary>
     ''' <param name="Core">Core to load</param>
+    ''' <remarks>
+    ''' Misc things this function does:
+    ''' - Delete files scheduled for deletion
+    ''' - Install pending extensions
+    ''' </remarks>
     Public Overridable Async Function LoadCore(Core As CoreSkyEditorPlugin) As Task
         'Load providers
         CurrentIOProvider = Core.GetIOProvider
@@ -172,11 +178,13 @@ Public Class PluginManager
             CurrentSettingsProvider.Save(CurrentIOProvider)
         Next
 
+        'Install any pending extensions
+        ExtensionDirectory = Core.GetExtensionDirectory
+        Await ExtensionHelper.InstallPendingExtensions(ExtensionDirectory, Me)
+
         'Load the provided core
         Me.CoreModAssembly = Core.GetType.GetTypeInfo.Assembly
         Core.Load(Me)
-
-        ExtensionDirectory = Core.GetExtensionDirectory
 
         'Load type registers
         RegisterTypeRegister(Of ExtensionType)()
@@ -320,7 +328,7 @@ Public Class PluginManager
         For Each actualType In Item.DefinedTypes
             'Check to see if this type inherits from one we're looking for
             For Each registeredType In TypeRegistery.Keys
-                If ReflectionHelpers.IsOfType(actualType, registeredType, True) Then
+                If ReflectionHelpers.IsOfType(actualType, registeredType) Then
                     RegisterType(registeredType, actualType)
                 End If
             Next
@@ -328,7 +336,7 @@ Public Class PluginManager
             'Do the same for each interface
             For Each i In actualType.ImplementedInterfaces
                 For Each registeredType In TypeRegistery.Keys
-                    If ReflectionHelpers.IsOfType(i, registeredType, True) Then
+                    If ReflectionHelpers.IsOfType(i, registeredType) Then
                         RegisterType(registeredType, actualType)
                     End If
                 Next

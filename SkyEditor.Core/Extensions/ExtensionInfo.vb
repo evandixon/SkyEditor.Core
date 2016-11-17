@@ -11,7 +11,7 @@ Namespace Extensions
         ''' Unique ID of the extension
         ''' </summary>
         ''' <returns></returns>
-        Public Property ID As Guid
+        Public Property ID As String
         Public Property Name As String
         Public Property Description As String
         Public Property Author As String
@@ -35,7 +35,7 @@ Namespace Extensions
             Return out
         End Function
         Public Sub New()
-            ID = Guid.NewGuid
+            ID = Guid.NewGuid.ToString 'Ensures it's unique
             ExtensionFiles = New List(Of String)
             Name = ""
             Description = ""

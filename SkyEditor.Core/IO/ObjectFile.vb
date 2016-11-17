@@ -9,7 +9,7 @@ Namespace IO
         Implements ISavableAs
         Implements IOnDisk
         Implements ICreatableFile
-        Implements IContainer(Of T)
+
         Private Class JsonContainer(Of U)
             Public Property ContainedObject As U
 
@@ -55,7 +55,7 @@ Namespace IO
         End Sub
 
 #Region "Properties"
-        Public Property ContainedObject As T Implements IContainer(Of T).Item
+        Public Property ContainedObject As T
 
         Public Property ContainedTypeName As String
 
