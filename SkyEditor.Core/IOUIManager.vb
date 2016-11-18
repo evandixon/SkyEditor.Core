@@ -49,15 +49,15 @@ Public Class IOUIManager
         End If
     End Sub
 
-    Private Sub IOUIManager_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles Me.PropertyChanged
-        For Each item In RootMenuItems
-            UpdateMenuItemVisibility(item)
+    Private Async Sub IOUIManager_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles Me.PropertyChanged
+        For Each item In Await GetRootMenuItems
+            Await UpdateMenuItemVisibility(item)
         Next
     End Sub
 
-    Private Sub _selectedFile_MenuItemRefreshRequested(sender As Object, e As EventArgs) Handles _selectedFile.MenuItemRefreshRequested
-        For Each item In RootMenuItems
-            UpdateMenuItemVisibility(item)
+    Private Async Sub _selectedFile_MenuItemRefreshRequested(sender As Object, e As EventArgs) Handles _selectedFile.MenuItemRefreshRequested
+        For Each item In Await GetRootMenuItems
+            Await UpdateMenuItemVisibility(item)
         Next
     End Sub
 
@@ -227,28 +227,7 @@ Public Class IOUIManager
     End Property
     Private WithEvents _currentProject As Project
 
-    Public Property RootMenuItems As ObservableCollection(Of ActionMenuItem)
-        Get
-            If _rootMenuItems Is Nothing Then
-                _rootMenuItems = New ObservableCollection(Of ActionMenuItem)
-                'Generate the menu items
-                For Each item In UIHelper.GenerateLogicalMenuItems(UIHelper.GetMenuItemInfo(CurrentPluginManager, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode), Me, Nothing)
-                    _rootMenuItems.Add(item)
-                Next
-                'Update their visibility now that all of them have been created
-                'Doing this before they're all created will cause unintended behavior
-                For Each item In _rootMenuItems
-                    UpdateMenuItemVisibility(item)
-                Next
-            End If
-            Return _rootMenuItems
-        End Get
-        Protected Set(value As ObservableCollection(Of ActionMenuItem))
-            _rootMenuItems = value
-        End Set
-    End Property
     Dim _rootMenuItems As ObservableCollection(Of ActionMenuItem)
-
 #End Region
 
 #Region "Task Watching"
@@ -456,6 +435,27 @@ Public Class IOUIManager
 #End Region
 
 #Region "Functions"
+
+    Public Async Function GetRootMenuItems As Task(Of ObservableCollection(Of ActionMenuItem))
+         If _rootMenuItems Is Nothing Then
+                _rootMenuItems = New ObservableCollection(Of ActionMenuItem)
+                'Generate the menu items
+                For Each item In UIHelper.GenerateLogicalMenuItems(Await UIHelper.GetMenuItemInfo(CurrentPluginManager, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode), Me, Nothing)
+                    _rootMenuItems.Add(item)
+                Next
+                'Update their visibility now that all of them have been created
+                'Doing this before they're all created will cause unintended behavior
+                For Each item In _rootMenuItems
+                    await UpdateMenuItemVisibility(item)
+                Next
+            End If
+            Return _rootMenuItems
+    End Function
+
+    Protected sub SetRootMenuItems(value As ObservableCollection(Of ActionMenuItem))
+        _rootMenuItems = value
+    End sub
+
 
 #Region "IO Filters"
 
@@ -731,34 +731,36 @@ Public Class IOUIManager
     ''' </summary>
     ''' <param name="action">The action for which to retrieve the targets</param>
     ''' <returns></returns>
-    Public Function GetMenuActionTargets(action As MenuAction) As IEnumerable(Of Object)
+    Public Async Function GetMenuActionTargets(action As MenuAction) As Task(Of IEnumerable(Of Object))
         Dim targets As New List(Of Object)
 
         'Add the current project to the targets if supported
-        If CurrentSolution IsNot Nothing AndAlso action.SupportsObject(CurrentSolution) Then
+        If CurrentSolution IsNot Nothing AndAlso Await action.SupportsObject(CurrentSolution) Then
             targets.Add(CurrentSolution)
         End If
 
         'Add the current project if supported
-        If CurrentProject IsNot Nothing AndAlso action.SupportsObject(CurrentProject) Then
+        If CurrentProject IsNot Nothing AndAlso Await action.SupportsObject(CurrentProject) Then
             targets.Add(CurrentProject)
         End If
 
         'Add the selected file if supported
         If SelectedFile IsNot Nothing Then
             'Add the file's view model if supported
-            If action.SupportsObject(SelectedFile) Then
+            If Await action.SupportsObject(SelectedFile) Then
                 targets.Add(SelectedFile)
             End If
 
             'Add the model if supported
-            If action.SupportsObject(SelectedFile.File) Then
+            If Await action.SupportsObject(SelectedFile.File) Then
                 targets.Add(SelectedFile.File)
             End If
 
             'Add a view model for the current file if available
-            For Each item In From vm In SelectedFile.GetViewModels(CurrentPluginManager) Where action.SupportsObject(vm)
-                targets.Add(item)
+            For Each item In From vm In SelectedFile.GetViewModels(CurrentPluginManager)
+                If Await action.SupportsObject(item) Then
+                    targets.Add(item)
+                End If
             Next
         End If
 
@@ -770,7 +772,7 @@ Public Class IOUIManager
     ''' </summary>
     ''' <param name="menuItem"></param>
     ''' <returns></returns>
-    Private Function UpdateMenuItemVisibility(menuItem As ActionMenuItem) As Boolean
+    Private Async Function UpdateMenuItemVisibility(menuItem As ActionMenuItem) As Task(Of Boolean)
         Dim possibleTargets = GetMenuActionTargets() 'Note: Excludes view models for the selected file
 
         'Default to not visible
@@ -790,7 +792,7 @@ Public Class IOUIManager
                     Else
                         For Each target In possibleTargets
                             'Check to see if this target is supported
-                            If item.SupportsObject(target) Then
+                            If Await item.SupportsObject(target) Then
                                 'If it is, then this menu item should be visible
                                 isVisible = True
 
@@ -802,7 +804,13 @@ Public Class IOUIManager
                         If Not isVisible AndAlso SelectedFile?.File IsNot Nothing Then
                             'Check to see if the action supports any view models
                             'If there are any view models that support the selected file, 
-                            isVisible = (From vm In SelectedFile.GetViewModels(CurrentPluginManager) Where item.SupportsObject(vm)).Any
+                            isVisible = False
+                            For Each vm In SelectedFile.GetViewModels(CurrentPluginManager)
+                                If Await item.SupportsObject(vm) Then
+                                    isVisible = True
+                                    Exit For
+                                End If
+                            Next
                         End If
                     End If
                 Else
@@ -814,7 +822,7 @@ Public Class IOUIManager
 
         'Update children
         For Each item In menuItem.Children
-            If UpdateMenuItemVisibility(item) Then
+            If Await UpdateMenuItemVisibility(item) Then
                 isVisible = True
             End If
         Next

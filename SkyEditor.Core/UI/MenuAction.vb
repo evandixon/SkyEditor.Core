@@ -5,6 +5,15 @@ Imports SkyEditor.Core.Utilities
 Namespace UI
     Public MustInherit Class MenuAction
 
+        Public Sub New(path As IEnumerable(Of String))
+            AlwaysVisible = False
+            ActionPath = New List(Of String)
+            ActionPath.AddRange(path)
+            DevOnly = False
+            SortOrder = Integer.MaxValue
+        End Sub
+
+
         Public Event CurrentPluginManagerChanged(sender As Object, e As EventArgs)
 
         ''' <summary>
@@ -27,9 +36,9 @@ Namespace UI
             Get
                 Return _currentPluginManager
             End Get
-            Set(value As PluginManager)
-                If value IsNot _currentPluginManager Then
-                    _currentPluginManager = value
+            Set
+                If Value IsNot _currentPluginManager Then
+                    _currentPluginManager = Value
                     RaiseEvent CurrentPluginManagerChanged(Me, New EventArgs)
                 End If
             End Set
@@ -52,8 +61,8 @@ Namespace UI
             Get
                 Return _alwaysVisible
             End Get
-            Protected Set(value As Boolean)
-                _alwaysVisible = value
+            Protected Set
+                _alwaysVisible = Value
             End Set
         End Property
         Dim _alwaysVisible As Boolean
@@ -67,8 +76,8 @@ Namespace UI
             Get
                 Return _devOnly
             End Get
-            Protected Set(value As Boolean)
-                _devOnly = value
+            Protected Set
+                _devOnly = Value
             End Set
         End Property
         Dim _devOnly As Boolean
@@ -81,8 +90,8 @@ Namespace UI
             Get
                 Return _sortOrder
             End Get
-            Protected Set(value As Decimal)
-                _sortOrder = value
+            Protected Set
+                _sortOrder = Value
             End Set
         End Property
         Dim _sortOrder As Decimal
@@ -96,29 +105,40 @@ Namespace UI
             Return {}
         End Function
 
-        Public Overridable Function SupportsObject(Obj As Object) As Boolean
-            If Obj Is Nothing Then
-                Return AlwaysVisible
+        ''' <summary>
+        ''' Determines whether or not the given object is supported.
+        ''' </summary>
+        ''' <param name="obj">Object to determine if it is supported.</param>
+        ''' <returns>A boolean indicating whether or not <paramref name="obj"/> is supported.</returns>
+        Public Overridable Function SupportsObject(obj As Object) As Task(Of Boolean)
+            If obj Is Nothing Then
+                Return Task.FromResult(AlwaysVisible)
             Else
-                Dim q = From t In SupportedTypes() Where ReflectionHelpers.IsOfType(Obj.GetType, t)
+                Dim q = From t In SupportedTypes() Where ReflectionHelpers.IsOfType(obj.GetType, t)
 
-                Return q.Any
+                Return Task.FromResult(q.Any)
             End If
         End Function
 
-        Public Overridable Function SupportsObjects(Objects As IEnumerable(Of Object)) As Boolean
-            Return (From o In Objects Where SupportsObject(o)).Any
+        ''' <summary>
+        ''' Determines whether or not the combination of given objects is supported.
+        ''' </summary>
+        ''' <param name="objects"><see cref="IEnumerable(Of Object)"/> to determine if they are supported.</param>
+        ''' <returns>A boolean indicating whether or not the given combination of objects is supported.</returns>
+        Public Overridable Async Function SupportsObjects(objects As IEnumerable(Of Object)) As Task(Of Boolean)
+            For Each item In objects
+                If Await SupportsObject(item) Then
+                    Return True
+                End If
+            Next
+            Return False
         End Function
 
-        Public MustOverride Sub DoAction(Targets As IEnumerable(Of Object))
-
-        Public Sub New(Path As IEnumerable(Of String))
-            _alwaysVisible = False
-            ActionPath = New List(Of String)
-            ActionPath.AddRange(Path)
-            DevOnly = False
-            SortOrder = Integer.MaxValue
-        End Sub
+        ''' <summary>
+        ''' Executes the logical function of the current <see cref="MenuAction"/>.
+        ''' </summary>
+        ''' <param name="targets">Targets of the <see cref="MenuAction"/>.</param>
+        Public MustOverride Sub DoAction(targets As IEnumerable(Of Object))
 
     End Class
 
