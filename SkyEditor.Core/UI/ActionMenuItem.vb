@@ -1,65 +1,67 @@
 ﻿Imports System.Windows.Input
 Imports SkyEditor.Core.UI
 
-Public Class ActionMenuItem
-    Implements INotifyPropertyChanged
+Namespace UI
+    Public Class ActionMenuItem
+        Implements INotifyPropertyChanged
 
-    Public Sub New()
-        Me.Actions = New List(Of MenuAction)
-        Me.Children = New ObservableCollection(Of ActionMenuItem)
-        Command = New RelayCommand(AddressOf RunActions)
-    End Sub
+        Public Sub New()
+            Me.Actions = New List(Of MenuAction)
+            Me.Children = New ObservableCollection(Of ActionMenuItem)
+            Command = New RelayCommand(AddressOf RunActions)
+        End Sub
 
-    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
 
-    Public Property CurrentIOUIManager As IOUIManager
-    Public Property Header As String
-        Get
-            Return _header
-        End Get
-        Set(value As String)
-            If Not _header = value Then
-                _header = value
-                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Header)))
+        Public Property CurrentIOUIManager As IOUIManager
+        Public Property Header As String
+            Get
+                Return _header
+            End Get
+            Set(value As String)
+                If Not _header = value Then
+                    _header = value
+                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(Header)))
+                End If
+            End Set
+        End Property
+        Dim _header As String
+
+        Public Property Actions As List(Of MenuAction)
+
+        Public Property IsVisible As Boolean
+            Get
+                Return _isVisible
+            End Get
+            Set(value As Boolean)
+                If Not _isVisible = value Then
+                    _isVisible = value
+                    RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsVisible)))
+                End If
+            End Set
+        End Property
+        Dim _isVisible As Boolean
+
+        Public Property Children As ObservableCollection(Of ActionMenuItem)
+
+        Public Property ContextTargets As IEnumerable(Of Object)
+
+        Public Property Command As ICommand
+
+        Private Async Sub RunActions()
+            'We're running these actions synchronously to avoid threading issues
+            For Each t In Actions
+                t.DoAction(Await GetTargets(t))
+            Next
+        End Sub
+
+        Private Async Function GetTargets(t As MenuAction) As Task(Of IEnumerable(Of Object))
+            If ContextTargets IsNot Nothing Then
+                Return ContextTargets
+            Else
+                Return Await CurrentIOUIManager.GetMenuActionTargets(t)
             End If
-        End Set
-    End Property
-    Dim _header As String
+        End Function
 
-    Public Property Actions As List(Of MenuAction)
-
-    Public Property IsVisible As Boolean
-        Get
-            Return _isVisible
-        End Get
-        Set(value As Boolean)
-            If Not _isVisible = value Then
-                _isVisible = value
-                RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(NameOf(IsVisible)))
-            End If
-        End Set
-    End Property
-    Dim _isVisible As Boolean
-
-    Public Property Children As ObservableCollection(Of ActionMenuItem)
-
-    Public Property ContextTargets As IEnumerable(Of Object)
-
-    Public Property Command As ICommand
-
-    Private Sub RunActions()
-        'We're running these actions synchronously to avoid threading issues
-        For Each t In Actions
-            t.DoAction(GetTargets(t))
-        Next
-    End Sub
-
-    Private Function GetTargets(t As MenuAction) As IEnumerable(Of Object)
-        If ContextTargets IsNot Nothing Then
-            Return ContextTargets
-        Else
-            Return CurrentIOUIManager.GetMenuActionTargets(t)
-        End If
-    End Function
-
-End Class
+    End Class
+End Namespace
