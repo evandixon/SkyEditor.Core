@@ -15,7 +15,7 @@ Namespace UI
         ''' <param name="pluginManager">Instance of the current plugin manager.</param>
         ''' <param name="isDevMode">Whether or not to get the dev-only menu items.</param>
         ''' <returns></returns>
-        Private Shared Function GetMenuItemInfo(isContextBased As Boolean, target As Object, pluginManager As PluginManager, isDevMode As Boolean) As List(Of MenuItemInfo)
+        Private Shared Async Function GetMenuItemInfo(isContextBased As Boolean, target As Object, pluginManager As PluginManager, isDevMode As Boolean) As Task(Of List(Of MenuItemInfo))
             If pluginManager Is Nothing Then
                 Throw New ArgumentNullException(NameOf(pluginManager))
             End If
@@ -26,7 +26,7 @@ Namespace UI
                 '1: If this is a context menu, only get actions that support the target and are context based
                 '2: Ensure menu actions are only visible based on their environment: non-context in regular menu, context in context menu
                 '3: DevOnly menu actions are only supported if we're in dev mode.
-                If (Not isContextBased OrElse (ActionInstance.SupportsObject(target) AndAlso ActionInstance.IsContextBased)) AndAlso
+                If (Not isContextBased OrElse ((Await ActionInstance.SupportsObject(target)) AndAlso ActionInstance.IsContextBased)) AndAlso
                     (isContextBased = ActionInstance.IsContextBased) AndAlso
                     (isDevMode OrElse Not ActionInstance.DevOnly) Then
 
@@ -106,12 +106,12 @@ Namespace UI
             Return menuItems
         End Function
 
-        Public Shared Function GetMenuItemInfo(pluginManager As PluginManager, isDevMode As Boolean) As List(Of MenuItemInfo)
-            Return GetMenuItemInfo(False, Nothing, pluginManager, isDevMode)
+        Public Shared Async Function GetMenuItemInfo(pluginManager As PluginManager, isDevMode As Boolean) As Task(Of List(Of MenuItemInfo))
+            Return Await GetMenuItemInfo(False, Nothing, pluginManager, isDevMode)
         End Function
 
-        Public Shared Function GetContextMenuItemInfo(target As Object, pluginManager As PluginManager, isDevMode As Boolean) As List(Of MenuItemInfo)
-            Return GetMenuItemInfo(True, target, pluginManager, isDevMode)
+        Public Shared Async Function GetContextMenuItemInfo(target As Object, pluginManager As PluginManager, isDevMode As Boolean) As Task(Of List(Of MenuItemInfo))
+            Return Await GetMenuItemInfo(True, target, pluginManager, isDevMode)
         End Function
 
         ''' <summary>
@@ -120,9 +120,9 @@ Namespace UI
         ''' <param name="MenuItemInfo">IEnumerable of MenuItemInfo that will be used to create the MenuItems.</param>
         ''' <param name="targets">Direct targets of the action, if applicable.  If Nothing, the IOUIManager will control the targets</param>
         ''' <returns></returns>
-        Public Shared Function GenerateLogicalMenuItems(MenuItemInfo As IEnumerable(Of MenuItemInfo), ioui As IOUIManager, targets As IEnumerable(Of Object)) As List(Of ActionMenuItem)
+        Public Shared Function GenerateLogicalMenuItems(menuItemInfo As IEnumerable(Of MenuItemInfo), ioui As IOUIManager, targets As IEnumerable(Of Object)) As List(Of ActionMenuItem)
             If MenuItemInfo Is Nothing Then
-                Throw New ArgumentNullException(NameOf(MenuItemInfo))
+                Throw New ArgumentNullException(NameOf(menuItemInfo))
             End If
 
             Dim output As New List(Of ActionMenuItem)
