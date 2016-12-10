@@ -155,23 +155,63 @@ Namespace Projects
             Return $"{My.Resources.Language.AllFiles} (*.*)|*.*" 'manager.IOFiltersString
         End Function
 
+        ''' <summary>
+        ''' Sets the type of a file to the given type
+        ''' </summary>
+        ''' <param name="path">Project path of the file of which to set the type</param>
+        ''' <param name="fileType">Desired type of the file</param>
+        ''' <remarks>Only affects files that have not yet been opened.</remarks>
+        Protected Sub SetFileType(path As String, fileType As Type)
+            Dim item = GetItem(path)
+            If item IsNot Nothing Then
+                item.FileAssemblyQualifiedTypeName = fileType.AssemblyQualifiedName
+            End If
+        End Sub
 
-        Public Overridable Sub AddExistingFile(parentPath As String, FilePath As String, provider As IOProvider)
-            Dim fixedParentPath = FixPath(parentPath)
-            Dim importedName = GetImportedFilePath(parentPath, FilePath)
+        ''' <summary>
+        ''' Adds a file to the solution to a specific path
+        ''' </summary>
+        ''' <param name="destinationPath">Desired full path of the file to import</param>
+        ''' <param name="filePath">Full path of the file to import</param>
+        ''' <param name="fileType">Type of the file.  To auto-detect on open, pass in null.</param>
+        ''' <param name="provider">Instance of the IO provider from which to get the file located at <paramref name="filePath"/>.</param>
+        Public Overridable Sub AddExistingFileToPath(destinationPath As String, filePath As String, fileType As Type, provider As IOProvider)
+            Dim fixedPath = FixPath(destinationPath)
+
+            Dim relativePath = filePath.Replace(Path.GetDirectoryName(Me.Filename), "").Replace("\", "/").TrimStart("/")
+            Dim wrapper As New ProjectFileWrapper(Me.Filename, relativePath)
+            AddItem(destinationPath, wrapper)
+            
+            RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = Path.GetFileName(destinationPath), .FullFilename = filePath})
+        End Sub
+
+        ''' <summary>
+        ''' Adds a file to the solution
+        ''' </summary>
+        ''' <param name="parentPath">Directory in which to put the imported file</param>
+        ''' <param name="filePath">Full path of the file to import</param>
+        Public Overridable Sub AddExistingFile(parentPath As String, filePath As String, fileType As Type, provider As IOProvider)
+            Dim fixedPath = FixPath(parentPath)
+            Dim importedName = GetImportedFilePath(fixedPath, filePath)
 
             'Copy the file
-            Dim source = FilePath
+            Dim source = filePath
             Dim dest = Path.Combine(Path.GetDirectoryName(Me.Filename), importedName.Replace("/", "\").TrimStart("\"))
             If Not source.Replace("\", "/").ToLower = dest.Replace("\", "/").ToLower Then
-                provider.CopyFile(FilePath, dest)
+                provider.CopyFile(filePath, dest)
             End If
 
             'Add the file
-            Dim relativePath = dest.Replace(Path.GetDirectoryName(Me.Filename), "").Replace("\", "/").TrimStart("/")
-            Dim wrapper As New ProjectFileWrapper(Me.Filename, relativePath)
-            AddItem(importedName, wrapper)
-            RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = Path.GetFileName(FilePath), .FullFilename = dest})
+            AddExistingFileToPath(importedName, dest, fileType, provider)
+        End Sub
+
+        ''' <summary>
+        ''' Adds a file to a directory in the project 
+        ''' </summary>
+        ''' <param name="parentPath">Directory in which to put the imported file</param>
+        ''' <param name="filePath">Full path of the file to import</param>
+        Public Overridable Sub AddExistingFile(parentPath As String, filePath As String, provider As IOProvider)
+            AddExistingFile(parentPath, filePath, Nothing, provider)
         End Sub
 
         Public Function FileExists(path As String) As Boolean
