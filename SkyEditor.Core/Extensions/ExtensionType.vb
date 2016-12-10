@@ -30,7 +30,7 @@ Namespace Extensions
         ''' The internal name of the extension type used in paths.
         ''' </summary>
         ''' <returns></returns>
-        Protected Overridable ReadOnly Property InternalName As String
+        Public Overridable ReadOnly Property InternalName As String
             Get
                 Return Me.GetType.Name
             End Get

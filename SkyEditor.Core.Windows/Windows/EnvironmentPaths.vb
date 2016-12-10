@@ -1,6 +1,7 @@
 ﻿Imports System.Deployment.Application
 Imports System.IO
 Imports System.Reflection
+Imports SkyEditor.Core.Extensions
 
 Namespace Windows
     Public Class EnvironmentPaths
@@ -10,6 +11,10 @@ Namespace Windows
         ''' <returns></returns>
         Public Shared Function GetExtensionDirectory() As String
             Return Path.Combine(GetRootResourceDirectory, "Extensions")
+        End Function
+
+        Public Shared Function GetPluginsExtensionDirectory As String
+            Return Path.Combine(GetExtensionDirectory, (New PluginExtensionType).InternalName)
         End Function
 
         ''' <summary>

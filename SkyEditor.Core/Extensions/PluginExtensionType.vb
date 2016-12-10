@@ -12,7 +12,7 @@ Namespace Extensions
             Return Task.FromResult("Plugins")
         End Function
 
-        Protected Overrides ReadOnly Property InternalName As String
+        Public Overrides ReadOnly Property InternalName As String
             Get
                 Return "Plugins"
             End Get

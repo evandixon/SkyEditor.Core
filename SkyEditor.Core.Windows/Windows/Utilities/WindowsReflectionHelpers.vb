@@ -182,7 +182,7 @@ Namespace Windows.Utilities
                 End If
 
                 'Todo: don't hard-code plugin directory
-                For Each item In Directory.GetDirectories(Path.Combine(EnvironmentPaths.GetExtensionDirectory, "Plugins"))
+                For Each item In Directory.GetDirectories(EnvironmentPaths.GetPluginsExtensionDirectory)
                     If Not item = applicationDir AndAlso Not item = requestingDir Then
                         potentialAssemblyPaths.AddRange(Directory.GetFiles(item, "*.dll"))
                         potentialAssemblyPaths.AddRange(Directory.GetFiles(item, "*.exe"))
