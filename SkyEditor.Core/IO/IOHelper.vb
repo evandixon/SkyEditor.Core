@@ -85,7 +85,7 @@ Namespace IO
             End If
 
             If ReflectionHelpers.CanCreateInstance(FileType) Then
-                Return Await openers.First.OpenFile(FileType, Filename, Manager.CurrentIOProvider)
+                Return Await openers.OrderBy(Function(x) x.GetUsagePriority(FileType)).First.OpenFile(FileType, Filename, Manager.CurrentIOProvider)
             Else
                 Throw New ArgumentException(My.Resources.Language.ErrorTypeNoDefaultConstructor, NameOf(FileType))
             End If
@@ -154,7 +154,7 @@ Namespace IO
                 Await g.OpenFile(File.OriginalFilename, manager.CurrentIOProvider)
                 Return g
             Else
-                Return Await openers.First.OpenFile(type, File.OriginalFilename, manager.CurrentIOProvider)
+                Return Await openers.OrderBy(Function(x) x.GetUsagePriority(type)).First.OpenFile(type, File.OriginalFilename, manager.CurrentIOProvider)
             End If
         End Function
 
