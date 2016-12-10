@@ -100,6 +100,15 @@ Namespace Windows.Utilities
                     'Try to find the references of this reference
                     Dim q = (From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = reference.FullName).FirstOrDefault
 
+                    If q Is Nothing
+                        'Nothing found, expand search to account for different versions
+                        q = (From a In AppDomain.CurrentDomain.GetAssemblies
+                             Let name = a.GetName()
+                             Where name.Name = reference.Name
+                             Order By name.Version Descending
+                             Select a).FirstOrDefault
+                    End If
+
                     If q IsNot Nothing Then
                         out.AddRange(GetAssemblyDependencies(q))
                     Else
@@ -181,7 +190,6 @@ Namespace Windows.Utilities
                     potentialAssemblyPaths.AddRange(Directory.GetFiles(requestingDir, "*.exe"))
                 End If
 
-                'Todo: don't hard-code plugin directory
                 For Each item In Directory.GetDirectories(EnvironmentPaths.GetPluginsExtensionDirectory)
                     If Not item = applicationDir AndAlso Not item = requestingDir Then
                         potentialAssemblyPaths.AddRange(Directory.GetFiles(item, "*.dll"))
