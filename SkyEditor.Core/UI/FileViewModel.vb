@@ -110,6 +110,8 @@ Namespace UI
                     out = Path.GetFileName(Filename)
                 ElseIf TypeOf File Is INamed Then
                     out = DirectCast(File, INamed).Name
+                ElseIf TypeOf File Is IOnDisk Then
+                    out = Path.GetFileName(DirectCast(File, IOnDisk).Filename)
                 Else
                     out = ReflectionHelpers.GetTypeFriendlyName(File.GetType)
                 End If
