@@ -180,6 +180,9 @@ Namespace Projects
 
             Dim relativePath = filePath.Replace(Path.GetDirectoryName(Me.Filename), "").Replace("\", "/").TrimStart("/")
             Dim wrapper As New ProjectFileWrapper(Me.Filename, relativePath)
+            If fileType IsNot Nothing
+                wrapper.FileAssemblyQualifiedTypeName = fileType.AssemblyQualifiedName
+            End If
             AddItem(destinationPath, wrapper)
             
             RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = Path.GetFileName(destinationPath), .FullFilename = filePath})
