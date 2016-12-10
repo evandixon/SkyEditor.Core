@@ -1,7 +1,7 @@
 ﻿Imports System.Reflection
 
 Namespace IO
-    Public Class ObjectFileDetector
+    <Obsolete> Public Class ObjectFileDetector
         Implements IFileTypeDetector
 
         Public Function DetectFileType(File As GenericFile, Manager As PluginManager) As Task(Of IEnumerable(Of FileTypeDetectionResult)) Implements IFileTypeDetector.DetectFileType
@@ -21,11 +21,11 @@ Namespace IO
         ''' </summary>
         ''' <param name="Filename"></param>
         ''' <returns></returns>
-        Private Function TryGetObjectFileType(Filename As String, Manager As PluginManager) As Reflection.TypeInfo
+        Private Function TryGetObjectFileType(Filename As String, Manager As PluginManager) As TypeInfo
             Try
-                Dim f As New ObjectFile(Of Object)(Manager.CurrentIOProvider, Filename)
+                Dim f As New ObjectFile(Manager.CurrentIOProvider, Filename)
                 'Doesn't work for ObjectFiles
-                Return Utilities.ReflectionHelpers.GetTypeByName(f.ContainedTypeName, Manager) 'GetType(ObjectFile(Of Object)).GetGenericTypeDefinition.MakeGenericType({Type.GetType(f.ContainedTypeName, AddressOf AssemblyResolver, AddressOf TypeResolver, False)})
+                Return Utilities.ReflectionHelpers.GetTypeByName(f.ContainedTypeName, Manager)
             Catch ex As Exception
                 Return Nothing
             End Try

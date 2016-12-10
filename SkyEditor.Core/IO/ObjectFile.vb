@@ -3,18 +3,18 @@ Imports System.Threading.Tasks
 Imports SkyEditor.Core.Utilities
 
 Namespace IO
-    Public Class ObjectFile(Of T)
-        Implements iNamed
+    Friend Class JsonContainer(Of U)
+        Public Property ContainedObject As U
+
+        Public Property ContainedTypeName As String
+    End Class
+
+    <Obsolete> Public Class ObjectFile
+        Implements INamed
         Implements IOpenableFile
         Implements ISavableAs
         Implements IOnDisk
         Implements ICreatableFile
-
-        Private Class JsonContainer(Of U)
-            Public Property ContainedObject As U
-
-            Public Property ContainedTypeName As String
-        End Class
 
         Public Sub New()
         End Sub
@@ -25,23 +25,21 @@ Namespace IO
 
         Public Sub New(FileProvider As IOProvider, Filename As String)
             Me.CurrentIOProvider = FileProvider
-            Me.OpenFileInternal(Filename)
+            Me.OpenFileInternal(Of Object)(Filename)
         End Sub
 
-        Public Sub CreateFile(Name As String) Implements ICreatableFile.CreateFile
-            If ReflectionHelpers.CanCreateInstance(GetType(T).GetTypeInfo) Then
-                ContainedObject = ReflectionHelpers.CreateInstance(GetType(T).GetTypeInfo)
-                _name = Name
-            End If
+        Public Overridable Sub CreateFile(Name As String) Implements ICreatableFile.CreateFile
+            ContainedObject = New Object
+            Me.Name = Name
         End Sub
 
-        Public Function OpenFile(Filename As String, Provider As IOProvider) As Task Implements IOpenableFile.OpenFile
+        Public Overridable Function OpenFile(Filename As String, Provider As IOProvider) As Task Implements IOpenableFile.OpenFile
             Me.CurrentIOProvider = Provider
-            OpenFileInternal(Filename)
+            OpenFileInternal(Of Object)(Filename)
             Return Task.FromResult(0)
         End Function
 
-        Private Sub OpenFileInternal(Filename As String)
+        Protected Overridable Sub OpenFileInternal(Of T)(Filename As String)
             Me.Filename = Filename
 
             If CurrentIOProvider.FileExists(Filename) Then
@@ -55,7 +53,7 @@ Namespace IO
         End Sub
 
 #Region "Properties"
-        Public Property ContainedObject As T
+        Public Property ContainedObject As Object
 
         Public Property ContainedTypeName As String
 
@@ -63,24 +61,27 @@ Namespace IO
 
         Public Property CurrentIOProvider As IOProvider
 
-        Public ReadOnly Property Name As String Implements INamed.Name
+        Public Property Name As String Implements INamed.Name
             Get
                 If String.IsNullOrEmpty(Filename) Then
                     Return _name
                 Else
-                    Return System.IO.Path.GetFileName(Filename)
+                    Return Path.GetFileName(Filename)
                 End If
             End Get
+            Protected Set(value As String)
+                _name = value
+            End Set
         End Property
         Dim _name As String
 #End Region
 
 #Region "ISaveable support"
 
-        Public Sub Save(Filename As String, provider As IOProvider) Implements ISavableAs.Save
-            Dim c As New JsonContainer(Of T)
+        Public Overridable Sub Save(Filename As String, provider As IOProvider) Implements ISavableAs.Save
+            Dim c As New JsonContainer(Of Object)
             c.ContainedObject = Me.ContainedObject
-            c.ContainedTypeName = Me.GetType.AssemblyQualifiedName 'GetType(T).AssemblyQualifiedName
+            c.ContainedTypeName = Me.GetType.AssemblyQualifiedName
             Json.SerializeToFile(Filename, c, provider)
             RaiseFileSaved(Me, New EventArgs)
         End Sub
@@ -111,6 +112,53 @@ Namespace IO
         Public Function GetSupportedExtensions() As IEnumerable(Of String) Implements ISavableAs.GetSupportedExtensions
             Return Nothing
         End Function
+    End Class
+
+    <Obsolete> Public Class ObjectFile(Of T)
+        Inherits ObjectFile
+
+        Public Shadows Property ContainedObject As T
+            Get
+                Return MyBase.ContainedObject
+            End Get
+            Set(value As T)
+                MyBase.ContainedObject = value
+            End Set
+        End Property
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(FileProvider As IOProvider)
+            Me.CurrentIOProvider = FileProvider
+        End Sub
+
+        Public Sub New(FileProvider As IOProvider, Filename As String)
+            Me.CurrentIOProvider = FileProvider
+            Me.OpenFileInternal(Of T)(Filename)
+        End Sub
+
+        Public Overrides Sub CreateFile(Name As String)
+            If ReflectionHelpers.CanCreateInstance(GetType(T).GetTypeInfo) Then
+                ContainedObject = ReflectionHelpers.CreateInstance(GetType(T).GetTypeInfo)
+                Me.Name = Name
+            End If
+        End Sub
+
+        Public Overrides Function OpenFile(Filename As String, Provider As IOProvider) As Task
+            Me.CurrentIOProvider = Provider
+            OpenFileInternal(Of T)(Filename)
+            Return Task.FromResult(0)
+        End Function
+
+        Public Overrides Sub Save(Filename As String, provider As IOProvider)
+            Dim c As New JsonContainer(Of T)
+            c.ContainedObject = Me.ContainedObject
+            c.ContainedTypeName = Me.GetType.AssemblyQualifiedName
+            Json.SerializeToFile(Filename, c, provider)
+            RaiseFileSaved(Me, New EventArgs)
+        End Sub
+
     End Class
 End Namespace
 
