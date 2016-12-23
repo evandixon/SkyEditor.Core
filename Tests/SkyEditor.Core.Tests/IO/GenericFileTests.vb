@@ -1,11 +1,16 @@
 ﻿Imports System.Text
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports SkyEditor.Core.IO
+Imports SkyEditor.Core.TestComponents
+Imports SkyEditor.Core.Windows.Providers
 
 Namespace IO
     <TestClass()> Public Class GenericFileTests
 
-        <TestMethod()> Public Sub RawData_InMemory_1Byte_ReadTest()
+        Private Const GenericFileCategory As String = "Generic File Tests"
+        Private Const RealFileSystem As String = "Real File System Access"
+
+        <TestMethod()> <TestCategory(GenericFileCategory)> Public Sub RawData_InMemory_1Byte_ReadTest()
             'Arrange
             Dim file As New GenericFile()
             Dim data As Byte() = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
@@ -45,6 +50,75 @@ Namespace IO
             Assert.AreEqual(index7Actual, index7Test, 0, $"Misread index 0: Expected {index7Actual}, got {index7Test}")
             Assert.AreEqual(index8Actual, index8Test, 0, $"Misread index 0: Expected {index8Actual}, got {index8Test}")
             Assert.AreEqual(index9Actual, index9Test, 0, $"Misread index 0: Expected {index9Actual}, got {index9Test}")
+        End Sub
+
+        <TestMethod()> <TestCategory(GenericFileCategory)> Public Sub OpenFileTest()
+
+            'Set up
+            Dim data As Byte() = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+            Dim provider As New MemoryIOProvider
+            provider.WriteAllBytes("/test.bin", data)
+
+            'Test
+            Dim file As New GenericFile
+            file.OpenFile("/test.bin", provider)
+
+            'Check
+            Assert.IsTrue(data.SequenceEqual(file.RawData), "File data is incorrect.")
+
+        End Sub
+
+        <TestMethod()> <TestCategory(GenericFileCategory)> Public Sub CreateFileCloneTest_InMemory()
+
+            'Set up
+            Dim dataOriginal As Byte() = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+            Dim dataAltered As Byte() = {7, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+            Dim provider As New MemoryIOProvider
+            provider.WriteAllBytes("/test.bin", dataOriginal)
+
+            'Test
+            Dim file1 As New GenericFile
+            file1.EnableInMemoryLoad = True
+            file1.OpenFile("/test.bin", provider)
+            file1.RawData(0) = 7
+
+            Dim file2 As New GenericFile
+            file2.CreateFile(file1, provider)
+
+            file1.RawData(0) = 9
+
+            'Check
+            Assert.IsTrue(dataOriginal.SequenceEqual(file1.RawData), "File 1 data is incorrect.")
+            Assert.IsTrue(dataAltered.SequenceEqual(file2.RawData), "File 2 data is incorrect.")
+
+        End Sub
+
+        <TestMethod()> <TestCategory(GenericFileCategory)> <TestCategory(RealFileSystem)> Public Sub CreateFileCloneTest_Stream()
+
+            'Set up
+            Dim dataOriginal As Byte() = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+            Dim dataAltered As Byte() = {7, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+            Dim provider As New WindowsIOProvider
+            provider.WriteAllBytes("test.bin", dataOriginal)
+
+            'Test
+            Using file1 As New GenericFile
+                file1.EnableInMemoryLoad = False
+                file1.OpenFile("test.bin", provider)
+                file1.RawData(0) = 7
+
+                Using file2 As New GenericFile
+                    file2.CreateFile(file1, provider)
+
+                    file1.RawData(0) = 9
+
+                    'Check
+                    Assert.IsTrue(dataOriginal.SequenceEqual(file1.RawData), "File 1 data is incorrect.")
+                    Assert.IsTrue(dataAltered.SequenceEqual(file2.RawData), "File 2 data is incorrect.")
+                End Using
+            End Using
+            provider.DeleteFile("test.bin")
+
         End Sub
 
     End Class

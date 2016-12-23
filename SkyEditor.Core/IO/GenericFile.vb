@@ -26,8 +26,8 @@ Namespace IO
         ''' <summary>
         ''' Creates a new instance of GenericFile for use with either GenericFile.OpenFile or GenericFile.CreateFile
         ''' </summary>
-        Public Sub New(FileProvider As IOProvider)
-            Me.FileProvider = FileProvider
+        Public Sub New(provider As IOProvider)
+            Me.FileProvider = provider
             IsReadOnly = False
             EnableInMemoryLoad = False 'This is an opt-in setting
             _enableShadowCopy = Nothing
@@ -37,22 +37,22 @@ Namespace IO
         ''' Creates a new instance of GenericFile using the given data.
         ''' </summary>
         ''' <param name="RawData"></param>
-        Public Sub New(FileProvider As IOProvider, RawData As Byte())
-            Me.FileProvider = FileProvider
+        Public Sub New(provider As IOProvider, rawData As Byte())
+            Me.FileProvider = provider
             IsReadOnly = False
             EnableInMemoryLoad = True
-            CreateFileInternal("", RawData, EnableInMemoryLoad)
+            CreateFileInternal("", rawData, EnableInMemoryLoad, provider)
         End Sub
 
         ''' <summary>
         ''' Creates a new instance of GenericFile from the given file.
         ''' </summary>
         ''' <param name="Filename">Full path of the file to load.</param>
-        Public Sub New(FileProvider As IOProvider, Filename As String)
-            Me.FileProvider = FileProvider
+        Public Sub New(provider As IOProvider, filename As String)
+            Me.FileProvider = provider
             Me.IsReadOnly = False
             Me.EnableInMemoryLoad = False
-            OpenFileInternal(Filename)
+            OpenFileInternal(filename)
         End Sub
 
         ''' <summary>
@@ -60,11 +60,11 @@ Namespace IO
         ''' </summary>
         ''' <param name="Filename">Full path of the file to load.</param>
         ''' <param name="IsReadOnly">Whether or not to allow altering the file.  If True, an IOException will be thrown when attempting to alter the file.</param>
-        Public Sub New(FileProvider As IOProvider, Filename As String, IsReadOnly As Boolean)
-            Me.FileProvider = FileProvider
-            Me.IsReadOnly = IsReadOnly
+        Public Sub New(provider As IOProvider, filename As String, isReadOnly As Boolean)
+            Me.FileProvider = provider
+            Me.IsReadOnly = isReadOnly
             Me.EnableInMemoryLoad = False
-            OpenFileInternal(Filename)
+            OpenFileInternal(filename)
         End Sub
 
         ''' <summary>
@@ -73,11 +73,11 @@ Namespace IO
         ''' <param name="Filename">Full path of the file to load.</param>
         ''' <param name="IsReadOnly">Whether or not to allow altering the file.  If True, an IOException will be thrown when attempting to alter the file, regardless of whether LoadToMemory is true.</param>
         ''' <param name="LoadToMemory">True to load the file into memory, False to use a FileStream.  If loading the file into memory would leave the system with less than 500MB, a FileStream will be used instead.</param>
-        Public Sub New(FileProvider As IOProvider, Filename As String, IsReadOnly As Boolean, LoadToMemory As Boolean)
-            Me.FileProvider = FileProvider
-            Me.IsReadOnly = IsReadOnly
-            Me.EnableInMemoryLoad = LoadToMemory
-            OpenFileInternal(Filename)
+        Public Sub New(provider As IOProvider, filename As String, isReadOnly As Boolean, loadToMemory As Boolean)
+            Me.FileProvider = provider
+            Me.IsReadOnly = isReadOnly
+            Me.EnableInMemoryLoad = loadToMemory
+            OpenFileInternal(filename)
         End Sub
 
 #End Region
@@ -204,6 +204,7 @@ Namespace IO
         ''' </summary>
         ''' <param name="Index">Index of the byte.</param>
         ''' <returns></returns>
+        ''' <remarks>This property is not thread safe.  For a thread-safe equivalent, see <see cref="Read(Long)"/> or <see cref="Write(Long, Byte)"/>.</remarks>
         Public Property RawData(Index As Long) As Byte
             Get
                 If InMemoryFile IsNot Nothing Then
@@ -234,6 +235,8 @@ Namespace IO
                 End If
             End Set
         End Property
+
+        ''' <remarks>This property is not thread safe.  For a thread-safe equivalent, see <see cref="Read(Long, Long)"/> or <see cref="Write(Long, Long, Byte())"/>.</remarks>
         Public Property RawData(Index As Long, Length As Long) As Byte()
             Get
                 Dim output(Length - 1) As Byte
@@ -261,6 +264,8 @@ Namespace IO
                 End If
             End Set
         End Property
+
+        ''' <remarks>This property is not thread safe.  For a thread-safe equivalent, see <see cref="Read()"/> or <see cref="Write(Byte())"/>.</remarks>
         Public Property RawData() As Byte()
             Get
                 If InMemoryFile IsNot Nothing Then
@@ -401,7 +406,7 @@ Namespace IO
                 If IsReadOnly Then
                     Throw New IOException(My.Resources.Language.ErrorWrittenReadonly)
                 End If
-                If EnableInMemoryLoad Then
+                If InMemoryFile IsNot Nothing Then
                     Array.Resize(InMemoryFile, value)
                 Else
                     FileReader.SetLength(value)
@@ -456,57 +461,73 @@ Namespace IO
         End Sub
 
         Public Overridable Sub CreateFile(Name As String, FileContents As Byte())
-            CreateFileInternal(Name, FileContents, True)
+            CreateFileInternal(Name, FileContents, True, FileProvider)
         End Sub
 
-        Private Sub CreateFileInternal(Name As String, FileContents As Byte(), EnableInMemoryLoad As Boolean)
+        ''' <summary>
+        ''' Creates a new <see cref="GenericFile"/> using the data from the given <paramref name="file"/>.
+        ''' </summary>
+        ''' <param name="file">File containing the data to create a new file.</param>
+        Public Sub CreateFile(file As GenericFile, provider As IOProvider)
+            CreateFileInternal(file.Name, {}, file.EnableInMemoryLoad, provider) 'Initializes properties needed by FileReader, if EnableInMemoryLoad is false
+            Me.Length = file.Length
+
+            If file.EnableInMemoryLoad Then
+                InMemoryFile = file.InMemoryFile.Clone
+            Else
+                CopyFrom(file.FileReader, 0, 0, Me.Length)
+            End If
+        End Sub
+
+        Private Sub CreateFileInternal(name As String, fileContents As Byte(), enableInMemoryLoad As Boolean, provider As IOProvider)
             'Load the file
-            Me.EnableInMemoryLoad = EnableInMemoryLoad
-            If EnableInMemoryLoad Then
+            Me.EnableInMemoryLoad = enableInMemoryLoad
+            If enableInMemoryLoad Then
                 'Set the in-memory file to the given contents
-                Me.InMemoryFile = FileContents
+                Me.InMemoryFile = fileContents
             Else
                 'Save the file to a temporary filename
-                Me.PhysicalFilename = FileProvider.GetTempFilename
+                Me.PhysicalFilename = provider.GetTempFilename
                 Me.OriginalFilename = Me.PhysicalFilename
-                FileProvider.WriteAllBytes(Me.PhysicalFilename, FileContents)
+                provider.WriteAllBytes(Me.PhysicalFilename, fileContents)
                 'The file reader will be initialized when it's first needed
             End If
 
-            Me.Name = Name
+            Me.Name = name
+            Me.FileProvider = provider
         End Sub
 
         ''' <summary>
         ''' Opens a file from the given filename.  If it does not exists, a blank one will be created.
         ''' </summary>
         ''' <param name="Filename"></param>
-        Public Overridable Function OpenFile(Filename As String, Provider As IOProvider) As Task Implements IOpenableFile.OpenFile
-            Me.FileProvider = Provider
-            OpenFileInternal(Filename)
+        Public Overridable Function OpenFile(filename As String, provider As IOProvider) As Task Implements IOpenableFile.OpenFile
+            Me.FileProvider = provider
+            OpenFileInternal(filename)
             Return Task.FromResult(0)
         End Function
 
-        Private Sub OpenFileInternal(Filename As String)
-            Dim fileSize As Long = FileProvider.GetFileLength(Filename)
+        Private Sub OpenFileInternal(filename As String)
+            Dim fileSize As Long = FileProvider.GetFileLength(filename)
             If (EnableInMemoryLoad AndAlso FileProvider.CanLoadFileInMemory(fileSize)) Then
                 'Load the file into memory if it's enabled and it will fit into RAM, with 500MB left over, just in case.
-                Me.OriginalFilename = Filename
-                Me.PhysicalFilename = Filename
-                InMemoryFile = FileProvider.ReadAllBytes(Filename)
+                Me.OriginalFilename = filename
+                Me.PhysicalFilename = filename
+                InMemoryFile = FileProvider.ReadAllBytes(filename)
             Else
                 'The file will be read from disk.  The only concern is whether or not we want to make a shadow copy.
                 If EnableShadowCopy Then
-                    Me.OriginalFilename = Filename
+                    Me.OriginalFilename = filename
                     Me.PhysicalFilename = FileProvider.GetTempFilename
-                    If FileProvider.FileExists(Filename) Then
-                        FileProvider.CopyFile(Filename, Me.PhysicalFilename)
+                    If FileProvider.FileExists(filename) Then
+                        FileProvider.CopyFile(filename, Me.PhysicalFilename)
                     Else
                         'If the file doesn't exist, we'll create a file.
                         FileProvider.WriteAllBytes(Me.PhysicalFilename, {})
                     End If
                 Else
-                    Me.OriginalFilename = Filename
-                    Me.PhysicalFilename = Filename
+                    Me.OriginalFilename = filename
+                    Me.PhysicalFilename = filename
                 End If
                 'The file stream will be initialized when it's needed.
             End If
@@ -605,6 +626,60 @@ Namespace IO
         End Function
 
         ''' <summary>
+        ''' Writes a range of bytes to the file.
+        ''' </summary>
+        ''' <param name="index">Index in the file to write the <paramref name="data"/>.</param>
+        ''' <param name="length">Length of the data, in bytes, to copy.</param>
+        ''' <param name="data">Array of bytes to write.</param>
+        ''' ''' <remarks>This function is thread-safe.</remarks>
+        Public Async Function Write(index As Long, length As Long, data As Byte()) As Task
+            If IsThreadSafe Then
+                RawData(index, length) = data
+            Else
+                Await Task.Run(Sub()
+                                   SyncLock _fileLock
+                                       RawData(index, length) = data
+                                   End SyncLock
+                               End Sub)
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Writes a single to the file.
+        ''' </summary>
+        ''' <param name="index">Index in the file to write the <paramref name="data"/>.</param>
+        ''' <param name="data">Array of bytes to write.</param>
+        ''' <remarks>This function is thread-safe.</remarks>
+        Public Async Function Write(index As Long, data As Byte) As Task
+            If IsThreadSafe Then
+                RawData(index) = data
+            Else
+                Await Task.Run(Sub()
+                                   SyncLock _fileLock
+                                       RawData(index) = data
+                                   End SyncLock
+                               End Sub)
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Replaces the contents of the file with the given data.
+        ''' </summary>
+        ''' <param name="data">Array of bytes to write.</param>
+        ''' <remarks>This function is thread-safe.</remarks>
+        Public Async Function Write(data As Byte()) As Task
+            If IsThreadSafe Then
+                RawData() = data
+            Else
+                Await Task.Run(Sub()
+                                   SyncLock _fileLock
+                                       RawData() = data
+                                   End SyncLock
+                               End Sub)
+            End If
+        End Function
+
+        ''' <summary>
         ''' Copies data into the given stream.
         ''' </summary>
         ''' <param name="destination">Stream to which to copy data.</param>
@@ -636,6 +711,42 @@ Namespace IO
                 FileReader.Seek(index, SeekOrigin.Begin)
                 FileReader.Read(buffer, 0, length)
                 destination.Write(buffer, 0, length)
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Reads data from the given stream.
+        ''' </summary>
+        ''' <param name="source">Stream from which to read data.</param>
+        ''' <param name="sourceIndex">Index of the stream to read data.</param>
+        ''' <param name="fileIndex">Index of the file where data should be written.</param>
+        ''' <param name="length">Length in bytes of the data to write.</param>
+        Public Sub CopyFrom(source As Stream, sourceIndex As Long, fileIndex As Long, length As Long)
+            If IsThreadSafe Then
+                CopyFromInternal(source, sourceIndex, fileIndex, length)
+            Else
+                SyncLock _fileLock
+                    CopyFromInternal(source, sourceIndex, fileIndex, length)
+                End SyncLock
+            End If
+        End Sub
+
+        Private Sub CopyFromInternal(source As Stream, sourceIndex As Long, fileIndex As Long, length As Long)
+            If source Is Nothing Then
+                Throw New ArgumentNullException(NameOf(source))
+            End If
+
+            If InMemoryFile IsNot Nothing Then
+                Dim buffer(length) As Byte
+                source.Seek(sourceIndex, SeekOrigin.Begin)
+                source.Read(buffer, 0, length)
+                InMemoryFile = buffer
+            Else
+                Dim buffer(length) As Byte
+                source.Seek(sourceIndex, SeekOrigin.Begin)
+                source.Read(buffer, 0, length)
+                FileReader.Seek(fileIndex, SeekOrigin.Begin)
+                FileReader.Write(buffer, 0, length)
             End If
         End Sub
 
@@ -736,8 +847,6 @@ Namespace IO
         Public Overrides Function ToString() As String
             Return Me.Name
         End Function
-
-
 
 #End Region
 

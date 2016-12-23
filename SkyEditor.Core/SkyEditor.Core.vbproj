@@ -179,7 +179,7 @@
     <Compile Include="UI\IObjectControl.vb" />
     <Compile Include="IO\IOnDisk.vb" />
     <Compile Include="IO\IOpenableFile.vb" />
-    <Compile Include="IO\iSavable.vb" />
+    <Compile Include="IO\ISavable.vb" />
     <Compile Include="IO\ISavableAs.vb" />
     <Compile Include="IO\IOProvider.vb" />
     <Compile Include="Language.Designer.vb">
