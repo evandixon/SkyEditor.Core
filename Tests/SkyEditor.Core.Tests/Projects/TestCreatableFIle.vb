@@ -15,9 +15,9 @@ Namespace Projects
             Me.Name = Name
         End Sub
 
-        Public Sub Save(provider As IOProvider) Implements ISavable.Save
+        Public Function Save(provider As IOProvider) As Task Implements ISavable.Save
             Throw New NotImplementedException()
-        End Sub
+        End Function
 
         Public Function OpenFile(Filename As String, Provider As IOProvider) As Task Implements IOpenableFile.OpenFile
             Throw New NotImplementedException()

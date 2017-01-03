@@ -536,37 +536,38 @@ Namespace IO
         ''' <summary>
         ''' Saves the file to the given destination.
         ''' </summary>
-        ''' <param name="Destination">Full path of where the file should be saved to.</param>
-        Public Overridable Sub Save(Destination As String, provider As IOProvider) Implements ISavableAs.Save
+        ''' <param name="filename">Full path of where the file should be saved to.</param>
+        Public Overridable Function Save(filename As String, provider As IOProvider) As Task Implements ISavableAs.Save
             RaiseEvent FileSaving(Me, New EventArgs)
             If InMemoryFile IsNot Nothing Then
-                provider.WriteAllBytes(Destination, InMemoryFile)
+                provider.WriteAllBytes(filename, InMemoryFile)
             Else
                 FileReader.Seek(0, SeekOrigin.Begin)
                 FileReader.Flush()
-                If Not String.IsNullOrEmpty(Destination) Then
-                    Using dest = provider.OpenFileWriteOnly(Destination)
+                If Not String.IsNullOrEmpty(filename) Then
+                    Using dest = provider.OpenFileWriteOnly(filename)
                         FileReader.CopyTo(dest)
                     End Using
                 End If
             End If
 
             If String.IsNullOrEmpty(OriginalFilename) Then
-                OriginalFilename = Destination
+                OriginalFilename = filename
             End If
             RaiseEvent FileSaved(Me, New EventArgs)
-        End Sub
+            Return Task.FromResult(0)
+        End Function
 
         ''' <summary>
         ''' Saves the file to the Original Filename.
         ''' Throws a NullReferernceException if the Original Filename is null.
         ''' </summary>
-        Public Sub Save(provider As IOProvider) Implements ISavable.Save
+        Public Async Function Save(provider As IOProvider) As Task Implements ISavable.Save
             If String.IsNullOrEmpty(Me.OriginalFilename) Then
                 Throw New NullReferenceException(My.Resources.Language.ErrorNoSaveFilename)
             End If
-            Save(Me.OriginalFilename, provider)
-        End Sub
+            Await Save(Me.OriginalFilename, provider)
+        End Function
 #End Region
 
 #Region "Data Interaction"
@@ -862,7 +863,11 @@ Namespace IO
                         _fileReader.Dispose()
                     End If
                     If EnableShadowCopy Then
-                        If FileProvider IsNot Nothing AndAlso FileProvider.FileExists(Me.PhysicalFilename) AndAlso Me.OriginalFilename <> Me.PhysicalFilename Then
+                        If FileProvider IsNot Nothing AndAlso
+                            Not String.IsNullOrEmpty(Me.PhysicalFilename) AndAlso
+                            FileProvider.FileExists(Me.PhysicalFilename) AndAlso
+                            Me.OriginalFilename <> Me.PhysicalFilename Then
+
                             FileProvider.DeleteFile(Me.PhysicalFilename)
                         End If
                     End If

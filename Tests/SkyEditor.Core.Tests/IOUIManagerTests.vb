@@ -1,6 +1,7 @@
 ﻿Imports SkyEditor.Core.Tests.TestComponents
 
 <TestClass> Public Class IOUIManagerTests
+    Private Const IOUIManagerCategory = "IO/UI Manager Tests"
     Public Property CurrentIOUIManager As IOUIManager
     <TestInitialize> Public Sub Initialize()
         Dim m As New PluginManager
@@ -9,7 +10,7 @@
         Assert.IsNotNull(CurrentIOUIManager)
     End Sub
 
-    <TestMethod> Public Sub RootMenuItemsTests()
+    <TestMethod> <TestCategory(IOUIManagerCategory)> Public Sub RootMenuItemsTests()
         'Test always visible
         Dim items = From m In CurrentIOUIManager.GetRootMenuItems.Result Where m.IsVisible = True
         Assert.AreEqual(1, items.Count, 0, "Expected only 1 always visible menu item.")
@@ -29,7 +30,7 @@
         Next
     End Sub
 
-    <TestMethod> Public Sub GetIOFilterTest()
+    <TestMethod> <TestCategory(IOUIManagerCategory)> Public Sub GetIOFilterTest()
         'Extensions without "*." are expected
         CurrentIOUIManager.RegisterIOFilter("txt", "Text Files")
         'But it'd be nice to support the "*." anyway

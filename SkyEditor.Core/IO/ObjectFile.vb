@@ -78,17 +78,18 @@ Namespace IO
 
 #Region "ISaveable support"
 
-        Public Overridable Sub Save(Filename As String, provider As IOProvider) Implements ISavableAs.Save
+        Public Overridable Function Save(filename As String, provider As IOProvider) As Task Implements ISavableAs.Save
             Dim c As New JsonContainer(Of Object)
             c.ContainedObject = Me.ContainedObject
             c.ContainedTypeName = Me.GetType.AssemblyQualifiedName
-            Json.SerializeToFile(Filename, c, provider)
+            Json.SerializeToFile(filename, c, provider)
             RaiseFileSaved(Me, New EventArgs)
-        End Sub
+            Return Task.FromResult(0)
+        End Function
 
-        Public Sub Save(provider As IOProvider) Implements ISavable.Save
-            Save(Me.Filename, provider)
-        End Sub
+        Public Async Function Save(provider As IOProvider) As Task Implements ISavable.Save
+            Await Save(Me.Filename, provider)
+        End Function
 
         Public Event FileSaved(sender As Object, e As EventArgs) Implements ISavable.FileSaved
         Protected Sub RaiseFileSaved(sender As Object, e As EventArgs)
@@ -151,13 +152,14 @@ Namespace IO
             Return Task.FromResult(0)
         End Function
 
-        Public Overrides Sub Save(Filename As String, provider As IOProvider)
+        Public Overrides Function Save(Filename As String, provider As IOProvider) As Task
             Dim c As New JsonContainer(Of T)
             c.ContainedObject = Me.ContainedObject
             c.ContainedTypeName = Me.GetType.AssemblyQualifiedName
             Json.SerializeToFile(Filename, c, provider)
             RaiseFileSaved(Me, New EventArgs)
-        End Sub
+            Return Task.FromResult(0)
+        End Function
 
     End Class
 End Namespace

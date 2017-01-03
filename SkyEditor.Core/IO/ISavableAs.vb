@@ -9,7 +9,7 @@
         ''' Saves the class to the given filename.
         ''' </summary>
         ''' <param name="Filename"></param>
-        Overloads Sub Save(Filename As String, provider As IOProvider)
+        Overloads Function Save(Filename As String, provider As IOProvider) As Task
 
         ''' <summary>
         ''' Gets the default extension for the file.

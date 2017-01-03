@@ -123,14 +123,15 @@ Public Class SettingsProvider
     ''' Saves the SettingsProvider to the filename it was loaded with.
     ''' </summary>
     ''' <exception cref="ArgumentNullException">Thrown if SettingsProvider.Filename is null.</exception>
-    Public Sub Save(provider As IOProvider) Implements ISettingsProvider.Save
+    Public Function Save(provider As IOProvider) As Task Implements ISettingsProvider.Save
         If String.IsNullOrEmpty(Filename) Then
             Throw New ArgumentNullException(NameOf(Filename))
         End If
 
         provider.WriteAllText(Me.Filename, Me.Serialize)
         RaiseEvent FileSaved(Me, New EventArgs)
-    End Sub
+        Return Task.FromResult(0)
+    End Function
 
     ''' <summary>
     ''' Sets a setting.

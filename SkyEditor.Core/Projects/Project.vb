@@ -396,7 +396,7 @@ Namespace Projects
 #End Region
 
 #Region "Save"
-        Public Sub Save(provider As IOProvider) Implements ISavable.Save
+        Public Function Save(provider As IOProvider) As Task Implements ISavable.Save
             Dim file As New ProjectFile
             file.FileFormat = ProjectFile.CurrentVersion
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName
@@ -405,7 +405,8 @@ Namespace Projects
             file.Files = GetProjectDictionary()
             Json.SerializeToFile(Filename, file, provider)
             RaiseEvent FileSaved(Me, New EventArgs)
-        End Sub
+            Return Task.FromResult(0)
+        End Function
 
         Private Function GetProjectDictionary() As Dictionary(Of String, FileValue)
             Dim out As New Dictionary(Of String, FileValue)

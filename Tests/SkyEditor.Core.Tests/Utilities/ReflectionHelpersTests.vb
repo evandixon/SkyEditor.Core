@@ -6,6 +6,7 @@ Imports SkyEditor.Core.Utilities
 
 Namespace Utilities
     <TestClass()> Public Class ReflectionHelpersTests
+        Private Const ReflectionHelperCategory = "ReflectionHelpers Tests"
         Public Class TestContainerClassMulti
 
             Public Property StringItem As String
@@ -18,7 +19,7 @@ Namespace Utilities
             End Sub
         End Class
 
-        <TestMethod> Public Sub GetCachedInstanceTests()
+        <TestMethod> <TestCategory(ReflectionHelperCategory)> Public Sub GetCachedInstanceTests()
             Dim type As TypeInfo = GetType(TestContainerClassMulti).GetTypeInfo
             Dim instance1 As TestContainerClassMulti = ReflectionHelpers.GetCachedInstance(type)
             Dim instance2 As TestContainerClassMulti = ReflectionHelpers.GetCachedInstance(type)
@@ -30,7 +31,7 @@ Namespace Utilities
             Assert.IsTrue(instance1 IsNot instance3, "New instance should not have same reference of cached instance")
         End Sub
 
-        <TestMethod> Public Sub IsOfTypeTests()
+        <TestMethod> <TestCategory(ReflectionHelperCategory)> Public Sub IsOfTypeTests()
             'Standard equality
             Assert.IsTrue(ReflectionHelpers.IsOfType(GetType(ReflectionHelpersTests), GetType(ReflectionHelpersTests)), "Failed to see type equality (ReflectionHelpersTests is of type ReflectionHelpersTests)")
             'Interface checks
@@ -41,7 +42,7 @@ Namespace Utilities
             Assert.IsFalse(ReflectionHelpers.IsOfType(GetType(String), GetType(Integer)), "Failed to see String is not of type Integer")
         End Sub
 
-        <TestMethod> Public Sub GetTypeByNameTests()
+        <TestMethod> <TestCategory(ReflectionHelperCategory)> Public Sub GetTypeByNameTests()
             'This one is a little hard to test due to the nature of reflection in a plugin-based environment
             'We will only test types that this function has no excuse to not be able to find
 
@@ -64,18 +65,18 @@ Namespace Utilities
             End Using
         End Sub
 
-        <TestMethod> Public Sub CanCreateInstanceTests()
+        <TestMethod> <TestCategory(ReflectionHelperCategory)> Public Sub CanCreateInstanceTests()
             Assert.IsTrue(ReflectionHelpers.CanCreateInstance(GetType(ReflectionHelpersTests)), "Failed to indicate that ReflectionHelpersTests can have an instance created")
             Assert.IsFalse(ReflectionHelpers.CanCreateInstance(GetType(CoreSkyEditorPlugin)), "Incorrectly indicated an abstract class can have an instance created")
         End Sub
 
-        <TestMethod> Public Sub CreateInstanceTests()
+        <TestMethod> <TestCategory(ReflectionHelperCategory)> Public Sub CreateInstanceTests()
             Dim multi = ReflectionHelpers.CreateInstance(GetType(TestContainerClassMulti))
             Assert.IsNotNull(multi)
             Assert.IsInstanceOfType(multi, GetType(TestContainerClassMulti))
         End Sub
 
-        <TestMethod> Public Sub CreateNewInstanceTests()
+        <TestMethod> <TestCategory(ReflectionHelperCategory)> Public Sub CreateNewInstanceTests()
             Dim original As New TestContainerClassMulti
             original.IntegerItem = 94
             original.StringItem = "94"
@@ -89,7 +90,7 @@ Namespace Utilities
             Assert.AreNotEqual(original.StringItem, DirectCast(newInst, TestContainerClassMulti), "CreateNewInstance did not create a new instance, instead returning the same instance")
         End Sub
 
-        <TestMethod> Public Sub GetTypeFriendlyNameTests()
+        <TestMethod> <TestCategory(ReflectionHelperCategory)> Public Sub GetTypeFriendlyNameTests()
             'Due to the nature of this function (reflection to find an entry in a resource file), we cannot fully test it.
             'Therefore, the only requirement to pass the test is that we return a string that is not null or empty.
             'The rest must be tested manually
