@@ -143,30 +143,30 @@ Namespace UI
         ''' Saves the current file.
         ''' </summary>
         ''' <param name="manager">Instance of the current plugin manager.</param>
-        Public Sub Save(manager As PluginManager)
+        Public Async Function Save(manager As PluginManager) As Task
             ForceViewModelRefresh()
             Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSave(File)).FirstOrDefault
             If saver Is Nothing Then
                 'If we can't find a saver that supports saving without a filename, use the explicit overload.
-                Save(Filename, manager)
+                Await Save(Filename, manager)
             Else
                 'We have a saver that works without a filename
-                saver.Save(File, manager.CurrentIOProvider)
+                Await saver.Save(File, manager.CurrentIOProvider)
             End If
             IsFileModified = False
-        End Sub
+        End Function
 
         ''' <summary>
         ''' Saves the file to the given filename.
         ''' </summary>
         ''' <param name="filename">Full path of the destination file.</param>
         ''' <param name="manager">Instance of the current plugin manager.</param>
-        Public Sub Save(filename As String, manager As PluginManager)
+        Public Async Function Save(filename As String, manager As PluginManager) As Task
             ForceViewModelRefresh()
             Dim saver = (From s In manager.GetRegisteredObjects(Of IFileSaver) Where s.SupportsSaveAs(File)).First
-            saver.Save(File, filename, manager.CurrentIOProvider)
+            Await saver.Save(File, filename, manager.CurrentIOProvider)
             IsFileModified = False
-        End Sub
+        End Function
 
         ''' <summary>
         ''' Determines whether <see cref="Save(PluginManager)"/> can be called.
