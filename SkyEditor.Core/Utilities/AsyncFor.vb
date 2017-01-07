@@ -133,16 +133,15 @@
                 Exit Function
             End If
 
-            Dim i As Integer = StartValue
-
-            Dim tasksRemaining As Integer = TotalTasks 'The tasks that still need to be queued
+            Dim nextI As Integer = StartValue
 
             'While there's either more tasks to start or while there's still tasks running
-            While (tasksRemaining > 0 OrElse (tasksRemaining = 0 AndAlso RunningTasks.Count > 0))
-                If RunningTasks.Count < BatchSize AndAlso tasksRemaining > 0 Then
+            While (nextI <= EndValue OrElse RunningTasks.Count > 0)
+                'Add tasks if possible
+                If nextI <= EndValue AndAlso RunningTasks.Count < BatchSize Then
                     'We can run more tasks
 
-                    Dim item = i 'To avoid async weirdness with having this in the below lambda
+                    Dim item = nextI 'To avoid async weirdness with having this in the below lambda
 
                     'Start the task
                     Dim tTask = Task.Run(Async Function() As Task
@@ -151,7 +150,7 @@
                                          End Function)
 
                     'Increment for the next run
-                    i += StepCount
+                    nextI += StepCount
 
                     'Either wait for it or move on
                     If RunSynchronously Then
@@ -159,23 +158,19 @@
                     Else
                         RunningTasks.Add(tTask)
                     End If
-                    tasksRemaining -= 1
                 Else
-                    If tasksRemaining > 0 Then
-                        'We can't start any more tasks, so we have to wait on one.
-                        Await Task.WhenAny(RunningTasks)
-
-                        'Remove completed tasks
-                        For count = RunningTasks.Count - 1 To 0 Step -1
-                            If RunningTasks(count).GetAwaiter.IsCompleted Then
-                                RunningTasks.RemoveAt(count)
-                            End If
-                        Next
-                    Else
-                        'We're finished.  Nothing else to do.
-                        Exit While
-                    End If
+                    'Otherwise, wait for one of them
+                    Await Task.WhenAny(RunningTasks)
                 End If
+
+                'Remove completed tasks
+                For count = RunningTasks.Count - 1 To 0 Step -1
+                    If RunningTasks(count).Exception IsNot Nothing Then
+                        Throw RunningTasks(count).Exception
+                    ElseIf RunningTasks(count).GetAwaiter.IsCompleted Then
+                        RunningTasks.RemoveAt(count)
+                    End If
+                Next
             End While
         End Function
 
