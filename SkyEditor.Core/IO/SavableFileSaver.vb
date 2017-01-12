@@ -13,12 +13,12 @@
             Return DirectCast(model, ISavableAs).GetSupportedExtensions
         End Function
 
-        Public Function Save(model As Object, provider As IOProvider) As Task Implements IFileSaver.Save
+        Public Function Save(model As Object, provider As IIOProvider) As Task Implements IFileSaver.Save
             DirectCast(model, ISavable).Save(provider)
             Return Task.FromResult(0)
         End Function
 
-        Public Function Save(model As Object, filename As String, provider As IOProvider) As Task Implements IFileSaver.Save
+        Public Function Save(model As Object, filename As String, provider As IIOProvider) As Task Implements IFileSaver.Save
             DirectCast(model, ISavableAs).Save(filename, provider)
             Return Task.FromResult(0)
         End Function

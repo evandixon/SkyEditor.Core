@@ -11,7 +11,7 @@ Public MustInherit Class CoreSkyEditorPlugin
     ''' Creates an instance of an IO Provider.
     ''' </summary>
     ''' <returns></returns>
-    Public MustOverride Function GetIOProvider() As IOProvider
+    Public MustOverride Function GetIOProvider() As IIOProvider
 
     ''' <summary>
     ''' Creates an instance of an ISettingsProvider.

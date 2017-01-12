@@ -175,7 +175,7 @@ Namespace Projects
         ''' <param name="filePath">Full path of the file to import</param>
         ''' <param name="fileType">Type of the file.  To auto-detect on open, pass in null.</param>
         ''' <param name="provider">Instance of the IO provider from which to get the file located at <paramref name="filePath"/>.</param>
-        Public Overridable Sub AddExistingFileToPath(destinationPath As String, filePath As String, fileType As Type, provider As IOProvider)
+        Public Overridable Sub AddExistingFileToPath(destinationPath As String, filePath As String, fileType As Type, provider As IIOProvider)
             Dim fixedPath = FixPath(destinationPath)
 
             Dim relativePath = filePath.Replace(Path.GetDirectoryName(Me.Filename), "").Replace("\", "/").TrimStart("/")
@@ -193,7 +193,7 @@ Namespace Projects
         ''' </summary>
         ''' <param name="parentPath">Directory in which to put the imported file</param>
         ''' <param name="filePath">Full path of the file to import</param>
-        Public Overridable Sub AddExistingFile(parentPath As String, filePath As String, fileType As Type, provider As IOProvider)
+        Public Overridable Sub AddExistingFile(parentPath As String, filePath As String, fileType As Type, provider As IIOProvider)
             Dim fixedPath = FixPath(parentPath)
             Dim importedName = GetImportedFilePath(fixedPath, filePath)
 
@@ -213,7 +213,7 @@ Namespace Projects
         ''' </summary>
         ''' <param name="parentPath">Directory in which to put the imported file</param>
         ''' <param name="filePath">Full path of the file to import</param>
-        Public Overridable Sub AddExistingFile(parentPath As String, filePath As String, provider As IOProvider)
+        Public Overridable Sub AddExistingFile(parentPath As String, filePath As String, provider As IIOProvider)
             AddExistingFile(parentPath, filePath, Nothing, provider)
         End Sub
 
@@ -396,7 +396,7 @@ Namespace Projects
 #End Region
 
 #Region "Save"
-        Public Function Save(provider As IOProvider) As Task Implements ISavable.Save
+        Public Function Save(provider As IIOProvider) As Task Implements ISavable.Save
             Dim file As New ProjectFile
             file.FileFormat = ProjectFile.CurrentVersion
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName

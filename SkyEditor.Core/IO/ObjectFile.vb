@@ -19,11 +19,11 @@ Namespace IO
         Public Sub New()
         End Sub
 
-        Public Sub New(FileProvider As IOProvider)
+        Public Sub New(FileProvider As IIOProvider)
             Me.CurrentIOProvider = FileProvider
         End Sub
 
-        Public Sub New(FileProvider As IOProvider, Filename As String)
+        Public Sub New(FileProvider As IIOProvider, Filename As String)
             Me.CurrentIOProvider = FileProvider
             Me.OpenFileInternal(Of Object)(Filename)
         End Sub
@@ -33,7 +33,7 @@ Namespace IO
             Me.Name = Name
         End Sub
 
-        Public Overridable Function OpenFile(Filename As String, Provider As IOProvider) As Task Implements IOpenableFile.OpenFile
+        Public Overridable Function OpenFile(Filename As String, Provider As IIOProvider) As Task Implements IOpenableFile.OpenFile
             Me.CurrentIOProvider = Provider
             OpenFileInternal(Of Object)(Filename)
             Return Task.FromResult(0)
@@ -59,7 +59,7 @@ Namespace IO
 
         Public Property Filename As String Implements IOnDisk.Filename
 
-        Public Property CurrentIOProvider As IOProvider
+        Public Property CurrentIOProvider As IIOProvider
 
         Public Property Name As String Implements INamed.Name
             Get
@@ -78,7 +78,7 @@ Namespace IO
 
 #Region "ISaveable support"
 
-        Public Overridable Function Save(filename As String, provider As IOProvider) As Task Implements ISavableAs.Save
+        Public Overridable Function Save(filename As String, provider As IIOProvider) As Task Implements ISavableAs.Save
             Dim c As New JsonContainer(Of Object)
             c.ContainedObject = Me.ContainedObject
             c.ContainedTypeName = Me.GetType.AssemblyQualifiedName
@@ -87,7 +87,7 @@ Namespace IO
             Return Task.FromResult(0)
         End Function
 
-        Public Async Function Save(provider As IOProvider) As Task Implements ISavable.Save
+        Public Async Function Save(provider As IIOProvider) As Task Implements ISavable.Save
             Await Save(Me.Filename, provider)
         End Function
 
@@ -130,11 +130,11 @@ Namespace IO
         Public Sub New()
         End Sub
 
-        Public Sub New(FileProvider As IOProvider)
+        Public Sub New(FileProvider As IIOProvider)
             Me.CurrentIOProvider = FileProvider
         End Sub
 
-        Public Sub New(FileProvider As IOProvider, Filename As String)
+        Public Sub New(FileProvider As IIOProvider, Filename As String)
             Me.CurrentIOProvider = FileProvider
             Me.OpenFileInternal(Of T)(Filename)
         End Sub
@@ -146,13 +146,13 @@ Namespace IO
             End If
         End Sub
 
-        Public Overrides Function OpenFile(Filename As String, Provider As IOProvider) As Task
+        Public Overrides Function OpenFile(Filename As String, Provider As IIOProvider) As Task
             Me.CurrentIOProvider = Provider
             OpenFileInternal(Of T)(Filename)
             Return Task.FromResult(0)
         End Function
 
-        Public Overrides Function Save(Filename As String, provider As IOProvider) As Task
+        Public Overrides Function Save(Filename As String, provider As IIOProvider) As Task
             Dim c As New JsonContainer(Of T)
             c.ContainedObject = Me.ContainedObject
             c.ContainedTypeName = Me.GetType.AssemblyQualifiedName

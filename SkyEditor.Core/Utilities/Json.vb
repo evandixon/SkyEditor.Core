@@ -38,7 +38,7 @@ Namespace Utilities
         ''' </summary>
         ''' <param name="Filename">Filename to store the JSON.</param>
         ''' <param name="ObjectToSerialize">Object to serialize.</param>
-        Public Shared Sub SerializeToFile(Filename As String, ObjectToSerialize As Object, FileProvider As IOProvider)
+        Public Shared Sub SerializeToFile(Filename As String, ObjectToSerialize As Object, FileProvider As IIOProvider)
             FileProvider.WriteAllText(Filename, Serialize(ObjectToSerialize))
         End Sub
 
@@ -48,7 +48,7 @@ Namespace Utilities
         ''' <typeparam name="T"></typeparam>
         ''' <param name="Filename">Path to the text file containing a JSON string.</param>
         ''' <returns></returns>
-        Public Shared Function DeserializeFromFile(Of T)(Filename As String, FileProvider As IOProvider) As T
+        Public Shared Function DeserializeFromFile(Of T)(Filename As String, FileProvider As IIOProvider) As T
             Return Deserialize(Of T)(FileProvider.ReadAllText(Filename))
         End Function
     End Class

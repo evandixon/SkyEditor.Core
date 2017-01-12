@@ -12,7 +12,7 @@ Namespace IO
         ''' <param name="filename">Full path of the file to open</param>
         ''' <param name="provider">Instance of the current IO provider</param>
         ''' <returns>An object representing the requested file</returns>
-        Function OpenFile(fileType As TypeInfo, filename As String, provider As IOProvider) As Task(Of Object)
+        Function OpenFile(fileType As TypeInfo, filename As String, provider As IIOProvider) As Task(Of Object)
 
         ''' <summary>
         ''' Determines whether or not the IFileOpener supports opening a file of the given type

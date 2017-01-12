@@ -123,7 +123,7 @@ Public Class SettingsProvider
     ''' Saves the SettingsProvider to the filename it was loaded with.
     ''' </summary>
     ''' <exception cref="ArgumentNullException">Thrown if SettingsProvider.Filename is null.</exception>
-    Public Function Save(provider As IOProvider) As Task Implements ISettingsProvider.Save
+    Public Function Save(provider As IIOProvider) As Task Implements ISettingsProvider.Save
         If String.IsNullOrEmpty(Filename) Then
             Throw New ArgumentNullException(NameOf(Filename))
         End If

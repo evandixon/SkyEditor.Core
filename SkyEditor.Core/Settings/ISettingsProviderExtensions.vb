@@ -90,7 +90,7 @@ Namespace Settings
         ''' </summary>
         ''' <param name="path">Full path of the directory to be deleted.</param>
         ''' <param name="provider">Instance of the current IO Provider.</param>
-        <Extension> Sub ScheduleDirectoryForDeletion(settingsProvider As ISettingsProvider, path As String, provider As IOProvider)
+        <Extension> Sub ScheduleDirectoryForDeletion(settingsProvider As ISettingsProvider, path As String, provider As IIOProvider)
             Dim setting As IList(Of String) = settingsProvider.GetSetting(My.Resources.SettingNames.DirectoriesForDeletion)
 
             If setting Is Nothing OrElse TypeOf setting IsNot IList(Of String) Then

@@ -44,7 +44,7 @@ Namespace UI
                 Throw New NotImplementedException()
             End Function
 
-            Public Overrides Function GetIOProvider() As IOProvider
+            Public Overrides Function GetIOProvider() As IIOProvider
                 Throw New NotImplementedException()
             End Function
 

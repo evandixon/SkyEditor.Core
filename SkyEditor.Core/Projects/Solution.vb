@@ -110,7 +110,7 @@ Namespace Projects
         ''' Saves all the projects in the solution
         ''' </summary>
         ''' <param name="provider"></param>
-        Public Overridable Sub SaveAllProjects(provider As IOProvider)
+        Public Overridable Sub SaveAllProjects(provider As IIOProvider)
             For Each item In GetAllProjects()
                 item.Save(provider)
             Next
@@ -384,7 +384,7 @@ Namespace Projects
 #End Region
 
 #Region "Save"
-        Public Sub Save(provider As IOProvider)
+        Public Sub Save(provider As IIOProvider)
             Dim file As New SolutionFile
             file.AssemblyQualifiedTypeName = Me.GetType.AssemblyQualifiedName
             file.Name = Me.Name

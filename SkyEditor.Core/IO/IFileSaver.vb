@@ -24,7 +24,7 @@
         ''' </summary>
         ''' <param name="model">Model to save.</param>
         ''' <param name="provider">Instance of the current IOProvider</param>
-        Function Save(model As Object, provider As IOProvider) As Task
+        Function Save(model As Object, provider As IIOProvider) As Task
 
         ''' <summary>
         ''' Saves the model to a file at the given path.
@@ -32,7 +32,7 @@
         ''' <param name="model">Model to save.</param>
         ''' <param name="filename">Full path of the file to which the model will be saved.</param>
         ''' <param name="provider">Instance of the current IOProvider</param>
-        Function Save(model As Object, filename As String, provider As IOProvider) As Task
+        Function Save(model As Object, filename As String, provider As IIOProvider) As Task
 
         ''' <summary>
         ''' Gets the default extension for the given model when using Save As.

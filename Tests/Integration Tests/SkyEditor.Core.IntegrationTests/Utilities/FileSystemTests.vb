@@ -7,7 +7,7 @@ Namespace Utilties
     Public Class FileSystemTests
         Public Const TestCategory = "File System Integration Tests"
 
-        Public Property CurrentIOProvider As IOProvider
+        Public Property CurrentIOProvider As IIOProvider
 
         <TestInitialize>
         Public Sub Init()

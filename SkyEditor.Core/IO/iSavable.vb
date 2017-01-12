@@ -6,7 +6,7 @@
         ''' <summary>
         ''' Saves the class to the last filename.
         ''' </summary>
-        Function Save(provider As IOProvider) As Task
+        Function Save(provider As IIOProvider) As Task
         ''' <summary>
         ''' Raised when the file is saved.
         ''' </summary>

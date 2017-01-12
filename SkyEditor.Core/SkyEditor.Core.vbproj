@@ -181,7 +181,7 @@
     <Compile Include="IO\IOpenableFile.vb" />
     <Compile Include="IO\ISavable.vb" />
     <Compile Include="IO\ISavableAs.vb" />
-    <Compile Include="IO\IOProvider.vb" />
+    <Compile Include="IO\IIOProvider.vb" />
     <Compile Include="Language.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

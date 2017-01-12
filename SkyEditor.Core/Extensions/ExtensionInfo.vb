@@ -23,13 +23,13 @@ Namespace Extensions
         Public Function GetFilename() As String
             Return Filename
         End Function
-        Public Sub Save(filename As String, provider As IOProvider)
+        Public Sub Save(filename As String, provider As IIOProvider)
             Json.SerializeToFile(filename, Me, provider)
         End Sub
         Public Shared Function Deserialize(serialized As String) As ExtensionInfo
             Return Json.Deserialize(Of ExtensionInfo)(serialized)
         End Function
-        Public Shared Function OpenFromFile(filename As String, provider As IOProvider) As ExtensionInfo
+        Public Shared Function OpenFromFile(filename As String, provider As IIOProvider) As ExtensionInfo
             Dim out = Json.DeserializeFromFile(Of ExtensionInfo)(filename, provider)
             out.Filename = filename
             Return out

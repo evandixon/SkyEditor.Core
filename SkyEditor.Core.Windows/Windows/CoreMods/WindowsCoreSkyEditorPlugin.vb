@@ -8,7 +8,7 @@ Namespace Windows.CoreMods
     Public MustInherit Class WindowsCoreSkyEditorPlugin
         Inherits CoreSkyEditorPlugin
 
-        Public Overrides Function GetIOProvider() As SkyEditor.Core.IO.IOProvider
+        Public Overrides Function GetIOProvider() As SkyEditor.Core.IO.IIOProvider
             Return New WindowsIOProvider
         End Function
 

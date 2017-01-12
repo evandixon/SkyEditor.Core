@@ -74,15 +74,15 @@ Public Class PluginManager
     ''' The current IO Provider for the application.
     ''' </summary>
     ''' <returns></returns>
-    Public Property CurrentIOProvider As IOProvider
+    Public Property CurrentIOProvider As IIOProvider
         Get
             Return _currentIOProvider
         End Get
-        Protected Set(value As IOProvider)
+        Protected Set(value As IIOProvider)
             _currentIOProvider = value
         End Set
     End Property
-    Dim _currentIOProvider As IOProvider
+    Dim _currentIOProvider As IIOProvider
 
     ''' <summary>
     ''' The current Settings Provider for the applicaiton.

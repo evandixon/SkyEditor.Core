@@ -8,7 +8,7 @@ Namespace Utilities
         ''' <param name="sourceDirectory">The directory to copy.</param>
         ''' <param name="destinationDirectory">The new destination for the source directory.</param>
         ''' <returns></returns>
-        Public Shared Async Function CopyDirectory(sourceDirectory As String, destinationDirectory As String, provider As IOProvider) As Task
+        Public Shared Async Function CopyDirectory(sourceDirectory As String, destinationDirectory As String, provider As IIOProvider) As Task
             'Get the files/directories to copy
             Dim files = provider.GetFiles(sourceDirectory, "*", False)
 
@@ -27,7 +27,7 @@ Namespace Utilities
                                End Sub, files).ConfigureAwait(False)
         End Function
 
-        Public Shared Async Function DeleteDirectoryContents(DirectoryName As String, provider As IOProvider, Optional reCreateDirectoryAfterDelete As Boolean = True) As Task
+        Public Shared Async Function DeleteDirectoryContents(DirectoryName As String, provider As IIOProvider, Optional reCreateDirectoryAfterDelete As Boolean = True) As Task
             Dim f As New AsyncFor()
 
             ''Delete the files (because recursive deletes sometimes fail
@@ -55,7 +55,7 @@ Namespace Utilities
         ''' Ensures the given diretory exists with nothing inside.
         ''' </summary>
         ''' <returns></returns>
-        Public Shared Async Function ReCreateDirectory(DirectoryName As String, provider As IOProvider) As Task
+        Public Shared Async Function ReCreateDirectory(DirectoryName As String, provider As IIOProvider) As Task
             If provider.DirectoryExists(DirectoryName) Then
                 Await DeleteDirectoryContents(DirectoryName, provider).ConfigureAwait(False)
             Else
@@ -68,7 +68,7 @@ Namespace Utilities
         ''' </summary>
         ''' <param name="DirectoryName"></param>
         ''' <returns></returns>
-        Public Shared Async Function DeleteDirectory(DirectoryName As String, provider As IOProvider) As Task
+        Public Shared Async Function DeleteDirectory(DirectoryName As String, provider As IIOProvider) As Task
             If provider.DirectoryExists(DirectoryName) Then
                 Await DeleteDirectoryContents(DirectoryName, provider, False).ConfigureAwait(False)
             End If
@@ -78,7 +78,7 @@ Namespace Utilities
         ''' Deletes the given file if it exists, and does nothing if it does not exist.
         ''' </summary>
         ''' <param name="Filename">Full path of the file to delete.</param>
-        Public Shared Sub DeleteFile(Filename As String, provider As IOProvider)
+        Public Shared Sub DeleteFile(Filename As String, provider As IIOProvider)
             If provider.FileExists(Filename) Then
                 provider.DeleteFile(Filename)
             End If

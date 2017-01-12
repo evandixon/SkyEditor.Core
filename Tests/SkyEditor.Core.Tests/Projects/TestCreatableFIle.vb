@@ -15,11 +15,11 @@ Namespace Projects
             Me.Name = Name
         End Sub
 
-        Public Function Save(provider As IOProvider) As Task Implements ISavable.Save
+        Public Function Save(provider As IIOProvider) As Task Implements ISavable.Save
             Throw New NotImplementedException()
         End Function
 
-        Public Function OpenFile(Filename As String, Provider As IOProvider) As Task Implements IOpenableFile.OpenFile
+        Public Function OpenFile(Filename As String, Provider As IIOProvider) As Task Implements IOpenableFile.OpenFile
             Throw New NotImplementedException()
         End Function
     End Class

@@ -26,7 +26,7 @@ Namespace IO
         ''' <summary>
         ''' Creates a new instance of GenericFile for use with either GenericFile.OpenFile or GenericFile.CreateFile
         ''' </summary>
-        Public Sub New(provider As IOProvider)
+        Public Sub New(provider As IIOProvider)
             Me.FileProvider = provider
             IsReadOnly = False
             EnableInMemoryLoad = False 'This is an opt-in setting
@@ -37,7 +37,7 @@ Namespace IO
         ''' Creates a new instance of GenericFile using the given data.
         ''' </summary>
         ''' <param name="RawData"></param>
-        Public Sub New(provider As IOProvider, rawData As Byte())
+        Public Sub New(provider As IIOProvider, rawData As Byte())
             Me.FileProvider = provider
             IsReadOnly = False
             EnableInMemoryLoad = True
@@ -48,7 +48,7 @@ Namespace IO
         ''' Creates a new instance of GenericFile from the given file.
         ''' </summary>
         ''' <param name="Filename">Full path of the file to load.</param>
-        Public Sub New(provider As IOProvider, filename As String)
+        Public Sub New(provider As IIOProvider, filename As String)
             Me.FileProvider = provider
             Me.IsReadOnly = False
             Me.EnableInMemoryLoad = False
@@ -60,7 +60,7 @@ Namespace IO
         ''' </summary>
         ''' <param name="Filename">Full path of the file to load.</param>
         ''' <param name="IsReadOnly">Whether or not to allow altering the file.  If True, an IOException will be thrown when attempting to alter the file.</param>
-        Public Sub New(provider As IOProvider, filename As String, isReadOnly As Boolean)
+        Public Sub New(provider As IIOProvider, filename As String, isReadOnly As Boolean)
             Me.FileProvider = provider
             Me.IsReadOnly = isReadOnly
             Me.EnableInMemoryLoad = False
@@ -73,7 +73,7 @@ Namespace IO
         ''' <param name="Filename">Full path of the file to load.</param>
         ''' <param name="IsReadOnly">Whether or not to allow altering the file.  If True, an IOException will be thrown when attempting to alter the file, regardless of whether LoadToMemory is true.</param>
         ''' <param name="LoadToMemory">True to load the file into memory, False to use a FileStream.  If loading the file into memory would leave the system with less than 500MB, a FileStream will be used instead.</param>
-        Public Sub New(provider As IOProvider, filename As String, isReadOnly As Boolean, loadToMemory As Boolean)
+        Public Sub New(provider As IIOProvider, filename As String, isReadOnly As Boolean, loadToMemory As Boolean)
             Me.FileProvider = provider
             Me.IsReadOnly = isReadOnly
             Me.EnableInMemoryLoad = loadToMemory
@@ -88,7 +88,7 @@ Namespace IO
         ''' Platform dependant abstraction layer for the file system.
         ''' </summary>
         ''' <returns></returns>
-        Protected Property FileProvider As IOProvider
+        Protected Property FileProvider As IIOProvider
 
 #Region "File Loading/Management"
         ''' <summary>
@@ -468,7 +468,7 @@ Namespace IO
         ''' Creates a new <see cref="GenericFile"/> using the data from the given <paramref name="file"/>.
         ''' </summary>
         ''' <param name="file">File containing the data to create a new file.</param>
-        Public Sub CreateFile(file As GenericFile, provider As IOProvider)
+        Public Sub CreateFile(file As GenericFile, provider As IIOProvider)
             CreateFileInternal(file.Name, {}, file.EnableInMemoryLoad, provider) 'Initializes properties needed by FileReader, if EnableInMemoryLoad is false
             Me.Length = file.Length
 
@@ -479,7 +479,7 @@ Namespace IO
             End If
         End Sub
 
-        Private Sub CreateFileInternal(name As String, fileContents As Byte(), enableInMemoryLoad As Boolean, provider As IOProvider)
+        Private Sub CreateFileInternal(name As String, fileContents As Byte(), enableInMemoryLoad As Boolean, provider As IIOProvider)
             'Load the file
             Me.EnableInMemoryLoad = enableInMemoryLoad
             If enableInMemoryLoad Then
@@ -501,7 +501,7 @@ Namespace IO
         ''' Opens a file from the given filename.  If it does not exists, a blank one will be created.
         ''' </summary>
         ''' <param name="Filename"></param>
-        Public Overridable Function OpenFile(filename As String, provider As IOProvider) As Task Implements IOpenableFile.OpenFile
+        Public Overridable Function OpenFile(filename As String, provider As IIOProvider) As Task Implements IOpenableFile.OpenFile
             Me.FileProvider = provider
             OpenFileInternal(filename)
             Return Task.FromResult(0)
@@ -537,7 +537,7 @@ Namespace IO
         ''' Saves the file to the given destination.
         ''' </summary>
         ''' <param name="filename">Full path of where the file should be saved to.</param>
-        Public Overridable Function Save(filename As String, provider As IOProvider) As Task Implements ISavableAs.Save
+        Public Overridable Function Save(filename As String, provider As IIOProvider) As Task Implements ISavableAs.Save
             RaiseEvent FileSaving(Me, New EventArgs)
             If InMemoryFile IsNot Nothing Then
                 provider.WriteAllBytes(filename, InMemoryFile)
@@ -562,7 +562,7 @@ Namespace IO
         ''' Saves the file to the Original Filename.
         ''' Throws a NullReferernceException if the Original Filename is null.
         ''' </summary>
-        Public Async Function Save(provider As IOProvider) As Task Implements ISavable.Save
+        Public Async Function Save(provider As IIOProvider) As Task Implements ISavable.Save
             If String.IsNullOrEmpty(Me.OriginalFilename) Then
                 Throw New NullReferenceException(My.Resources.Language.ErrorNoSaveFilename)
             End If

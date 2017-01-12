@@ -8,7 +8,7 @@ Namespace IO
     Public Class OpenableFileOpener
         Implements IFileOpener        
 
-        Public Async Function OpenFile(fileType As TypeInfo, filename As String, provider As IOProvider) As Task(Of Object) Implements IFileOpener.OpenFile
+        Public Async Function OpenFile(fileType As TypeInfo, filename As String, provider As IIOProvider) As Task(Of Object) Implements IFileOpener.OpenFile
             Dim file As IOpenableFile = ReflectionHelpers.CreateInstance(fileType)
             Await file.OpenFile(filename, provider)
             Return file
