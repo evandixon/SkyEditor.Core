@@ -45,7 +45,10 @@ Public Class IOUIManager
     Private Sub IOUIManager_FileOpened(sender As Object, e As FileOpenedEventArguments) Handles Me.FileOpened
         'Make sure there's an open file
         If SelectedFile Is Nothing AndAlso OpenFiles.Count > 0 Then
-            SelectedFile = OpenFiles.First
+            Dim newFile = e.FileViewModel
+            If newFile IsNot Nothing Then
+                SelectedFile = newFile
+            End If
         End If
     End Sub
 
@@ -549,7 +552,7 @@ Public Class IOUIManager
             Dim wrapper = CreateViewModel(model)
             OpenFiles.Add(wrapper)
             FileDisposalSettings.Add(model, DisposeOnClose)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = DisposeOnClose})
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .FileViewModel = wrapper, .DisposeOnExit = DisposeOnClose})
         End If
     End Sub
 
@@ -571,7 +574,7 @@ Public Class IOUIManager
             Dim wrapper = CreateViewModel(model)
             OpenedProjectFiles.Add(wrapper, parentProject)
             OpenFiles.Add(wrapper)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = False, .ParentProject = parentProject})
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .FileViewModel = wrapper, .DisposeOnExit = False, .ParentProject = parentProject})
         End If
     End Sub
 
@@ -594,7 +597,7 @@ Public Class IOUIManager
             wrapper.Filename = filename
             OpenFiles.Add(wrapper)
             FileDisposalSettings.Add(model, True)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = True})
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .FileViewModel = wrapper, .DisposeOnExit = True})
         End If
     End Function
 
@@ -617,7 +620,7 @@ Public Class IOUIManager
             wrapper.Filename = filename
             OpenFiles.Add(wrapper)
             FileDisposalSettings.Add(model, True)
-            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .DisposeOnExit = True})
+            RaiseEvent FileOpened(Nothing, New FileOpenedEventArguments With {.File = model, .FileViewModel = wrapper, .DisposeOnExit = True})
         End If
     End Function
 
@@ -658,15 +661,33 @@ Public Class IOUIManager
 #End Region
 
     ''' <summary>
+    ''' Gets the <see cref="FileViewModel"/> wrapping <paramref name="model"/>, provided it exists in <see cref="OpenFiles"/>.
+    ''' </summary>
+    ''' <param name="model">The model for which to find the <see cref="FileViewModel"/>.</param>
+    ''' <returns>The <see cref="FileViewModel"/> wrapping <paramref name="model"/>, <paramref name="model"/> if it is itself a <see cref="FileViewModel"/>, or null if it does not exist.</returns>
+    Public Function GetFileViewModelForModel(model As Object) As FileViewModel
+        Dim fvm = (From f In OpenFiles Where f.File Is model).FirstOrDefault
+        If fvm Is Nothing Then
+            If TypeOf model Is FileViewModel Then
+                Return model
+            Else
+                Return Nothing
+            End If
+        Else
+            Return fvm
+        End If
+    End Function
+
+    ''' <summary>
     ''' Gets the current view models for the model, creating them if necessary.
     ''' </summary>
     ''' <param name="model">Model for which to get the view models.</param>
     ''' <returns>An IEnumerable of view models that support the given model, or null if the model is not an open file.</returns>
     Public Function GetViewModelsForModel(model As Object) As IEnumerable(Of GenericViewModel)
-        Dim file = (From f In OpenFiles Where f.File Is model).FirstOrDefault
+        Dim file = GetFileViewModelForModel(model)
         If file IsNot Nothing Then
             'The file is open
-            Return file?.GetViewModels(CurrentPluginManager)
+            Return file.GetViewModels(CurrentPluginManager)
         ElseIf TypeOf model Is FileViewModel Then
             'The model provided is a file view model, which we can still work with
             Return DirectCast(model, FileViewModel).GetViewModels(CurrentPluginManager)
