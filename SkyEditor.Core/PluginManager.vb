@@ -41,39 +41,31 @@ Public Class PluginManager
     ''' Matches plugins (key) to plugins that depend on that plugin (value).
     ''' If a plugin is a key, it is manually loaded by each of the plugins in the value.
     ''' </summary>
-    ''' <returns></returns>
     Protected Property DependantPlugins As Dictionary(Of SkyEditorPlugin, List(Of SkyEditorPlugin))
 
     ''' <summary>
     ''' Queue of dependant plugins that need to be loaded.
     ''' </summary>
-    ''' <returns></returns>
     Private Property DependantPluginLoadingQueue As Queue(Of SkyEditorPlugin)
 
     ''' <summary>
     ''' Contains the assemblies that contain plugin information.
     ''' </summary>
-    ''' <returns></returns>
     Public Property Assemblies As List(Of Assembly)
 
     ''' <summary>
     ''' List of all loaded iSkyEditorPlugins that are loaded.
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
     Public Property Plugins As New List(Of SkyEditorPlugin)
 
     ''' <summary>
     ''' Gets a list of assemblies that failed to be loaded as plugins, while being registered as such.
     ''' </summary>
-    ''' <returns></returns>
     Protected Property FailedPluginLoads As List(Of String)
 
     ''' <summary>
     ''' The current IO Provider for the application.
     ''' </summary>
-    ''' <returns></returns>
     Public Property CurrentIOProvider As IIOProvider
         Get
             Return _currentIOProvider
@@ -87,7 +79,6 @@ Public Class PluginManager
     ''' <summary>
     ''' The current Settings Provider for the applicaiton.
     ''' </summary>
-    ''' <returns></returns>
     Public Property CurrentSettingsProvider As ISettingsProvider
         Get
             Return _currentSettingsProvider
@@ -99,9 +90,8 @@ Public Class PluginManager
     Dim _currentSettingsProvider As ISettingsProvider
 
     ''' <summary>
-    ''' The current Console Provider for the application.
+    ''' The current Console Provider for the application.  This is the abstraction layer between the console and the application.
     ''' </summary>
-    ''' <returns></returns>
     Public Property CurrentConsoleProvider As IConsoleProvider
         Get
             Return _currentConsoleProvider
@@ -113,9 +103,22 @@ Public Class PluginManager
     Dim _currentConsoleProvider As IConsoleProvider
 
     ''' <summary>
-    ''' The current instance of the IO/UI Manager, helping manage open files and their associated UI.
+    ''' The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
     ''' </summary>
     ''' <returns></returns>
+    Public Property CurrentConsoleManager As ConsoleManager
+        Get
+            Return _currentConsoleManager
+        End Get
+        Protected Set(value As ConsoleManager)
+            _currentConsoleManager = value
+        End Set
+    End Property
+    Dim _currentConsoleManager As ConsoleManager
+
+    ''' <summary>
+    ''' The current instance of the IO/UI Manager, helping manage open files and their associated UI.
+    ''' </summary>
     Public Property CurrentIOUIManager As IOUIManager
         Get
             Return _currentIOmanager

@@ -98,7 +98,7 @@
     <Compile Include="ConsoleCommands\ConsoleColor.vb" />
     <Compile Include="ConsoleCommands\ConsoleCommand.vb" />
     <Compile Include="ConsoleCommands\ConsoleCommandAsync.vb" />
-    <Compile Include="ConsoleCommands\ConsoleHelper.vb" />
+    <Compile Include="ConsoleCommands\ConsoleManager.vb" />
     <Compile Include="ConsoleCommands\DummyConsoleProvider.vb" />
     <Compile Include="ConsoleCommands\IConsoleProvider.vb" />
     <Compile Include="ConsoleCommands\InstallExtension.vb" />
