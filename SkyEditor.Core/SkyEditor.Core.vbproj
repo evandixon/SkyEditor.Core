@@ -161,7 +161,9 @@
       <DependentUpon>SettingNames.resx</DependentUpon>
     </Compile>
     <Compile Include="Projects\Solution.vb" />
+    <Compile Include="TestComponents\MemoryConsoleProvider.vb" />
     <Compile Include="TestComponents\MemoryIOProvider.vb" />
+    <Compile Include="TestComponents\TestHelpers.vb" />
     <Compile Include="UI\ActionMenuItem.vb" />
     <Compile Include="UI\AnchorableViewModel.vb" />
     <Compile Include="UI\FileViewModel.vb" />

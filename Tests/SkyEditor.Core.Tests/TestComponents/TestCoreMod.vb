@@ -1,4 +1,6 @@
-﻿Imports SkyEditor.Core.IO
+﻿Imports SkyEditor.Core.ConsoleCommands
+Imports SkyEditor.Core.IO
+Imports SkyEditor.Core.TestComponents
 Imports SkyEditor.Core.UI
 Imports SkyEditor.Core.Windows.CoreMods
 
@@ -26,6 +28,10 @@ Namespace TestComponents
 
         Public Overrides Function IsPluginLoadingEnabled() As Boolean
             Return False
+        End Function
+
+        Public Overrides Function GetConsoleProvider() As IConsoleProvider
+            Return New MemoryConsoleProvider
         End Function
 
         Public Overrides Sub Load(manager As PluginManager)

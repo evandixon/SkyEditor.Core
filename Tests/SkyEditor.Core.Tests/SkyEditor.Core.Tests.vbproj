@@ -120,6 +120,8 @@
     <Compile Include="TestComponents\TestViewModel.vb" />
     <Compile Include="TestComponents\TextFile.vb" />
     <Compile Include="TestComponents\ViewModelTestAction.vb" />
+    <Compile Include="ConsoleCommands\ConsoleCommandTestIntegration.vb" />
+    <Compile Include="TestComponentTests\MemoryConsoleProviderTests.vb" />
     <Compile Include="TestComponentTests\MemoryIOProviderTests.vb" />
     <Compile Include="UI\GeneralUITests.vb" />
     <Compile Include="UI\GenericViewModelTests.vb" />
@@ -156,6 +158,7 @@
       <Name>SkyEditor.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
