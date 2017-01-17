@@ -17,4 +17,3 @@
         Yellow
     End Enum
 End Namespace
-

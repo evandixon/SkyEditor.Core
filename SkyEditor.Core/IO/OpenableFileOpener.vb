@@ -6,7 +6,7 @@ Namespace IO
     ''' Opens files using file types that implement IOpenableFile
     ''' </summary>
     Public Class OpenableFileOpener
-        Implements IFileOpener        
+        Implements IFileOpener
 
         Public Async Function OpenFile(fileType As TypeInfo, filename As String, provider As IIOProvider) As Task(Of Object) Implements IFileOpener.OpenFile
             Dim file As IOpenableFile = ReflectionHelpers.CreateInstance(fileType)
@@ -23,4 +23,3 @@ Namespace IO
         End Function
     End Class
 End Namespace
-

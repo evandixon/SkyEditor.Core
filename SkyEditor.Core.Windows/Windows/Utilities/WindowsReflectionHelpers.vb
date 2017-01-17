@@ -58,7 +58,7 @@ Namespace Windows.Utilities
         ''' <param name="sourceAssembly">Assembly of which to get the dependencies.</param>
         ''' <returns>A list containing all of the file paths of all dependency assemblies, both direct and indirect.</returns>
         ''' <remarks>Only returns assemblies in the same directory as the <paramref name="sourceAssembly"/>.
-        ''' 
+        '''
         ''' A side effect that may cause issues is that any referenced assembly that is not in the current app domain will be loaded.</remarks>
         Public Shared Function GetAssemblyDependencies(sourceAssembly As Assembly) As List(Of String)
             Dim out As New List(Of String)
@@ -100,7 +100,7 @@ Namespace Windows.Utilities
                     'Try to find the references of this reference
                     Dim q = (From a In AppDomain.CurrentDomain.GetAssemblies Where a.FullName = reference.FullName).FirstOrDefault
 
-                    If q Is Nothing
+                    If q Is Nothing Then
                         'Nothing found, expand search to account for different versions
                         q = (From a In AppDomain.CurrentDomain.GetAssemblies
                              Let name = a.GetName()

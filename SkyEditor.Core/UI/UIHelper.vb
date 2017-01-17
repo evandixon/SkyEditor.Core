@@ -54,7 +54,6 @@ Namespace UI
                             current = m
                         End If
 
-
                         For count = 1 To ActionInstance.ActionPath.Count - 2
                             Dim index = count 'To avoid potential issues with using the below linq expression.  Might not be needed, but it's probably best to avoid potential issues.
                             parent = From m As MenuItemInfo In current.Children Where m.Header = ActionInstance.ActionPath(index)
@@ -76,7 +75,6 @@ Namespace UI
                                 current = m
                             End If
                         Next
-
 
                         If ActionInstance.ActionPath.Count > 1 Then
                             'Check to see if the menu item exists
@@ -121,14 +119,14 @@ Namespace UI
         ''' <param name="targets">Direct targets of the action, if applicable.  If Nothing, the IOUIManager will control the targets</param>
         ''' <returns></returns>
         Public Shared Function GenerateLogicalMenuItems(menuItemInfo As IEnumerable(Of MenuItemInfo), ioui As IOUIManager, targets As IEnumerable(Of Object)) As List(Of ActionMenuItem)
-            If MenuItemInfo Is Nothing Then
+            If menuItemInfo Is Nothing Then
                 Throw New ArgumentNullException(NameOf(menuItemInfo))
             End If
 
             Dim output As New List(Of ActionMenuItem)
 
             'Create the menu items
-            For Each item In From m In MenuItemInfo Order By m.SortOrder, m.Header
+            For Each item In From m In menuItemInfo Order By m.SortOrder, m.Header
                 Dim m As New ActionMenuItem '= ReflectionHelpers.CreateInstance(RootMenuItemType.GetTypeInfo)
                 m.Header = item.Header
                 m.CurrentIOUIManager = ioui
@@ -389,4 +387,3 @@ Namespace UI
         End Function
     End Class
 End Namespace
-

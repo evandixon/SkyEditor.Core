@@ -1,5 +1,4 @@
-﻿
-Imports SkyEditor.Core.UI
+﻿Imports SkyEditor.Core.UI
 
 Namespace Projects
     Public Class FileOpenedEventArguments

@@ -51,4 +51,3 @@ Namespace Windows.Utilities
     End Class
 
 End Namespace
-

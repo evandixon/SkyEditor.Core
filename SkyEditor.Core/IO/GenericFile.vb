@@ -12,7 +12,6 @@ Namespace IO
 
         Private _fileLock As New Object
 
-
 #Region "Constructors"
         ''' <summary>
         ''' Creates a new instance of GenericFile for use with either GenericFile.OpenFile or GenericFile.CreateFile
@@ -688,7 +687,7 @@ Namespace IO
         ''' <param name="length">Number of bytes to copy into the destination stream.</param>
         ''' <exception cref="ArgumentNullException">Thrown if <paramref name="destination"/> is null.</exception>
         ''' <remarks>Currently, the data of size <paramref name="length"/> is buffered in memory, and will error if there is insufficient memory.
-        ''' 
+        '''
         ''' To avoid threading issues, this function will synchronously block using SyncLock until the operation is complete.</remarks>
         Public Sub CopyTo(destination As Stream, index As Long, length As Long)
             If IsThreadSafe Then

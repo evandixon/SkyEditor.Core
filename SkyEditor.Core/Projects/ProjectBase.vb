@@ -106,7 +106,7 @@ Namespace Projects
         ''' </summary>
         ''' <remarks>Key: logical path; Value: Item (Projects for Solutions, Files for Projects).
         ''' If the value is null, the path is an empty directory.
-        ''' 
+        '''
         ''' Example Paths (In form: "{Path}"/{Value})
         ''' ""/null - Represents the root directory
         ''' "Test"/null - directory
@@ -295,7 +295,7 @@ Namespace Projects
 
                                        Return x.Key.ToLowerInvariant.StartsWith(fixedPath) AndAlso
                                             Not x.Key.ToLowerInvariant = fixedPath AndAlso 'Filters the same direcctory (/Test is not a child of /Test)
-                                            Not relativePath.Contains("/") AndAlso 'Filters anything with a slash after the parent directory                                            
+                                            Not relativePath.Contains("/") AndAlso 'Filters anything with a slash after the parent directory
                                             ((getDirectories AndAlso x.Value Is Nothing) OrElse (Not getDirectories AndAlso x.Value IsNot Nothing))
                                    End Function).
                              OrderBy(Function(x) x.Key, New DirectoryStructureComparer)

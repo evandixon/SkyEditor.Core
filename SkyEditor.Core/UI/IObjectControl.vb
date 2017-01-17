@@ -62,7 +62,7 @@ Namespace UI
         ''' Determines whether or not this <see cref="IObjectControl"/> should be used for the given object if another control exists for it.
         ''' If false, this will be used if <see cref="SupportsObject(Object)"/> is true.
         ''' If true, this will only be used if no other <see cref="IObjectControl"/> can edit the given object.
-        ''' 
+        '''
         ''' If multiple backup controls are present, <see cref="GetSortOrder(Type, Boolean)"/> will be used to determine which <see cref="IObjectControl"/> is used.</remarks>
         Function IsBackupControl() As Boolean
 

@@ -13,7 +13,6 @@ Namespace UI
             SortOrder = Integer.MaxValue
         End Sub
 
-
         Public Event CurrentPluginManagerChanged(sender As Object, e As EventArgs)
 
         ''' <summary>

@@ -10,4 +10,3 @@ Namespace Windows.ConsoleCommands
         End Sub
     End Class
 End Namespace
-

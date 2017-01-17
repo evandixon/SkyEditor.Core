@@ -34,7 +34,6 @@ Namespace Windows.Extensions.Online
         Private Property GetExtensionsEndpoint As String
         Private Property CachedInfo As Dictionary(Of Integer, OnlineExtensionInfo)
 
-
         Private Async Function GetResponse() As Task(Of RootCollectionResponse)
             If _response Is Nothing Then
                 Dim endpoint = RootEndpoint
@@ -112,4 +111,3 @@ Namespace Windows.Extensions.Online
         End Function
     End Class
 End Namespace
-

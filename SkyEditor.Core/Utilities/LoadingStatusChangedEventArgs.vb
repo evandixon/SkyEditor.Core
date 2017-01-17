@@ -7,4 +7,3 @@
         Public Property Total As Integer
     End Class
 End Namespace
-

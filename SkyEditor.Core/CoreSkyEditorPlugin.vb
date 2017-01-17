@@ -53,4 +53,3 @@ Public MustInherit Class CoreSkyEditorPlugin
     End Function
 
 End Class
-

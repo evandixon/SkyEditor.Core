@@ -4,4 +4,3 @@
         Public Property IsVisible As Boolean
     End Class
 End Namespace
-

@@ -1,5 +1,4 @@
-﻿
-' Copyright Christophe Bertrand.
+﻿' Copyright Christophe Bertrand.
 ' Downloaded from https://chrisbertrandprogramer.wordpress.com/2013/07/22/a-parser-for-assemblyqualifiedname-for-net/
 ' Slightly modified by Evan Dixon
 
@@ -75,7 +74,6 @@ Namespace Utilities
                     Me.GenericTypeName = Me.TypeName
                     IsGenericType = False
                 End If
-
 
                 Me.CSharpStyleName = New Lazy(Of String)(Function()
                                                              Return Me.LanguageStyle("<", ">")
@@ -186,8 +184,6 @@ Namespace Utilities
         End Function
 #End If
     End Class
-
-
 
 End Namespace
 

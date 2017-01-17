@@ -13,7 +13,7 @@ Namespace Extensions
             ExtensionBanks = New Dictionary(Of String, ExtensionType)
         End Sub
 
-        Public ReadOnly Property Name As String Implements iNamed.Name
+        Public ReadOnly Property Name As String Implements INamed.Name
             Get
                 Return "Extensions"
             End Get
@@ -40,7 +40,6 @@ Namespace Extensions
             End If
             Return ExtensionBanks(extensionTypeName)
         End Function
-
 
         Public Shared Function IsExtensionInstalled(info As ExtensionInfo, manager As PluginManager) As Boolean
             Dim extensionType = ReflectionHelpers.GetTypeByName(info.ExtensionTypeName, manager)

@@ -131,6 +131,5 @@ Namespace TestComponents
             End SyncLock
         End Function
 
-
     End Class
 End Namespace

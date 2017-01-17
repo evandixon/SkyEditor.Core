@@ -8,4 +8,3 @@
         ReadOnly Property IsCompleted As Boolean
     End Interface
 End Namespace
-

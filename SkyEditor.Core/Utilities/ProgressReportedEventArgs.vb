@@ -7,4 +7,3 @@
         Public Property IsIndeterminate As Boolean
     End Class
 End Namespace
-

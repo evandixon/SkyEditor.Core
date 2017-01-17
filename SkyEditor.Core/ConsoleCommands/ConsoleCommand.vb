@@ -15,4 +15,3 @@ Namespace ConsoleCommands
         Public MustOverride Sub Main(arguments As String())
     End Class
 End Namespace
-

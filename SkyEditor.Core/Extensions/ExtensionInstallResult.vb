@@ -7,4 +7,3 @@
         IncompatiblePlatform 'For when the extension isn't supported on the current platform of Sky Editor (e.g. a WPF UI plugin on Android).
     End Enum
 End Namespace
-

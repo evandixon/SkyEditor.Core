@@ -4,11 +4,11 @@ Imports SkyEditor.Core.IO
 Imports SkyEditor.Core.UI
 Imports SkyEditor.Core.Utilities
 Imports SkyEditor.Core.Settings
-Imports System.Windows.Input
 Imports System.Collections.Specialized
 Imports SkyEditor.Core.Projects
+
 ''' <summary>
-''' Class that manages open files, solutions, and projects, and helps with the UI display them.
+''' Class that manages open files, solutions, and projects, and helps the UI display them.
 ''' </summary>
 Public Class IOUIManager
     Implements IDisposable
@@ -53,13 +53,13 @@ Public Class IOUIManager
     End Sub
 
     Private Async Sub IOUIManager_PropertyChanged(sender As Object, e As PropertyChangedEventArgs) Handles Me.PropertyChanged
-        For Each item In Await GetRootMenuItems
+        For Each item In Await GetRootMenuItems()
             Await UpdateMenuItemVisibility(item)
         Next
     End Sub
 
     Private Async Sub _selectedFile_MenuItemRefreshRequested(sender As Object, e As EventArgs) Handles _selectedFile.MenuItemRefreshRequested
-        For Each item In Await GetRootMenuItems
+        For Each item In Await GetRootMenuItems()
             Await UpdateMenuItemVisibility(item)
         Next
     End Sub
@@ -275,7 +275,6 @@ Public Class IOUIManager
 
     End Class
 
-
     Public Event LoadingProgressChanged(sender As Object, e As ProgressReportedEventArgs) Implements IReportProgress.ProgressChanged
     Public Event LoadingProgressCompleted(sender As Object, e As EventArgs) Implements IReportProgress.Completed
 
@@ -439,26 +438,25 @@ Public Class IOUIManager
 
 #Region "Functions"
 
-    Public Async Function GetRootMenuItems As Task(Of ObservableCollection(Of ActionMenuItem))
-         If _rootMenuItems Is Nothing Then
-                _rootMenuItems = New ObservableCollection(Of ActionMenuItem)
-                'Generate the menu items
-                For Each item In UIHelper.GenerateLogicalMenuItems(Await UIHelper.GetMenuItemInfo(CurrentPluginManager, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode), Me, Nothing)
-                    _rootMenuItems.Add(item)
-                Next
-                'Update their visibility now that all of them have been created
-                'Doing this before they're all created will cause unintended behavior
-                For Each item In _rootMenuItems
-                    await UpdateMenuItemVisibility(item)
-                Next
-            End If
-            Return _rootMenuItems
+    Public Async Function GetRootMenuItems() As Task(Of ObservableCollection(Of ActionMenuItem))
+        If _rootMenuItems Is Nothing Then
+            _rootMenuItems = New ObservableCollection(Of ActionMenuItem)
+            'Generate the menu items
+            For Each item In UIHelper.GenerateLogicalMenuItems(Await UIHelper.GetMenuItemInfo(CurrentPluginManager, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode), Me, Nothing)
+                _rootMenuItems.Add(item)
+            Next
+            'Update their visibility now that all of them have been created
+            'Doing this before they're all created will cause unintended behavior
+            For Each item In _rootMenuItems
+                Await UpdateMenuItemVisibility(item)
+            Next
+        End If
+        Return _rootMenuItems
     End Function
 
-    Protected sub SetRootMenuItems(value As ObservableCollection(Of ActionMenuItem))
+    Protected Sub SetRootMenuItems(value As ObservableCollection(Of ActionMenuItem))
         _rootMenuItems = value
-    End sub
-
+    End Sub
 
 #Region "IO Filters"
 
@@ -587,7 +585,7 @@ Public Class IOUIManager
     ''' To open a project file, use <see cref="OpenFile(Object, Project)"/>.
     ''' To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
     ''' To open a file using a specific type as the model, use <see cref="OpenFile(String, TypeInfo)"/>.
-    ''' 
+    '''
     ''' When the file is closed, the underlying model will be disposed.</remarks>
     Public Async Function OpenFile(filename As String, autoDetectSelector As IOHelper.DuplicateMatchSelector) As Task
         Dim model = Await IOHelper.OpenObject(filename, autoDetectSelector, CurrentPluginManager)
@@ -610,7 +608,7 @@ Public Class IOUIManager
     ''' To open a project file, use <see cref="OpenFile(Object, Project)"/>.
     ''' To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
     ''' To open a file, auto-detecting the file type, use <see cref="OpenFile(String, IOHelper.DuplicateMatchSelector)"/>.
-    ''' 
+    '''
     ''' When the file is closed, the underlying model will be disposed.</remarks>
     Public Async Function OpenFile(filename As String, modelType As TypeInfo) As Task
         Dim model = Await IOHelper.OpenFile(filename, modelType, CurrentPluginManager)
@@ -719,7 +717,6 @@ Public Class IOUIManager
         Return Me.OpenedProjectFiles.Where(Function(x) x.Key.File Is model).Select(Function(x) x.Value).FirstOrDefault
     End Function
 
-
     ''' <summary>
     ''' Gets the possible targets for a menu action.
     ''' </summary>
@@ -824,7 +821,7 @@ Public Class IOUIManager
 
                         If Not isVisible AndAlso SelectedFile?.File IsNot Nothing Then
                             'Check to see if the action supports any view models
-                            'If there are any view models that support the selected file, 
+                            'If there are any view models that support the selected file,
                             isVisible = False
                             For Each vm In SelectedFile.GetViewModels(CurrentPluginManager)
                                 If Await item.SupportsObject(vm) Then

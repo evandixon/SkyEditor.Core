@@ -194,7 +194,6 @@ Namespace Projects
             Assert.AreEqual(1, items.Count, "Incorrect number of files")
         End Sub
 
-
 #End Region
 
 #Region "Building"
@@ -242,4 +241,3 @@ Namespace Projects
 
     End Class
 End Namespace
-

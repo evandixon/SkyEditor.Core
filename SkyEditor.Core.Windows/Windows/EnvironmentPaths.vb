@@ -13,7 +13,7 @@ Namespace Windows
             Return Path.Combine(GetRootResourceDirectory, "Extensions")
         End Function
 
-        Public Shared Function GetPluginsExtensionDirectory As String
+        Public Shared Function GetPluginsExtensionDirectory() As String
             Return Path.Combine(GetExtensionDirectory, (New PluginExtensionType).InternalName)
         End Function
 

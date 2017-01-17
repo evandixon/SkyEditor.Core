@@ -383,7 +383,6 @@ Public Class PluginManager
         RegisterTypeRegister(GetType(T).GetTypeInfo)
     End Sub
 
-
     ''' <summary>
     ''' Registers the given Type in the type registry.
     ''' </summary>
@@ -397,7 +396,6 @@ Public Class PluginManager
             Throw New ArgumentNullException(NameOf(Type))
         End If
         Dim x = From c In Type.DeclaredConstructors Where c.GetParameters.Length = 1
-
 
         If Not ReflectionHelpers.CanCreateInstance(Type) Then
             'We only want types with default constructors.

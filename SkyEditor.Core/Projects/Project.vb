@@ -11,7 +11,6 @@ Namespace Projects
             Settings = New SettingsProvider
         End Sub
 
-
 #Region "Child Classes"
         Private Class SettingValue
             Public Property AssemblyQualifiedTypeName As String
@@ -180,11 +179,11 @@ Namespace Projects
 
             Dim relativePath = filePath.Replace(Path.GetDirectoryName(Me.Filename), "").Replace("\", "/").TrimStart("/")
             Dim wrapper As New ProjectFileWrapper(Me.Filename, relativePath)
-            If fileType IsNot Nothing
+            If fileType IsNot Nothing Then
                 wrapper.FileAssemblyQualifiedTypeName = fileType.AssemblyQualifiedName
             End If
             AddItem(destinationPath, wrapper)
-            
+
             RaiseEvent FileAdded(Me, New ProjectFileAddedEventArgs With {.Filename = Path.GetFileName(destinationPath), .FullFilename = filePath})
         End Sub
 
@@ -209,7 +208,7 @@ Namespace Projects
         End Sub
 
         ''' <summary>
-        ''' Adds a file to a directory in the project 
+        ''' Adds a file to a directory in the project
         ''' </summary>
         ''' <param name="parentPath">Directory in which to put the imported file</param>
         ''' <param name="filePath">Full path of the file to import</param>
@@ -425,4 +424,3 @@ Namespace Projects
 
     End Class
 End Namespace
-

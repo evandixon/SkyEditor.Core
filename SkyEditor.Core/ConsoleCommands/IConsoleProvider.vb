@@ -18,4 +18,3 @@
         Sub WriteLine(format As String, ParamArray arg As Object())
     End Interface
 End Namespace
-

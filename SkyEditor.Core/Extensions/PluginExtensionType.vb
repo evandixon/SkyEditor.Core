@@ -2,7 +2,7 @@
 Imports System.Threading.Tasks
 Imports SkyEditor.Core.Extensions
 Imports SkyEditor.Core.IO
-Imports SkyEditor.Core.settings
+Imports SkyEditor.Core.Settings
 
 Namespace Extensions
     Public Class PluginExtensionType

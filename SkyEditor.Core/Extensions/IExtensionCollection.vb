@@ -11,4 +11,3 @@ Namespace Extensions
         Function UninstallExtension(extensionID As String, manager As PluginManager) As Task(Of ExtensionUninstallResult)
     End Interface
 End Namespace
-

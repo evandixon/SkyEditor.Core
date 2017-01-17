@@ -18,4 +18,3 @@
         Public Property MatchChance As Single
     End Class
 End Namespace
-

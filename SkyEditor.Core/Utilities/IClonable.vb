@@ -7,4 +7,3 @@
         Function Clone() As Object
     End Interface
 End Namespace
-

@@ -14,4 +14,3 @@ Public Class TypeRegisteredEventArgs
     ''' <returns></returns>
     Public Property RegisteredType As TypeInfo
 End Class
-
