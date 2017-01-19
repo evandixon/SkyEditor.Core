@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -176,7 +177,7 @@ namespace SkyEditor.Core
                         if (assemblyActual != null)
                         {
                             PluginAssemblies.Add(assemblyActual);
-                            foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin)) && ReflectionHelpers.CanCreateInstance(x)))
+                            foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin).GetTypeInfo()) && ReflectionHelpers.CanCreateInstance(x)))
                             {
                                 Plugins.Add(ReflectionHelpers.CreateInstance(plg));
                             }
