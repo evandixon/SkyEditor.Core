@@ -435,6 +435,7 @@ Public Class PluginManager
 #End Region
 
 #Region "Functions"
+
 #Region "Read Type Registry"
     Protected Function GetCachedInstance(type As TypeInfo) As Object
         If TypeInstances.ContainsKey(type) Then
