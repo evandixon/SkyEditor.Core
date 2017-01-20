@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.Settings;
 using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -256,7 +257,7 @@ namespace SkyEditor.Core
             }
 
             // Files
-            foreach (var item in settings.GetFilesScheduledForDeletion.ToList()) // Create a new list because the original will be continuously modified
+            foreach (var item in settings.GetFilesScheduledForDeletion().ToList()) // Create a new list because the original will be continuously modified
             {
                 if (CurrentIOProvider.FileExists(item))
                 {
@@ -267,7 +268,7 @@ namespace SkyEditor.Core
             }
 
             // Directories
-            foreach (var item in settings.GetDirectoriesScheduledForDeletion.ToList())
+            foreach (var item in settings.GetDirectoriesScheduledForDeletion().ToList())
             {
                 if (CurrentIOProvider.DirectoryExists(item))
                 {
