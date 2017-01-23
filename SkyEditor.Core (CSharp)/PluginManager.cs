@@ -1,4 +1,9 @@
-﻿using SkyEditor.Core.IO;
+﻿// To-Do:
+// - Uncomment CurrentConsoleProvider, CurrentConsoleManager, and CurrentIOUIManager in Properties
+// - Uncomment first bit in LoadCore
+// - Uncomment GetPluginPaths in Functions
+
+using SkyEditor.Core.IO;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.Utilities;
 using System;
@@ -91,20 +96,20 @@ namespace SkyEditor.Core
         /// </summary>
         public ISettingsProvider CurrentSettingsProvider { get; protected set; }
 
-        /// <summary>
-        /// The current Console Provider for the application.  This is the abstraction layer between the console and the application.
-        /// </summary>
-        public IConsoleProvider CurrentConsoleProvider { get; protected set; }
+        ///// <summary>
+        ///// The current Console Provider for the application.  This is the abstraction layer between the console and the application.
+        ///// </summary>
+        //public IConsoleProvider CurrentConsoleProvider { get; protected set; }
 
-        /// <summary>
-        /// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
-        /// </summary>
-        public ConsoleManager CurrentConsoleManager { get; protected set; }
+        ///// <summary>
+        ///// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
+        ///// </summary>
+        //public ConsoleManager CurrentConsoleManager { get; protected set; }
 
-        /// <summary>
-        /// The current instance of the IO/UI Manager, helping manage open files and their associated UI.
-        /// </summary>
-        public IOUIManager CurrentIOUIManager { get; protected set; }
+        ///// <summary>
+        ///// The current instance of the IO/UI Manager, helping manage open files and their associated UI.
+        ///// </summary>
+        //public IOUIManager CurrentIOUIManager { get; protected set; }
 
         #endregion
 
@@ -113,8 +118,7 @@ namespace SkyEditor.Core
         /// <summary>
         /// Raised when a type is added into the type registry.
         /// </summary>
-        public event TypeRegisteredEventHandler TypeRegistered;
-        public delegate void TypeRegisteredEventHandler(object sender, TypeRegisteredEventHandler e);
+        public event EventHandler<TypeRegisteredEventArgs> TypeRegistered;
 
         /// <summary>
         /// Raised before the plugins' Load methods are called.
@@ -145,58 +149,59 @@ namespace SkyEditor.Core
             {
                 throw new ArgumentNullException(nameof(core));
             }
-            // Load providers
-            CurrentIOProvider = core.GetIOProvider();
-            CurrentSettingsProvider = core.GetSettingsProvider(this);
-            CurrentConsoleProvider = core.GetConsoleProvider();
-            CurrentIOUIManager = core.GetIOUIManager(this);
 
-            // Delete files and directories scheduled for deletion
-            await DeleteScheduledFiles(CurrentSettingsProvider, CurrentIOProvider);
+            //// Load providers
+            //CurrentIOProvider = core.GetIOProvider();
+            //CurrentSettingsProvider = core.GetSettingsProvider(this);
+            //CurrentConsoleProvider = core.GetConsoleProvider();
+            //CurrentIOUIManager = core.GetIOUIManager(this);
 
-            // Install pending extensions
-            ExtensionDirectory = core.GetExtensionDirectory();
-            await ExtensionHelper.InstallPendingExtensions(ExtensionDirectory, this);
+            //// Delete files and directories scheduled for deletion
+            //await DeleteScheduledFiles(CurrentSettingsProvider, CurrentIOProvider);
+
+            //// Install pending extensions
+            //ExtensionDirectory = core.GetExtensionDirectory();
+            //await ExtensionHelper.InstallPendingExtensions(ExtensionDirectory, this);
 
             // Load the provided core
             CorePluginAssembly = core.GetType().GetTypeInfo().Assembly;
             Plugins.Add(core);
             core.Load(this);
 
-            // Load plugins, if enabled
-            if (core.IsPluginLoadingEnabled())
-            {
-                // Get the paths of all plugins to be loaded
-                var supportedPlugins = GetPluginPaths();
+            //// Load plugins, if enabled
+            //if (core.IsPluginLoadingEnabled())
+            //{
+            //    // Get the paths of all plugins to be loaded
+            //    var supportedPlugins = GetPluginPaths();
 
-                // Load the plugin assemblies
-                foreach (var item in supportedPlugins)
-                {
-                    try
-                    {
-                        var assemblyActual = core.LoadAssembly(item);
-                        if (assemblyActual != null)
-                        {
-                            PluginAssemblies.Add(assemblyActual);
-                            foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin).GetTypeInfo()) && ReflectionHelpers.CanCreateInstance(x)))
-                            {
-                                Plugins.Add(ReflectionHelpers.CreateInstance(plg));
-                            }
-                        }
-                    }
-                    catch (BadImageFormatException)
-                    {
-                        // The assembly is a bad assembly.  We can continue loading plugins, but not with this
-                        FailedPluginLoads.Add(item);
-                    }
-                    catch (NotSupportedException)
-                    {
-                        // The current environment does not support loading assemblies this way.
-                        // Abort dynamic assembly loading
-                        break;
-                    }
-                }
-            }
+            //    // Load the plugin assemblies
+            //    foreach (var item in supportedPlugins)
+            //    {
+            //        try
+            //        {
+            //            var assemblyActual = core.LoadAssembly(item);
+            //            if (assemblyActual != null)
+            //            {
+            //                PluginAssemblies.Add(assemblyActual);
+            //                foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin).GetTypeInfo()) && ReflectionHelpers.CanCreateInstance(x)))
+            //                {
+            //                    Plugins.Add(ReflectionHelpers.CreateInstance(plg) as SkyEditorPlugin);
+            //                }
+            //            }
+            //        }
+            //        catch (BadImageFormatException)
+            //        {
+            //            // The assembly is a bad assembly.  We can continue loading plugins, but not with this
+            //            FailedPluginLoads.Add(item);
+            //        }
+            //        catch (NotSupportedException)
+            //        {
+            //            // The current environment does not support loading assemblies this way.
+            //            // Abort dynamic assembly loading
+            //            break;
+            //        }
+            //    }
+            //}
 
             // Load logical plugins
             PluginsLoading.Invoke(this, new EventArgs());
@@ -279,25 +284,25 @@ namespace SkyEditor.Core
             }
         }
 
-        /// <summary>
-        /// Gets the paths corresponding to all plugin assemblies.
-        /// </summary>
-        /// <returns>Full paths of all plugin assemblies</returns>
-        protected List<string> GetPluginPaths()
-        {
-            var supportedPlugins = new List<string>();
+        ///// <summary>
+        ///// Gets the paths corresponding to all plugin assemblies.
+        ///// </summary>
+        ///// <returns>Full paths of all plugin assemblies</returns>
+        //protected List<string> GetPluginPaths()
+        //{
+        //    var supportedPlugins = new List<string>();
 
-            // Look at plugin extensions to find plugins
-            var pluginExtType = new PluginExtensionType();
-            pluginExtType.CurrentPluginManager = this;
+        //    // Look at plugin extensions to find plugins
+        //    var pluginExtType = new PluginExtensionType();
+        //    pluginExtType.CurrentPluginManager = this;
 
-            foreach(var item in pluginExtType.GetInstalledExtensions(this))
-            {
-                supportedPlugins.AddRange(item.ExtensionFiles.Select((x) => Path.Combine(pluginExtType.GetExtensionDirectory(item.ID), x)));
-            }
+        //    foreach(var item in pluginExtType.GetInstalledExtensions(this))
+        //    {
+        //        supportedPlugins.AddRange(item.ExtensionFiles.Select((x) => Path.Combine(pluginExtType.GetExtensionDirectory(item.ID), x)));
+        //    }
 
-            return supportedPlugins;
-        }
+        //    return supportedPlugins;
+        //}
 
         /// <summary>
         /// Loads supported types inside the given assembly into the type registry
