@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core", "SkyEditor.Core\SkyEditor.Core.vbproj", "{6F869961-8D92-4FB1-9680-A1D5C6938350}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.Windows", "SkyEditor.Core.Windows\SkyEditor.Core.Windows.vbproj", "{8238A6A2-76AF-4741-8564-D1D2A4B067BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C6561B48-E3A6-4DFA-A1BB-82EA5107062F}"
@@ -17,7 +15,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration Tests", "Integr
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.IntegrationTests", "Tests\Integration Tests\SkyEditor.Core.IntegrationTests\SkyEditor.Core.IntegrationTests.vbproj", "{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SkyEditor.Core (CSharp)", "SkyEditor.Core (CSharp)\SkyEditor.Core (CSharp).xproj", "{11EEEB65-532C-41AE-9340-7C82B3F6357C}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core (VB)", "SkyEditor.Core (VB)\SkyEditor.Core (VB).vbproj", "{6F869961-8D92-4FB1-9680-A1D5C6938350}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SkyEditor.Core (CSharp)", "SkyEditor.Core\SkyEditor.Core (CSharp).xproj", "{11EEEB65-532C-41AE-9340-7C82B3F6357C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -43,6 +39,10 @@ Global
 		{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDF05F3E-A4C6-4DAF-8FA4-462308DCC7C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F869961-8D92-4FB1-9680-A1D5C6938350}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11EEEB65-532C-41AE-9340-7C82B3F6357C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11EEEB65-532C-41AE-9340-7C82B3F6357C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11EEEB65-532C-41AE-9340-7C82B3F6357C}.Release|Any CPU.ActiveCfg = Release|Any CPU

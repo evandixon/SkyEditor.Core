@@ -148,9 +148,9 @@
     <None Include="SkyEditor.Core.Windows.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SkyEditor.Core\SkyEditor.Core.vbproj">
+    <ProjectReference Include="..\SkyEditor.Core %28VB%29\SkyEditor.Core %28VB%29.vbproj">
       <Project>{6f869961-8d92-4fb1-9680-a1d5c6938350}</Project>
-      <Name>SkyEditor.Core</Name>
+      <Name>SkyEditor.Core %28VB%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
