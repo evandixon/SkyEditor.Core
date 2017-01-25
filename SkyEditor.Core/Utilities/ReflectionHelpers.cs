@@ -92,6 +92,23 @@ namespace SkyEditor.Core.Utilities
         }
 
         /// <summary>
+        /// Gets a type using the assembly-qualified name if possible
+        /// </summary>
+        /// <param name="assemblyQualifiedName">Assembly-qualified name of the type</param>
+        /// <param name="manager">Instance of the current plugin manager from which to load available assemblies</param>
+        /// <returns>The type with the given assembly-qualified name or null if it cannot be found</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="assemblyQualifiedName"/> or <paramref name="manager"/> is null.</exception>
+        public static TypeInfo GetTypeByName(string assemblyQualifiedName, PluginManager manager)
+        {
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
+
+            return GetTypeByName(assemblyQualifiedName, manager.GetLoadedAssemblies());
+        }
+
+        /// <summary>
         /// Determines whether or not <see cref="CreateInstance(TypeInfo)"/> can create an instance of this type.
         /// </summary>
         /// <param name="type">Type to check</param>
