@@ -26,9 +26,9 @@ namespace SkyEditor.Core.IO
         /// <summary>
         /// Determines whether the specified directory exists.
         /// </summary>
-        /// <param name="filename">Full path of the directory.</param>
+        /// <param name="path">Full path of the directory.</param>
         /// <returns>A boolean indicating whether or not a directory exists at the given path.</returns>
-        bool DirectoryExists(string filename);
+        bool DirectoryExists(string path);
 
         /// <summary>
         /// Creates a directory at the given path.
