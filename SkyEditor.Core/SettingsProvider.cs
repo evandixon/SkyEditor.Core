@@ -227,6 +227,7 @@ namespace SkyEditor.Core
         public Task Save(IIOProvider provider)
         {
             provider.WriteAllText(Filename, Serialize());
+            FileSaved?.Invoke(this, new EventArgs());
             return Task.CompletedTask;
         }
     }

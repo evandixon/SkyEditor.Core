@@ -204,7 +204,7 @@ namespace SkyEditor.Core
             //}
 
             // Load logical plugins
-            PluginsLoading.Invoke(this, new EventArgs());
+            PluginsLoading?.Invoke(this, new EventArgs());
 
             foreach (var item in Plugins)
             {
@@ -241,6 +241,8 @@ namespace SkyEditor.Core
             {
                 LoadTypes(item);
             }
+
+            PluginLoadComplete?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -347,11 +349,11 @@ namespace SkyEditor.Core
         /// <param name="targetPlugin">The plugin to load</param>
         /// <param name="dependantPlugin">The plugin requesting the load</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="targetPlugin"/> or <paramref name="dependantPlugin"/> is null.</exception>
-        public virtual void LoadRequiredPlugin(SkyEditorPlugin targetPlugin, SkyEditorPlugin dependantPlugin)
+        public virtual void LoadRequiredPlugin(SkyEditorPlugin pluginToLoad, SkyEditorPlugin dependantPlugin)
         {
-            if (targetPlugin == null)
+            if (pluginToLoad == null)
             {
-                throw new ArgumentNullException(nameof(targetPlugin));
+                throw new ArgumentNullException(nameof(pluginToLoad));
             }
 
             if (dependantPlugin == null)
@@ -360,20 +362,20 @@ namespace SkyEditor.Core
             }
 
             // - Create the dependant plugin list if it doesn't exist
-            if (!DependantPlugins.ContainsKey(targetPlugin))
+            if (!DependantPlugins.ContainsKey(pluginToLoad))
             {
-                DependantPlugins.Add(targetPlugin, new List<SkyEditorPlugin>());
+                DependantPlugins.Add(pluginToLoad, new List<SkyEditorPlugin>());
             }
 
             // - Add the plugin to the dependant plugin list
-            if (!DependantPlugins[targetPlugin].Contains(dependantPlugin))
+            if (!DependantPlugins[pluginToLoad].Contains(dependantPlugin))
             {
-                DependantPlugins[targetPlugin].Add(dependantPlugin);
+                DependantPlugins[pluginToLoad].Add(dependantPlugin);
             }
 
             // Mark this plugin as a dependant, will be loaded by plugin engine later
             // Because loading takes place in a For Each loop iterating through Plugins, we cannot load plugins here, because that would change the collection.
-            DependantPluginLoadingQueue.Enqueue(targetPlugin);
+            DependantPluginLoadingQueue.Enqueue(pluginToLoad);
         }
 
         /// <summary>
@@ -603,6 +605,15 @@ namespace SkyEditor.Core
             }
 
             return output;
+        }
+
+        /// <summary>
+        /// Gets the currently loaded plugins
+        /// </summary>
+        /// <returns>A new list of the currently loaded Sky Editor plugins.</returns>
+        public List<SkyEditorPlugin> GetPlugins()
+        {
+            return Plugins.ToList();
         }
         #endregion
 

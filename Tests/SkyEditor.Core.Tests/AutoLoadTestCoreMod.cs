@@ -7,7 +7,7 @@ using SkyEditor.Core.TestComponents;
 
 namespace SkyEditor.Core.Tests
 {
-    public class PluginCoreMod : CoreSkyEditorPlugin
+    public class AutoLoadTestCoreMod : CoreSkyEditorPlugin
     {
         public override string Credits
         {
@@ -46,6 +46,13 @@ namespace SkyEditor.Core.Tests
         public override ISettingsProvider GetSettingsProvider(PluginManager manager)
         {
             return SettingsProvider.Open("/settings.json", manager);
+        }
+
+        public override void Load(PluginManager manager)
+        {
+            base.Load(manager);
+
+            throw new NotImplementedException();
         }
     }
 }
