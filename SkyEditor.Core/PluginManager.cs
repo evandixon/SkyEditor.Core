@@ -1,8 +1,9 @@
 ﻿// To-Do:
-// - Uncomment CurrentConsoleProvider, CurrentConsoleManager, and CurrentIOUIManager in Properties
+// - Uncomment CurrentConsoleManager, and CurrentIOUIManager in Properties
 // - Uncomment first bit in LoadCore
 // - Uncomment GetPluginPaths in Functions
 
+using SkyEditor.Core.ConsoleCommands;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.Utilities;
@@ -96,10 +97,10 @@ namespace SkyEditor.Core
         /// </summary>
         public ISettingsProvider CurrentSettingsProvider { get; protected set; }
 
-        ///// <summary>
-        ///// The current Console Provider for the application.  This is the abstraction layer between the console and the application.
-        ///// </summary>
-        //public IConsoleProvider CurrentConsoleProvider { get; protected set; }
+        /// <summary>
+        /// The current Console Provider for the application.  This is the abstraction layer between the console and the application.
+        /// </summary>
+        public IConsoleProvider CurrentConsoleProvider { get; protected set; }
 
         ///// <summary>
         ///// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
@@ -150,9 +151,9 @@ namespace SkyEditor.Core
                 throw new ArgumentNullException(nameof(core));
             }
 
-            //// Load providers
-            //CurrentIOProvider = core.GetIOProvider();
-            //CurrentSettingsProvider = core.GetSettingsProvider(this);
+            // Load providers
+            CurrentIOProvider = core.GetIOProvider();
+            CurrentSettingsProvider = core.GetSettingsProvider(this);
             //CurrentConsoleProvider = core.GetConsoleProvider();
             //CurrentIOUIManager = core.GetIOUIManager(this);
 

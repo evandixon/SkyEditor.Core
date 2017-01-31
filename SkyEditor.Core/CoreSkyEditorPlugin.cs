@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.IO;
+﻿using SkyEditor.Core.ConsoleCommands;
+using SkyEditor.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +27,14 @@ namespace SkyEditor.Core
         /// <returns>An instance of the <see cref="ISettingsProvider"/> for the application environment.</returns>
         public abstract ISettingsProvider GetSettingsProvider(PluginManager manager);
 
-        ///// <summary>
-        ///// Creates an instance of <see cref="IConsoleProvider"/> for the application environment.
-        ///// </summary>
-        ///// <returns>An instance of the <see cref="IConsoleProvider"/> for the application environment.</returns>
-        //public virtual IConsoleProvider GetConsoleProvider()
-        //{
-        //    return new DummyConsoleProvider();
-        //}
+        /// <summary>
+        /// Creates an instance of <see cref="IConsoleProvider"/> for the application environment.
+        /// </summary>
+        /// <returns>An instance of the <see cref="IConsoleProvider"/> for the application environment.</returns>
+        public virtual IConsoleProvider GetConsoleProvider()
+        {
+            return new DummyConsoleProvider();
+        }
 
         ///// <summary>
         ///// Creates an instance of <see cref="IOUIManager"/> for the application environment.
