@@ -102,10 +102,10 @@ namespace SkyEditor.Core
         /// </summary>
         public IConsoleProvider CurrentConsoleProvider { get; protected set; }
 
-        ///// <summary>
-        ///// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
-        ///// </summary>
-        //public ConsoleManager CurrentConsoleManager { get; protected set; }
+        /// <summary>
+        /// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
+        /// </summary>
+        public ConsoleManager CurrentConsoleManager { get; protected set; }
 
         ///// <summary>
         ///// The current instance of the IO/UI Manager, helping manage open files and their associated UI.
@@ -154,7 +154,7 @@ namespace SkyEditor.Core
             // Load providers
             CurrentIOProvider = core.GetIOProvider();
             CurrentSettingsProvider = core.GetSettingsProvider(this);
-            //CurrentConsoleProvider = core.GetConsoleProvider();
+            CurrentConsoleProvider = core.GetConsoleProvider();
             //CurrentIOUIManager = core.GetIOUIManager(this);
 
             //// Delete files and directories scheduled for deletion
@@ -244,6 +244,9 @@ namespace SkyEditor.Core
             }
 
             PluginLoadComplete?.Invoke(this, new EventArgs());
+
+            // Initialize things that depend on plugins being loaded
+            CurrentConsoleManager = new ConsoleManager(this);
         }
 
         /// <summary>
