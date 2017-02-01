@@ -10,7 +10,6 @@
 
 namespace SkyEditor.Core.Properties {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -23,7 +22,7 @@ namespace SkyEditor.Core.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -37,10 +36,10 @@ namespace SkyEditor.Core.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Properties.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -52,7 +51,7 @@ namespace SkyEditor.Core.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -64,7 +63,7 @@ namespace SkyEditor.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The following commands are available:.
         /// </summary>
-        public static string Console_AvailableCommands {
+        internal static string Console_AvailableCommands {
             get {
                 return ResourceManager.GetString("Console_AvailableCommands", resourceCulture);
             }
@@ -73,7 +72,7 @@ namespace SkyEditor.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Unknown command &quot;{0}&quot;..
         /// </summary>
-        public static string Console_CommandNotFound {
+        internal static string Console_CommandNotFound {
             get {
                 return ResourceManager.GetString("Console_CommandNotFound", resourceCulture);
             }
@@ -82,7 +81,7 @@ namespace SkyEditor.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Cannot load sibling view models..
         /// </summary>
-        public static string UI_ErrorCantLoadSiblingViewModels {
+        internal static string UI_ErrorCantLoadSiblingViewModels {
             get {
                 return ResourceManager.GetString("UI_ErrorCantLoadSiblingViewModels", resourceCulture);
             }
@@ -91,7 +90,7 @@ namespace SkyEditor.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No sibling view model of type &quot;{0}&quot; could be found..
         /// </summary>
-        public static string UI_ErrorNoSiblingViewModelOfType {
+        internal static string UI_ErrorNoSiblingViewModelOfType {
             get {
                 return ResourceManager.GetString("UI_ErrorNoSiblingViewModelOfType", resourceCulture);
             }

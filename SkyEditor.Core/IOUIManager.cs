@@ -17,12 +17,18 @@ namespace SkyEditor.Core
         }
 
         #region Events
+        public event EventHandler Completed;
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler<ProgressReportedEventArgs> ProgressChanged;
-        public event EventHandler Completed;
+        public event EventHandler SolutionChanged;
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Instance of the current plugin manager
+        /// </summary>
+        public PluginManager CurrentPluginManager { get; set; }
+
         /// <summary>
         /// The files that are currently open
         /// </summary>
