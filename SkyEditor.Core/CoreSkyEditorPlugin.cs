@@ -36,14 +36,14 @@ namespace SkyEditor.Core
             return new DummyConsoleProvider();
         }
 
-        ///// <summary>
-        ///// Creates an instance of <see cref="IOUIManager"/> for the application environment.
-        ///// </summary>
-        ///// <param name="manager">Instance of the current plugin manager.</param>
-        //public virtual GetIOUIManager(PluginManager manager)
-        //{
-        //    return new IOUIManager(manager);
-        //}
+        /// <summary>
+        /// Creates an instance of <see cref="IOUIManager"/> for the application environment.
+        /// </summary>
+        /// <param name="manager">Instance of the current plugin manager.</param>
+        public virtual IOUIManager GetIOUIManager(PluginManager manager)
+        {
+            return new IOUIManager(manager);
+        }
 
         /// <summary>
         /// Gets the full path of the directory inside the current IO provider where extensions are stored.

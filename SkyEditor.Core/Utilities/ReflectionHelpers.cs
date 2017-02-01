@@ -36,11 +36,11 @@ namespace SkyEditor.Core.Utilities
 
             // Determine which type we're evaluating
             // If obj is a type, use it.  Otherwise, get the type of obj.
-            if (obj.GetType() == typeof(TypeInfo))
+            if (obj is TypeInfo)
             {
                 original = (TypeInfo)obj;
             }
-            else if (obj.GetType() == typeof(Type))
+            else if (obj is Type)
             {
                 original = ((Type)obj).GetTypeInfo();
             }

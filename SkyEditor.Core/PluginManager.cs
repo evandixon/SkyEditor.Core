@@ -1,5 +1,4 @@
 ﻿// To-Do:
-// - Uncomment CurrentConsoleManager, and CurrentIOUIManager in Properties
 // - Uncomment first bit in LoadCore
 // - Uncomment GetPluginPaths in Functions
 
@@ -107,10 +106,10 @@ namespace SkyEditor.Core
         /// </summary>
         public ConsoleManager CurrentConsoleManager { get; protected set; }
 
-        ///// <summary>
-        ///// The current instance of the IO/UI Manager, helping manage open files and their associated UI.
-        ///// </summary>
-        //public IOUIManager CurrentIOUIManager { get; protected set; }
+        /// <summary>
+        /// The current instance of the IO/UI Manager, helping manage open files and their associated UI.
+        /// </summary>
+        public IOUIManager CurrentIOUIManager { get; protected set; }
 
         #endregion
 
@@ -155,7 +154,7 @@ namespace SkyEditor.Core
             CurrentIOProvider = core.GetIOProvider();
             CurrentSettingsProvider = core.GetSettingsProvider(this);
             CurrentConsoleProvider = core.GetConsoleProvider();
-            //CurrentIOUIManager = core.GetIOUIManager(this);
+            CurrentIOUIManager = core.GetIOUIManager(this);
 
             //// Delete files and directories scheduled for deletion
             //await DeleteScheduledFiles(CurrentSettingsProvider, CurrentIOProvider);
@@ -580,9 +579,11 @@ namespace SkyEditor.Core
         /// <returns>An IEnumerable containing shared instances of classes that inherit or implement the given base type.</returns>
         /// <remarks>These are shared instances, useful for metadata of specific instances of abstract classes (or other similar things).  If anything unique needs to be done with this, use <see cref="ReflectionHelpers.CreateNewInstance(object)"/> to create new instances of desired objects.</remarks>
 
-        public IEnumerable<object> GetRegisteredObjects<T>()
+        public IEnumerable<T> GetRegisteredObjects<T>() where T : class
         {
-            return GetRegisteredObjects(typeof(T).GetTypeInfo());
+            return GetRegisteredObjects(typeof(T).GetTypeInfo())
+                .Select(x => x as T ?? // Cast then perform sanity check
+                    throw new NullReferenceException($"GetRegisteredObjects<T> cast should not return null.  T is '{typeof(T).Name}' and x is '{x.GetType().Name}'."));
         }
         #endregion
 

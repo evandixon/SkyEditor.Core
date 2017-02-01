@@ -78,5 +78,23 @@ namespace SkyEditor.Core.Properties {
                 return ResourceManager.GetString("Console_CommandNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot load sibling view models..
+        /// </summary>
+        public static string UI_ErrorCantLoadSiblingViewModels {
+            get {
+                return ResourceManager.GetString("UI_ErrorCantLoadSiblingViewModels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No sibling view model of type &quot;{0}&quot; could be found..
+        /// </summary>
+        public static string UI_ErrorNoSiblingViewModelOfType {
+            get {
+                return ResourceManager.GetString("UI_ErrorNoSiblingViewModelOfType", resourceCulture);
+            }
+        }
     }
 }

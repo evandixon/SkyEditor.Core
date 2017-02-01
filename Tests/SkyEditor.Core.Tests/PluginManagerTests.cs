@@ -57,7 +57,7 @@ namespace SkyEditor.Core.Tests
             await manager.LoadCore(core);
 
             var plugins = manager.GetPlugins();
-            Assert.AreEqual(1, plugins.Where(x => x.GetType() == typeof(ManualLoadPlugin.BasicTestCoreMod)).Count());
+            Assert.AreEqual(1, plugins.Where(x => x is ManualLoadPlugin.BasicTestCoreMod).Count());
         }
 
 

@@ -123,4 +123,10 @@
   <data name="Console_CommandNotFound" xml:space="preserve">
     <value>Unknown command "{0}".</value>
   </data>
+  <data name="UI_ErrorCantLoadSiblingViewModels" xml:space="preserve">
+    <value>Cannot load sibling view models.</value>
+  </data>
+  <data name="UI_ErrorNoSiblingViewModelOfType" xml:space="preserve">
+    <value>No sibling view model of type "{0}" could be found.</value>
+  </data>
 </root>
