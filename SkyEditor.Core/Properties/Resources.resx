@@ -123,6 +123,9 @@
   <data name="Console_CommandNotFound" xml:space="preserve">
     <value>Unknown command "{0}".</value>
   </data>
+  <data name="Project_ItemExistsAtPath" xml:space="preserve">
+    <value>An item already exists at the given path</value>
+  </data>
   <data name="UI_ErrorCantLoadSiblingViewModels" xml:space="preserve">
     <value>Cannot load sibling view models.</value>
   </data>

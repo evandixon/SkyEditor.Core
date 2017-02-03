@@ -186,6 +186,23 @@ namespace SkyEditor.Core
         }
 
         /// <summary>
+        /// Gets or sets the setting with the given name
+        /// </summary>
+        /// <param name="settingName">Name of the setting</param>
+        /// <returns>The value of the setting, or null if the setting does not exist</returns>
+        public object this[string settingName]
+        {
+            get
+            {
+                return GetSetting(settingName);
+            }
+            set
+            {
+                SetSetting(settingName, value);
+            }
+        }
+
+        /// <summary>
         /// Serializes the current settings
         /// </summary>
         public string Serialize()

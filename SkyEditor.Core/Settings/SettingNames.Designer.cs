@@ -10,8 +10,9 @@
 
 namespace SkyEditor.Core.Settings {
     using System;
-    
-    
+    using System.Reflection;
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -39,7 +40,7 @@ namespace SkyEditor.Core.Settings {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Settings.SettingNames", typeof(SettingNames).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Settings.SettingNames", typeof(SettingNames).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -10,6 +10,7 @@
 
 namespace SkyEditor.Core.Properties {
     using System;
+    using System.Reflection;
     
     
     /// <summary>
@@ -39,7 +40,7 @@ namespace SkyEditor.Core.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Properties.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -75,6 +76,15 @@ namespace SkyEditor.Core.Properties {
         internal static string Console_CommandNotFound {
             get {
                 return ResourceManager.GetString("Console_CommandNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An item already exists at the given path.
+        /// </summary>
+        internal static string Project_ItemExistsAtPath {
+            get {
+                return ResourceManager.GetString("Project_ItemExistsAtPath", resourceCulture);
             }
         }
         
