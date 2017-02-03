@@ -154,7 +154,7 @@ namespace SkyEditor.Core
             CurrentIOProvider = core.GetIOProvider();
             CurrentSettingsProvider = core.GetSettingsProvider(this);
             CurrentConsoleProvider = core.GetConsoleProvider();
-            CurrentIOUIManager = core.GetIOUIManager(this);
+            //CurrentIOUIManager = core.GetIOUIManager(this);
 
             //// Delete files and directories scheduled for deletion
             //await DeleteScheduledFiles(CurrentSettingsProvider, CurrentIOProvider);
