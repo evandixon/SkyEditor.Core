@@ -6,11 +6,14 @@ using SkyEditor.Core.IO;
 
 namespace SkyEditor.Core.Projects
 {
-    public class Project : ProjectBase<ProjectFileWrapper>
+    /// <summary>
+    /// Represents a project that cannot be loaded due to an invalid type
+    /// </summary>
+    public class UnsupportedProject : ProjectBase
     {
         protected override Task<IOnDisk> LoadProjectItem(ItemValue item)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IOnDisk>(item);
         }
     }
 }

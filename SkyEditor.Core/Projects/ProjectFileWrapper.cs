@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SkyEditor.Core.Projects
 {
-    public class ProjectFileWrapper
+    public class ProjectFileWrapper : IOnDisk
     {
         /// <summary>
         /// Creates a new instance of <see cref="ProjectFileWrapper"/>

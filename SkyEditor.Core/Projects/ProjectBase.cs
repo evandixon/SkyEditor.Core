@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,14 +13,83 @@ namespace SkyEditor.Core.Projects
     /// <summary>
     /// Defines the common functionality of both projects and solutions
     /// </summary>
-    public class ProjectBase : INotifyModified, IReportProgress, IDisposable
+    public abstract class ProjectBase : INotifyModified, IReportProgress, ISavable, IDisposable
     {
 
-        public ProjectBase(PluginManager manager)
+        /// <summary>
+        /// Opens a project
+        /// </summary>
+        /// <typeparam name="T">Type of the project to load</typeparam>
+        /// <param name="filename">Path of the project file</param>
+        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <returns>The newly-opened project</returns>
+        public static async Task<ProjectBase> OpenProjectFile<T>(string filename, PluginManager manager)
         {
-            Settings = new SettingsProvider(manager);
-            this.CurrentPluginManager = manager;
+            // Open the file
+            var file = Json.DeserializeFromFile<ProjectFile>(filename, manager.CurrentIOProvider);
+
+            // Get the type
+            var projectType = ReflectionHelpers.GetTypeByName(file.AssemblyQualifiedTypeName, manager);
+            if (projectType == null)
+            {
+                // Can't find the type.  Use a dummy one so basic loading can continue.
+                projectType = typeof(UnsupportedProject).GetTypeInfo();
+            }
+
+            // Create the project & load basic info
+            var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
+            output.Filename = filename;
+            output.CurrentPluginManager = manager;
+            output.Name = file.Name;
+            output.Settings = SettingsProvider.Deserialize(file.InternalSettings, manager);
+
+            // Load items
+            var itemLoadTasks = new Dictionary<string, Task<IOnDisk>>();
+            foreach (var item in file.Items)
+            {
+                if (item.Value == null)
+                {
+                    // Directory
+                    output.CreateDirectory(item.Key);
+                }
+                else
+                {
+                    // Item
+                    itemLoadTasks.Add(item.Key, output.LoadProjectItem(item.Value));
+                }
+            }
+
+            // Add the items
+            foreach (var item in itemLoadTasks)
+            {
+                output.AddItem(item.Key, await item.Value);
+            }
+
+            return output;
         }
+
+        #region Child Classes
+
+        protected class ItemValue : IOnDisk
+        {
+            public string AssemblyQualifiedTypeName { get; set; }
+            public string Filename { get; set; }
+        }
+
+        protected class ProjectFile
+        {
+            public ProjectFile()
+            {
+                Items = new Dictionary<string, ItemValue>();
+            }
+            public const string CurrentVersion = "v2";
+            public string FileFormat { get; set; }
+            public string AssemblyQualifiedTypeName { get; set; }
+            public string Name { get; set; }
+            public Dictionary<string, ItemValue> Items { get; set; }
+            public string InternalSettings { get; set; }
+        }
+        #endregion
 
         #region Events
         /// <summary>
@@ -56,6 +126,11 @@ namespace SkyEditor.Core.Projects
         /// Raised when the build progresses
         /// </summary>
         public event EventHandler<ProgressReportedEventArgs> ProgressChanged;
+
+        /// <summary>
+        /// Raised when the project file has been saved
+        /// </summary>
+        public event EventHandler FileSaved;
         #endregion
 
         #region Properties
@@ -91,14 +166,7 @@ namespace SkyEditor.Core.Projects
         /// "/Test"/null - directory
         /// "/Test/Ing"/null - directory
         /// "/Test/File"/[GenericFile] - File of type GenericFile, named "File", in directory "Test"</remarks>
-        private Dictionary<string, object> Items { get; set; }
-
-        // While it would work to simply make Items protected, a function has the context that the result is calculated.
-        // ProjectBase(Of T) will shadow this function to return a different object type (for low-level access during saving), so this context is beneficial.
-        protected Dictionary<string, object> GetItemDictionary()
-        {
-            return Items;
-        }
+        private Dictionary<string, IOnDisk> Items { get; set; }
 
         /// <summary>
         /// Whether or not the project has unsaved changes
@@ -216,6 +284,55 @@ namespace SkyEditor.Core.Projects
         #endregion
 
         #region Functions
+
+        #region Project Open/Save
+
+        /// <summary>
+        /// Creates an instance of the current project item type from the data stored in the project file
+        /// </summary>
+        /// <param name="item">The data needed to load the item</param>
+        protected abstract Task<IOnDisk> LoadProjectItem(ItemValue item);
+
+        /// <summary>
+        /// Saves the project to the current file
+        /// </summary>
+        /// <param name="provider">Instance of the current IO provider</param>
+        public Task Save(IIOProvider provider)
+        {
+            var file = new ProjectFile();
+            file.FileFormat = ProjectFile.CurrentVersion;
+            file.AssemblyQualifiedTypeName = GetType().AssemblyQualifiedName;
+            file.Name = this.Name;
+            file.InternalSettings = this.Settings.Serialize();
+            file.Items = new Dictionary<string, ItemValue>();
+
+            // Create the item dictionary for the file
+            foreach (var item in Items)
+            {
+                if (item.Value == null)
+                {
+                    // Directory
+                    file.Items.Add(FixPath(item.Key), null);
+                }
+                else
+                {
+                    // Item
+                    file.Items.Add(FixPath(item.Key),
+                               new ItemValue
+                               {
+                                   Filename = item.Value.Filename.Replace(Path.GetDirectoryName(Filename), ""),
+                                   AssemblyQualifiedTypeName = item.Value.GetType().AssemblyQualifiedName
+                               });
+                }
+            }
+
+            Json.SerializeToFile(this.Filename, file, provider);
+            FileSaved?.Invoke(this, new EventArgs());
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
         #region Building
 
         /// <summary>
@@ -277,7 +394,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="recursive">Whether or not to search child directories.</param>
         /// <param name="getDirectories">Whether to get files or directories.</param>
         /// <returns>An instance of <see cref="IEnumerable<KeyValuePair<string, object>>"/>, where each key is the full path and each value is the corresponding object, or null if the path is a directory.</returns>
-        private IEnumerable<KeyValuePair<string, object>> GetItemsInternal(string path, bool recursive, bool getDirectories)
+        private IEnumerable<KeyValuePair<string, IOnDisk>> GetItemsInternal(string path, bool recursive, bool getDirectories)
         {
             var fixedPath = FixPath(path).ToLowerInvariant() + "/";
 
@@ -316,7 +433,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="path">Path from which to get the items</param>
         /// <param name="recursive">Whether or not to search all directories or only the given path</param>
         /// <returns>The keys and values of all the items in the given path</returns>
-        public Dictionary<string, object> GetItems(string path, bool recursive)
+        public Dictionary<string, IOnDisk> GetItems(string path, bool recursive)
         {
             return GetItemsInternal(path, recursive, false).ToDictionary(x => x.Key, y => y.Value);
         }
@@ -348,7 +465,7 @@ namespace SkyEditor.Core.Projects
         /// </summary>
         /// <param name="path">New path of the item</param>
         /// <param name="item">The item to add</param>
-        protected void AddItem(string path, object item)
+        protected void AddItem(string path, IOnDisk item)
         {
             if (ItemExists(path))
             {
@@ -531,17 +648,8 @@ namespace SkyEditor.Core.Projects
         #endregion
     }
 
-    public abstract class ProjectBase<T> : ProjectBase where T : class
+    public abstract class ProjectBase<T> : ProjectBase where T : class, IOnDisk
     {
-        public ProjectBase(PluginManager manager) : base(manager)
-        {
-        }
-
-        protected new Dictionary<string, T> GetItemDictionary()
-        {
-            return base.GetItemDictionary().ToDictionary(x => x.Key, y => y as T);
-        }
-
         protected new T GetItem(string path)
         {
             return base.GetItem(path) as T;
