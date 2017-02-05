@@ -8,7 +8,7 @@ using System.Text;
 
 namespace SkyEditor.Core
 {
-    public class IOUIManager : IDisposable, INotifyPropertyChanged, IReportProgress
+    public class IOUIManager : IDisposable, INotifyPropertyChanged/*, IReportProgress*/
     {
 
         public IOUIManager(PluginManager manager)
@@ -44,13 +44,13 @@ namespace SkyEditor.Core
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
-        public float Progress => throw new NotImplementedException();
+        //public float Progress => throw new NotImplementedException();
 
-        public string Message => throw new NotImplementedException();
+        //public string Message => throw new NotImplementedException();
 
-        public bool IsIndeterminate => throw new NotImplementedException();
+        //public bool IsIndeterminate => throw new NotImplementedException();
 
-        public bool IsCompleted => throw new NotImplementedException();
+        //public bool IsCompleted => throw new NotImplementedException();
 
         protected virtual void Dispose(bool disposing)
         {

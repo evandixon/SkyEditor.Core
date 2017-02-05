@@ -576,9 +576,7 @@ namespace SkyEditor.Core
 
         public IEnumerable<T> GetRegisteredObjects<T>() where T : class
         {
-            return GetRegisteredObjects(typeof(T).GetTypeInfo())
-                .Select(x => x as T ?? // Cast then perform sanity check
-                    throw new NullReferenceException($"GetRegisteredObjects<T> cast should not return null.  T is '{typeof(T).Name}' and x is '{x.GetType().Name}'."));
+            return GetRegisteredObjects(typeof(T).GetTypeInfo()).Select(x => x as T);
         }
         #endregion
 
