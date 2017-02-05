@@ -80,11 +80,83 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No method to open the file of type &quot;{0}&quot; could be found.  This type must either implement IOpenableFile or have a registered IFileOpener that supports this type..
+        /// </summary>
+        internal static string IO_ErrorNoFileOpener {
+            get {
+                return ResourceManager.GetString("IO_ErrorNoFileOpener", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempted to write to read-only file.
+        /// </summary>
+        internal static string IO_ErrorReadOnly {
+            get {
+                return ResourceManager.GetString("IO_ErrorReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a file at the given path in the current I/O provider.
+        /// </summary>
+        internal static string IO_FileNotFound {
+            get {
+                return ResourceManager.GetString("IO_FileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When the file is in memory, length cannot exceed int.MaxValue.
+        /// </summary>
+        internal static string IO_GenericFile_ErrorLengthTooLarge {
+            get {
+                return ResourceManager.GetString("IO_GenericFile_ErrorLengthTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using GenericFile.Save() requires GenericFile.Filename to not be null..
+        /// </summary>
+        internal static string IO_GenericFile_ErrorNoSaveFilename {
+            get {
+                return ResourceManager.GetString("IO_GenericFile_ErrorNoSaveFilename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Index &quot;{0}&quot; out of range.  Total length of file: &quot;{1}&quot;..
+        /// </summary>
+        internal static string IO_GenericFile_OutOfRange {
+            get {
+                return ResourceManager.GetString("IO_GenericFile_OutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An item already exists at the given path.
         /// </summary>
         internal static string Project_ItemExistsAtPath {
             get {
                 return ResourceManager.GetString("Project_ItemExistsAtPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid type supplied.  It should implement or inherit &quot;{0}&quot;..
+        /// </summary>
+        internal static string Reflection_ErrorInvalidType {
+            get {
+                return ResourceManager.GetString("Reflection_ErrorInvalidType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The supplied type cannot be instatiated.  Please make sure it has a default constructor and is not an abstract class or interface..
+        /// </summary>
+        internal static string Reflection_ErrorNoDefaultConstructor {
+            get {
+                return ResourceManager.GetString("Reflection_ErrorNoDefaultConstructor", resourceCulture);
             }
         }
         

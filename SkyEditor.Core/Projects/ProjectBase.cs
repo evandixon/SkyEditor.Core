@@ -15,6 +15,12 @@ namespace SkyEditor.Core.Projects
     public class ProjectBase : INotifyModified, IReportProgress, IDisposable
     {
 
+        public ProjectBase(PluginManager manager)
+        {
+            Settings = new SettingsProvider(manager);
+            this.CurrentPluginManager = manager;
+        }
+
         #region Events
         /// <summary>
         /// Raised when the project completes a build
@@ -527,6 +533,10 @@ namespace SkyEditor.Core.Projects
 
     public abstract class ProjectBase<T> : ProjectBase where T : class
     {
+        public ProjectBase(PluginManager manager) : base(manager)
+        {
+        }
+
         protected new Dictionary<string, T> GetItemDictionary()
         {
             return base.GetItemDictionary().ToDictionary(x => x.Key, y => y as T);

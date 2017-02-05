@@ -123,8 +123,32 @@
   <data name="Console_CommandNotFound" xml:space="preserve">
     <value>Unknown command "{0}".</value>
   </data>
+  <data name="IO_ErrorNoFileOpener" xml:space="preserve">
+    <value>No method to open the file of type "{0}" could be found.  This type must either implement IOpenableFile or have a registered IFileOpener that supports this type.</value>
+  </data>
+  <data name="IO_ErrorReadOnly" xml:space="preserve">
+    <value>Attempted to write to read-only file</value>
+  </data>
+  <data name="IO_FileNotFound" xml:space="preserve">
+    <value>Could not find a file at the given path in the current I/O provider</value>
+  </data>
+  <data name="IO_GenericFile_ErrorLengthTooLarge" xml:space="preserve">
+    <value>When the file is in memory, length cannot exceed int.MaxValue</value>
+  </data>
+  <data name="IO_GenericFile_ErrorNoSaveFilename" xml:space="preserve">
+    <value>Using GenericFile.Save() requires GenericFile.Filename to not be null.</value>
+  </data>
+  <data name="IO_GenericFile_OutOfRange" xml:space="preserve">
+    <value>Index "{0}" out of range.  Total length of file: "{1}".</value>
+  </data>
   <data name="Project_ItemExistsAtPath" xml:space="preserve">
     <value>An item already exists at the given path</value>
+  </data>
+  <data name="Reflection_ErrorInvalidType" xml:space="preserve">
+    <value>Invalid type supplied.  It should implement or inherit "{0}".</value>
+  </data>
+  <data name="Reflection_ErrorNoDefaultConstructor" xml:space="preserve">
+    <value>The supplied type cannot be instatiated.  Please make sure it has a default constructor and is not an abstract class or interface.</value>
   </data>
   <data name="UI_ErrorCantLoadSiblingViewModels" xml:space="preserve">
     <value>Cannot load sibling view models.</value>

@@ -82,11 +82,6 @@ namespace SkyEditor.Core
         public string ExtensionDirectory { get; set; }
 
         /// <summary>
-        /// Function that can determine whether or not a file of a given length will safely fit in memory.
-        /// </summary>
-        public Func<long, bool> CanLoadFileInMemoryFunction { get; protected set; }
-
-        /// <summary>
         /// The current IO Provider for the application.
         /// </summary>
         public IIOProvider CurrentIOProvider { get; protected set; }
