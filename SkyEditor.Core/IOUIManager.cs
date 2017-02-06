@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SkyEditor.Core
 {
@@ -165,6 +166,11 @@ namespace SkyEditor.Core
         #endregion
 
         public IEnumerable<object> GetViewModelsForModel(object dummy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<object>> GetMenuActionTargets(MenuAction action)
         {
             throw new NotImplementedException();
         }
