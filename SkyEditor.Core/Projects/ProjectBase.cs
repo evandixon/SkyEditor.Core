@@ -13,7 +13,7 @@ namespace SkyEditor.Core.Projects
     /// <summary>
     /// Defines the common functionality of both projects and solutions
     /// </summary>
-    public abstract class ProjectBase : INotifyModified, IReportProgress, ISavable, IDisposable
+    public abstract class ProjectBase : INotifyModified, IReportProgress, IOnDisk, ISavable, IDisposable
     {
 
         /// <summary>

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace SkyEditor.Core.UI
 {
+    /// <summary>
+    /// View model for an anchorable control
+    /// </summary>
     public abstract class AnchorableViewModel
     {
         /// <summary>

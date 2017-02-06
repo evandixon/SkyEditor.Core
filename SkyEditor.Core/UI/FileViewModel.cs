@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.Projects;
 using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -197,6 +198,16 @@ namespace SkyEditor.Core.UI
         /// The command used to close the file
         /// </summary>
         public RelayCommand CloseCommand { get; }
+
+        /// <summary>
+        /// Whether or not to dispose the underlying model when the view model is closed
+        /// </summary>
+        public bool DisposeOnClose { get; set; }
+
+        /// <summary>
+        /// The project to which the file belongs, or null if the file is independant
+        /// </summary>
+        public Project ParentProject { get; set; }
 
         #endregion
 
@@ -438,8 +449,11 @@ namespace SkyEditor.Core.UI
             {
                 if (disposing)
                 {
-                    // Dispose of the underlying model if applicable
-                    (_model as IDisposable)?.Dispose();
+                    if (DisposeOnClose)
+                    {
+                        // Dispose of the underlying model if applicable
+                        (_model as IDisposable)?.Dispose();
+                    }                   
 
                     // Dispose of view models
                     ResetViewModels();
