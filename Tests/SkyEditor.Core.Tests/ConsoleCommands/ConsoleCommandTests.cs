@@ -41,7 +41,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
             TestConsoleCommand command = new TestConsoleCommand();
 
-            Assert.AreEqual("True\r\ntest\r\narguments\r\nstandard\r\nin\r\n", ConsoleManager.TestConsoleCommand(command, manager, new string[] { "test", "arguments" }, "standard\r\nin").Result);
+            Assert.AreEqual("True%ntest%narguments%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleManager.TestConsoleCommand(command, manager, new string[] { "test", "arguments" }, "standard\nin").Result);
         }
     }
 
