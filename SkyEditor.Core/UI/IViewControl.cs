@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace SkyEditor.Core.UI
 {
+    /// <summary>
+    /// Represents a View for a ViewModel
+    /// </summary>
     public interface IViewControl
     {
         /// <summary>

@@ -161,6 +161,15 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All Files.
+        /// </summary>
+        internal static string UI_AllFiles {
+            get {
+                return ResourceManager.GetString("UI_AllFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A menu action&apos;s ActionPath must contain at least one element..
         /// </summary>
         internal static string UI_ErrorActionMenuPathEmpty {
@@ -202,6 +211,24 @@ namespace SkyEditor.Core.Properties {
         internal static string UI_Ready {
             get {
                 return ResourceManager.GetString("UI_Ready", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Supported Files.
+        /// </summary>
+        internal static string UI_SupportedFiles {
+            get {
+                return ResourceManager.GetString("UI_SupportedFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Files.
+        /// </summary>
+        internal static string UI_UnknownFileRegisterTemplate {
+            get {
+                return ResourceManager.GetString("UI_UnknownFileRegisterTemplate", resourceCulture);
             }
         }
     }
