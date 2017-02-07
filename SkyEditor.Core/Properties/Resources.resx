@@ -156,4 +156,7 @@
   <data name="UI_ErrorNoSiblingViewModelOfType" xml:space="preserve">
     <value>No sibling view model of type "{0}" could be found.</value>
   </data>
+  <data name="UI_Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
 </root>

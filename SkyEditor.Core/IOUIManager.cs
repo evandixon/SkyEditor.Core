@@ -10,12 +10,22 @@ using System.Threading.Tasks;
 
 namespace SkyEditor.Core
 {
-    public class IOUIManager : IDisposable, INotifyPropertyChanged/*, IReportProgress*/
+    public class IOUIManager : IDisposable, INotifyPropertyChanged, IReportProgress
     {
 
         public IOUIManager(PluginManager manager)
         {
-            throw new NotImplementedException();
+            // Set main properties
+            this.CurrentPluginManager = manager;
+            this.CurrentSolution = null;
+            this.OpenFiles = new ObservableCollection<FileViewModel>();
+            this.AnchorableViewModels = new ObservableCollection<AnchorableViewModel>();
+
+            // Set Progress Properties
+            this._message = Properties.Resources.UI_Ready;
+            this._progress = 0;
+            this._isIndeterminate = false;
+            this._isCompleted = true;
         }
 
         #region Events
@@ -163,6 +173,89 @@ namespace SkyEditor.Core
         private Project _currentProject;
 
         private ObservableCollection<ActionMenuItem> _rootMenuItems;
+
+        // IReportProgress properties
+
+        /// <summary>
+        /// The progress of the current loading operation
+        /// </summary>
+        public float Progress
+        {
+            get
+            {
+                return _progress;
+            }
+            set
+            {
+                if (_progress != value)
+                {
+                    _progress = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
+                }
+            }
+        }
+        private float _progress;
+
+        /// <summary>
+        /// A user-friendly string identifying what the current loading operation is doing
+        /// </summary>
+        public string Message
+        {
+            get
+            {
+                return _message;
+            }
+            set
+            {
+                if (_message != value)
+                {
+                    _message = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
+                }
+            }
+        }
+        private string _message;
+
+        /// <summary>
+        /// Whether or not the current loading progress (<see cref="Progress"/>) can be accurately determined
+        /// </summary>
+        public bool IsIndeterminate
+        {
+            get
+            {
+                return _isIndeterminate;
+            }
+            set
+            {
+                if (_isIndeterminate != value)
+                {
+                    _isIndeterminate = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsIndeterminate)));
+                }
+            }
+        }
+        private bool _isIndeterminate;
+
+        /// <summary>
+        /// Whether or not the current load operation is complete
+        /// </summary>
+        public bool IsCompleted
+        {
+            get
+            {
+                return _isCompleted;
+            }
+            set
+            {
+                if (_isCompleted != value)
+                {
+                    _isCompleted = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
+                }
+            }
+        }
+        private bool _isCompleted;
+
         #endregion
 
         public IEnumerable<object> GetViewModelsForModel(object dummy)

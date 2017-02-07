@@ -177,5 +177,14 @@ namespace SkyEditor.Core.Properties {
                 return ResourceManager.GetString("UI_ErrorNoSiblingViewModelOfType", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        internal static string UI_Ready {
+            get {
+                return ResourceManager.GetString("UI_Ready", resourceCulture);
+            }
+        }
     }
 }
