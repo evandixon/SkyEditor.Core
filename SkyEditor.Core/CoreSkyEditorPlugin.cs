@@ -40,9 +40,9 @@ namespace SkyEditor.Core
         /// Creates an instance of <see cref="IOUIManager"/> for the application environment.
         /// </summary>
         /// <param name="manager">Instance of the current plugin manager.</param>
-        public virtual IOUIManager GetIOUIManager(PluginManager manager)
+        public virtual ApplicationViewModel GetIOUIManager(PluginManager manager)
         {
-            return new IOUIManager(manager);
+            return new ApplicationViewModel(manager);
         }
 
         /// <summary>

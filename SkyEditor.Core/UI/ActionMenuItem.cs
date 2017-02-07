@@ -23,7 +23,7 @@ namespace SkyEditor.Core.UI
         /// <summary>
         /// Instance of the current IO/UI manager
         /// </summary>
-        public IOUIManager CurrentIOUIManager { get; set; }
+        public ApplicationViewModel CurrentApplicationViewModel { get; set; }
 
         /// <summary>
         /// Header of the menu item
@@ -102,7 +102,7 @@ namespace SkyEditor.Core.UI
             }
             else
             {
-                return await CurrentIOUIManager.GetMenuActionTargets(action);
+                return await CurrentApplicationViewModel.GetMenuActionTargets(action);
             }
         }
     }

@@ -101,11 +101,6 @@ namespace SkyEditor.Core
         /// </summary>
         public ConsoleManager CurrentConsoleManager { get; protected set; }
 
-        /// <summary>
-        /// The current instance of the IO/UI Manager, helping manage open files and their associated UI.
-        /// </summary>
-        public IOUIManager CurrentIOUIManager { get; protected set; }
-
         #endregion
 
         #region Events

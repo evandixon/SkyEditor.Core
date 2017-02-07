@@ -259,14 +259,14 @@ namespace SkyEditor.Core.UI
         /// <summary>
         /// Gets the current view models for the given file, creating them if necessary
         /// </summary>
-        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <param name="appViewModel">Instance of the current application ViewModel</param>
         /// <returns>An IEnumerable of view models that support the given file's model</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="manager"/> is null</exception>
-        public IEnumerable<GenericViewModel> GetViewModels(PluginManager manager)
+        public IEnumerable<GenericViewModel> GetViewModels(ApplicationViewModel appViewModel)
         {
-            if (manager == null)
+            if (appViewModel == null)
             {
-                throw new ArgumentNullException(nameof(manager));
+                throw new ArgumentNullException(nameof(appViewModel));
             }
 
             // Initialize if null
@@ -275,13 +275,13 @@ namespace SkyEditor.Core.UI
                 ViewModels = new List<GenericViewModel>();
 
                 // Search for potential view models
-                var allViewModels = manager.GetRegisteredObjects<GenericViewModel>();
+                var allViewModels = appViewModel.CurrentPluginManager.GetRegisteredObjects<GenericViewModel>();
                 foreach (var item in allViewModels)
                 {
                     // Set the plugin manager if needed
-                    if (item.CurrentPluginManager == null)
+                    if (item.CurrentApplicationViewModel == null)
                     {
-                        item.SetPluginManager(manager);
+                        item.SetApplicationViewModel(appViewModel);
                     }
 
                     // Check to see if this would be a valid view model
@@ -289,7 +289,7 @@ namespace SkyEditor.Core.UI
                     {
                         // Create the view model
                         var vm = ReflectionHelpers.CreateNewInstance(item) as GenericViewModel;
-                        vm.SetPluginManager(manager);
+                        vm.SetApplicationViewModel(appViewModel);
                         vm.SetModel(Model);
                         ViewModels.Add(vm);
 

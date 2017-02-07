@@ -20,36 +20,36 @@ namespace SkyEditor.Core.UI
         protected event EventHandler CurrentIOUIManagerChanged;
 
         /// <summary>
-        /// The IO/UI Manager to which this anchorable view model belongs
+        /// The application ViewModel to which this anchorable view model belongs
         /// </summary>
-        public IOUIManager CurrentIOUIManager
+        public ApplicationViewModel CurrentApplicationViewModel
         {
             get
             {
-                return _iouiManager;
+                return _appViewModel;
             }
             set
             {
                 // Remove old event handler
-                if (_iouiManager != null)
+                if (_appViewModel != null)
                 {
-                    _iouiManager.SolutionChanged -= _iouiManager_SolutionName;
+                    _appViewModel.SolutionChanged -= _iouiManager_SolutionName;
                 }
 
                 // Set the value
-                _iouiManager = value;
+                _appViewModel = value;
 
                 // Add new event handler
-                if (_iouiManager != null)
+                if (_appViewModel != null)
                 {
-                    _iouiManager.SolutionChanged += _iouiManager_SolutionName;
+                    _appViewModel.SolutionChanged += _iouiManager_SolutionName;
                 }
 
                 // Raise changed event
                 CurrentIOUIManagerChanged?.Invoke(this, new EventArgs());
             }
         }
-        protected IOUIManager _iouiManager;
+        protected ApplicationViewModel _appViewModel;
 
         /// <summary>
         /// Unique identifier for the anchorable view model

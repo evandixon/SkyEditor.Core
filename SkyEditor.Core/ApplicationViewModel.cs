@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace SkyEditor.Core
 {
-    public class IOUIManager : IDisposable, INotifyPropertyChanged, IReportProgress
+    public class ApplicationViewModel : IDisposable, INotifyPropertyChanged, IReportProgress
     {
 
-        public IOUIManager(PluginManager manager)
+        public ApplicationViewModel(PluginManager manager)
         {
             // Set main properties
             this.CurrentPluginManager = manager;
