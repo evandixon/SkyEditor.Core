@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -172,6 +173,8 @@ namespace SkyEditor.Core
         }
         private Project _currentProject;
 
+        private List<IReportProgress> RunningProgressReportables { get; set; }
+
         private ObservableCollection<ActionMenuItem> _rootMenuItems;
 
         // IReportProgress properties
@@ -256,6 +259,174 @@ namespace SkyEditor.Core
         }
         private bool _isCompleted;
 
+        #endregion
+
+        #region Task Watching
+        private class TaskProgressReporterWrapper : IReportProgress
+        {
+            public TaskProgressReporterWrapper(Task task)
+            {
+                IsCompleted = task.IsCompleted;
+                IsIndeterminate = true;
+                Message = Properties.Resources.UI_LoadingGeneric;
+                Progress = 0;
+                InnerTask = task;
+            }
+
+            public TaskProgressReporterWrapper(Task task, string loadingMessage)
+            {
+                IsCompleted = task.IsCompleted;
+                IsIndeterminate = true;
+                Message = loadingMessage;
+                Progress = 0;
+                InnerTask = task;
+            }
+
+            public Task InnerTask;
+
+            public float Progress { get; set; }
+
+            public string Message { get; set; }
+
+            public bool IsIndeterminate { get; set; }
+
+            public bool IsCompleted { get; set; }
+
+            public event EventHandler<ProgressReportedEventArgs> ProgressChanged;
+            public event EventHandler Completed;
+
+            public async void Start()
+            {
+                await InnerTask;
+                IsCompleted = true;
+                Completed?.Invoke(this, new EventArgs());
+            }
+        }
+
+        private object _loadingStatusLock = new object();
+        private object _loadingReportablesLock = new object();
+
+        /// <summary>
+        /// Adds the given <paramref name="task"/> to the list of currently loading tasks.
+        /// </summary>
+        /// <param name="task"><see cref="Task"/> to add to the loading list.</param>
+        /// <remarks>This overload will never show determinate progress.</remarks>    
+        public void ShowLoading(Task task)
+        {
+            var wrapper = new TaskProgressReporterWrapper(task);
+            wrapper.Start();
+            ShowLoading(wrapper);
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="task"/> to the list of currently loading tasks.
+        /// </summary>
+        /// <param name="task"><see cref="Task"/> to add to the loading list.</param>
+        /// <param name="loadingMessage">User-friendly loading message.  Usually what the task is doing.</param>
+        /// <remarks>This overload will never show determinate progress.</remarks>
+        public void ShowLoading(Task task, string loadingMessage)
+        {
+            var wrapper = new TaskProgressReporterWrapper(task, loadingMessage);
+            wrapper.Start();
+            ShowLoading(wrapper);
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="task"/> to the list of currently loading tasks.
+        /// </summary>
+        /// <param name="task"><see cref="IReportProgress"/> to add to the loading list.</param>
+        public void ShowLoading(IReportProgress task)
+        {
+            task.Completed += OnLoadingTaskCompleted;
+            task.ProgressChanged += OnLoadingTaskProgressed;
+
+            IsCompleted = false;
+
+            lock (_loadingReportablesLock)
+            {
+                RunningProgressReportables.Add(task);
+            }
+
+            UpdateLoadingStatus();
+        }
+
+        private void OnLoadingTaskCompleted(object sender, EventArgs e)
+        {
+            CleanupCompletedTasks();
+        }
+
+        private void OnLoadingTaskProgressed(object sender, ProgressReportedEventArgs e)
+        {
+            UpdateLoadingStatus();
+        }
+
+        private void UpdateLoadingStatus()
+        {
+            lock (_loadingStatusLock)
+            {
+                lock (_loadingReportablesLock)
+                {
+                    // Update progress and determinancy
+                    if (RunningProgressReportables.Any(x => x.IsIndeterminate))
+                    {
+                        IsIndeterminate = true;
+                    }
+                    else
+                    {
+                        IsIndeterminate = false;
+                        
+                        if (RunningProgressReportables.Count == 1)
+                        {
+                            Progress = RunningProgressReportables.First().Progress;
+                        }
+                        else if (RunningProgressReportables.Count == 0)
+                        {
+                            // Should be unreachable
+                            Progress = 0;
+                        }
+                        else
+                        {
+                            RunningProgressReportables.Select(x => x.Progress).Aggregate((x, y) => x * y);
+                        }
+
+                        // Update message
+                        if (RunningProgressReportables.Count > 1)
+                        {
+                            Message = Properties.Resources.UI_LoadingGeneric;
+                        }
+                        else if (RunningProgressReportables.Count == 0)
+                        {
+                            Message = Properties.Resources.UI_Ready;
+                        }
+                        else
+                        {
+                            Message = RunningProgressReportables.First().Message;
+                        }
+                    }
+                }
+            }
+
+            ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = this.IsIndeterminate, Message = this.Message, Progress = this.Progress });
+        }
+
+        private void CleanupCompletedTasks()
+        {
+            lock (_loadingReportablesLock)
+            {
+                foreach (var item in RunningProgressReportables.Where(x => x.IsCompleted).ToList())
+                {
+                    item.Completed -= OnLoadingTaskCompleted;
+                    item.ProgressChanged -= OnLoadingTaskProgressed;
+                    RunningProgressReportables.Remove(item);
+                }
+
+                if (RunningProgressReportables.Count == 0)
+                {
+                    IsCompleted = true;
+                    Completed?.Invoke(this, new EventArgs());
+                }
+            }
+        }
         #endregion
 
         public IEnumerable<object> GetViewModelsForModel(object dummy)
