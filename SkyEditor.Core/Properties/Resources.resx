@@ -150,6 +150,9 @@
   <data name="Reflection_ErrorNoDefaultConstructor" xml:space="preserve">
     <value>The supplied type cannot be instatiated.  Please make sure it has a default constructor and is not an abstract class or interface.</value>
   </data>
+  <data name="UI_ErrorActionMenuPathEmpty" xml:space="preserve">
+    <value>A menu action's ActionPath must contain at least one element.</value>
+  </data>
   <data name="UI_ErrorCantLoadSiblingViewModels" xml:space="preserve">
     <value>Cannot load sibling view models.</value>
   </data>

@@ -161,6 +161,15 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A menu action&apos;s ActionPath must contain at least one element..
+        /// </summary>
+        internal static string UI_ErrorActionMenuPathEmpty {
+            get {
+                return ResourceManager.GetString("UI_ErrorActionMenuPathEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot load sibling view models..
         /// </summary>
         internal static string UI_ErrorCantLoadSiblingViewModels {

@@ -429,7 +429,7 @@ namespace SkyEditor.Core
         }
         #endregion
 
-        public IEnumerable<object> GetViewModelsForModel(object dummy)
+        public IEnumerable<GenericViewModel> GetViewModelsForModel(object dummy)
         {
             throw new NotImplementedException();
         }
