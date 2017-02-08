@@ -27,7 +27,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="matches">The matches between which to distinguish</param>
         /// <returns>The <see cref="FileTypeDetectionResult"/> that was selected.</returns>
-        public static FileTypeDetectionResult PickFirstDuplicateMatchSelector(List<FileTypeDetectionResult> matches)
+        public static FileTypeDetectionResult PickFirstDuplicateMatchSelector(IEnumerable<FileTypeDetectionResult> matches)
         {
             return matches.First();
         }
