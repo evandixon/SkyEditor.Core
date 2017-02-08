@@ -16,9 +16,9 @@ namespace SkyEditor.Core.UI
         {
         }
 
-        public GenericViewModel(object model, PluginManager manager)
+        public GenericViewModel(object model, ApplicationViewModel appViewModel)
         {
-            SetPluginManager(manager);
+            SetApplicationViewModel(appViewModel);
             SetModel(model);
         }
 
@@ -47,9 +47,9 @@ namespace SkyEditor.Core.UI
         public virtual object Model { get; set; }
 
         /// <summary>
-        /// Instance of the current plugin manager
+        /// Instance of the current application ViewModel
         /// </summary>
-        public virtual PluginManager CurrentPluginManager { get; set; }
+        public virtual ApplicationViewModel CurrentApplicationViewModel { get; set; }
 
         /// <summary>
         /// An integer used to sort a list of sibling view models with the same model
@@ -86,7 +86,7 @@ namespace SkyEditor.Core.UI
         /// <returns>A boolean indicating whether or not a view model of the desired type exists with the same model as <see cref="Model"/></returns>
         public bool HasSiblingViewModel<T>() where T : GenericViewModel
         {
-            var siblings = CurrentPluginManager.CurrentIOUIManager.GetViewModelsForModel(Model);
+            var siblings = CurrentApplicationViewModel.GetViewModelsForModel(Model);
             return siblings?.Any(x => x is T) ?? false;
         }
 
@@ -98,7 +98,7 @@ namespace SkyEditor.Core.UI
         /// <returns>An instance of a view model with the desired type that has the same model as <see cref="Model"/>, or null if <paramref name="throwOnError"/> is false and no such view model could be found</returns>
         public T GetSiblingViewModel<T>(bool throwOnError = true) where T : GenericViewModel
         {
-            var siblings = CurrentPluginManager.CurrentIOUIManager.GetViewModelsForModel(Model);
+            var siblings = CurrentApplicationViewModel.GetViewModelsForModel(Model);
             if (siblings == null)
             {
                 if (throwOnError)
@@ -136,12 +136,12 @@ namespace SkyEditor.Core.UI
         #region Current Model/Manager
 
         /// <summary>
-        /// Sets the current plugin manager
+        /// Sets the current application ViewModel
         /// </summary>
-        /// <param name="manager">Instance of the current plugin manager</param>
-        public virtual void SetPluginManager(PluginManager manager)
+        /// <param name="manager">Instance of the current application ViewModel</param>
+        public virtual void SetApplicationViewModel(ApplicationViewModel appViewModel)
         {
-            this.CurrentPluginManager = manager;
+            this.CurrentApplicationViewModel = appViewModel;
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace SkyEditor.Core.UI
         {
         }
 
-        public GenericViewModel(T model, PluginManager manager) : base(model, manager)
+        public GenericViewModel(T model, ApplicationViewModel appViewModel) : base(model, appViewModel)
         {
         }
 

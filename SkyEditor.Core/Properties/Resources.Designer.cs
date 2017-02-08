@@ -161,6 +161,24 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All Files.
+        /// </summary>
+        internal static string UI_AllFiles {
+            get {
+                return ResourceManager.GetString("UI_AllFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A menu action&apos;s ActionPath must contain at least one element..
+        /// </summary>
+        internal static string UI_ErrorActionMenuPathEmpty {
+            get {
+                return ResourceManager.GetString("UI_ErrorActionMenuPathEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot load sibling view models..
         /// </summary>
         internal static string UI_ErrorCantLoadSiblingViewModels {
@@ -175,6 +193,42 @@ namespace SkyEditor.Core.Properties {
         internal static string UI_ErrorNoSiblingViewModelOfType {
             get {
                 return ResourceManager.GetString("UI_ErrorNoSiblingViewModelOfType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading....
+        /// </summary>
+        internal static string UI_LoadingGeneric {
+            get {
+                return ResourceManager.GetString("UI_LoadingGeneric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        internal static string UI_Ready {
+            get {
+                return ResourceManager.GetString("UI_Ready", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Supported Files.
+        /// </summary>
+        internal static string UI_SupportedFiles {
+            get {
+                return ResourceManager.GetString("UI_SupportedFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Files.
+        /// </summary>
+        internal static string UI_UnknownFileRegisterTemplate {
+            get {
+                return ResourceManager.GetString("UI_UnknownFileRegisterTemplate", resourceCulture);
             }
         }
         

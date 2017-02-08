@@ -118,67 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Console_AvailableCommands" xml:space="preserve">
-    <value>The following commands are available:</value>
+    <value>Les commandes suivants sont disponible:</value>
   </data>
   <data name="Console_CommandNotFound" xml:space="preserve">
-    <value>Unknown command "{0}".</value>
-  </data>
-  <data name="IO_ErrorNoFileOpener" xml:space="preserve">
-    <value>No method to open the file of type "{0}" could be found.  This type must either implement IOpenableFile or have a registered IFileOpener that supports this type.</value>
+    <value>Impossible de trouver la commande:"{0}".</value>
   </data>
   <data name="IO_ErrorReadOnly" xml:space="preserve">
-    <value>Attempted to write to read-only file</value>
-  </data>
-  <data name="IO_FileNotFound" xml:space="preserve">
-    <value>Could not find a file at the given path in the current I/O provider</value>
-  </data>
-  <data name="IO_GenericFile_ErrorLengthTooLarge" xml:space="preserve">
-    <value>When the file is in memory, length cannot exceed int.MaxValue</value>
-  </data>
-  <data name="IO_GenericFile_ErrorNoSaveFilename" xml:space="preserve">
-    <value>Using GenericFile.Save() requires GenericFile.Filename to not be null.</value>
-  </data>
-  <data name="IO_GenericFile_OutOfRange" xml:space="preserve">
-    <value>Index "{0}" out of range.  Total length of file: "{1}".</value>
-  </data>
-  <data name="Project_ItemExistsAtPath" xml:space="preserve">
-    <value>An item already exists at the given path</value>
-  </data>
-  <data name="Reflection_ErrorInvalidType" xml:space="preserve">
-    <value>Invalid type supplied.  It should implement or inherit "{0}".</value>
-  </data>
-  <data name="Reflection_ErrorNoDefaultConstructor" xml:space="preserve">
-    <value>The supplied type cannot be instatiated.  Please make sure it has a default constructor and is not an abstract class or interface.</value>
+    <value>L'écriture sur un fichier en lecture seule n'est pas autorisée.</value>
   </data>
   <data name="UI_AllFiles" xml:space="preserve">
-    <value>All Files</value>
-  </data>
-  <data name="UI_ErrorActionMenuPathEmpty" xml:space="preserve">
-    <value>A menu action's ActionPath must contain at least one element.</value>
-  </data>
-  <data name="UI_ErrorCantLoadSiblingViewModels" xml:space="preserve">
-    <value>Cannot load sibling view models.</value>
-  </data>
-  <data name="UI_ErrorNoSiblingViewModelOfType" xml:space="preserve">
-    <value>No sibling view model of type "{0}" could be found.</value>
-  </data>
-  <data name="Utilities_AsyncFor_ErrorNoConcurrentExecution" xml:space="preserve">
-    <value>Only one AsyncFor operation can run at any one time.  To run another, create another instance of AsyncFor.</value>
-  </data>
-  <data name="Utilities_AsyncFor_ErrorStepCount0" xml:space="preserve">
-    <value>Step count cannot be zero.</value>
+    <value>Tous les Fichiers</value>
   </data>
   <data name="UI_LoadingGeneric" xml:space="preserve">
-    <value>Loading...</value>
+    <value>Chargement...</value>
   </data>
   <data name="UI_Ready" xml:space="preserve">
-    <value>Ready</value>
+    <value>Prêt</value>
   </data>
   <data name="UI_SupportedFiles" xml:space="preserve">
-    <value>Supported Files</value>
+    <value>Fichiers Supportés</value>
   </data>
   <data name="UI_UnknownFileRegisterTemplate" xml:space="preserve">
-    <value>{0} Files</value>
+    <value>{0} Fichiers</value>
     <comment>Display name for IO filters that aren't registered.  {0} will be replaced by the upper case of the extension.</comment>
   </data>
 </root>
