@@ -177,5 +177,23 @@ namespace SkyEditor.Core.Properties {
                 return ResourceManager.GetString("UI_ErrorNoSiblingViewModelOfType", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one AsyncFor operation can run at any one time.  To run another, create another instance of AsyncFor..
+        /// </summary>
+        internal static string Utilities_AsyncFor_ErrorNoConcurrentExecution {
+            get {
+                return ResourceManager.GetString("Utilities_AsyncFor_ErrorNoConcurrentExecution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Step count cannot be zero..
+        /// </summary>
+        internal static string Utilities_AsyncFor_ErrorStepCount0 {
+            get {
+                return ResourceManager.GetString("Utilities_AsyncFor_ErrorStepCount0", resourceCulture);
+            }
+        }
     }
 }

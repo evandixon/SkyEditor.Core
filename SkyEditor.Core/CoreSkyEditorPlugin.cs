@@ -25,7 +25,10 @@ namespace SkyEditor.Core
         /// </summary>
         /// <param name="manager"></param>
         /// <returns>An instance of the <see cref="ISettingsProvider"/> for the application environment.</returns>
-        public abstract ISettingsProvider GetSettingsProvider(PluginManager manager);
+        public virtual ISettingsProvider GetSettingsProvider(PluginManager manager)
+        {
+            return new SettingsProvider(manager);
+        }
 
         /// <summary>
         /// Creates an instance of <see cref="IConsoleProvider"/> for the application environment.
@@ -70,6 +73,22 @@ namespace SkyEditor.Core
         public virtual Assembly LoadAssembly(string assemblyPath)
         {
             throw new NotSupportedException();
+        }
+
+        public override void Load(PluginManager manager)
+        {
+            base.Load(manager);
+
+            manager.RegisterTypeRegister<IFileOpener>();
+            manager.RegisterTypeRegister<IFileTypeDetector>();
+            manager.RegisterTypeRegister<IDirectoryTypeDetector>();
+
+            manager.RegisterType<IFileOpener, OpenableFileOpener>();
+            manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
+
+            manager.RegisterTypeRegister<IOpenableFile>();
+            manager.RegisterTypeRegister<ICreatableFile>();
+            manager.RegisterTypeRegister<IDetectableFileType>();
         }
     }
 }

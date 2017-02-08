@@ -156,4 +156,10 @@
   <data name="UI_ErrorNoSiblingViewModelOfType" xml:space="preserve">
     <value>No sibling view model of type "{0}" could be found.</value>
   </data>
+  <data name="Utilities_AsyncFor_ErrorNoConcurrentExecution" xml:space="preserve">
+    <value>Only one AsyncFor operation can run at any one time.  To run another, create another instance of AsyncFor.</value>
+  </data>
+  <data name="Utilities_AsyncFor_ErrorStepCount0" xml:space="preserve">
+    <value>Step count cannot be zero.</value>
+  </data>
 </root>
