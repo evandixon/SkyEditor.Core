@@ -15,6 +15,35 @@ namespace SkyEditor.Core.Projects
     /// </summary>
     public abstract class ProjectBase : INotifyModified, IReportProgress, IOnDisk, ISavable, IDisposable
     {
+        /// <summary>
+        /// Creates a new project
+        /// </summary>
+        /// <typeparam name="T">Type of the project</typeparam>
+        /// <param name="parentPath">Directory in which the project directory will be created</param>
+        /// <param name="projectName">Name of the project</param>
+        /// <param name="projectType">Type of the project</param>
+        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <returns>The newly created project</returns>
+        public static T CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
+        {           
+            // Create the instance
+            var output = ReflectionHelpers.CreateInstance(projectType) as T;
+
+            // Get the filename
+            var filename = Path.Combine(parentPath, projectName, projectName + "." + output.ProjectFileExtension);
+            // Create the directory if it doesn't exist
+            if (!manager.CurrentIOProvider.DirectoryExists(Path.GetDirectoryName(filename)))
+            {
+                manager.CurrentIOProvider.CreateDirectory(Path.GetDirectoryName(filename));
+            }
+
+            // Set the properties
+            output.Filename = filename;
+            output.CurrentPluginManager = manager;
+            output.Name = projectName;
+            output.Settings = new SettingsProvider(manager);
+            return output;
+        }
 
         /// <summary>
         /// Opens a project
@@ -23,7 +52,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="filename">Path of the project file</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly-opened project</returns>
-        public static async Task<ProjectBase> OpenProjectFile<T>(string filename, PluginManager manager)
+        public static async Task<T> OpenProjectFile<T>(string filename, PluginManager manager) where T : ProjectBase
         {
             // Open the file
             var file = Json.DeserializeFromFile<ProjectFile>(filename, manager.CurrentIOProvider);
@@ -37,7 +66,7 @@ namespace SkyEditor.Core.Projects
             }
 
             // Create the project & load basic info
-            var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
+            var output = ReflectionHelpers.CreateInstance(projectType) as T;
             output.Filename = filename;
             output.CurrentPluginManager = manager;
             output.Name = file.Name;
@@ -149,6 +178,11 @@ namespace SkyEditor.Core.Projects
         /// Name of the project
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// The default extension used for the project file
+        /// </summary>
+        public virtual string ProjectFileExtension => "skyproj";
 
         /// <summary>
         /// Settings associated with the project
