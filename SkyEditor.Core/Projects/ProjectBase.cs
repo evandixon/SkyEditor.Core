@@ -316,11 +316,13 @@ namespace SkyEditor.Core.Projects
                 }
                 else
                 {
+                    var absolutePath = new Uri(item.Value.Filename);
+                    var otherPath = new Uri(Path.GetDirectoryName(Filename));
                     // Item
                     file.Items.Add(FixPath(item.Key),
                                new ItemValue
                                {
-                                   Filename = item.Value.Filename.Replace(Path.GetDirectoryName(Filename), ""),
+                                   Filename = absolutePath.MakeRelativeUri(otherPath).LocalPath,
                                    AssemblyQualifiedTypeName = item.Value.GetType().AssemblyQualifiedName
                                });
                 }

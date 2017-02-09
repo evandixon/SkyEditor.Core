@@ -8,6 +8,11 @@ namespace SkyEditor.Core.Projects
 {
     public class Solution : ProjectBase<Project>
     {
+        public IEnumerable<Project> GetProjectsByName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override Task<IOnDisk> LoadProjectItem(ItemValue item)
         {
             throw new NotImplementedException();
