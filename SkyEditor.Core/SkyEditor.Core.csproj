@@ -8,6 +8,11 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>true</EnableDefaultEmbeddedResourceItems>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>4.1.0</Version>
+    <Authors>Evan Dixon</Authors>
+    <Description>Plugin framework for .Net applications</Description>
+    <FileVersion>4.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
