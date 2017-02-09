@@ -225,11 +225,17 @@ namespace SkyEditor.Core
             }
 
             // Use reflection to fill the type registry
-            LoadTypes(CorePluginAssembly);
-            foreach (var item in PluginAssemblies)
+            if (core.IsCorePluginAssemblyDynamicTypeLoadEnabled())
             {
-                LoadTypes(item);
+                LoadTypes(CorePluginAssembly);
             }
+            if (core.IsExtraPluginAssemblyDynamicTypeLoadEnabled())
+            {
+                foreach (var item in PluginAssemblies)
+                {
+                    LoadTypes(item);
+                }
+            }            
 
             PluginLoadComplete?.Invoke(this, new EventArgs());
 

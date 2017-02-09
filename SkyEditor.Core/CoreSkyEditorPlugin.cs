@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 
 namespace SkyEditor.Core
@@ -64,6 +65,22 @@ namespace SkyEditor.Core
         }
 
         /// <summary>
+        /// Whether or not types in the core plugin assembly will be dynamically loaded into the type registry
+        /// </summary>
+        public virtual bool IsCorePluginAssemblyDynamicTypeLoadEnabled()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Whether or not types in plugin assemblies will be dynamically loaded into the type registry.  This does not include the core plugin (see <see cref="IsCorePluginAssemblyDynamicTypeLoadEnabled"/>)
+        /// </summary>
+        public virtual bool IsExtraPluginAssemblyDynamicTypeLoadEnabled()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Loads the assembly located at the given path into the current AppDomain and returns it.
         /// </summary>
         /// <param name="assemblyPath">Full path of the assembly to load.</param>
@@ -72,7 +89,7 @@ namespace SkyEditor.Core
         /// <exception cref="BadImageFormatException">Thrown when the assembly is not a valid .Net assembly.</exception>
         public virtual Assembly LoadAssembly(string assemblyPath)
         {
-            throw new NotSupportedException();
+            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
         }
 
         public override void Load(PluginManager manager)
