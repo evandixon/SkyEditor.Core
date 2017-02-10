@@ -133,24 +133,30 @@ namespace SkyEditor.Core.TestComponents
 
         public int Read()
         {
-            int c = 0;
+            char? c;
             lock (_stdInLock)
             {
                 if (StdIn.Length > 0)
                 {
-                    c = Convert.ToInt32(StdIn[0]);
+                    c = StdIn[0];
                     StdIn.Remove(0, 1);
                 }
                 else
                 {
-                    c = -1;
+                    c = null;
                 }
             }
-            return c;
+            return c.Value;
         }
 
         public string ReadLine()
         {
+            if (StdIn.Length == 0)
+            {
+                // End of input
+                return null;
+            }
+
             StringBuilder line = new StringBuilder();
             lock (_stdInLock)
             {

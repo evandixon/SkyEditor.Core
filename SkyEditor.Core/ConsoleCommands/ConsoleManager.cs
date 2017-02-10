@@ -21,8 +21,27 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="arguments">Input arguments</param>
         /// <param name="stdIn">New-line separated standard input</param>
         /// <returns>New-line separated standard output</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="command"/> or <paramref name="manager"/> is null.</exception>
         public static async Task<string> TestConsoleCommand(ConsoleCommand command, PluginManager manager, string[] arguments, string stdIn)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
+
+            if (arguments == null)
+            {
+                arguments = new string[] { };
+            }
+            if (stdIn == null)
+            {
+                stdIn = "";
+            }
+
             var provider = new MemoryConsoleProvider();
             provider.StdIn.Append(stdIn);
             command.CurrentPluginManager = manager;
@@ -34,6 +53,7 @@ namespace SkyEditor.Core.ConsoleCommands
         public ConsoleManager(PluginManager manager)
         {
             Console = manager.CurrentConsoleProvider;
+            AllCommands = new Dictionary<string, ConsoleCommand>();
             foreach (ConsoleCommand item in manager.GetRegisteredObjects<ConsoleCommand>())
             {
                 item.CurrentPluginManager = manager;
@@ -44,7 +64,7 @@ namespace SkyEditor.Core.ConsoleCommands
 
         protected Dictionary<string, ConsoleCommand> AllCommands { get; set; }
         protected IConsoleProvider Console { get; set; }
-        protected Regex ParameterRegex => new Regex("(\\\".*?\\\")|\\S+)", RegexOptions.Compiled);
+        protected Regex ParameterRegex => new Regex("(\\\".*?\\\")|\\S+", RegexOptions.Compiled);
 
         /// <summary>
         /// Listens for user input from the console provider provided via the plugin manager from <see cref="ConsoleManager.New(PluginManager)"/> and handles commands accordingly.
@@ -54,7 +74,14 @@ namespace SkyEditor.Core.ConsoleCommands
         {
             while (true)
             {
-                var cmdParts = Console.ReadLine().Split(" ".ToCharArray(), 2);
+                var line = Console.ReadLine();
+                if (line == null)
+                {
+                    // end of input
+                    break;
+                }
+
+                var cmdParts = line.Split(" ".ToCharArray(), 2);
 
                 var commandString = cmdParts[0].ToLower();
                 var argumentString = cmdParts.Length > 1 ? cmdParts[1] : null;
