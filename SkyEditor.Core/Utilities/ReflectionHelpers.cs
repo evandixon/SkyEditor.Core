@@ -62,6 +62,18 @@ namespace SkyEditor.Core.Utilities
         }
 
         /// <summary>
+        /// Determines whether the given object is, inherits, or implements the given type.
+        /// </summary>
+        /// <param name="obj">Object to check.  If this is a type, its value as opposed to its type will be evaluated.</param>
+        /// <param name="typeToCheck">The type for which to check</param>
+        /// <returns>A boolean indicating whether or not <paramref name="obj"/> is, inherits, or implements the given type.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="obj"/> or <paramref name="typeToCheck"/> is null.</exception>
+        public static bool IsOfType(object obj, Type typeToCheck)
+        {
+            return IsOfType(obj, typeToCheck.GetTypeInfo());
+        }
+
+        /// <summary>
         /// Gets a type using the assembly-qualified name if possible
         /// </summary>
         /// <param name="assemblyQualifiedName">Assembly-qualified name of the type</param>
@@ -86,7 +98,7 @@ namespace SkyEditor.Core.Utilities
                 // Can't find the time.
                 // Parse it and search the available assemblies.
                 var name = new ParsedAssemblyQualifiedName(assemblyQualifiedName, assemblies);
-                t = name.FoundType.Value;
+                t = name.FoundType?.Value;
             }
             return t?.GetTypeInfo();
         }
@@ -126,6 +138,25 @@ namespace SkyEditor.Core.Utilities
             }
 
             return !type.IsAbstract && type.DeclaredConstructors.Any(x => x.GetParameters().Length == 0);
+        }
+
+        /// <summary>
+        /// Determines whether or not <see cref="CreateInstance(TypeInfo)"/> can create an instance of this type.
+        /// </summary>
+        /// <param name="type">Type to check</param>
+        /// <returns>A boolean indicating whether or not an instance of this type can be created</returns>
+        /// <remarks>
+        /// Current criteria:
+        /// - Type must not be abstract
+        /// - Type must have a default constructor</remarks>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        public static bool CanCreateInstance(Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+            return CanCreateInstance(type.GetTypeInfo());
         }
 
         /// <summary>

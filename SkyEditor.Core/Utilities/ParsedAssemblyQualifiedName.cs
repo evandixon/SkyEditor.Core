@@ -62,6 +62,13 @@ namespace SkyEditor.Core.Utilities
                 }
             }
 
+            if (index == -1)
+            {
+                // Failed to get type.
+                AssemblyQualifiedName = null;
+                return;
+            }
+
             this.TypeName = AssemblyQualifiedName.Substring(0, index);
 
             this.CSharpStyleName = new Lazy<string>(
