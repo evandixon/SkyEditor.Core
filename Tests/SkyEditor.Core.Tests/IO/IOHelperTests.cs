@@ -206,6 +206,27 @@ namespace SkyEditor.Core.Tests.IO
             {
                 return new MemoryIOProvider();
             }
+
+            public override bool IsCorePluginAssemblyDynamicTypeLoadEnabled()
+            {
+                return false;
+            }
+
+            public override void Load(PluginManager manager)
+            {
+                base.Load(manager);
+
+                manager.RegisterType<IFileOpener, CustomFileOpener>();
+                manager.RegisterType<IFileOpener, DirectoryOpener>();
+                manager.RegisterType<IFileTypeDetector, CustomFileTypeDetector>();
+                manager.RegisterType<IDirectoryTypeDetector, DirectoryDetector>();
+
+                manager.RegisterType<ICreatableFile, CreatableTextFile>();
+                manager.RegisterType<ICreatableFile, NoDefaultConstructorCreatableFile>();
+                manager.RegisterType<IOpenableFile, CreatableTextFile>();
+                manager.RegisterType<IOpenableFile, OpenableTextFile>();
+                manager.RegisterType<IDetectableFileType, OpenableTextFile>();
+            }
         }
 
         #endregion
@@ -373,7 +394,7 @@ namespace SkyEditor.Core.Tests.IO
 
             // Assert
             var types = IOHelper.GetOpenableFileTypes(manager).ToList();
-            Assert.AreEqual(2, types.Count, "Incorrect number of ICreatableFile types.");
+            Assert.AreEqual(2, types.Count, "Incorrect number of IOpenableFile types.");
             Assert.IsTrue(types.Any(x => ReflectionHelpers.IsOfType(x, typeof(CreatableTextFile).GetTypeInfo())));
             Assert.IsTrue(types.Any(x => ReflectionHelpers.IsOfType(x, typeof(OpenableTextFile).GetTypeInfo())));
         }
