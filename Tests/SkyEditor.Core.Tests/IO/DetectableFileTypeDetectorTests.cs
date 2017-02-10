@@ -15,7 +15,7 @@ namespace SkyEditor.Core.Tests.IO
     [TestClass]
     public class DetectableFileTypeDetectorTests
     {
-        public const string TestCategory = "IO Tests";
+        public const string TestCategory = "I/O";
         public class File00 : IDetectableFileType
         {
             public async Task<bool> IsOfType(GenericFile file)
