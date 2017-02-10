@@ -134,6 +134,42 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You!.
+        /// </summary>
+        internal static string PluginDevExtAuthor {
+            get {
+                return ResourceManager.GetString("PluginDevExtAuthor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All of the plugins that are placed in the development directory..
+        /// </summary>
+        internal static string PluginDevExtDescription {
+            get {
+                return ResourceManager.GetString("PluginDevExtDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Development Plugins.
+        /// </summary>
+        internal static string PluginDevExtName {
+            get {
+                return ResourceManager.GetString("PluginDevExtName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0.0.
+        /// </summary>
+        internal static string PluginDevExtVersion {
+            get {
+                return ResourceManager.GetString("PluginDevExtVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An item already exists at the given path.
         /// </summary>
         internal static string Project_ItemExistsAtPath {
@@ -188,11 +224,29 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This IExtensionCollection lists extensions that are currently installed, not ones that can be installed, so this cannnot install extensions..
+        /// </summary>
+        internal static string UI_ErrorLocalExtensionCollectionInstall {
+            get {
+                return ResourceManager.GetString("UI_ErrorLocalExtensionCollectionInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No sibling view model of type &quot;{0}&quot; could be found..
         /// </summary>
         internal static string UI_ErrorNoSiblingViewModelOfType {
             get {
                 return ResourceManager.GetString("UI_ErrorNoSiblingViewModelOfType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed Extensions.
+        /// </summary>
+        internal static string UI_InstalledExtension {
+            get {
+                return ResourceManager.GetString("UI_InstalledExtension", resourceCulture);
             }
         }
         

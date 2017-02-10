@@ -181,4 +181,22 @@
     <value>{0} Files</value>
     <comment>Display name for IO filters that aren't registered.  {0} will be replaced by the upper case of the extension.</comment>
   </data>
+  <data name="PluginDevExtAuthor" xml:space="preserve">
+    <value>You!</value>
+  </data>
+  <data name="PluginDevExtDescription" xml:space="preserve">
+    <value>All of the plugins that are placed in the development directory.</value>
+  </data>
+  <data name="PluginDevExtName" xml:space="preserve">
+    <value>Development Plugins</value>
+  </data>
+  <data name="PluginDevExtVersion" xml:space="preserve">
+    <value>0.0</value>
+  </data>
+  <data name="UI_ErrorLocalExtensionCollectionInstall" xml:space="preserve">
+    <value>This IExtensionCollection lists extensions that are currently installed, not ones that can be installed, so this cannnot install extensions.</value>
+  </data>
+  <data name="UI_InstalledExtension" xml:space="preserve">
+    <value>Installed Extensions</value>
+  </data>
 </root>

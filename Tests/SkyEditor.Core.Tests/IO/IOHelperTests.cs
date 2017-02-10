@@ -199,7 +199,7 @@ namespace SkyEditor.Core.Tests.IO
 
             public override string GetExtensionDirectory()
             {
-                throw new NotImplementedException();
+                return "/extensions";
             }
 
             public override IIOProvider GetIOProvider()

@@ -52,7 +52,7 @@ namespace SkyEditor.Core.Tests.TestComponents
                 "Test line 2" + Environment.NewLine +
                 "Test formatted line" + Environment.NewLine +
                 "{0}" + Environment.NewLine +
-                "a specific substring", meString) + "\r\n", provider.StdOut.ToString());
+                "a specific substring" + Environment.NewLine, meString), provider.StdOut.ToString());
         }
     }
 }

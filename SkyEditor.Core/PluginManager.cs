@@ -3,6 +3,7 @@
 // - Uncomment GetPluginPaths in Functions
 
 using SkyEditor.Core.ConsoleCommands;
+using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.Utilities;
@@ -145,52 +146,52 @@ namespace SkyEditor.Core
             CurrentSettingsProvider = core.GetSettingsProvider(this);
             CurrentConsoleProvider = core.GetConsoleProvider();
 
-            //// Delete files and directories scheduled for deletion
-            //await DeleteScheduledFiles(CurrentSettingsProvider, CurrentIOProvider);
+            // Delete files and directories scheduled for deletion
+            await DeleteScheduledFiles(CurrentSettingsProvider, CurrentIOProvider);
 
-            //// Install pending extensions
-            //ExtensionDirectory = core.GetExtensionDirectory();
-            //await ExtensionHelper.InstallPendingExtensions(ExtensionDirectory, this);
+            // Install pending extensions
+            ExtensionDirectory = core.GetExtensionDirectory();
+            await ExtensionHelper.InstallPendingExtensions(ExtensionDirectory, this);
 
             // Load the provided core
             CorePluginAssembly = core.GetType().GetTypeInfo().Assembly;
             Plugins.Add(core);
             core.Load(this);
 
-            //// Load plugins, if enabled
-            //if (core.IsPluginLoadingEnabled())
-            //{
-            //    // Get the paths of all plugins to be loaded
-            //    var supportedPlugins = GetPluginPaths();
+            // Load plugins, if enabled
+            if (core.IsPluginLoadingEnabled())
+            {
+                // Get the paths of all plugins to be loaded
+                var supportedPlugins = GetPluginPaths();
 
-            //    // Load the plugin assemblies
-            //    foreach (var item in supportedPlugins)
-            //    {
-            //        try
-            //        {
-            //            var assemblyActual = core.LoadAssembly(item);
-            //            if (assemblyActual != null)
-            //            {
-            //                PluginAssemblies.Add(assemblyActual);
-            //                foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin).GetTypeInfo()) && ReflectionHelpers.CanCreateInstance(x)))
-            //                {
-            //                    Plugins.Add(ReflectionHelpers.CreateInstance(plg) as SkyEditorPlugin);
-            //                }
-            //            }
-            //        }
-            //        catch (BadImageFormatException)
-            //        {
-            //            // The assembly is a bad assembly.  We can continue loading plugins, but not with this
-            //            FailedPluginLoads.Add(item);
-            //        }
-            //        catch (NotSupportedException)
-            //        {
-            //            // The current environment does not support loading assemblies this way.
-            //            // Abort dynamic assembly loading
-            //            break;
-            //        }
-            //    }
-            //}
+                // Load the plugin assemblies
+                foreach (var item in supportedPlugins)
+                {
+                    try
+                    {
+                        var assemblyActual = core.LoadAssembly(item);
+                        if (assemblyActual != null)
+                        {
+                            PluginAssemblies.Add(assemblyActual);
+                            foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin).GetTypeInfo()) && ReflectionHelpers.CanCreateInstance(x)))
+                            {
+                                Plugins.Add(ReflectionHelpers.CreateInstance(plg) as SkyEditorPlugin);
+                            }
+                        }
+                    }
+                    catch (BadImageFormatException)
+                    {
+                        // The assembly is a bad assembly.  We can continue loading plugins, but not with this
+                        FailedPluginLoads.Add(item);
+                    }
+                    catch (NotSupportedException)
+                    {
+                        // The current environment does not support loading assemblies this way.
+                        // Abort dynamic assembly loading
+                        break;
+                    }
+                }
+            }
 
             // Load logical plugins
             PluginsLoading?.Invoke(this, new EventArgs());
@@ -284,25 +285,25 @@ namespace SkyEditor.Core
             }
         }
 
-        ///// <summary>
-        ///// Gets the paths corresponding to all plugin assemblies.
-        ///// </summary>
-        ///// <returns>Full paths of all plugin assemblies</returns>
-        //protected List<string> GetPluginPaths()
-        //{
-        //    var supportedPlugins = new List<string>();
+        /// <summary>
+        /// Gets the paths corresponding to all plugin assemblies.
+        /// </summary>
+        /// <returns>Full paths of all plugin assemblies</returns>
+        protected List<string> GetPluginPaths()
+        {
+            var supportedPlugins = new List<string>();
 
-        //    // Look at plugin extensions to find plugins
-        //    var pluginExtType = new PluginExtensionType();
-        //    pluginExtType.CurrentPluginManager = this;
+            // Look at plugin extensions to find plugins
+            var pluginExtType = new PluginExtensionType();
+            pluginExtType.CurrentPluginManager = this;
 
-        //    foreach(var item in pluginExtType.GetInstalledExtensions(this))
-        //    {
-        //        supportedPlugins.AddRange(item.ExtensionFiles.Select((x) => Path.Combine(pluginExtType.GetExtensionDirectory(item.ID), x)));
-        //    }
+            foreach (var item in pluginExtType.GetExtensions(this))
+            {
+                supportedPlugins.AddRange(item.ExtensionFiles.Select((x) => Path.Combine(pluginExtType.GetExtensionDirectory(item.ID), x)));
+            }
 
-        //    return supportedPlugins;
-        //}
+            return supportedPlugins;
+        }
 
         /// <summary>
         /// Loads supported types inside the given assembly into the type registry

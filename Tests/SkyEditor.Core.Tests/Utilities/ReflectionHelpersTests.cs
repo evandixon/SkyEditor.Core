@@ -26,7 +26,7 @@ namespace SkyEditor.Core.Tests.Utilities
 
             public override string GetExtensionDirectory()
             {
-                throw new NotImplementedException();
+                return "/extensions";
             }
 
             public override IIOProvider GetIOProvider()
