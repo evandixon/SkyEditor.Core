@@ -81,7 +81,7 @@ namespace SkyEditor.Core.TestComponents
         {
             lock (_stdOutLock)
             {
-                StdOut.AppendLine();
+                StdOut.Append(Environment.NewLine);
             }
         }
 
@@ -93,7 +93,7 @@ namespace SkyEditor.Core.TestComponents
                 {
                     StdOut.Append(c);
                 }
-                StdOut.AppendLine();
+                StdOut.Append(Environment.NewLine);
             }
         }
 
@@ -101,7 +101,8 @@ namespace SkyEditor.Core.TestComponents
         {
             lock (_stdOutLock)
             {
-                StdOut.AppendLine(value.ToString());
+                StdOut.Append(value.ToString());
+                StdOut.Append(Environment.NewLine);
             }
         }
 
@@ -109,7 +110,8 @@ namespace SkyEditor.Core.TestComponents
         {
             lock (_stdOutLock)
             {
-                StdOut.AppendLine(value);
+                StdOut.Append(value);
+                StdOut.Append(Environment.NewLine);
             }
         }
 
@@ -118,7 +120,7 @@ namespace SkyEditor.Core.TestComponents
             lock (_stdOutLock)
             {
                 StdOut.AppendFormat(format, arg);
-                StdOut.AppendLine();
+                StdOut.Append(Environment.NewLine);
             }
         }
 
@@ -127,7 +129,7 @@ namespace SkyEditor.Core.TestComponents
             lock (_stdOutLock)
             {
                 StdOut.Append(value, index, count);
-                StdOut.AppendLine();
+                StdOut.Append(Environment.NewLine);
             }
         }
 
