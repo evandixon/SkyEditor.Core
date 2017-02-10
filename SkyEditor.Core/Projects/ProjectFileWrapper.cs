@@ -18,7 +18,7 @@ namespace SkyEditor.Core.Projects
         public ProjectFileWrapper(string projectFilename, string filename)
         {
             this.ProjectFilename = projectFilename;
-            this.Filename = filename;
+            this.Filename = Path.Combine(Path.GetDirectoryName(projectFilename), filename.TrimStart('\\'));
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace SkyEditor.Core.Projects
         public string FileAssemblyQualifiedTypeName { get; set; }
 
         /// <summary>
-        /// Path of the file, relative to the project directory
+        /// Absolute path of the file
         /// </summary>
         public string Filename { get; set; }
 
@@ -64,34 +64,24 @@ namespace SkyEditor.Core.Projects
         /// </summary>
         public string ProjectFilename { get; set; }
 
-        /// <summary>
-        /// Gets the full path of the file
-        /// </summary>
-        /// <returns>A string containing the full path of the file</returns>
-        public string GetFullPath()
-        {
-            return Path.Combine(Path.GetDirectoryName(ProjectFilename), Filename.TrimStart('\\'));
-        }
-
         public async Task<object> GetFile(PluginManager manager, IOHelper.DuplicateMatchSelector duplicateMatchSelector)
         {
             if (File == null)
             {
-                var path = GetFullPath();
                 if (string.IsNullOrEmpty(FileAssemblyQualifiedTypeName))
                 {
-                    File = await IOHelper.OpenFile(path, duplicateMatchSelector, manager);
+                    File = await IOHelper.OpenFile(Filename, duplicateMatchSelector, manager);
                 }
                 else
                 {
                     var type = ReflectionHelpers.GetTypeByName(FileAssemblyQualifiedTypeName, manager);
                     if (type == null)
                     {
-                        File = await IOHelper.OpenFile(path, duplicateMatchSelector, manager);
+                        File = await IOHelper.OpenFile(Filename, duplicateMatchSelector, manager);
                     }
                     else
                     {
-                        File = await IOHelper.OpenFile(path, type, manager);
+                        File = await IOHelper.OpenFile(Filename, type, manager);
                     }
                 }
             }
