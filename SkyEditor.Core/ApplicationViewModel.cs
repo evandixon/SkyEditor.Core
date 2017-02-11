@@ -24,8 +24,7 @@ namespace SkyEditor.Core
             this.CurrentPluginManager = manager;
             this.CurrentSolution = null;
             this.OpenFiles = new ObservableCollection<FileViewModel>();
-            this.AnchorableViewModels = new ObservableCollection<AnchorableViewModel>();
-            this.IOFilters = new Dictionary<string, string>();
+            this.AnchorableViewModels = new ObservableCollection<AnchorableViewModel>();            
 
             // Set Progress Properties
             this._message = Properties.Resources.UI_Ready;
@@ -134,11 +133,6 @@ namespace SkyEditor.Core
             }
         }
         private object _activeContent;
-
-        /// <summary>
-        /// Filters used in Open and Save dialogs.  Key: Extension, Value: Friendly name
-        /// </summary>
-        public Dictionary<string, string> IOFilters { get; private set; }
 
         /// <summary>
         /// The current solution
@@ -518,14 +512,14 @@ namespace SkyEditor.Core
         public string GetIOFilter(ICollection<string> filters, bool addSupportedFilesEntry, bool allowAllFiles)
         {
             // Register any unregistered filters
-            foreach (var item in (from f in filters where !IOFilters.ContainsKey(f) select f))
+            foreach (var item in (from f in filters where !CurrentPluginManager.IOFilters.ContainsKey(f) select f))
             {
-                IOFilters.Add(item, string.Format(Properties.Resources.UI_UnknownFileRegisterTemplate, item.Trim('*').Trim('.').ToUpper()));
+                CurrentPluginManager.IOFilters.Add(item, string.Format(Properties.Resources.UI_UnknownFileRegisterTemplate, item.Trim('*').Trim('.').ToUpper()));
             }
 
             // Generate the IO Filter string
             var fullFilter = new StringBuilder();
-            var usableFilters = IOFilters.Where(x => filters.Contains(x.Key)).ToDictionary(x => x.Key, y => y.Value);
+            var usableFilters = CurrentPluginManager.IOFilters.Where(x => filters.Contains(x.Key)).ToDictionary(x => x.Key, y => y.Value);
 
             if (addSupportedFilesEntry)
             {
@@ -549,7 +543,7 @@ namespace SkyEditor.Core
         /// <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
         public string GetIOFilter()
         {
-            return GetIOFilter(IOFilters.Keys, true, true);
+            return GetIOFilter(CurrentPluginManager.IOFilters.Keys, true, true);
         }
 
         /// <summary>
@@ -560,19 +554,6 @@ namespace SkyEditor.Core
         public string GetIOFilter(ICollection<string> filters)
         {
             return GetIOFilter(filters, true, true);
-        }
-
-        /// <summary>
-        /// Registers a filter for use in open and save file dialogs.
-        /// </summary>
-        /// <param name="FileExtension">Filter for the dialog.  If this is by extension, should be *.extension</param>
-        /// <param name="FileFormatName">Name of the file format</param>
-        public void RegisterIOFilter(string fileExtension, string fileFormatName)
-        {
-            if (!IOFilters.ContainsKey(fileExtension))
-            {
-                IOFilters.Add(fileExtension, fileFormatName);
-            }
         }
 
         #endregion

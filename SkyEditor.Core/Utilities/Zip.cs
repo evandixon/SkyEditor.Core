@@ -16,7 +16,7 @@ namespace SkyEditor.Core.Utilities
         /// <param name="zipFilename">Path of the file to unzip</param>
         /// <param name="outputDir">Directory in which to unzip the files</param>
         /// <param name="provider">I/O provider containing the zip file and the output directory</param>
-        public static async Task Unzip(string zipFilename, string outputDir, IIOProvider provider)
+        public static async Task UnzipDir(string zipFilename, string outputDir, IIOProvider provider)
         {
             using (var archive = provider.OpenFileReadOnly(zipFilename))
             {
@@ -25,19 +25,49 @@ namespace SkyEditor.Core.Utilities
                     provider.CreateDirectory(outputDir);
                 }
 
-                var zip = new ZipArchive(archive);
-                foreach (var item in zip.Entries)
+                using (var zip = new ZipArchive(archive, ZipArchiveMode.Read))
                 {
-                    using (var zipEntry = item.Open())
+                    foreach (var item in zip.Entries)
                     {
-                        using (var file = provider.OpenFileWriteOnly(Path.Combine(outputDir, item.FullName)))
+                        using (var zipEntry = item.Open())
                         {
-                            await zipEntry.CopyToAsync(file);
+                            using (var file = provider.OpenFileWriteOnly(Path.Combine(outputDir, item.FullName)))
+                            {
+                                await zipEntry.CopyToAsync(file);
+                            }
+                        }
+                    }
+                }                    
+            }                
+        }
+
+        /// <summary>
+        /// Zips the given directory
+        /// </summary>
+        /// <param name="inputDir">Directory to zip</param>
+        /// <param name="zipFilename">Path of the target zip file</param>
+        /// <param name="provider">I/O provider containing the zip file and the input directory</param>
+        public static async Task ZipDir(string inputDir, string zipFilename, IIOProvider provider)
+        {
+            var inputUri = new Uri(inputDir);
+            using (var archive = provider.OpenFile(zipFilename))
+            {
+                using (var zip = new ZipArchive(archive, ZipArchiveMode.Create))
+                {
+                    foreach (var filename in provider.GetFiles(inputDir, "*", false))
+                    {
+                        using (var file = provider.OpenFileReadOnly(filename))
+                        {
+                            var fileUri = new Uri(filename);
+                            var entry = zip.CreateEntry(fileUri.MakeRelativeUri(inputUri).LocalPath, CompressionLevel.Optimal);
+                            using (var entryStream = entry.Open())
+                            {
+                                await file.CopyToAsync(entryStream);
+                            }
                         }
                     }
                 }
             }
-                
         }
     }
 }

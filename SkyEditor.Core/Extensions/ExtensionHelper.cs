@@ -108,7 +108,7 @@ namespace SkyEditor.Core.Extensions
             await FileSystem.EnsureDirectoryEmpty(tempDir, provider).ConfigureAwait(false);
 
             //Extract the given zip file to it
-            await Zip.Unzip(extensionZipPath, tempDir, provider);
+            await Zip.UnzipDir(extensionZipPath, tempDir, provider);
 
             //Open the info file
             string infoFilename = Path.Combine(tempDir, "info.skyext");

@@ -190,7 +190,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                 new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
                 new object[] { null, new ApplicationViewModel(new PluginManager()), new string[] { }, "" });
 
-            TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleManager), nameof(ConsoleManager.TestConsoleCommand), "manager",
+            TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleManager), nameof(ConsoleManager.TestConsoleCommand), "appViewModel",
                 new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
                 new object[] { new TestConsoleCommand(), null, new string[] { }, "" });
         }

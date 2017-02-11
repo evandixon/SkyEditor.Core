@@ -27,6 +27,7 @@ namespace SkyEditor.Core
             FailedPluginLoads = new List<string>();
             DependantPlugins = new Dictionary<SkyEditorPlugin, List<SkyEditorPlugin>>();
             DependantPluginLoadingQueue = new Queue<SkyEditorPlugin>();
+            IOFilters = new Dictionary<string, string>();
         }
 
         #region Properties
@@ -81,6 +82,11 @@ namespace SkyEditor.Core
         /// Location of extensions within the current IO provider.
         /// </summary>
         public string ExtensionDirectory { get; set; }
+
+        /// <summary>
+        /// Filters used in Open and Save dialogs.  Key: Extension, Value: Friendly name
+        /// </summary>
+        public Dictionary<string, string> IOFilters { get; private set; }
 
         /// <summary>
         /// The current IO Provider for the application.
@@ -478,6 +484,19 @@ namespace SkyEditor.Core
         public void RegisterType<R, T>()
         {
             RegisterType(typeof(R).GetTypeInfo(), typeof(T).GetTypeInfo());
+        }
+
+        /// <summary>
+        /// Registers a filter for use in open and save file dialogs.
+        /// </summary>
+        /// <param name="FileExtension">Filter for the dialog.  If this is by extension, should be *.extension</param>
+        /// <param name="FileFormatName">Name of the file format</param>
+        public void RegisterIOFilter(string fileExtension, string fileFormatName)
+        {
+            if (!IOFilters.ContainsKey(fileExtension))
+            {
+                IOFilters.Add(fileExtension, fileFormatName);
+            }
         }
         #endregion
 
