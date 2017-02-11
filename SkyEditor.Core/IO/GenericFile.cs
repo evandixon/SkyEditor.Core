@@ -117,7 +117,7 @@ namespace SkyEditor.Core.IO
         /// <summary>
         /// The position of operations where index is not specified
         /// </summary>
-        public ulong Position { get; set; }
+        public long Position { get; set; }
 
         #region File Loading and Management
 
@@ -847,7 +847,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Int16 ReadInt16(int offset)
+        public Int16 ReadInt16(long offset)
         {
             return BitConverter.ToInt16(Read(offset, 2), 0);
         }
@@ -857,7 +857,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Task<Int16> ReadInt16(int offset)
+        public async Task<Int16> ReadInt16Async(long offset)
         {
             return BitConverter.ToInt16(await ReadAsync(offset, 2), 0);
         }
@@ -878,7 +878,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Int32 ReadInt32(int offset)
+        public Int32 ReadInt32(long offset)
         {
             return BitConverter.ToInt32(Read(offset, 4), 0);
         }
@@ -888,7 +888,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Task<Int16> ReadInt32(int offset)
+        public async Task<Int32> ReadInt32Async(long offset)
         {
             return BitConverter.ToInt32(await ReadAsync(offset, 4), 0);
         }
@@ -897,7 +897,7 @@ namespace SkyEditor.Core.IO
         /// Reads the signed 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
         /// </summary>
         /// <returns>The integer from the current position</returns>
-        public Int16 ReadInt32()
+        public Int32 ReadInt32()
         {
             var output = ReadInt32(Position);
             Position += 4;
@@ -909,7 +909,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Int16 ReadInt64(int offset)
+        public Int64 ReadInt64(long offset)
         {
             return BitConverter.ToInt64(Read(offset, 8), 0);
         }
@@ -919,7 +919,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Task<Int16> ReadInt64(int offset)
+        public async Task<Int64> ReadInt64Async(long offset)
         {
             return BitConverter.ToInt64(await ReadAsync(offset, 8), 0);
         }
@@ -928,7 +928,7 @@ namespace SkyEditor.Core.IO
         /// Reads the signed 64 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
         /// </summary>
         /// <returns>The integer from the current position</returns>
-        public Int16 ReadInt64()
+        public Int64 ReadInt64()
         {
             var output = ReadInt64(Position);
             Position += 8;
@@ -940,7 +940,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public UInt16 ReadUInt16(int offset)
+        public UInt16 ReadUInt16(long offset)
         {
             return BitConverter.ToUInt16(Read(offset, 2), 0);
         }
@@ -950,7 +950,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Task<UInt16> ReadUInt16(int offset)
+        public async Task<UInt16> ReadUInt16Async(long offset)
         {
             return BitConverter.ToUInt16(await ReadAsync(offset, 2), 0);
         }
@@ -971,7 +971,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public UInt32 ReadUInt32(int offset)
+        public UInt32 ReadUInt32(long offset)
         {
             return BitConverter.ToUInt32(Read(offset, 4), 0);
         }
@@ -981,16 +981,16 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Task<UInt16> ReadUInt32(int offset)
+        public async Task<UInt32> ReadUInt32Async(long offset)
         {
             return BitConverter.ToUInt32(await ReadAsync(offset, 4), 0);
         }
 
         /// <summary>
-        /// Reads the unsigned 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// Reads the unsigned 32 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
         /// </summary>
         /// <returns>The integer from the current position</returns>
-        public UInt16 ReadInt32()
+        public UInt32 ReadUInt32()
         {
             var output = ReadUInt32(Position);
             Position += 4;
@@ -1002,7 +1002,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public UInt16 ReadUInt64(int offset)
+        public UInt64 ReadUInt64(long offset)
         {
             return BitConverter.ToUInt64(Read(offset, 8), 0);
         }
@@ -1012,16 +1012,16 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
-        public Task<UInt16> ReadUInt64(int offset)
+        public async Task<UInt64> ReadUInt64Async(int offset)
         {
             return BitConverter.ToUInt64(await ReadAsync(offset, 8), 0);
         }
 
         /// <summary>
-        /// Reads the unsigned 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// Reads the unsigned 64 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
         /// </summary>
         /// <returns>The integer from the current position</returns>
-        public UInt16 ReadUInt64()
+        public UInt64 ReadUInt64()
         {
             var output = ReadUInt64(Position);
             Position += 8;
@@ -1033,9 +1033,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public void WriteInt16(int offset, Int16 value)
+        public void WriteInt16(long offset, Int16 value)
         {
-            Write(offset, BitConverter.GetBytes(value));
+            Write(offset, 2, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1043,9 +1043,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteInt16(int offset, Int16 value)
+        public async Task WriteInt16Async(long offset, Int16 value)
         {
-            await WriteAsync(offset, BitConverter.GetBytes(value));
+            await WriteAsync(offset, 2, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1063,9 +1063,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public void WriteInt32(int offset, Int32 value)
+        public void WriteInt32(long offset, Int32 value)
         {
-            Write(offset, BitConverter.GetBytes(value));
+            Write(offset, 4, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1073,9 +1073,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteInt32(int offset, Int32 value)
+        public async Task WriteInt32Async (long offset, Int32 value)
         {
-            await WriteAsync(offset, BitConverter.GetBytes(value));
+            await WriteAsync(offset, 4, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1092,9 +1092,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public void WriteInt64(int offset, Int64 value)
+        public void WriteInt64(long offset, Int64 value)
         {
-            Write(offset, BitConverter.GetBytes(value));
+            Write(offset, 8, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1102,9 +1102,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteInt32(int offset, Int64 value)
+        public async Task WriteInt32(long offset, Int64 value)
         {
-            await WriteAsync(offset, BitConverter.GetBytes(value));
+            await WriteAsync(offset, 8, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1121,9 +1121,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public void WriteUInt16(int offset, UInt16 value)
+        public void WriteUInt16(long offset, UInt16 value)
         {
-            Write(offset, BitConverter.GetBytes(value));
+            Write(offset, 2, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1131,9 +1131,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteUInt16(int offset, UInt16 value)
+        public async Task WriteUInt16Async(long offset, UInt16 value)
         {
-            await WriteAsync(offset, BitConverter.GetBytes(value));
+            await WriteAsync(offset, 2, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1142,7 +1142,7 @@ namespace SkyEditor.Core.IO
         /// <param name="value">The integer to write</param>
         public void WriteUInt16(UInt16 value)
         {
-            WriteInt16(Position, value);
+            WriteUInt16(Position, value);
             Position += 2;
         }
 
@@ -1151,9 +1151,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public void WriteUInt32(int offset, UInt32 value)
+        public void WriteUInt32(long offset, UInt32 value)
         {
-            Write(offset, BitConverter.GetBytes(value));
+            Write(offset, 4, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1161,9 +1161,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteUInt32(int offset, UInt32 value)
+        public async Task WriteUInt32Async(long offset, UInt32 value)
         {
-            await WriteAsync(offset, BitConverter.GetBytes(value));
+            await WriteAsync(offset, 4, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1181,9 +1181,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public void WriteUInt64(int offset, UInt64 value)
+        public void WriteUInt64(long offset, UInt64 value)
         {
-            Write(offset, BitConverter.GetBytes(value));
+            Write(offset, 8, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1191,16 +1191,16 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteUInt32(int offset, UInt64 value)
+        public async Task WriteUInt64Async(long offset, UInt64 value)
         {
-            await WriteAsync(offset, BitConverter.GetBytes(value));
+            await WriteAsync(offset, 8, BitConverter.GetBytes(value));
         }
 
         /// <summary>
         /// Writes the unsigned 64 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
         /// </summary>
         /// <param name="value">The integer to write</param>
-        public void WriteUInt64(Int64 value)
+        public void WriteUInt64(UInt64 value)
         {
             WriteUInt64(Position, value);
             Position += 8;
