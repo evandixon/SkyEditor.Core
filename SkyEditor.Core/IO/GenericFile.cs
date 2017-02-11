@@ -841,14 +841,371 @@ namespace SkyEditor.Core.IO
 
         #endregion
 
+        #region Integer Read/Write
+        /// <summary>
+        /// Reads a signed 16 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Int16 ReadInt16(int offset)
+        {
+            return BitConverter.ToInt16(Read(offset, 2), 0);
+        }
 
+        /// <summary>
+        /// Reads a signed 16 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Task<Int16> ReadInt16(int offset)
+        {
+            return BitConverter.ToInt16(await ReadAsync(offset, 2), 0);
+        }
 
-        #region Integer Reading
+        /// <summary>
+        /// Reads the signed 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <returns>The integer from the current position</returns>
+        public Int16 ReadInt16()
+        {
+            var output = ReadInt16(Position);
+            Position += 2;
+            return output;
+        }
 
+        /// <summary>
+        /// Reads a signed 32 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Int32 ReadInt32(int offset)
+        {
+            return BitConverter.ToInt32(Read(offset, 4), 0);
+        }
+
+        /// <summary>
+        /// Reads a signed 32 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Task<Int16> ReadInt32(int offset)
+        {
+            return BitConverter.ToInt32(await ReadAsync(offset, 4), 0);
+        }
+
+        /// <summary>
+        /// Reads the signed 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <returns>The integer from the current position</returns>
+        public Int16 ReadInt32()
+        {
+            var output = ReadInt32(Position);
+            Position += 4;
+            return output;
+        }
+
+        /// <summary>
+        /// Reads a signed 64 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Int16 ReadInt64(int offset)
+        {
+            return BitConverter.ToInt64(Read(offset, 8), 0);
+        }
+
+        /// <summary>
+        /// Reads a signed 64 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Task<Int16> ReadInt64(int offset)
+        {
+            return BitConverter.ToInt64(await ReadAsync(offset, 8), 0);
+        }
+
+        /// <summary>
+        /// Reads the signed 64 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <returns>The integer from the current position</returns>
+        public Int16 ReadInt64()
+        {
+            var output = ReadInt64(Position);
+            Position += 8;
+            return output;
+        }
+
+        /// <summary>
+        /// Reads an unsigned 16 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public UInt16 ReadUInt16(int offset)
+        {
+            return BitConverter.ToUInt16(Read(offset, 2), 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 16 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Task<UInt16> ReadUInt16(int offset)
+        {
+            return BitConverter.ToUInt16(await ReadAsync(offset, 2), 0);
+        }
+
+        /// <summary>
+        /// Reads the unsigned 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <returns>The integer from the current position</returns>
+        public UInt16 ReadUInt16()
+        {
+            var output = ReadUInt16(Position);
+            Position += 2;
+            return output;
+        }
+
+        /// <summary>
+        /// Reads an unsigned 32 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public UInt32 ReadUInt32(int offset)
+        {
+            return BitConverter.ToUInt32(Read(offset, 4), 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 32 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Task<UInt16> ReadUInt32(int offset)
+        {
+            return BitConverter.ToUInt32(await ReadAsync(offset, 4), 0);
+        }
+
+        /// <summary>
+        /// Reads the unsigned 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <returns>The integer from the current position</returns>
+        public UInt16 ReadInt32()
+        {
+            var output = ReadUInt32(Position);
+            Position += 4;
+            return output;
+        }
+
+        /// <summary>
+        /// Reads an unsigned 64 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public UInt16 ReadUInt64(int offset)
+        {
+            return BitConverter.ToUInt64(Read(offset, 8), 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 64 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public Task<UInt16> ReadUInt64(int offset)
+        {
+            return BitConverter.ToUInt64(await ReadAsync(offset, 8), 0);
+        }
+
+        /// <summary>
+        /// Reads the unsigned 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <returns>The integer from the current position</returns>
+        public UInt16 ReadUInt64()
+        {
+            var output = ReadUInt64(Position);
+            Position += 8;
+            return output;
+        }
+
+        /// <summary>
+        /// Writes a signed 16 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public void WriteInt16(int offset, Int16 value)
+        {
+            Write(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes a signed 16 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public async Task WriteInt16(int offset, Int16 value)
+        {
+            await WriteAsync(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the signed 16 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="value">The integer to write</param>
+        public void WriteInt16(Int16 value)
+        {
+            WriteInt16(Position, value);
+            Position += 2;
+        }
+
+        /// <summary>
+        /// Writes a signed 32 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public void WriteInt32(int offset, Int32 value)
+        {
+            Write(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes a signed 32 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public async Task WriteInt32(int offset, Int32 value)
+        {
+            await WriteAsync(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the signed 32 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        public void WriteInt32(Int32 value)
+        {
+            WriteInt32(Position, value);
+            Position += 4;
+        }
+
+        /// <summary>
+        /// Writes a signed 64 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public void WriteInt64(int offset, Int64 value)
+        {
+            Write(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes a signed 64 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public async Task WriteInt32(int offset, Int64 value)
+        {
+            await WriteAsync(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the signed 64 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        public void WriteInt64(Int64 value)
+        {
+            WriteInt64(Position, value);
+            Position += 8;
+        }
+
+        /// <summary>
+        /// Writes an unsigned 16 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public void WriteUInt16(int offset, UInt16 value)
+        {
+            Write(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes an unsigned 16 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public async Task WriteUInt16(int offset, UInt16 value)
+        {
+            await WriteAsync(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the unsigned 16 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="value">The integer to write</param>
+        public void WriteUInt16(UInt16 value)
+        {
+            WriteInt16(Position, value);
+            Position += 2;
+        }
+
+        /// <summary>
+        /// Writes an unsigned 32 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public void WriteUInt32(int offset, UInt32 value)
+        {
+            Write(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes an unsigned 32 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public async Task WriteUInt32(int offset, UInt32 value)
+        {
+            await WriteAsync(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the unsigned 32 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="value">The integer to write</param>
+        public void WriteUInt32(UInt32 value)
+        {
+            WriteUInt32(Position, value);
+            Position += 4;
+        }
+
+        /// <summary>
+        /// Writes an unsigned 64 bit little endian integer.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public void WriteUInt64(int offset, UInt64 value)
+        {
+            Write(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes an unsigned 64 bit little endian integer.  This function is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the integer to write.</param>
+        /// <param name="value">The integer to write</param>
+        public async Task WriteUInt32(int offset, UInt64 value)
+        {
+            await WriteAsync(offset, BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the unsigned 64 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <param name="value">The integer to write</param>
+        public void WriteUInt64(Int64 value)
+        {
+            WriteUInt64(Position, value);
+            Position += 8;
+        }
         #endregion
-
-
-
 
         #endregion
 
