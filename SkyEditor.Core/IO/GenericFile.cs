@@ -718,6 +718,46 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
+        /// Reads an unsigned byte from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        /// <returns>The integer from the given location</returns>
+        public byte ReadByte()
+        {
+            var output = Read(Position);
+            Position += 1;
+            return output;
+        }
+
+        /// <summary>
+        /// Reads an unsigned byte from the current position (<see cref="Position"/>), then advances the current position.  This function is thread-safe.
+        /// </summary>
+        /// <returns>The integer from the given location</returns>
+        public async Task<byte> ReadByteAsync()
+        {
+            var output = await ReadAsync(Position);
+            Position += 1;
+            return output;
+        }
+
+        /// <summary>
+        /// Writes a byte to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// </summary>
+        public void WriteByte(byte value)
+        {
+            Write(Position, value);
+            Position += 1;
+        }
+
+        /// <summary>
+        /// Writes a byte to the current position (<see cref="Position"/>), then advances the current position.  This function is thread-safe.
+        /// </summary>
+        public async Task WriteByteAsync(byte value)
+        {
+            await WriteAsync(Position, value);
+            Position += 1;
+        }
+
+        /// <summary>
         /// Copies data into the given stream.  Not thread-safe.
         /// </summary>
         /// <param name="destination">Stream to which to copy data.</param>
@@ -842,6 +882,7 @@ namespace SkyEditor.Core.IO
         #endregion
 
         #region Integer Read/Write
+
         /// <summary>
         /// Reads a signed 16 bit little endian integer.  This function is not thread-safe.
         /// </summary>
@@ -1102,7 +1143,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteInt32(long offset, Int64 value)
+        public async Task WriteInt64Async(long offset, Int64 value)
         {
             await WriteAsync(offset, 8, BitConverter.GetBytes(value));
         }
