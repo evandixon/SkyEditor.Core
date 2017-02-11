@@ -45,6 +45,11 @@ namespace SkyEditor.Core
         public event EventHandler<FileOpenedEventArguments> FileOpened;
 
         /// <summary>
+        /// Raised immediately before a file is closed
+        /// </summary>
+        public event EventHandler<FileClosingEventArgs> FileClosing;
+
+        /// <summary>
         /// Raised when a file is closed
         /// </summary>
         public event EventHandler<FileClosedEventArgs> FileClosed;
@@ -678,21 +683,29 @@ namespace SkyEditor.Core
         {
             if (file != null)
             {
-                for (var i = OpenFiles.Count - 1; i >= 0; i--)
+                var args = new FileClosingEventArgs();
+                args.File = file;
+
+                FileClosing?.Invoke(this, args);
+
+                if (!args.Cancel)
                 {
-                    if (ReferenceEquals(OpenFiles[i], file))
+                    for (var i = OpenFiles.Count - 1; i >= 0; i--)
                     {
-                        OpenFiles[i].Dispose();
-                        OpenFiles.RemoveAt(i);
+                        if (ReferenceEquals(OpenFiles[i], file))
+                        {
+                            OpenFiles[i].Dispose();
+                            OpenFiles.RemoveAt(i);
+                        }
                     }
-                }
 
-                if (ReferenceEquals(file, SelectedFile))
-                {
-                    SelectedFile = null;
-                }
+                    if (ReferenceEquals(file, SelectedFile))
+                    {
+                        SelectedFile = null;
+                    }
 
-                FileClosed?.Invoke(this, new FileClosedEventArgs { File = file.Model });
+                    FileClosed?.Invoke(this, new FileClosedEventArgs { File = file.Model });
+                }                
             }
         }
         #endregion
