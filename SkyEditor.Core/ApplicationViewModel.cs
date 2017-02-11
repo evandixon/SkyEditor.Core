@@ -708,7 +708,7 @@ namespace SkyEditor.Core
             {
                 _rootMenuItems = new ObservableCollection<ActionMenuItem>();
                 //Generate the menu items
-                foreach (var item in UIHelper.GenerateLogicalMenuItems(await UIHelper.GetMenuItemInfo(CurrentPluginManager, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode()), this, null))
+                foreach (var item in UIHelper.GenerateLogicalMenuItems(await UIHelper.GetMenuItemInfo(this, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode()), this, null))
                 {
                     _rootMenuItems.Add(item);
                 }

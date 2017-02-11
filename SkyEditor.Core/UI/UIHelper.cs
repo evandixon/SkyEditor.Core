@@ -16,19 +16,19 @@ namespace SkyEditor.Core.UI
         /// <param name="isContextBased">Whether or not the desired menu item info is for context menus.</param>
         /// <param name="isDevMode">Whether or not to get the dev-only menu items.</param>
         /// <param name="target">Target of the menu item, or null if there is no target</param>
-        /// <param name="pluginManager">Instance of the current plugin manager.</param>
+        /// <param name="pluginManager">Instance of the current application ViewModel.</param>
         /// <returns>A list of <see cref="MenuItemInfo"/> with each item's <see cref="MenuItemInfo.Children"/> correctly initialized</returns>
-        private static async Task<List<MenuItemInfo>> GetMenuItemInfo(bool isContextBased, bool isDevMode, object target, PluginManager pluginManager)
+        private static async Task<List<MenuItemInfo>> GetMenuItemInfo(bool isContextBased, bool isDevMode, object target, ApplicationViewModel appViewModel)
         {
-            if (pluginManager == null)
+            if (appViewModel == null)
             {
-                throw (new ArgumentNullException(nameof(pluginManager)));
+                throw (new ArgumentNullException(nameof(appViewModel)));
             }
 
             var menuItems = new List<MenuItemInfo>();
-            foreach (var actionInstance in pluginManager.GetRegisteredObjects<MenuAction>())
+            foreach (var actionInstance in appViewModel.CurrentPluginManager.GetRegisteredObjects<MenuAction>())
             {
-                actionInstance.CurrentPluginManager = pluginManager;
+                actionInstance.CurrentApplicationViewModel = appViewModel;
 
                 //1: If this is a context menu, only get actions that support the target and are context based
                 //2: Ensure menu actions are only visible based on their environment: non-context in regular menu, context in context menu
@@ -143,26 +143,25 @@ namespace SkyEditor.Core.UI
         }
 
         /// <summary>
-        /// Gets the currently registered MenuActions in heiarchy form.
+        /// Gets the currently registered MenuActions in heiarchy form
         /// </summary>
-        /// <param name="isDevMode">Whether or not to get the dev-only menu items.</param>
-        /// <param name="target">Target of the menu item, or null if there is no target</param>
-        /// <param name="pluginManager">Instance of the current plugin manager.</param>
+        /// <param name="isDevMode">Whether or not to get the dev-only menu items</param>
+        /// <param name="appViewModel">Instance of the current application ViewModel</param>
         /// <returns>A list of <see cref="MenuItemInfo"/> with each item's <see cref="MenuItemInfo.Children"/> correctly initialized</returns>
-        public static async Task<List<MenuItemInfo>> GetMenuItemInfo(PluginManager pluginManager, bool isDevMode = false)
+        public static async Task<List<MenuItemInfo>> GetMenuItemInfo(ApplicationViewModel appViewModel, bool isDevMode = false)
         {
-            return await GetMenuItemInfo(false, isDevMode, null, pluginManager);
+            return await GetMenuItemInfo(false, isDevMode, null, appViewModel);
         }
         /// <summary>
         /// Gets the currently registered MenuActions in heiarchy form.
         /// </summary>
         /// <param name="isDevMode">Whether or not to get the dev-only menu items.</param>
         /// <param name="target">Target of the menu item, or null if there is no target</param>
-        /// <param name="pluginManager">Instance of the current plugin manager.</param>
+        /// <param name="appViewModel">Instance of the current application ViewModel</param>
         /// <returns>A list of <see cref="MenuItemInfo"/> with each item's <see cref="MenuItemInfo.Children"/> correctly initialized</returns>
-        public static async Task<List<MenuItemInfo>> GetContextMenuItemInfo(object target, PluginManager pluginManager, bool isDevMode = false)
+        public static async Task<List<MenuItemInfo>> GetContextMenuItemInfo(object target, ApplicationViewModel appViewModel, bool isDevMode = false)
         {
-            return await GetMenuItemInfo(true, isDevMode, target, pluginManager);
+            return await GetMenuItemInfo(true, isDevMode, target, appViewModel);
         }
 
         /// <summary>
@@ -190,7 +189,7 @@ namespace SkyEditor.Core.UI
                 foreach (var action in item.ActionTypes)
                 {
                     var a = ReflectionHelpers.CreateInstance(action) as MenuAction;
-                    a.CurrentPluginManager = appViewModel.CurrentPluginManager;
+                    a.CurrentApplicationViewModel = appViewModel;
                     m.Actions.Add(a);
                 }
                 foreach (var child in GenerateLogicalMenuItems(item.Children, appViewModel, targets))

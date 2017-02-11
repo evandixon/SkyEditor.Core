@@ -15,7 +15,7 @@ namespace SkyEditor.Core.UI
 
         }
 
-        public event EventHandler CurrentPluginManagerChanged;
+        public event EventHandler CurrentApplicationViewModelChanged;
 
         /// <summary>
         /// Whether or not the menu action is a context menu action
@@ -30,22 +30,22 @@ namespace SkyEditor.Core.UI
         /// <summary>
         /// Instance of the current plugin manager
         /// </summary>
-        public PluginManager CurrentPluginManager
+        public ApplicationViewModel CurrentApplicationViewModel
         {
             get
             {
-                return _currentPluginManager;
+                return _currentApplicationViewModel;
             }
             set
             {
-                if (_currentPluginManager != value)
+                if (_currentApplicationViewModel != value)
                 {
-                    _currentPluginManager = value;
-                    CurrentPluginManagerChanged?.Invoke(this, new EventArgs());
+                    _currentApplicationViewModel = value;
+                    CurrentApplicationViewModelChanged?.Invoke(this, new EventArgs());
                 }
             }
         }
-        private PluginManager _currentPluginManager;
+        private ApplicationViewModel _currentApplicationViewModel;
 
         /// <summary>
         /// Whether or not visibility is independent from the action supporting the current target
