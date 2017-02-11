@@ -118,24 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ConsoleTests_TestRunCommand_ArgArr_Output" xml:space="preserve">
-    <value>True
-main
-arg
-</value>
+    <value>True%nmain%narg%n</value>
   </data>
   <data name="ConsoleTests_TestRunCommand_ArgString_Output" xml:space="preserve">
-    <value>True
-arg
-main
-</value>
+    <value>True%narg%nmain%n</value>
   </data>
   <data name="ConsoleTests_TestRunConsole_Output" xml:space="preserve">
-    <value>The following commands are available:
-TestConsoleCommand
-Unknown command "blarg".
-Unknown command "testconsolecommand2".
-True
-exit
-</value>
+    <value>The following commands are available:%nTestConsoleCommand%nUnknown command "blarg".%nUnknown command "testconsolecommand2".%nTrue%nexit%n</value>
   </data>
 </root>

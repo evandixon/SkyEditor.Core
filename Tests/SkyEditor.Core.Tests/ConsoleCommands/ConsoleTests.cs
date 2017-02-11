@@ -219,7 +219,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
                     // Check
                     var output = c.GetStdOut();
-                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunConsole_Output, c.GetStdOut());
+                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunConsole_Output.Replace("%n", Environment.NewLine), c.GetStdOut());
                 }
             }
         }
@@ -242,7 +242,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
                     // Check
                     var output = c.GetStdOut();
-                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgString_Output, c.GetStdOut());
+                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgString_Output.Replace("%n", Environment.NewLine), c.GetStdOut());
                 }                    
             }
         }
@@ -265,7 +265,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
                     // Check
                     var output = c.GetStdOut();
-                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgArr_Output, c.GetStdOut());
+                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgArr_Output.Replace("%n", Environment.NewLine), c.GetStdOut());
                 }                    
             }
         }

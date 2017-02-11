@@ -62,10 +62,7 @@ namespace SkyEditor.Core.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to True
-        ///main
-        ///arg
-        ///.
+        ///   Looks up a localized string similar to True%nmain%narg%n.
         /// </summary>
         internal static string ConsoleTests_TestRunCommand_ArgArr_Output {
             get {
@@ -74,10 +71,7 @@ namespace SkyEditor.Core.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to True
-        ///arg
-        ///main
-        ///.
+        ///   Looks up a localized string similar to True%narg%nmain%n.
         /// </summary>
         internal static string ConsoleTests_TestRunCommand_ArgString_Output {
             get {
@@ -86,13 +80,7 @@ namespace SkyEditor.Core.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following commands are available:
-        ///TestConsoleCommand
-        ///Unknown command &quot;blarg&quot;.
-        ///Unknown command &quot;testconsolecommand2&quot;.
-        ///True
-        ///exit
-        ///.
+        ///   Looks up a localized string similar to The following commands are available:%nTestConsoleCommand%nUnknown command &quot;blarg&quot;.%nUnknown command &quot;testconsolecommand2&quot;.%nTrue%nexit%n.
         /// </summary>
         internal static string ConsoleTests_TestRunConsole_Output {
             get {
