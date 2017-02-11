@@ -25,7 +25,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly created project</returns>
         public static T CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
-        {           
+        {
             // Create the instance
             var output = ReflectionHelpers.CreateInstance(projectType) as T;
 
@@ -227,17 +227,62 @@ namespace SkyEditor.Core.Projects
         /// <summary>
         /// The progress of the current build
         /// </summary>
-        public float Progress { get; set; }
+        public float Progress
+        {
+            get
+            {
+                return _progress;
+            }
+            set
+            {
+                if (_progress != value)
+                {
+                    _progress = value;
+                    ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                }
+            }
+        }
+        private float _progress;
 
         /// <summary>
         /// What the current build is doing
         /// </summary>
-        public string Message { get; set; }
+        public string Message
+        {
+            get
+            {
+                return _message;
+            }
+            set
+            {
+                if (_message != value)
+                {
+                    _message = value;
+                    ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                }
+            }
+        }
+        private string _message;
 
         /// <summary>
         /// Whether or not the exact build progress can currently be determined
         /// </summary>
-        public bool IsIndeterminate { get; set; }
+        public bool IsIndeterminate
+        {
+            get
+            {
+                return _isIndeterminate;
+            }
+            set
+            {
+                if (_isIndeterminate != value)
+                {
+                    _isIndeterminate = value;
+                    ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                }
+            }
+        }
+        private bool _isIndeterminate;
 
         /// <summary>
         /// Whether or not the current build is complete
@@ -601,7 +646,7 @@ namespace SkyEditor.Core.Projects
                     Items.Add(fixedPath, null);
                     DirectoryCreated?.Invoke(this, new DirectoryCreatedEventArgs(fixedPath));
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -623,13 +668,13 @@ namespace SkyEditor.Core.Projects
             if (CanDeleteDirectory(path))
             {
                 // Delete items
-                foreach(var item in GetItems(path, true).ToArray())
+                foreach (var item in GetItems(path, true).ToArray())
                 {
                     DeleteItem(item.Key);
                 }
 
                 // Delete child directories
-                foreach(var item in GetDirectories(path, true).ToArray())
+                foreach (var item in GetDirectories(path, true).ToArray())
                 {
                     DeleteDirectory(item);
                 }

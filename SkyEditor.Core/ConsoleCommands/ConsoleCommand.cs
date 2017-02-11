@@ -10,7 +10,7 @@ namespace SkyEditor.Core.ConsoleCommands
     /// </summary>
     public abstract class ConsoleCommand
     {
-        public virtual PluginManager CurrentPluginManager { get; set; }
+        public virtual ApplicationViewModel CurrentApplicationViewModel { get; set; }
         public virtual IConsoleProvider Console { get; set; }
         public virtual string CommandName
         {

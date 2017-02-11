@@ -20,7 +20,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
             protected override void Main(string[] arguments)
             {
-                Console.WriteLine(CurrentPluginManager != null);
+                Console.WriteLine(CurrentApplicationViewModel.CurrentPluginManager != null);
                 foreach (var item in arguments)
                 {
                     Console.WriteLine(item);
@@ -40,7 +40,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
             protected override void Main(string[] arguments)
             {
-                Console.WriteLine(CurrentPluginManager != null);
+                Console.WriteLine(CurrentApplicationViewModel.CurrentPluginManager != null);
                 foreach (var item in arguments.Reverse())
                 {
                     Console.WriteLine(item);
@@ -144,24 +144,34 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
         [TestCategory(ConsoleTestsCategory)]
         public async Task TestConsoleCommandTest()
         {
-            PluginManager manager = new PluginManager();
-            await manager.LoadCore(new BasicTestCoreMod());
+            using (var manager = new PluginManager())
+            {
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    await manager.LoadCore(new BasicTestCoreMod());
 
-            var command = new TestConsoleCommand();
+                    var command = new TestConsoleCommand();
 
-            Assert.AreEqual("True%ntest%narguments%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleManager.TestConsoleCommand(command, manager, new string[] { "test", "arguments" }, "standard\nin").Result);
+                    Assert.AreEqual("True%ntest%narguments%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleManager.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
+                }
+            }
         }
 
         [TestMethod]
         [TestCategory(ConsoleTestsCategory)]
         public async Task TestConsoleCommand2Test()
         {
-            PluginManager manager = new PluginManager();
-            await manager.LoadCore(new BasicTestCoreMod());
+            using (var manager = new PluginManager())
+            {
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    await manager.LoadCore(new BasicTestCoreMod());
 
-            var command = new TestConsoleCommand2();
+                    var command = new TestConsoleCommand2();
 
-            Assert.AreEqual("True%narguments%ntest%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleManager.TestConsoleCommand(command, manager, new string[] { "test", "arguments" }, "standard\nin").Result);
+                    Assert.AreEqual("True%narguments%ntest%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleManager.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
+                }
+            }
         }
 
         [TestMethod]
@@ -177,11 +187,11 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
         public void TestConsoleCommand_ArgumentNullChecks()
         {
             TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleManager), nameof(ConsoleManager.TestConsoleCommand), "command",
-                new Type[] { typeof(ConsoleCommand), typeof(PluginManager), typeof(string[]), typeof(string) },
-                new object[] { null, new PluginManager(), new string[] { }, "" });
+                new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
+                new object[] { null, new ApplicationViewModel(new PluginManager()), new string[] { }, "" });
 
             TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleManager), nameof(ConsoleManager.TestConsoleCommand), "manager",
-                new Type[] { typeof(ConsoleCommand), typeof(PluginManager), typeof(string[]), typeof(string) },
+                new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
                 new object[] { new TestConsoleCommand(), null, new string[] { }, "" });
         }
 
@@ -192,22 +202,25 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
             var coreMod = new TestCoreMod1();
             using (var manager = new PluginManager())
             {
-                await manager.LoadCore(coreMod);
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    await manager.LoadCore(coreMod);
 
-                // Set up
-                var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
-                c.StdIn.AppendLine("help");
-                c.StdIn.AppendLine("blarg");
-                c.StdIn.AppendLine("TestConsoleCommand2"); // Should not be registered
-                c.StdIn.AppendLine("TestConsoleCommand"); // Should work properly
-                c.StdIn.AppendLine("exit");
+                    // Set up
+                    var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
+                    c.StdIn.AppendLine("help");
+                    c.StdIn.AppendLine("blarg");
+                    c.StdIn.AppendLine("TestConsoleCommand2"); // Should not be registered
+                    c.StdIn.AppendLine("TestConsoleCommand"); // Should work properly
+                    c.StdIn.AppendLine("exit");
 
-                // Test
-                await manager.CurrentConsoleManager.RunConsole();
+                    // Test
+                    await appViewModel.CurrentConsoleManager.RunConsole();
 
-                // Check
-                var output = c.GetStdOut();
-                Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunConsole_Output, c.GetStdOut());
+                    // Check
+                    var output = c.GetStdOut();
+                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunConsole_Output, c.GetStdOut());
+                }
             }
         }
 
@@ -218,16 +231,19 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
             var coreMod = new TestCoreMod2();
             using (var manager = new PluginManager())
             {
-                await manager.LoadCore(coreMod);
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    await manager.LoadCore(coreMod);
 
-                var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
+                    var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
 
-                // Test
-                await manager.CurrentConsoleManager.RunCommand("TestConsoleCommand2", "main arg");
+                    // Test
+                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommand2", "main arg");
 
-                // Check
-                var output = c.GetStdOut();
-                Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgString_Output, c.GetStdOut());
+                    // Check
+                    var output = c.GetStdOut();
+                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgString_Output, c.GetStdOut());
+                }                    
             }
         }
 
@@ -238,16 +254,19 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
             var coreMod = new TestCoreMod2();
             using (var manager = new PluginManager())
             {
-                await manager.LoadCore(coreMod);
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    await manager.LoadCore(coreMod);
 
-                var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
+                    var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
 
-                // Test
-                await manager.CurrentConsoleManager.RunCommand("TestConsoleCommand", new string[] { "main", "arg" });
+                    // Test
+                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommand", new string[] { "main", "arg" });
 
-                // Check
-                var output = c.GetStdOut();
-                Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgArr_Output, c.GetStdOut());
+                    // Check
+                    var output = c.GetStdOut();
+                    Assert.AreEqual(Properties.Resources.ConsoleTests_TestRunCommand_ArgArr_Output, c.GetStdOut());
+                }                    
             }
         }
 
@@ -258,27 +277,30 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
             var coreMod = new TestCoreMod2();
             using (var manager = new PluginManager())
             {
-                await manager.LoadCore(coreMod);
-
-                var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
-
-                // Test
-                await manager.CurrentConsoleManager.RunCommand("TestConsoleCommandException", "main arg", true);
-
-                Assert.IsTrue(c.GetStdOut().Contains(nameof(TestException)), "Console output does not contain correct exception.");
-
-                try
+                using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    await manager.CurrentConsoleManager.RunCommand("TestConsoleCommandException", "main arg", false);
-                }
-                catch (TestException)
-                {
-                    // Pass
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail("Incorrect exeption thrown: " + ex.ToString());
-                }
+                    await manager.LoadCore(coreMod);
+
+                    var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
+
+                    // Test
+                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", "main arg", true);
+
+                    Assert.IsTrue(c.GetStdOut().Contains(nameof(TestException)), "Console output does not contain correct exception.");
+
+                    try
+                    {
+                        await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", "main arg", false);
+                    }
+                    catch (TestException)
+                    {
+                        // Pass
+                    }
+                    catch (Exception ex)
+                    {
+                        Assert.Fail("Incorrect exeption thrown: " + ex.ToString());
+                    }
+                }                    
             }
         }
 
@@ -289,27 +311,30 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
             var coreMod = new TestCoreMod2();
             using (var manager = new PluginManager())
             {
-                await manager.LoadCore(coreMod);
-
-                var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
-
-                // Test
-                await manager.CurrentConsoleManager.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, true);
-
-                Assert.IsTrue(c.GetStdOut().Contains(nameof(TestException)), "Console output does not contain correct exception.");
-
-                try
+                using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    await manager.CurrentConsoleManager.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, false);
-                }
-                catch (TestException)
-                {
-                    // Pass
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail("Incorrect exeption thrown: " + ex.ToString());
-                }
+                    await manager.LoadCore(coreMod);
+
+                    var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
+
+                    // Test
+                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, true);
+
+                    Assert.IsTrue(c.GetStdOut().Contains(nameof(TestException)), "Console output does not contain correct exception.");
+
+                    try
+                    {
+                        await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, false);
+                    }
+                    catch (TestException)
+                    {
+                        // Pass
+                    }
+                    catch (Exception ex)
+                    {
+                        Assert.Fail("Incorrect exeption thrown: " + ex.ToString());
+                    }
+                }                    
             }
         }
     }

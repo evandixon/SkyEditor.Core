@@ -17,20 +17,20 @@ namespace SkyEditor.Core.ConsoleCommands
         /// Runs a console command with custom input and returns the output.
         /// </summary>
         /// <param name="command">Command to run</param>
-        /// <param name="manager">Plugin manager to use</param>
+        /// <param name="appViewModel">Current application view model</param>
         /// <param name="arguments">Input arguments</param>
         /// <param name="stdIn">New-line separated standard input</param>
         /// <returns>New-line separated standard output</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="command"/> or <paramref name="manager"/> is null.</exception>
-        public static async Task<string> TestConsoleCommand(ConsoleCommand command, PluginManager manager, string[] arguments, string stdIn)
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="command"/> or <paramref name="appViewModel"/> is null.</exception>
+        public static async Task<string> TestConsoleCommand(ConsoleCommand command, ApplicationViewModel appViewModel, string[] arguments, string stdIn)
         {
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
             }
-            if (manager == null)
+            if (appViewModel == null)
             {
-                throw new ArgumentNullException(nameof(manager));
+                throw new ArgumentNullException(nameof(appViewModel));
             }
 
             if (arguments == null)
@@ -44,19 +44,19 @@ namespace SkyEditor.Core.ConsoleCommands
 
             var provider = new MemoryConsoleProvider();
             provider.StdIn.Append(stdIn);
-            command.CurrentPluginManager = manager;
+            command.CurrentApplicationViewModel = appViewModel;
             command.Console = provider;
             await command.MainAsync(arguments).ConfigureAwait(false);
             return provider.GetStdOut();
         }
 
-        public ConsoleManager(PluginManager manager)
+        public ConsoleManager(ApplicationViewModel appViewModel)
         {
-            Console = manager.CurrentConsoleProvider;
+            Console = appViewModel.CurrentPluginManager.CurrentConsoleProvider;
             AllCommands = new Dictionary<string, ConsoleCommand>();
-            foreach (ConsoleCommand item in manager.GetRegisteredObjects<ConsoleCommand>())
+            foreach (ConsoleCommand item in appViewModel.CurrentPluginManager.GetRegisteredObjects<ConsoleCommand>())
             {
-                item.CurrentPluginManager = manager;
+                item.CurrentApplicationViewModel = appViewModel;
                 item.Console = Console;
                 AllCommands.Add(item.CommandName, item);
             }

@@ -403,6 +403,7 @@ namespace SkyEditor.Core.IO
                 }
             }
             this.Filename = filename;
+            FileSaved?.Invoke(this, new EventArgs());
         }
 
         /// <summary>

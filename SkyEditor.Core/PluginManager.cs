@@ -97,11 +97,6 @@ namespace SkyEditor.Core
         /// </summary>
         public IConsoleProvider CurrentConsoleProvider { get; protected set; }
 
-        /// <summary>
-        /// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
-        /// </summary>
-        public ConsoleManager CurrentConsoleManager { get; protected set; }
-
         #endregion
 
         #region Events
@@ -239,9 +234,6 @@ namespace SkyEditor.Core
             }            
 
             PluginLoadComplete?.Invoke(this, new EventArgs());
-
-            // Initialize things that depend on plugins being loaded
-            CurrentConsoleManager = new ConsoleManager(this);
         }
 
         /// <summary>

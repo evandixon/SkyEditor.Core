@@ -44,7 +44,6 @@ namespace SkyEditor.Core.Tests
             Assert.IsNotNull(manager.CurrentIOProvider);
             Assert.IsNotNull(manager.CurrentSettingsProvider);
             Assert.IsNotNull(manager.CurrentConsoleProvider);
-            Assert.IsNotNull(manager.CurrentConsoleManager);
         }
 
 

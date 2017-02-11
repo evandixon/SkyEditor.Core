@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.IO;
+﻿using SkyEditor.Core.ConsoleCommands;
+using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;
@@ -273,6 +274,22 @@ namespace SkyEditor.Core
         }
         private bool _isCompleted;
 
+        /// <summary>
+        /// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
+        /// </summary>
+        public ConsoleManager CurrentConsoleManager
+        {
+            get
+            {
+                if (_consoleManager == null)
+                {
+                    _consoleManager = new ConsoleManager(this);
+                }
+                return _consoleManager;
+            }
+        }
+        private ConsoleManager _consoleManager;
+
         #endregion
 
         #region Task Watching
@@ -298,11 +315,56 @@ namespace SkyEditor.Core
 
             public Task InnerTask;
 
-            public float Progress { get; set; }
+            public float Progress
+            {
+                get
+                {
+                    return _progress;
+                }
+                set
+                {
+                    if (_progress != value)
+                    {
+                        _progress = value;
+                        ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                    }
+                }
+            }
+            private float _progress;
 
-            public string Message { get; set; }
+            public string Message
+            {
+                get
+                {
+                    return _message;
+                }
+                set
+                {
+                    if (_message != value)
+                    {
+                        _message = value;
+                        ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                    }
+                }
+            }
+            private string _message;
 
-            public bool IsIndeterminate { get; set; }
+            public bool IsIndeterminate
+            {
+                get
+                {
+                    return _isIndeterminate;
+                }
+                set
+                {
+                    if (_isIndeterminate != value)
+                    {
+                        _isIndeterminate = value;
+                        ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                    }
+                }
+            }
+            private bool _isIndeterminate;
 
             public bool IsCompleted { get; set; }
 
