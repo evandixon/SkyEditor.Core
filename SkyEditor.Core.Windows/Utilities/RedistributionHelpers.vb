@@ -75,7 +75,7 @@ Namespace Utilities
             Next
 
             'Copy temporary files
-            Await FileSystem.EnsureDirectoryEmpty(tempDir, manager.CurrentIOProvider).ConfigureAwait(False)
+            Await Core.Utilities.FileSystem.EnsureDirectoryEmpty(tempDir, manager.CurrentIOProvider).ConfigureAwait(False)
             For Each filePath In ToCopy
                 If File.Exists(filePath) Then
                     Dim dest = filePath.Replace(devDir, tempDir)
