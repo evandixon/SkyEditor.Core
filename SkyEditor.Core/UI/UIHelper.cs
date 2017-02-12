@@ -167,14 +167,23 @@ namespace SkyEditor.Core.UI
         /// <summary>
         /// Generates MenuItems from the given IEnumerable of MenuItemInfo.
         /// </summary>
-        /// <param name="MenuItemInfo">IEnumerable of MenuItemInfo that will be used to create the MenuItems.</param>
+        /// <param name="menuItemInfo">IEnumerable of MenuItemInfo that will be used to create the MenuItems.</param>
+        /// <param name="appViewModel">Instance of the current application ViewModel</param>
         /// <param name="targets">Direct targets of the action, if applicable.  If Nothing, the IOUIManager will control the targets</param>
-        /// <returns></returns>
+        /// <returns>A list of <see cref="ActionMenuItem"/> corresponding to the given menu item info (<paramref name="menuItemInfo"/>)</returns>
         public static List<ActionMenuItem> GenerateLogicalMenuItems(IEnumerable<MenuItemInfo> menuItemInfo, ApplicationViewModel appViewModel, IEnumerable<object> targets)
         {
             if (menuItemInfo == null)
             {
                 throw (new ArgumentNullException(nameof(menuItemInfo)));
+            }
+            if (appViewModel == null)
+            {
+                throw new ArgumentNullException(nameof(appViewModel));
+            }
+            if (targets == null)
+            {
+                targets = new object[] { };
             }
 
             List<ActionMenuItem> output = new List<ActionMenuItem>();
@@ -208,6 +217,10 @@ namespace SkyEditor.Core.UI
         /// <returns>An enumerable of view controls</returns>
         private static IEnumerable<IViewControl> GetViewControls(PluginManager manager)
         {
+            if (manager == null)
+            {
+                throw new ArgumentNullException(nameof(manager));
+            }
             return manager.GetRegisteredObjects<IViewControl>();
         }
 

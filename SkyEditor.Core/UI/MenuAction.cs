@@ -12,7 +12,7 @@ namespace SkyEditor.Core.UI
     {
         public MenuAction(IEnumerable<string> path)
         {
-
+            ActionPath = path.ToList();
         }
 
         public event EventHandler CurrentApplicationViewModelChanged;
