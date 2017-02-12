@@ -41,7 +41,7 @@ namespace SkyEditor.Core.UI
             }
             set
             {
-                if (_isEnabled == value)
+                if (_isEnabled != value)
                 {
                     _isEnabled = value;
                     CanExecuteChanged?.Invoke(this, new EventArgs());
