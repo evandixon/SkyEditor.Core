@@ -182,7 +182,7 @@ namespace SkyEditor.Core.Projects
         /// <summary>
         /// The default extension used for the project file
         /// </summary>
-        public virtual string ProjectFileExtension => "skyproj";
+        public abstract string ProjectFileExtension { get; }
 
         /// <summary>
         /// Settings associated with the project

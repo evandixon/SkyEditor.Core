@@ -199,4 +199,10 @@
   <data name="UI_InstalledExtension" xml:space="preserve">
     <value>Installed Extensions</value>
   </data>
+  <data name="File_SkyEditorProject" xml:space="preserve">
+    <value>Sky Editor Project</value>
+  </data>
+  <data name="File_SkyEditorSolution" xml:space="preserve">
+    <value>Sky Editor Solution</value>
+  </data>
 </root>

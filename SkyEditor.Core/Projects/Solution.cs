@@ -12,6 +12,10 @@ namespace SkyEditor.Core.Projects
     public class Solution : ProjectBase<Project>
     {
 
+        public const string SolutionFileExt = "skysln";
+
+        public override string ProjectFileExtension => SolutionFileExt;
+
         #region Events
         /// <summary>
         /// Raised when the solution builds one or more projects

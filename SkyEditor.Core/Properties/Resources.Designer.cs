@@ -80,6 +80,24 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sky Editor Project.
+        /// </summary>
+        internal static string File_SkyEditorProject {
+            get {
+                return ResourceManager.GetString("File_SkyEditorProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sky Editor Solution.
+        /// </summary>
+        internal static string File_SkyEditorSolution {
+            get {
+                return ResourceManager.GetString("File_SkyEditorSolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No method to open the file of type &quot;{0}&quot; could be found.  This type must either implement IOpenableFile or have a registered IFileOpener that supports this type..
         /// </summary>
         internal static string IO_ErrorNoFileOpener {

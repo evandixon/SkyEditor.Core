@@ -11,6 +11,8 @@ namespace SkyEditor.Core.Projects
     /// </summary>
     public class UnsupportedProject : ProjectBase
     {
+        public override string ProjectFileExtension => Project.ProjectFileExt;
+
         protected override Task<IOnDisk> LoadProjectItem(ItemValue item)
         {
             return Task.FromResult<IOnDisk>(item);

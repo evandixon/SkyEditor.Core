@@ -14,6 +14,10 @@ namespace SkyEditor.Core.Projects
     {
         private const string ProjectReferencesSettingName = "ProjectReferences";
 
+        public const string ProjectFileExt = "skyproj";
+
+        public override string ProjectFileExtension => ProjectFileExt;
+
         /// <summary>
         /// Raised when a file has been added to the project
         /// </summary>
