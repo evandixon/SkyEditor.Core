@@ -17,6 +17,7 @@ namespace SkyEditor.Core.UI
         {
             Actions = new List<MenuAction>();
             Children = new ObservableCollection<ActionMenuItem>();
+            Command = new RelayCommand(new Action<object>(RunActions));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -86,7 +87,7 @@ namespace SkyEditor.Core.UI
         /// </summary>
         public ICommand Command { get; private set; }
 
-        private async void RunActions()
+        private async void RunActions(object dummy)
         {
             // Run synchronously to avoid threading issues
             foreach (var t in Actions)
