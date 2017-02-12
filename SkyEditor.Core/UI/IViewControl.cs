@@ -13,7 +13,7 @@ namespace SkyEditor.Core.UI
         /// <summary>
         /// Raised when the header has changed
         /// </summary>
-        event EventHandler HeaderUpdated;
+        event EventHandler<HeaderUpdatedEventArgs> HeaderUpdated;
 
         /// <summary>
         /// Raised when the <see cref="IsModified"/> property's value has changed
