@@ -959,14 +959,6 @@ namespace SkyEditor.Core
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
-        //public float Progress => throw new NotImplementedException();
-
-        //public string Message => throw new NotImplementedException();
-
-        //public bool IsIndeterminate => throw new NotImplementedException();
-
-        //public bool IsCompleted => throw new NotImplementedException();
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -974,6 +966,15 @@ namespace SkyEditor.Core
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
+                    CurrentPluginManager?.Dispose();
+                    CurrentSolution?.Dispose();
+                    foreach (var item in OpenFiles)
+                    {
+                        if (item is IDisposable)
+                        {
+                            (item as IDisposable).Dispose();
+                        }
+                    }
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

@@ -703,6 +703,13 @@ namespace SkyEditor.Core.Projects
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
+                    foreach (var item in Items)
+                    {
+                        if (item.Value is IDisposable)
+                        {
+                            (item.Value as IDisposable).Dispose();
+                        }
+                    }
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
