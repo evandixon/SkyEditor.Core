@@ -216,11 +216,11 @@ namespace SkyEditor.Core.Tests.UI
 
         public class CoreMod : CoreSkyEditorPlugin
         {
-            public override string PluginName => throw new NotImplementedException();
+            public override string PluginName { get; }
 
-            public override string PluginAuthor => throw new NotImplementedException();
+            public override string PluginAuthor { get; }
 
-            public override string Credits => throw new NotImplementedException();
+            public override string Credits { get; }
 
             public override string GetExtensionDirectory()
             {
