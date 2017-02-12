@@ -20,7 +20,6 @@ Namespace CoreMods
 
             manager.RegisterType(GetType(ConsoleCommand), GetType(DistPrep))
             manager.RegisterType(GetType(ConsoleCommand), GetType(GeneratePluginExtensions))
-            manager.RegisterIOFilter("*.skysln", My.Resources.Language.SkyEditorSolution)
         End Sub
 
         Public Overrides Function IsPluginLoadingEnabled() As Boolean

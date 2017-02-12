@@ -1,5 +1,8 @@
 ﻿using SkyEditor.Core.ConsoleCommands;
+using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
+using SkyEditor.Core.Projects;
+using SkyEditor.Core.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,8 +99,16 @@ namespace SkyEditor.Core
             base.Load(manager);
 
             manager.RegisterTypeRegister<IFileOpener>();
+            manager.RegisterTypeRegister<IFileSaver>();
             manager.RegisterTypeRegister<IFileTypeDetector>();
             manager.RegisterTypeRegister<IDirectoryTypeDetector>();
+            manager.RegisterTypeRegister<ConsoleCommand>();
+            manager.RegisterTypeRegister<LocalExtensionCollection>();
+            manager.RegisterTypeRegister<Solution>();
+            manager.RegisterTypeRegister<Project>();
+            manager.RegisterTypeRegister<MenuAction>();
+            manager.RegisterTypeRegister<GenericViewModel>();
+            manager.RegisterTypeRegister<IViewControl>();
 
             manager.RegisterType<IFileOpener, OpenableFileOpener>();
             manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
