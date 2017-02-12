@@ -349,5 +349,24 @@ namespace SkyEditor.Core.Tests.UI
                 }
             }
         }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task GetContextMenuItemInfo()
+        {
+            using (var manager = new PluginManager())
+            {
+                await manager.LoadCore(new CoreMod());
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    var info = await UIHelper.GetContextMenuItemInfo("a string", appViewModel, true);
+                    var menuItems = UIHelper.GenerateLogicalMenuItems(info, appViewModel, new object[] { "a string" });
+                    Assert.AreEqual(3, info.Count);
+                    Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionA).GetTypeInfo())).Children.Count);
+                    Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionB).GetTypeInfo())).Children.Count);
+                    Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionDev).GetTypeInfo())).Children.Count);
+                }
+            }
+        }
     }
 }

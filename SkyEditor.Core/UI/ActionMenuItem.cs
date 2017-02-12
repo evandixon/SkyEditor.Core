@@ -15,7 +15,8 @@ namespace SkyEditor.Core.UI
     {
         public ActionMenuItem()
         {
-
+            Actions = new List<MenuAction>();
+            Children = new ObservableCollection<ActionMenuItem>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
