@@ -39,10 +39,10 @@ namespace SkyEditor.Core.UI
         bool IsModified { get; set; }
 
         /// <summary>
-        /// Updates the current IObjectControl's reference to the current plugin manager
+        /// Updates the current reference to the current application ViewModel
         /// </summary>
-        /// <param name="manager">Instance of the current plugin manager</param>
-        void SetPluginManager(PluginManager manager);
+        /// <param name="appViewModel">Instance of the current application ViewModel</param>
+        void SetApplicationViewModel(ApplicationViewModel appViewModel);
 
         /// <summary>
         /// IEnumerable of every type of view model that the control can target.
