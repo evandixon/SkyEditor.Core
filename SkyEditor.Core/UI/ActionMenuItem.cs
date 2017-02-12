@@ -17,7 +17,10 @@ namespace SkyEditor.Core.UI
         {
             Actions = new List<MenuAction>();
             Children = new ObservableCollection<ActionMenuItem>();
-            Command = new RelayCommand(new Action<object>(RunActions));
+
+            var command = new RelayCommand(new Action<object>(RunActions));
+            command.IsEnabled = true;
+            Command = command;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
