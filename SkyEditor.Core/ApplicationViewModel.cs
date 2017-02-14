@@ -517,7 +517,7 @@ namespace SkyEditor.Core
         public string GetIOFilter(ICollection<string> filters, bool addSupportedFilesEntry, bool allowAllFiles)
         {
             // Register any unregistered filters
-            foreach (var item in (from f in filters where !CurrentPluginManager.IOFilters.ContainsKey(f) select f))
+            foreach (var item in filters.Where(f => !CurrentPluginManager.IOFilters.ContainsKey(f)))
             {
                 CurrentPluginManager.IOFilters.Add(item, string.Format(Properties.Resources.UI_UnknownFileRegisterTemplate, item.Trim('*').Trim('.').ToUpper()));
             }
@@ -529,14 +529,14 @@ namespace SkyEditor.Core
             if (addSupportedFilesEntry)
             {
                 fullFilter.Append(Properties.Resources.UI_SupportedFiles + "|" +
-                    string.Join(";", usableFilters.Select(x => "*." + x.Key.Trim('*').Trim('.')) + "|"));
+                    string.Join(";", usableFilters.Select(x => x.Key).ToArray()) + "|");
             }
 
-            fullFilter.Append(string.Join("|", from i in usableFilters select string.Format("{0} ({1})|{1}", i.Value, "*." + i.Key.Trim('*').Trim('.'))));
+            fullFilter.Append(string.Join("|", usableFilters.Select(i => string.Format("{0}|{1}", i.Value, i.Key))));
 
             if (allowAllFiles)
             {
-                fullFilter.Append("|" + Properties.Resources.UI_AllFiles + " (*.*)|*.*");
+                fullFilter.Append("|" + Properties.Resources.UI_AllFiles + "|*.*");
             }
 
             return fullFilter.ToString();
