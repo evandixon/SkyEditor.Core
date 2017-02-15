@@ -120,6 +120,8 @@ namespace SkyEditor.Core
             manager.RegisterType<IOpenableFile, TextFile>();
             manager.RegisterType<ICreatableFile, TextFile>();
             manager.RegisterType<IDetectableFileType, TextFile>();
+
+            manager.RegisterIOFilter("*.txt", Properties.Resources.File_TextFile);
         }
     }
 }

@@ -229,4 +229,7 @@
   <data name="Console_SelectFile_Usage" xml:space="preserve">
     <value>Usage: SelectFile &lt;File Index&gt;</value>
   </data>
+  <data name="File_TextFile" xml:space="preserve">
+    <value>Text Files</value>
+  </data>
 </root>
