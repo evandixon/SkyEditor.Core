@@ -7,6 +7,7 @@ using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -31,6 +32,9 @@ namespace SkyEditor.Core
             this._progress = 0;
             this._isIndeterminate = false;
             this._isCompleted = true;
+
+            this.FileOpened += ApplicationViewModel_FileOpened;
+            this.PropertyChanged += ApplicationViewModel_PropertyChanged;
         }
 
         #region Events
@@ -75,6 +79,71 @@ namespace SkyEditor.Core
         public event EventHandler CurrentProjectChanged;
         #endregion
 
+        #region Event Handlers
+
+        private void ApplicationViewModel_FileOpened(object sender, FileOpenedEventArguments e)
+        {
+            //Make sure there's an open file
+            if (ReferenceEquals(SelectedFile, null) && OpenFiles.Count > 0)
+            {
+                var newFile = e.FileViewModel;
+                if (newFile != null)
+                {
+                    SelectedFile = newFile;
+                }
+            }
+        }
+
+        private async void ApplicationViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            foreach (var item in await GetRootMenuItems())
+            {
+                await UpdateMenuItemVisibility(item);
+            }
+        }
+
+        private async void _selectedFile_MenuItemRefreshRequested(object sender, EventArgs e)
+        {
+            foreach (var item in await GetRootMenuItems())
+            {
+                await UpdateMenuItemVisibility(item);
+            }
+        }
+
+        private void _openFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (FileViewModel item in e.NewItems)
+                {
+                    item.CloseCommandExecuted += File_OnClosed;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (FileViewModel item in e.OldItems)
+                {
+                    item.CloseCommandExecuted -= File_OnClosed;
+                }
+            }
+        }
+
+        private void File_OnClosed(object sender, EventArgs e)
+        {
+            var args = new FileClosingEventArgs();
+            args.File = sender;
+
+            FileClosing?.Invoke(this, args);
+
+            if (!args.Cancel)
+            {
+                // Doing the cast again in case something changed args
+                CloseFile(sender as FileViewModel);
+            }
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Instance of the current plugin manager
@@ -101,7 +170,31 @@ namespace SkyEditor.Core
         /// <summary>
         /// The files that are currently open
         /// </summary>
-        public ObservableCollection<FileViewModel> OpenFiles { get; private set; }
+        public ObservableCollection<FileViewModel> OpenFiles
+        {
+            get
+            {
+                return _openFiles;
+            }
+            set
+            {
+                if (_openFiles != value)
+                {
+                    if (_openFiles != null)
+                    {
+                        _openFiles.CollectionChanged -= _openFiles_CollectionChanged;
+                    }
+
+                    _openFiles = value;
+
+                    if (_openFiles != null)
+                    {
+                        _openFiles.CollectionChanged += _openFiles_CollectionChanged;
+                    }
+                }
+            }
+        }
+        private ObservableCollection<FileViewModel> _openFiles;
 
         /// <summary>
         /// The currently-selected file
@@ -116,7 +209,18 @@ namespace SkyEditor.Core
             {
                 if (_selectedFile != value)
                 {
-                    _selectedFile = value;
+                    if (_selectedFile != null)
+                    {
+                        _selectedFile.MenuItemRefreshRequested -= _selectedFile_MenuItemRefreshRequested;
+                    }
+
+                    _selectedFile = value;                    
+
+                    if (_selectedFile != null)
+                    {
+                        _selectedFile.MenuItemRefreshRequested += _selectedFile_MenuItemRefreshRequested;
+                    }
+
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedFile)));
                 }
             }
@@ -976,7 +1080,7 @@ namespace SkyEditor.Core
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
+                    // Dispose contained objects
                     CurrentPluginManager?.Dispose();
                     CurrentSolution?.Dispose();
                     foreach (var item in OpenFiles)
@@ -986,6 +1090,12 @@ namespace SkyEditor.Core
                             (item as IDisposable).Dispose();
                         }
                     }
+
+                    // Clear event handlers
+                    SelectedFile = null;
+                    OpenFiles = null;
+                    this.FileOpened -= ApplicationViewModel_FileOpened;
+                    this.PropertyChanged -= ApplicationViewModel_PropertyChanged;
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
