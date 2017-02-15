@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.Core.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
             Console.WriteLine($"{files.Count} files:");
             for (var count = 0; count <= files.Count - 1; count++)
             {
-                Console.WriteLine($"{count}: {files[count].Title}");
+                Console.WriteLine($"{count}: {files[count].Title} - {files[count].Model.GetType().FullName}");
             }
         }
     }

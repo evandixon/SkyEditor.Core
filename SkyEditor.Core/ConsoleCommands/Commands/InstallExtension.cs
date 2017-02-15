@@ -8,13 +8,13 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class InstallExtension : ConsoleCommand
     {
-        public override async Task MainAsync(string[] Arguments)
+        public override async Task MainAsync(string[] arguments)
         {
-            if (Arguments.Length > 0)
+            if (arguments.Length > 1)
             {
-                if (CurrentApplicationViewModel.CurrentPluginManager.CurrentIOProvider.FileExists(Arguments[0]))
+                if (CurrentApplicationViewModel.CurrentPluginManager.CurrentIOProvider.FileExists(arguments[1]))
                 {
-                    var result = await ExtensionHelper.InstallExtensionZip(Arguments[0], CurrentApplicationViewModel.CurrentPluginManager).ConfigureAwait(false);
+                    var result = await ExtensionHelper.InstallExtensionZip(arguments[1], CurrentApplicationViewModel.CurrentPluginManager).ConfigureAwait(false);
                     if (result == ExtensionInstallResult.Success)
                     {
                         Console.WriteLine("Extension install was successful.");

@@ -19,42 +19,64 @@ namespace SkyEditor.Core.TestComponents
         public MemoryIOProvider()
         {
             Files = new ConcurrentDictionary<string, byte[]>();
-            EnableInMemoryLoad = true;
             tempCounter = 0;
+            ResetWorkingDirectory();
         }
 
         protected ConcurrentDictionary<string, byte[]> Files { get; set; }
 
-        /// <summary>
-        /// Controls the output of <see cref="CanLoadFileInMemory(long)"/>
-        /// </summary>
-        public bool EnableInMemoryLoad { get; set; }
-
         private int tempCounter;
         private object tempCounterLock = new object();
+
+
+        public string WorkingDirectory { get; set; }
+
+        public void ResetWorkingDirectory()
+        {
+            WorkingDirectory = "/";
+        }
+
+        /// <summary>
+        /// Standardizes the path, making it absolute if not already
+        /// </summary>
+        /// <param name="path">The path to standardize.  Can be relative to the working directory (<see cref="WorkingDirectory"/>) or absolute</param>
+        /// <returns>The standardized absolute path</returns>
+        protected string FixPath(string path)
+        {
+            var fixedPath = path.Replace('\\', '/');
+            if (fixedPath.StartsWith("/"))
+            {
+                return fixedPath;
+            }
+            else
+            {
+                return WorkingDirectory.Replace('\\', '/').TrimEnd('/') + "/" + fixedPath;
+            }
+        }
 
         #region IIO Provider Implementation
 
         public virtual long GetFileLength(string filename)
         {
-            var filenameLower = filename.ToLowerInvariant();
+            var filenameLower = FixPath(filename.ToLowerInvariant());
             return Files.First(x => x.Key.ToLowerInvariant() == filenameLower && x.Value != null).Value.Length;
         }
 
         public virtual bool FileExists(string filename)
         {
-            var filenameLower = filename.ToLowerInvariant();
+            var filenameLower = FixPath(filename.ToLowerInvariant());
             return Files.Any(x => x.Key.ToLower() == filenameLower && x.Value != null);
         }
 
         public virtual bool DirectoryExists(string path)
         {
-            var dirNameLower = path.ToLowerInvariant();
+            var dirNameLower = FixPath(path.ToLowerInvariant());
             return Files.Any(x => x.Key.ToLower() == dirNameLower && x.Value == null);
         }
 
         public virtual void CreateDirectory(string path)
         {
+            path = FixPath(path);
             if (!string.IsNullOrEmpty(path))
             {
                 // Create the parent directory
@@ -111,47 +133,48 @@ namespace SkyEditor.Core.TestComponents
 
         public virtual string[] GetFiles(string path, string searchPattern, bool topDirectoryOnly)
         {
+            path = FixPath(path);
             var searchPatternRegex = new Regex(searchPattern);
             return Files.Where(x => searchPatternRegex.IsMatch(x.Key) && x.Value != null).Select(x => x.Key).ToArray();
         }
 
         public string[] GetDirectories(string path, bool topDirectoryOnly)
         {
-            var pathLower = path.ToLowerInvariant() + "/";
+            var pathLower = FixPath(path.ToLowerInvariant() + "/");
             return Files.Where(x => x.Key.ToLowerInvariant().StartsWith(pathLower) && x.Value == null).Select(x => x.Key).ToArray();
         }
 
         public byte[] ReadAllBytes(string filename)
         {
-            var filenameLower = filename.ToLower();
+            var filenameLower = FixPath(filename.ToLower());
             return Files.First(x => x.Key.ToLowerInvariant() == filenameLower && x.Value != null).Value;
         }
 
         public string ReadAllText(string filename)
         {
-            var bytes = ReadAllBytes(filename);
+            var bytes = ReadAllBytes(FixPath(filename));
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
         public void WriteAllBytes(string filename, byte[] data)
         {
-            Files[filename.Replace(@"\", @"/")] = data;
+            Files[FixPath(filename)] = data;
         }
 
         public void WriteAllText(string filename, string data)
         {
-            WriteAllBytes(filename, Encoding.UTF8.GetBytes(data));
+            WriteAllBytes(FixPath(filename), Encoding.UTF8.GetBytes(data));
         }
 
         public void CopyFile(string sourceFilename, string destinationFilename)
         {
-            WriteAllBytes(destinationFilename, ReadAllBytes(sourceFilename));
+            WriteAllBytes(FixPath(destinationFilename), ReadAllBytes(FixPath(sourceFilename)));
         }
 
         public void DeleteFile(string filename)
         {
             byte[] dummy;
-            var filenameLower = filename.ToLowerInvariant();
+            var filenameLower = FixPath(filename.ToLowerInvariant());
             foreach (var match in Files.Where(x => x.Key.ToLowerInvariant() == filenameLower && x.Value != null).ToList())
             {
                 Files.TryRemove(match.Key, out dummy);
@@ -161,6 +184,7 @@ namespace SkyEditor.Core.TestComponents
         public void DeleteDirectory(string path)
         {
             byte[] dummy;
+            path = FixPath(path);
             if (DirectoryExists(path))
             {
                 // Delete child directories
@@ -205,17 +229,17 @@ namespace SkyEditor.Core.TestComponents
 
         public Stream OpenFile(string filename)
         {
-            return new MemoryStream(ReadAllBytes(filename), true);
+            return new MemoryStream(ReadAllBytes(FixPath(filename)), true);
         }
 
         public Stream OpenFileReadOnly(string filename)
         {
-            return new MemoryStream(ReadAllBytes(filename), false);
+            return new MemoryStream(ReadAllBytes(FixPath(filename)), false);
         }
 
         public Stream OpenFileWriteOnly(string filename)
         {
-            return new MemoryStream(ReadAllBytes(filename), true);
+            return new MemoryStream(ReadAllBytes(FixPath(filename)), true);
         }
 
         #endregion

@@ -124,6 +124,6 @@
     <value>True%narg%nmain%n</value>
   </data>
   <data name="ConsoleTests_TestRunConsole_Output" xml:space="preserve">
-    <value>The following commands are available:%nTestConsoleCommand%nUnknown command "blarg".%nUnknown command "testconsolecommand2".%nTrue%nexit%n</value>
+    <value>~/ $ The following commands are available:%nTestConsoleCommand%n~/ $ Unknown command "blarg".%n~/ $ Unknown command "testconsolecommand2".%n~/ $ True%nTestConsoleCommand%nexit%n~/ $ </value>
   </data>
 </root>

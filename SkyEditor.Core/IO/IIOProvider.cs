@@ -10,6 +10,16 @@ namespace SkyEditor.Core.IO
     {
 
         /// <summary>
+        /// The directory used when paths are not absolute
+        /// </summary>
+        string WorkingDirectory { get; set; }
+
+        /// <summary>
+        /// Resets the current working directory to its original value
+        /// </summary>
+        void ResetWorkingDirectory();
+
+        /// <summary>
         /// Gets the length, in bytes, of the file at the given path.
         /// </summary>
         /// <param name="filename">Full path of the file.</param>

@@ -152,7 +152,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
                     var command = new TestConsoleCommand();
 
-                    Assert.AreEqual("True%ntest%narguments%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleManager.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
+                    Assert.AreEqual("True%ntest%narguments%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleShell.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
                 }
             }
         }
@@ -169,7 +169,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
                     var command = new TestConsoleCommand2();
 
-                    Assert.AreEqual("True%narguments%ntest%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleManager.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
+                    Assert.AreEqual("True%narguments%ntest%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleShell.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
                 }
             }
         }
@@ -186,11 +186,11 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
         [TestCategory(ConsoleTestsCategory)]
         public void TestConsoleCommand_ArgumentNullChecks()
         {
-            TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleManager), nameof(ConsoleManager.TestConsoleCommand), "command",
+            TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleShell), nameof(ConsoleShell.TestConsoleCommand), "command",
                 new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
                 new object[] { null, new ApplicationViewModel(new PluginManager()), new string[] { }, "" });
 
-            TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleManager), nameof(ConsoleManager.TestConsoleCommand), "appViewModel",
+            TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleShell), nameof(ConsoleShell.TestConsoleCommand), "appViewModel",
                 new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
                 new object[] { new TestConsoleCommand(), null, new string[] { }, "" });
         }
@@ -215,7 +215,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                     c.StdIn.AppendLine("exit");
 
                     // Test
-                    await appViewModel.CurrentConsoleManager.RunConsole();
+                    await appViewModel.CurrentConsoleShell.RunConsole();
 
                     // Check
                     var output = c.GetStdOut();
@@ -238,7 +238,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                     var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
 
                     // Test
-                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommand2", "main arg");
+                    await appViewModel.CurrentConsoleShell.RunCommand("TestConsoleCommand2", "main arg");
 
                     // Check
                     var output = c.GetStdOut();
@@ -261,7 +261,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                     var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
 
                     // Test
-                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommand", new string[] { "main", "arg" });
+                    await appViewModel.CurrentConsoleShell.RunCommand("TestConsoleCommand", new string[] { "main", "arg" });
 
                     // Check
                     var output = c.GetStdOut();
@@ -284,13 +284,13 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                     var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
 
                     // Test
-                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", "main arg", true);
+                    await appViewModel.CurrentConsoleShell.RunCommand("TestConsoleCommandException", "main arg", true);
 
                     Assert.IsTrue(c.GetStdOut().Contains(nameof(TestException)), "Console output does not contain correct exception.");
 
                     try
                     {
-                        await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", "main arg", false);
+                        await appViewModel.CurrentConsoleShell.RunCommand("TestConsoleCommandException", "main arg", false);
                     }
                     catch (TestException)
                     {
@@ -318,13 +318,13 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                     var c = manager.CurrentConsoleProvider as MemoryConsoleProvider;
 
                     // Test
-                    await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, true);
+                    await appViewModel.CurrentConsoleShell.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, true);
 
                     Assert.IsTrue(c.GetStdOut().Contains(nameof(TestException)), "Console output does not contain correct exception.");
 
                     try
                     {
-                        await appViewModel.CurrentConsoleManager.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, false);
+                        await appViewModel.CurrentConsoleShell.RunCommand("TestConsoleCommandException", new string[] { "main", "arg" }, false);
                     }
                     catch (TestException)
                     {

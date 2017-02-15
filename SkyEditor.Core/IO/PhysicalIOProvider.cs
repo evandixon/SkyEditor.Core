@@ -13,83 +13,135 @@ namespace SkyEditor.Core.IO
 
         public PhysicalIOProvider()
         {
+            ResetWorkingDirectory();
+        }
+
+        public string WorkingDirectory
+        {
+            get
+            {
+                return _workingDirectory;
+            }
+            set
+            {
+                if (Path.IsPathRooted(value))
+                {
+                    _workingDirectory = value;
+                }
+                else
+                {
+                    foreach (var part in value.Replace('\\', '/').Split('/'))
+                    {
+                        if (part == ".")
+                        {
+                            // Do nothing
+                        }
+                        else if (part == "..")
+                        {
+                            _workingDirectory = Path.GetDirectoryName(_workingDirectory);
+                        }
+                        else
+                        {
+                            _workingDirectory = Path.Combine(_workingDirectory, part);
+                        }                        
+                    }
+                }
+            }
+        }
+        private string _workingDirectory;
+
+        protected string FixPath(string path)
+        {
+            if (Path.IsPathRooted(path))
+            {
+                return path;
+            }
+            else
+            {
+                return Path.Combine(WorkingDirectory, path);
+            }
+        }
+
+        public void ResetWorkingDirectory()
+        {
+            WorkingDirectory = Directory.GetCurrentDirectory();
         }
 
         public virtual void CopyFile(string sourceFilename, string destinationFilename)
         {
-            File.Copy(sourceFilename, destinationFilename, true);
+            File.Copy(FixPath(sourceFilename), FixPath(destinationFilename), true);
         }
 
         public virtual void CreateDirectory(string path)
         {
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(FixPath(path));
         }
 
         public virtual void DeleteDirectory(string path)
         {
-            Directory.Delete(path, true);
+            Directory.Delete(FixPath(path), true);
         }
 
         public virtual void DeleteFile(string filename)
         {
-            File.Delete(filename);
+            File.Delete(FixPath(filename));
         }
 
         public virtual void WriteAllBytes(string filename, byte[] data)
         {
-            File.WriteAllBytes(filename, data);
+            File.WriteAllBytes(FixPath(filename), data);
         }
 
         public virtual void WriteAllText(string filename, string data)
         {
-            File.WriteAllText(filename, data);
+            File.WriteAllText(FixPath(filename), data);
         }
 
         public virtual bool DirectoryExists(string directoryPath)
         {
-            return Directory.Exists(directoryPath);
+            return Directory.Exists(FixPath(directoryPath));
         }
 
         public virtual bool FileExists(string Filename)
         {
-            return File.Exists(Filename);
+            return File.Exists(FixPath(Filename));
         }
 
         public virtual string[] GetDirectories(string path, bool topDirectoryOnly)
         {
             if (topDirectoryOnly)
             {
-                return Directory.GetDirectories(path, "*", SearchOption.TopDirectoryOnly);
+                return Directory.GetDirectories(FixPath(path), "*", SearchOption.TopDirectoryOnly);
             }
             else
             {
-                return Directory.GetDirectories(path, "*", SearchOption.AllDirectories);
+                return Directory.GetDirectories(FixPath(path), "*", SearchOption.AllDirectories);
             }
         }
 
         public virtual long GetFileLength(string filename)
         {
-            return (new FileInfo(filename)).Length;
+            return (new FileInfo(FixPath(filename))).Length;
         }
 
         public virtual string[] GetFiles(string path, string searchPattern, bool topDirectoryOnly)
         {
             if (topDirectoryOnly)
             {
-                return Directory.GetFiles(path, searchPattern, SearchOption.TopDirectoryOnly);
+                return Directory.GetFiles(FixPath(path), searchPattern, SearchOption.TopDirectoryOnly);
             }
             else
             {
-                return Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories);
+                return Directory.GetFiles(FixPath(path), searchPattern, SearchOption.AllDirectories);
             }
         }
 
         public virtual string GetTempDirectory()
         {
             var tempDir = Path.Combine(Path.GetTempPath(), "SkyEditor", Guid.NewGuid().ToString());
-            if (!DirectoryExists(System.Convert.ToString(tempDir)))
+            if (!DirectoryExists(tempDir))
             {
-                CreateDirectory(System.Convert.ToString(tempDir));
+                CreateDirectory(tempDir);
             }
             return tempDir;
         }
@@ -101,27 +153,27 @@ namespace SkyEditor.Core.IO
 
         public virtual Stream OpenFile(string filename)
         {
-            return File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+            return File.Open(FixPath(filename), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
         }
 
         public virtual Stream OpenFileReadOnly(string filename)
         {
-            return File.Open(filename, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
+            return File.Open(FixPath(filename), FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
         }
 
         public virtual Stream OpenFileWriteOnly(string filename)
         {
-            return File.Open(filename, FileMode.OpenOrCreate, FileAccess.Write);
+            return File.Open(FixPath(filename), FileMode.OpenOrCreate, FileAccess.Write);
         }
 
         public virtual byte[] ReadAllBytes(string filename)
         {
-            return File.ReadAllBytes(filename);
+            return File.ReadAllBytes(FixPath(filename));
         }
 
         public virtual string ReadAllText(string filename)
         {
-            return File.ReadAllText(filename);
+            return File.ReadAllText(FixPath(filename));
         }
     }
 }

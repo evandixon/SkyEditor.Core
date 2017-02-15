@@ -11,7 +11,7 @@ namespace SkyEditor.Core.ConsoleCommands
     /// <summary>
     /// Provides the core logic for the Sky Editor console.
     /// </summary>
-    public class ConsoleManager
+    public class ConsoleShell
     {
         /// <summary>
         /// Runs a console command with custom input and returns the output.
@@ -50,8 +50,9 @@ namespace SkyEditor.Core.ConsoleCommands
             return provider.GetStdOut();
         }
 
-        public ConsoleManager(ApplicationViewModel appViewModel)
+        public ConsoleShell(ApplicationViewModel appViewModel)
         {
+            CurrentApplicationViewModel = appViewModel;
             Console = appViewModel.CurrentPluginManager.CurrentConsoleProvider;
             AllCommands = new Dictionary<string, ConsoleCommand>();
             foreach (ConsoleCommand item in appViewModel.CurrentPluginManager.GetRegisteredObjects<ConsoleCommand>())
@@ -62,30 +63,39 @@ namespace SkyEditor.Core.ConsoleCommands
             }
         }
 
+        protected ApplicationViewModel CurrentApplicationViewModel { get; set; }
         protected Dictionary<string, ConsoleCommand> AllCommands { get; set; }
         protected IConsoleProvider Console { get; set; }
         protected Regex ParameterRegex => new Regex("(\\\".*?\\\")|\\S+", RegexOptions.Compiled);
 
         /// <summary>
-        /// Listens for user input from the console provider provided via the plugin manager from <see cref="ConsoleManager.New(PluginManager)"/> and handles commands accordingly.
+        /// Listens for user input from the console provider provided via the plugin manager from <see cref="ConsoleShell.New(PluginManager)"/> and handles commands accordingly.
         /// </summary>
         /// <returns></returns>
         public async Task RunConsole()
         {
             while (true)
             {
+                // Write bash-style working directory
+                Console.Write("~");
+                Console.Write(CurrentApplicationViewModel.CurrentPluginManager.CurrentIOProvider.WorkingDirectory);
+                Console.Write(" $ ");
+
+                // Accept input
                 var line = Console.ReadLine();
+
+                // Interpret input
+                // - Exit if null
                 if (line == null)
                 {
-                    // end of input
                     break;
                 }
 
+                // - Break up the command into its parts
                 var cmdParts = line.Split(" ".ToCharArray(), 2);
-
                 var commandString = cmdParts[0].ToLower();
-                var argumentString = cmdParts.Length > 1 ? cmdParts[1] : null;
 
+                // - Shell commands
                 if (commandString == "exit")
                 {
                     // Stop listening
@@ -100,9 +110,10 @@ namespace SkyEditor.Core.ConsoleCommands
                         Console.WriteLine(item);
                     }
                 }
+                // - Other commands
                 else if (AllCommands.Keys.Contains(commandString, StringComparer.CurrentCultureIgnoreCase))
                 {
-                    await RunCommand(commandString, argumentString, true).ConfigureAwait(false);
+                    await RunCommand(commandString, line, true).ConfigureAwait(false);
                 }
                 else
                 {

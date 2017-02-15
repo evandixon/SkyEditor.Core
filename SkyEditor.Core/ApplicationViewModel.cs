@@ -24,7 +24,7 @@ namespace SkyEditor.Core
             this.CurrentPluginManager = manager;
             this.CurrentSolution = null;
             this.OpenFiles = new ObservableCollection<FileViewModel>();
-            this.AnchorableViewModels = new ObservableCollection<AnchorableViewModel>();            
+            this.AnchorableViewModels = new ObservableCollection<AnchorableViewModel>();
 
             // Set Progress Properties
             this._message = Properties.Resources.UI_Ready;
@@ -80,6 +80,17 @@ namespace SkyEditor.Core
         /// Instance of the current plugin manager
         /// </summary>
         public PluginManager CurrentPluginManager { get; set; }
+
+        /// <summary>
+        /// Instance of the current plugin manager's current I/O provider
+        /// </summary>
+        public IIOProvider CurrentIOProvider
+        {
+            get
+            {
+                return CurrentPluginManager.CurrentIOProvider;
+            }
+        }
 
         /// <summary>
         /// The view models for anchorable views
@@ -274,20 +285,20 @@ namespace SkyEditor.Core
         private bool _isCompleted;
 
         /// <summary>
-        /// The current <see cref="ConsoleManager"/> for the application.  This is the class that handles parsing and executing commands from the console.
+        /// The current <see cref="ConsoleShell"/> for the application.  This is the class that handles parsing and executing commands from the console.
         /// </summary>
-        public ConsoleManager CurrentConsoleManager
+        public ConsoleShell CurrentConsoleShell
         {
             get
             {
-                if (_consoleManager == null)
+                if (_consoleShell == null)
                 {
-                    _consoleManager = new ConsoleManager(this);
+                    _consoleShell = new ConsoleShell(this);
                 }
-                return _consoleManager;
+                return _consoleShell;
             }
         }
-        private ConsoleManager _consoleManager;
+        private ConsoleShell _consoleShell;
 
         #endregion
 
@@ -705,7 +716,7 @@ namespace SkyEditor.Core
                     }
 
                     FileClosed?.Invoke(this, new FileClosedEventArgs { File = file.Model });
-                }                
+                }
             }
         }
         #endregion
