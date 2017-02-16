@@ -80,7 +80,7 @@ namespace SkyEditor.Core.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following commands are available:%nTestConsoleCommand%nUnknown command &quot;blarg&quot;.%nUnknown command &quot;testconsolecommand2&quot;.%nTrue%nexit%n.
+        ///   Looks up a localized string similar to ~/ $ The following commands are available:%nTestConsoleCommand%n~/ $ Unknown command &quot;blarg&quot;.%n~/ $ Unknown command &quot;testconsolecommand2&quot;.%n~/ $ True%nTestConsoleCommand%nexit%n~/ $ .
         /// </summary>
         internal static string ConsoleTests_TestRunConsole_Output {
             get {

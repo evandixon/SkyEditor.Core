@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -293,21 +294,59 @@ namespace SkyEditor.Core.UI
                         vm.SetModel(Model);
                         ViewModels.Add(vm);
 
-                        // Register event handlers
-                        if (vm is ISavable)
-                        {
-                            (vm as ISavable).FileSaved += File_OnSaved;
-                        }
-                        if (vm is INotifyModified)
-                        {
-                            (vm as INotifyModified).Modified += File_OnModified;
-                        }
-                        vm.MenuItemRefreshRequested += OnMenuItemRefreshRequested;
+                        RegisterViewModelEventHandlers(vm);
                     }
                 }
             }
 
             return ViewModels;
+        }
+
+        /// <summary>
+        /// Gets the view model with the given type, creating it if necessary
+        /// </summary>
+        /// <typeparam name="T">Type of the desired view model</typeparam>
+        /// <param name="appViewModel">Instance of the current application ViewModel</param>
+        /// <returns>The requested view model, or null if it does not exist</returns>
+        public T GetViewModel<T>(ApplicationViewModel appViewModel) where T : GenericViewModel
+        {
+            var currentViewModels = GetViewModels(appViewModel);
+            var desired = currentViewModels.FirstOrDefault(x => x is T);
+            if (desired != null)
+            {
+                return desired as T;
+            }
+            else
+            {
+                var newInstance = ReflectionHelpers.CreateInstance(typeof(T)) as GenericViewModel;
+                if (newInstance.SupportsObject(Model))
+                {
+                    newInstance.SetApplicationViewModel(appViewModel);
+                    newInstance.SetModel(Model);
+                    ViewModels.Add(newInstance);
+
+                    RegisterViewModelEventHandlers(newInstance);
+                    return newInstance as T;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        protected void RegisterViewModelEventHandlers(GenericViewModel viewModel)
+        {
+            // Register event handlers
+            if (viewModel is ISavable)
+            {
+                (viewModel as ISavable).FileSaved += File_OnSaved;
+            }
+            if (viewModel is INotifyModified)
+            {
+                (viewModel as INotifyModified).Modified += File_OnModified;
+            }
+            viewModel.MenuItemRefreshRequested += OnMenuItemRefreshRequested;
         }
 
         #endregion

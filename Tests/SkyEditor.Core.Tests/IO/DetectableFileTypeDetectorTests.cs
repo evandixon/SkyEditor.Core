@@ -102,10 +102,11 @@ namespace SkyEditor.Core.Tests.IO
                 {
                     fileF.CreateFile(new byte[] { 0xFF });
                     var results = await detector.DetectFileType(fileF, manager);
-                    Assert.AreEqual(2, results.Count());
+                    Assert.AreEqual(3, results.Count());
                     Assert.IsTrue(results.All(x => x.MatchChance == 0.5f), "FileF: Not all results have correct match percentage");
                     Assert.IsTrue(results.Any(x => ReflectionHelpers.IsOfType(x.FileType, typeof(FileFF).GetTypeInfo())), "FileFF should have been a match for FileF.");
                     Assert.IsTrue(results.Any(x => ReflectionHelpers.IsOfType(x.FileType, typeof(AnyFile).GetTypeInfo())), "AnyFile should have been a match FileF.");
+                    Assert.IsTrue(results.Any(x => ReflectionHelpers.IsOfType(x.FileType, typeof(TextFile).GetTypeInfo())), "TextFile should have been a match FileF.");
                 }
             }
                

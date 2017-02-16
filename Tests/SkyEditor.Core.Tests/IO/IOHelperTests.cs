@@ -214,7 +214,10 @@ namespace SkyEditor.Core.Tests.IO
 
             public override void Load(PluginManager manager)
             {
-                base.Load(manager);
+                //base.Load(manager);
+
+                manager.RegisterType<IFileOpener, OpenableFileOpener>();
+                manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
 
                 manager.RegisterType<IFileOpener, CustomFileOpener>();
                 manager.RegisterType<IFileOpener, DirectoryOpener>();

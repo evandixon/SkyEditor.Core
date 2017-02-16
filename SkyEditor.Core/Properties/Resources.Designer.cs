@@ -80,6 +80,78 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Directory &quot;{0}&quot; does not exist.
+        /// </summary>
+        internal static string Console_DirectoryDoesNotExist {
+            get {
+                return ResourceManager.GetString("Console_DirectoryDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter the number of the prefered type: .
+        /// </summary>
+        internal static string Console_OpenFile_DuplicateChoose {
+            get {
+                return ResourceManager.GetString("Console_OpenFile_DuplicateChoose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate potential file types found:.
+        /// </summary>
+        internal static string Console_OpenFile_DuplicateList {
+            get {
+                return ResourceManager.GetString("Console_OpenFile_DuplicateList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The number you entered is out of range..
+        /// </summary>
+        internal static string Console_OpenFile_InputOutOfRange {
+            get {
+                return ResourceManager.GetString("Console_OpenFile_InputOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid input &quot;{0}&quot;..
+        /// </summary>
+        internal static string Console_OpenFile_InvalidInput {
+            get {
+                return ResourceManager.GetString("Console_OpenFile_InvalidInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: OpenFile &lt;Filename&gt; [Type].
+        /// </summary>
+        internal static string Console_OpenFile_Usage {
+            get {
+                return ResourceManager.GetString("Console_OpenFile_Usage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Index must be a valid integer..
+        /// </summary>
+        internal static string Console_SelectFile_InvalidInput {
+            get {
+                return ResourceManager.GetString("Console_SelectFile_InvalidInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: SelectFile &lt;File Index&gt;.
+        /// </summary>
+        internal static string Console_SelectFile_Usage {
+            get {
+                return ResourceManager.GetString("Console_SelectFile_Usage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sky Editor Project.
         /// </summary>
         internal static string File_SkyEditorProject {
@@ -94,6 +166,15 @@ namespace SkyEditor.Core.Properties {
         internal static string File_SkyEditorSolution {
             get {
                 return ResourceManager.GetString("File_SkyEditorSolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text Files.
+        /// </summary>
+        internal static string File_TextFile {
+            get {
+                return ResourceManager.GetString("File_TextFile", resourceCulture);
             }
         }
         

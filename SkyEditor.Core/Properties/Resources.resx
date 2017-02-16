@@ -205,4 +205,31 @@
   <data name="File_SkyEditorSolution" xml:space="preserve">
     <value>Sky Editor Solution</value>
   </data>
+  <data name="Console_DirectoryDoesNotExist" xml:space="preserve">
+    <value>Directory "{0}" does not exist</value>
+  </data>
+  <data name="Console_OpenFile_DuplicateChoose" xml:space="preserve">
+    <value>Please enter the number of the prefered type: </value>
+  </data>
+  <data name="Console_OpenFile_DuplicateList" xml:space="preserve">
+    <value>Duplicate potential file types found:</value>
+  </data>
+  <data name="Console_OpenFile_InputOutOfRange" xml:space="preserve">
+    <value>The number you entered is out of range.</value>
+  </data>
+  <data name="Console_OpenFile_InvalidInput" xml:space="preserve">
+    <value>Invalid input "{0}".</value>
+  </data>
+  <data name="Console_OpenFile_Usage" xml:space="preserve">
+    <value>Usage: OpenFile &lt;Filename&gt; [Type]</value>
+  </data>
+  <data name="Console_SelectFile_InvalidInput" xml:space="preserve">
+    <value>File Index must be a valid integer.</value>
+  </data>
+  <data name="Console_SelectFile_Usage" xml:space="preserve">
+    <value>Usage: SelectFile &lt;File Index&gt;</value>
+  </data>
+  <data name="File_TextFile" xml:space="preserve">
+    <value>Text Files</value>
+  </data>
 </root>
