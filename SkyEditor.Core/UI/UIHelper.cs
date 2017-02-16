@@ -242,7 +242,8 @@ namespace SkyEditor.Core.UI
         /// <returns>An enumerable of view controls that target the given view model</returns>
         public static IEnumerable<IViewControl> GetViewControlTabs(object viewModel, IEnumerable<Type> requestedTabTypes, ApplicationViewModel appViewModel)
         {
-            if (appViewModel.GetViewModelsForModel(viewModel).Any())
+            var viewModels = appViewModel.GetViewModelsForModel(viewModel);
+            if (viewModels != null && viewModels.Any())
             {
                 // Use the new method
                 return GetViewControlsByViewModel(viewModel, requestedTabTypes, appViewModel);
