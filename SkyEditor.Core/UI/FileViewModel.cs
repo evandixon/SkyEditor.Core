@@ -251,7 +251,7 @@ namespace SkyEditor.Core.UI
         /// </summary>
         private void ForceViewModelRefresh()
         {
-            foreach (var item in ViewModels)
+            foreach (var item in ViewModels ?? Enumerable.Empty<GenericViewModel>())
             {
                 item.UpdateModel(Model);
             }
