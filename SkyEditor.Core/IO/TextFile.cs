@@ -8,30 +8,30 @@ namespace SkyEditor.Core.IO
 {
     public class TextFile : ICreatableFile, IOpenableFile, ISavableAs, IDetectableFileType
     {
-        public string Filename { get; set; }
+        public virtual string Filename { get; set; }
 
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
-        public string Contents { get; set; }
+        public virtual string Contents { get; set; }
 
         public event EventHandler FileSaved;
 
-        public void CreateFile(string name)
+        public virtual void CreateFile(string name)
         {
             this.Name = name;
         }
 
-        public string GetDefaultExtension()
+        public virtual string GetDefaultExtension()
         {
             return "*.txt";
         }
 
-        public IEnumerable<string> GetSupportedExtensions()
+        public virtual IEnumerable<string> GetSupportedExtensions()
         {
             return new string[] { "*.txt" };
         }
 
-        public Task OpenFile(string filename, IIOProvider provider)
+        public virtual Task OpenFile(string filename, IIOProvider provider)
         {
             this.Contents = provider.ReadAllText(filename);
             this.Filename = filename;
@@ -39,12 +39,12 @@ namespace SkyEditor.Core.IO
             return Task.CompletedTask;
         }
 
-        public async Task Save(IIOProvider provider)
+        public virtual async Task Save(IIOProvider provider)
         {
             await Save(Filename, provider);
         }
 
-        public Task Save(string filename, IIOProvider provider)
+        public virtual Task Save(string filename, IIOProvider provider)
         {
             provider.WriteAllText(filename, Contents);
             this.Filename = filename;
@@ -52,7 +52,7 @@ namespace SkyEditor.Core.IO
             return Task.CompletedTask;
         }
 
-        public async Task<bool> IsOfType(GenericFile file)
+        public virtual async Task<bool> IsOfType(GenericFile file)
         {
             for (int i = 0;i < file.Length;i++)
             {
