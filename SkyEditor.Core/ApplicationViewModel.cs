@@ -833,7 +833,7 @@ namespace SkyEditor.Core
         /// <returns>The top-level menu items</returns>
         public async Task<ObservableCollection<ActionMenuItem>> GetRootMenuItems()
         {
-            if (ReferenceEquals(_rootMenuItems, null))
+            if (_rootMenuItems == null)
             {
                 _rootMenuItems = new ObservableCollection<ActionMenuItem>();
                 //Generate the menu items

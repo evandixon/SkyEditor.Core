@@ -169,7 +169,7 @@ namespace SkyEditor.Core.UI
         /// </summary>
         /// <param name="menuItemInfo">IEnumerable of MenuItemInfo that will be used to create the MenuItems.</param>
         /// <param name="appViewModel">Instance of the current application ViewModel</param>
-        /// <param name="targets">Direct targets of the action, if applicable.  If Nothing, the IOUIManager will control the targets</param>
+        /// <param name="targets">Direct targets of the action, if applicable.  If Nothing, the application ViewModel will control the targets</param>
         /// <returns>A list of <see cref="ActionMenuItem"/> corresponding to the given menu item info (<paramref name="menuItemInfo"/>)</returns>
         public static List<ActionMenuItem> GenerateLogicalMenuItems(IEnumerable<MenuItemInfo> menuItemInfo, ApplicationViewModel appViewModel, IEnumerable<object> targets)
         {
@@ -180,10 +180,6 @@ namespace SkyEditor.Core.UI
             if (appViewModel == null)
             {
                 throw new ArgumentNullException(nameof(appViewModel));
-            }
-            if (targets == null)
-            {
-                targets = new object[] { };
             }
 
             List<ActionMenuItem> output = new List<ActionMenuItem>();
