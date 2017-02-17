@@ -117,7 +117,8 @@ namespace SkyEditor.Core
                 foreach (FileViewModel item in e.NewItems)
                 {
                     item.CloseCommandExecuted += File_OnClosed;
-                }
+                    SelectedFile = item;
+                }                
             }
 
             if (e.OldItems != null)
@@ -1081,7 +1082,6 @@ namespace SkyEditor.Core
                 if (disposing)
                 {
                     // Dispose contained objects
-                    CurrentPluginManager?.Dispose();
                     CurrentSolution?.Dispose();
                     foreach (var item in OpenFiles)
                     {

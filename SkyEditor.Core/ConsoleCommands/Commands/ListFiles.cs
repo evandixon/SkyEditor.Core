@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SkyEditor.Core.ConsoleCommands.Commands
 {
-    public class ViewFiles : ConsoleCommand
+    public class ListFiles : ConsoleCommand
     {
 
         protected override void Main(string[] arguments)
@@ -14,6 +14,10 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
             Console.WriteLine($"{files.Count} files:");
             for (var count = 0; count <= files.Count - 1; count++)
             {
+                if (ReferenceEquals(CurrentApplicationViewModel.SelectedFile, files[count]))
+                {
+                    Console.Write("*");
+                }
                 Console.WriteLine($"{count}: {files[count].Title} - {files[count].Model.GetType().FullName}");
             }
         }
