@@ -1265,12 +1265,12 @@ namespace SkyEditor.Core.IO
         #endregion
 
 
-        public string GetDefaultExtension()
+        public virtual string GetDefaultExtension()
         {
             return null;
         }
 
-        public IEnumerable<string> GetSupportedExtensions()
+        public virtual IEnumerable<string> GetSupportedExtensions()
         {
             return null;
         }
