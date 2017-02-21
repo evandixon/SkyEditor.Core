@@ -112,6 +112,7 @@ namespace SkyEditor.Core
 
             manager.RegisterType<IFileOpener, OpenableFileOpener>();
             manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
+            manager.RegisterType<IFileSaver, SavableFileSaver>();
 
             manager.RegisterTypeRegister<IOpenableFile>();
             manager.RegisterTypeRegister<ICreatableFile>();

@@ -117,7 +117,8 @@ namespace SkyEditor.Core
                 foreach (FileViewModel item in e.NewItems)
                 {
                     item.CloseCommandExecuted += File_OnClosed;
-                }
+                    SelectedFile = item;
+                }                
             }
 
             if (e.OldItems != null)
@@ -832,7 +833,7 @@ namespace SkyEditor.Core
         /// <returns>The top-level menu items</returns>
         public async Task<ObservableCollection<ActionMenuItem>> GetRootMenuItems()
         {
-            if (ReferenceEquals(_rootMenuItems, null))
+            if (_rootMenuItems == null)
             {
                 _rootMenuItems = new ObservableCollection<ActionMenuItem>();
                 //Generate the menu items
@@ -1081,7 +1082,6 @@ namespace SkyEditor.Core
                 if (disposing)
                 {
                     // Dispose contained objects
-                    CurrentPluginManager?.Dispose();
                     CurrentSolution?.Dispose();
                     foreach (var item in OpenFiles)
                     {

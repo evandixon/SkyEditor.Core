@@ -47,5 +47,22 @@ namespace SkyEditor.Core.Tests
                 }
             }
         }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task OpenFile_SetsSelectedFile()
+        {
+            using (var manager = new PluginManager())
+            {
+                await manager.LoadCore(new CoreMod());
+                manager.CurrentIOProvider.WriteAllText("/test.txt", "testing");
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    Assert.IsNull(appViewModel.SelectedFile, "Selected File should be null before any file is opened");
+                    await appViewModel.OpenFile("/test.txt", IOHelper.PickFirstDuplicateMatchSelector);
+                    Assert.IsNotNull(appViewModel.SelectedFile, "Selected File should not be null after a file is opened");
+                }     
+            }
+        }
     }
 }
