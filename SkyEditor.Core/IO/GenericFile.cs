@@ -383,7 +383,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="filename">Path of the file</param>
         /// <param name="provider">Instance of the I/O provider that will the file</param>
-        public async Task Save(string filename, IIOProvider provider)
+        public virtual async Task Save(string filename, IIOProvider provider)
         {
             FileSaving?.Invoke(this, new EventArgs());
             if (InMemoryFile != null)
