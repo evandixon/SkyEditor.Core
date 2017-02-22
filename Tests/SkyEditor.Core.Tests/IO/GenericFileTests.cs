@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkyEditor.Core.IO;
+using SkyEditor.Core.TestComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,37 @@ namespace SkyEditor.Core.Tests.IO
     public class GenericFileTests
     {
         public const string TestCategory = "I/O - GenericFile";
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task OpenFile_InMemory()
+        {
+            var provider = new MemoryIOProvider();
+            provider.WriteAllBytes("/test.bin", new byte[] { 0, 1, 2, 3 });
+
+            var file = new GenericFile();
+            file.EnableInMemoryLoad = true;
+            await file.OpenFile("/test.bin", provider);
+
+            Assert.AreEqual(4, file.Length, "Failed to determine length.");
+            Assert.IsTrue(file.Read().SequenceEqual(new byte[] { 0, 1, 2, 3 }), "Failed to read sample data.");
+        }
+
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task OpenFile_Stream()
+        {
+            var provider = new MemoryIOProvider();
+            provider.WriteAllBytes("/test.bin", new byte[] { 0, 1, 2, 3 });
+
+            var file = new GenericFile();
+            file.EnableInMemoryLoad = false;
+            await file.OpenFile("/test.bin", provider);
+
+            Assert.AreEqual(4, file.Length, "Failed to determine length.");
+            Assert.IsTrue(file.Read().SequenceEqual(new byte[] { 0, 1, 2, 3 }), "Failed to read sample data.");
+        }
 
         #region Low-level Access
         [TestMethod]

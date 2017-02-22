@@ -204,7 +204,7 @@ namespace SkyEditor.Core.TestComponents
             string filename = null;
             lock(tempCounterLock)
             {
-                while (filename != null || FileExists(filename))
+                while (filename == null || FileExists(filename))
                 {
                     filename = "/temp/" + tempCounter++.ToString();
                 }                

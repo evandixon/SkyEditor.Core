@@ -23,7 +23,7 @@ namespace SkyEditor.Core.Utilities
         public delegate Task ForItemAsync(int i);
 
         /// <summary>
-        /// Raised when the progress of the batch operation is complete
+        /// Raised when the progress of the batch operation changes
         /// </summary>
         public event EventHandler LoadingStatusChanged;
 

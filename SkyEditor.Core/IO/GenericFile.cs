@@ -58,7 +58,7 @@ namespace SkyEditor.Core.IO
         {
             get
             {
-                if (InMemoryFile == null)
+                if (InMemoryFile != null)
                 {
                     return null;
                 }
@@ -557,7 +557,7 @@ namespace SkyEditor.Core.IO
             }
             else
             {
-                byte[] buffer = new byte[length - 1];
+                byte[] buffer = new byte[length];
                 FileReader.Seek(index, SeekOrigin.Begin);
                 FileReader.Read(buffer, 0, length);
                 return buffer;
