@@ -388,7 +388,7 @@ namespace SkyEditor.Core.IO
             }
             else
             {
-                this.PhysicalFilename = provider.GetTempFilename();
+                this.PhysicalFilename = filename;
             }
             // The stream will be initialized when needed
         }

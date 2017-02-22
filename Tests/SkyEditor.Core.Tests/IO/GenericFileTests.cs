@@ -39,6 +39,23 @@ namespace SkyEditor.Core.Tests.IO
 
             var file = new GenericFile();
             file.EnableInMemoryLoad = false;
+            file.IsReadOnly = false;
+            await file.OpenFile("/test.bin", provider);
+
+            Assert.AreEqual(4, file.Length, "Failed to determine length.");
+            Assert.IsTrue(file.Read().SequenceEqual(new byte[] { 0, 1, 2, 3 }), "Failed to read sample data.");
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task OpenFile_Stream_ReadOnly()
+        {
+            var provider = new MemoryIOProvider();
+            provider.WriteAllBytes("/test.bin", new byte[] { 0, 1, 2, 3 });
+
+            var file = new GenericFile();
+            file.EnableInMemoryLoad = false;
+            file.IsReadOnly = true;
             await file.OpenFile("/test.bin", provider);
 
             Assert.AreEqual(4, file.Length, "Failed to determine length.");
