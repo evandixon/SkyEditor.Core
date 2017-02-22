@@ -15,7 +15,8 @@ namespace SkyEditor.Core.IO
         {
         }
 
-        [Obsolete("Use GenericFile(string, IIOProvider) instead.")] public GenericFile(IIOProvider provider, string filename)
+        [Obsolete("Use GenericFile(string, IIOProvider) instead.")]
+        public GenericFile(IIOProvider provider, string filename)
         {
             OpenFileInternal(filename, provider);
         }
@@ -1128,7 +1129,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
-        public async Task WriteInt32Async (long offset, Int32 value)
+        public async Task WriteInt32Async(long offset, Int32 value)
         {
             await WriteAsync(offset, 4, BitConverter.GetBytes(value));
         }
@@ -1260,6 +1261,83 @@ namespace SkyEditor.Core.IO
             WriteUInt64(Position, value);
             Position += 8;
         }
+        #endregion
+
+        #region String Interaction
+
+        /// <summary>
+        /// Reads a UTF-16 string.  This method is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <param name="length">Length in characters of the string</param>
+        /// <returns>The UTF-16 string at the given offset</returns>
+        public string ReadUnicodeString(long index, int length)
+        {
+            return Encoding.Unicode.GetString(Read(index, length * 2), 0, length * 2);
+        }
+
+        /// <summary>
+        /// Reads a UTF-16 string.  This method is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <param name="length">Length in characters of the string</param>
+        /// <returns>The UTF-16 string at the given offset</returns>
+        public async Task<string> ReadUnicodeStringAsync(long index, int length)
+        {
+            if (IsThreadSafe)
+            {
+                return ReadUnicodeString(index, length);
+            }
+            else
+            {
+                return await Task.Run(() =>
+                {
+                    lock (_fileAccessLock)
+                    {
+                        return ReadUnicodeString(index, length);
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// Reads a null-terminated UTF-16 string.  This method is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <returns>The UTF-16 string</returns>
+        public string ReadNullTerminatedUnicodeString(long index)
+        {
+            int length = 0;
+            while (Read(index + length * 2) != 0 || Read(index + length * 2 + 1) != 0)
+            {
+                length += 1;
+            }
+            return ReadUnicodeString(index, length);
+        }
+
+        /// <summary>
+        /// Reads a null-terminated UTF-16 string.  This method is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <returns>The UTF-16 string</returns>
+        public async Task<string> ReadNullTerminatedUnicodeStringAsync(long index)
+        {
+            if (IsThreadSafe)
+            {
+                return ReadNullTerminatedUnicodeString(index);
+            }
+            else
+            {
+                return await Task.Run(() =>
+                {
+                    lock (_fileAccessLock)
+                    {
+                        return ReadNullTerminatedUnicodeString(index);
+                    }
+                });
+            }
+        }
+
         #endregion
 
         #endregion

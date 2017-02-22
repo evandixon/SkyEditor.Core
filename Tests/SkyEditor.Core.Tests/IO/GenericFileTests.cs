@@ -157,7 +157,7 @@ namespace SkyEditor.Core.Tests.IO
                 f.CreateFile(testData.Clone() as byte[]);
                 for (int start = 0; start < 7; start++)
                 {
-                    for (int length = 1; length < 7 - start;length++)
+                    for (int length = 1; length < 7 - start; length++)
                     {
                         var value = f.Read(start, length);
                         Assert.IsTrue(testData.Skip(start).Take(length).SequenceEqual(value), "Failed to execute Read(" + start.ToString() + ", " + length.ToString() + ").");
@@ -958,5 +958,54 @@ namespace SkyEditor.Core.Tests.IO
             }
         }
         #endregion
+
+        #region String Access
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadUnicodeString_Sync()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 0x74, 0x00, 0x65, 0x00, 0x73, 0x00, 0x74, 0x00, 0x00, 0x00 });
+                Assert.AreEqual("te", f.ReadUnicodeString(0, 2));
+                Assert.AreEqual("test", f.ReadUnicodeString(0, 4));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadUnicodeString_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 0x74, 0x00, 0x65, 0x00, 0x73, 0x00, 0x74, 0x00, 0x00, 0x00 });
+                Assert.AreEqual("te", await f.ReadUnicodeStringAsync(0, 2));
+                Assert.AreEqual("test", await f.ReadUnicodeStringAsync(0, 4));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadNullTerminatedUnicodeString_Sync()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 0x74, 0x00, 0x65, 0x00, 0x73, 0x00, 0x74, 0x00, 0x00, 0x00 });
+                Assert.AreEqual("test", f.ReadNullTerminatedUnicodeString(0));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadNullTerminatedUnicodeString_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 0x74, 0x00, 0x65, 0x00, 0x73, 0x00, 0x74, 0x00, 0x00, 0x00 });
+                Assert.AreEqual("test", await f.ReadNullTerminatedUnicodeStringAsync(0));
+            }
+        }
+        #endregion
+
     }
 }
