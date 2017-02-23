@@ -15,12 +15,6 @@ namespace SkyEditor.Core.IO
         {
         }
 
-        [Obsolete("Use GenericFile(string, IIOProvider) instead.")]
-        public GenericFile(IIOProvider provider, string filename)
-        {
-            OpenFileInternal(filename, provider);
-        }
-
         public GenericFile(string filename, IIOProvider provider)
         {
             OpenFileInternal(filename, provider);
