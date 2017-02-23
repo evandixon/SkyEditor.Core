@@ -1332,6 +1332,85 @@ namespace SkyEditor.Core.IO
             }
         }
 
+        /// <summary>
+        /// Reads a string using the given encoding.  This method is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <param name="length">Length in characters of the string</param>
+        /// <returns>The UTF-16 string at the given offset</returns>
+        public string ReadString(long index, int length, Encoding e)
+        {
+            return e.GetString(Read(index, length), 0, length);
+        }
+
+        /// <summary>
+        /// Reads a string using the given encoding.  This method is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <param name="length">Length in characters of the string</param>
+        /// <returns>The UTF-16 string at the given offset</returns>
+        public async Task<string> ReadStringAsync(long index, int length, Encoding e)
+        {
+            if (IsThreadSafe)
+            {
+                return ReadString(index, length, e);
+            }
+            else
+            {
+                return await Task.Run(() =>
+                {
+                    lock (_fileAccessLock)
+                    {
+                        return ReadString(index, length, e);
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// Reads a null-terminated string using the given encoding.  This method is not thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <returns>The string at the given location</returns>
+        public string ReadNullTerminatedString(long index, Encoding e)
+        {
+            // The null character we're looking for
+            var nullCharSequence = e.GetBytes(Convert.ToChar(0x0).ToString());
+
+            // Find the length of the string as determined by the location of the null-char sequence
+            int length = 0;
+            while (!Read(index + length * nullCharSequence.Length, nullCharSequence.Length).All(x => x == 0))
+            {
+                length += 1;
+            }
+
+
+            return ReadString(index, length, e);
+        }
+
+        /// <summary>
+        /// Reads a null-terminated using the given encoding.  This method is thread-safe.
+        /// </summary>
+        /// <param name="offset">Offset of the string</param>
+        /// <returns>The string at the given location</returns>
+        public async Task<string> ReadNullTerminatedStringAsync(long index, Encoding e)
+        {
+            if (IsThreadSafe)
+            {
+                return ReadNullTerminatedString(index, e);
+            }
+            else
+            {
+                return await Task.Run(() =>
+                {
+                    lock (_fileAccessLock)
+                    {
+                        return ReadNullTerminatedString(index, e);
+                    }
+                });
+            }
+        }
+
         #endregion
 
         #endregion
