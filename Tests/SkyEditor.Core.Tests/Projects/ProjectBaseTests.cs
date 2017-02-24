@@ -16,11 +16,11 @@ namespace SkyEditor.Core.Tests.Projects
 
         public class TestProject : ProjectBase
         {
-            public override string ProjectFileExtension => throw new NotImplementedException();
+            public override string ProjectFileExtension { get; }
 
             protected override Task<IOnDisk> LoadProjectItem(ItemValue item)
             {
-                throw new NotImplementedException();
+                return Task.FromResult<IOnDisk>(new SampleIOnDisk(item.Filename));
             }
 
             public new void AddItem(string path, IOnDisk item)
