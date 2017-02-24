@@ -126,7 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj">
-      <Project>{11eeeb65-532c-41ae-9340-7c82b3f6357c}</Project>
+      <Project>{4985bc22-88b5-422d-a0d3-b772470b2aa8}</Project>
       <Name>SkyEditor.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\ManualLoadPlugin\ManualLoadPlugin.csproj">
