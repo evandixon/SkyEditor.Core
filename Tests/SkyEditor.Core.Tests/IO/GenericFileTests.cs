@@ -1054,6 +1054,28 @@ namespace SkyEditor.Core.Tests.IO
                 Assert.AreEqual("test", await f.ReadNullTerminatedUnicodeStringAsync(0));
             }
         }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadNullTerminatedString_Sync()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x00, 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x00 });
+                Assert.AreEqual("Pokémon", f.ReadNullTerminatedString(0, Encoding.UTF8));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadNullTerminatedString_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x00, 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x00 });
+                Assert.AreEqual("Pokémon", await f.ReadNullTerminatedStringAsync(0, Encoding.UTF8));
+            }
+        }
         #endregion
 
     }
