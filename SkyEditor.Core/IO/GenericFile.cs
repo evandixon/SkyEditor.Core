@@ -553,7 +553,12 @@ namespace SkyEditor.Core.IO
                 {
                     throw new OverflowException(Properties.Resources.IO_GenericFile_ErrorLengthTooLarge);
                 }
-                return InMemoryFile.Skip((int)index).Take(length).ToArray();
+                var buffer = new byte[length];
+                for (int i = 0; i < length; i++)
+                {
+                    buffer[i] = InMemoryFile[index + i];
+                }
+                return buffer;
             }
             else
             {
