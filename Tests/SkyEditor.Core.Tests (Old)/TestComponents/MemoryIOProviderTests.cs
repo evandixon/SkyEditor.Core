@@ -70,8 +70,8 @@ namespace SkyEditor.Core.Tests.TestComponents
             byte[] testSequence = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             Provider.WriteAllBytes("/testFile.bin", testSequence);
 
-            var read = Provider.ReadAllBytes("/testFile.bin");
-            Assert.IsTrue(testSequence.SequenceEqual(read));
+            dynamic read = Provider.ReadAllBytes("/testFile.bin");
+            Assert.AreEqual(testSequence, read);
         }
 
         [TestMethod()]
@@ -81,8 +81,8 @@ namespace SkyEditor.Core.Tests.TestComponents
             string testSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZqbcdefghijklmnopqrstuvwxyz0123456789àèéêç";
             Provider.WriteAllText("/testFile.bin", testSequence);
 
-            var read = Provider.ReadAllText("/testFile.bin");
-            Assert.IsTrue(testSequence.SequenceEqual(read));
+            dynamic read = Provider.ReadAllText("/testFile.bin");
+            Assert.AreEqual(testSequence, read);
         }
 
         [TestMethod()]

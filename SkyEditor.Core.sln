@@ -14,13 +14,13 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.Windows", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyEditor.Core", "SkyEditor.Core\SkyEditor.Core.csproj", "{11EEEB65-532C-41AE-9340-7C82B3F6357C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core.Tests", "Tests\SkyEditor.Core.Tests\SkyEditor.Core.Tests.csproj", "{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualLoadPlugin", "Tests\ManualLoadPlugin\ManualLoadPlugin.csproj", "{7F66164A-6E68-4F75-BD31-F0F184162562}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLoadPlugin", "Tests\AutoLoadPlugin\AutoLoadPlugin.csproj", "{7E0BFD24-BBB9-4481-B183-38CD6836924F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sky Editor Console", "Sky Editor Console\Sky Editor Console.csproj", "{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core.Tests", "Tests\SkyEditor.Core.Tests\SkyEditor.Core.Tests.csproj", "{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,18 +56,6 @@ Global
 		{11EEEB65-532C-41AE-9340-7C82B3F6357C}.Release|x64.Build.0 = Release|x64
 		{11EEEB65-532C-41AE-9340-7C82B3F6357C}.Release|x86.ActiveCfg = Release|x86
 		{11EEEB65-532C-41AE-9340-7C82B3F6357C}.Release|x86.Build.0 = Release|x86
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Debug|x64.ActiveCfg = Debug|x64
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Debug|x64.Build.0 = Debug|x64
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Debug|x86.ActiveCfg = Debug|x86
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Debug|x86.Build.0 = Debug|x86
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Release|x64.ActiveCfg = Release|x64
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Release|x64.Build.0 = Release|x64
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Release|x86.ActiveCfg = Release|x86
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47}.Release|x86.Build.0 = Release|x86
 		{7F66164A-6E68-4F75-BD31-F0F184162562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F66164A-6E68-4F75-BD31-F0F184162562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F66164A-6E68-4F75-BD31-F0F184162562}.Debug|x64.ActiveCfg = Debug|x64
@@ -104,13 +92,25 @@ Global
 		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|x64.Build.0 = Release|x64
 		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|x86.ActiveCfg = Release|x86
 		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|x86.Build.0 = Release|x86
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|x64.Build.0 = Debug|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|x86.Build.0 = Debug|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Release|x64.ActiveCfg = Release|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Release|x64.Build.0 = Release|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Release|x86.ActiveCfg = Release|Any CPU
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{6E46E7F9-359F-4C84-9D00-AC4FD6C10F47} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
 		{7F66164A-6E68-4F75-BD31-F0F184162562} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
 		{7E0BFD24-BBB9-4481-B183-38CD6836924F} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
+		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8} = {C6561B48-E3A6-4DFA-A1BB-82EA5107062F}
 	EndGlobalSection
 EndGlobal
