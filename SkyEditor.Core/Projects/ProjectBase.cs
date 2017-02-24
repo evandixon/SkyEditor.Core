@@ -97,6 +97,11 @@ namespace SkyEditor.Core.Projects
             return output;
         }
 
+        public ProjectBase()
+        {
+            Items = new Dictionary<string, IOnDisk>();
+        }
+
         #region Child Classes
 
         protected class ItemValue : IOnDisk
@@ -502,7 +507,7 @@ namespace SkyEditor.Core.Projects
                 // fixedPath is /Test/
                 // Eliminate anything with more slashes than fixedPath
                 var currentSlashCount = fixedPath.Where(x => x == '/').Count();
-                return recursiveSelect.Where(x => x.Key.Where(c => c == '/').Count() > currentSlashCount)
+                return recursiveSelect.Where(x => x.Key.Where(c => c == '/').Count() == currentSlashCount)
                                       .OrderBy(x => x.Key, new DirectoryStructureComparer());
             }
         }
@@ -621,7 +626,7 @@ namespace SkyEditor.Core.Projects
         /// <returns>A boolean indicating whether or not a directory can be created inside the given directory</returns>
         public virtual bool CanCreateDirectory(string parentPath)
         {
-            return DirectoryExists(parentPath);
+            return !DirectoryExists(parentPath);
         }
 
         /// <summary>

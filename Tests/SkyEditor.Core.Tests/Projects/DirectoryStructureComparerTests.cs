@@ -9,7 +9,7 @@ namespace SkyEditor.Core.Tests.Projects
     [TestClass]
     public class DirectoryStructureComparerTests
     {
-        public const string TestCategory = "Project Tests";
+        public const string TestCategory = "Projects - DirectoryStructureComparer";
 
         [TestMethod]
         [TestCategory(TestCategory)]
