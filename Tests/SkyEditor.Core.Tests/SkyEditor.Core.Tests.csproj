@@ -130,7 +130,7 @@
       <Name>SkyEditor.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\ManualLoadPlugin\ManualLoadPlugin.csproj">
-      <Project>{7f66164a-6e68-4f75-bd31-f0f184162562}</Project>
+      <Project>{c148ba65-420c-4437-bb2e-a5100207bfb0}</Project>
       <Name>ManualLoadPlugin</Name>
     </ProjectReference>
   </ItemGroup>
