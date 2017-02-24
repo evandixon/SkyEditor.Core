@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C6561B48-E3A6-4DFA-A1BB-82EA5107062F}"
 EndProject
@@ -12,8 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.Windows", "SkyEditor.Core.Windows\SkyEditor.Core.Windows.vbproj", "{8238A6A2-76AF-4741-8564-D1D2A4B067BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sky Editor Console", "Sky Editor Console\Sky Editor Console.csproj", "{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core.Tests", "Tests\SkyEditor.Core.Tests\SkyEditor.Core.Tests.csproj", "{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core", "SkyEditor.Core\SkyEditor.Core.csproj", "{4985BC22-88B5-422D-A0D3-B772470B2AA8}"
@@ -21,6 +19,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualLoadPlugin", "Tests\ManualLoadPlugin\ManualLoadPlugin.csproj", "{C148BA65-420C-4437-BB2E-A5100207BFB0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLoadPlugin", "Tests\AutoLoadPlugin\AutoLoadPlugin.csproj", "{E8735025-71AD-4C4E-A2E8-1B9FAFCBFC8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sky Editor Console", "Sky Editor Console\Sky Editor Console.csproj", "{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,18 +44,6 @@ Global
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|x64.Build.0 = Release|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|x86.ActiveCfg = Release|Any CPU
 		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|x86.Build.0 = Release|Any CPU
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Debug|x64.ActiveCfg = Debug|x64
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Debug|x64.Build.0 = Debug|x64
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Debug|x86.ActiveCfg = Debug|x86
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Debug|x86.Build.0 = Debug|x86
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|x64.ActiveCfg = Release|x64
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|x64.Build.0 = Release|x64
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|x86.ActiveCfg = Release|x86
-		{9DACCC13-502C-49D9-8C01-0CDD7390E7D1}.Release|x86.Build.0 = Release|x86
 		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DE9438A-CA6B-4875-8F73-7C234EBB07D8}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -104,6 +92,18 @@ Global
 		{E8735025-71AD-4C4E-A2E8-1B9FAFCBFC8F}.Release|x64.Build.0 = Release|Any CPU
 		{E8735025-71AD-4C4E-A2E8-1B9FAFCBFC8F}.Release|x86.ActiveCfg = Release|Any CPU
 		{E8735025-71AD-4C4E-A2E8-1B9FAFCBFC8F}.Release|x86.Build.0 = Release|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Debug|x64.Build.0 = Debug|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Debug|x86.Build.0 = Debug|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Release|x64.ActiveCfg = Release|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Release|x64.Build.0 = Release|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Release|x86.ActiveCfg = Release|Any CPU
+		{19D0829E-1A4C-48EF-93F9-1E6443B34C1F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
