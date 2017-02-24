@@ -626,7 +626,7 @@ namespace SkyEditor.Core.Projects
         /// <returns>A boolean indicating whether or not a directory can be created inside the given directory</returns>
         public virtual bool CanCreateDirectory(string parentPath)
         {
-            return !DirectoryExists(parentPath);
+            return true;
         }
 
         /// <summary>
@@ -635,14 +635,15 @@ namespace SkyEditor.Core.Projects
         /// <param name="path">Path of the new directory</param>
         public void CreateDirectory(string path)
         {
-            if (CanCreateDirectory(path))
+            var parentPath = Path.GetDirectoryName(path);
+            if (CanCreateDirectory(parentPath))
             {
                 var fixedPath = FixPath(path);
 
                 // Ensure parent directory exists
-                if (!string.IsNullOrEmpty(path)) // But only if it isn't the root
+                if (!string.IsNullOrEmpty(fixedPath)) // But only if it isn't the root
                 {
-                    CreateDirectory(Path.GetDirectoryName(path));
+                    CreateDirectory(parentPath);
                 }
 
                 // Create the directory
