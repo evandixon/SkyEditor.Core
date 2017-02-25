@@ -46,6 +46,8 @@
     <Compile Include="ConsoleCommands\Commands\ListProperties.cs" />
     <Compile Include="ConsoleCommands\Commands\OpenFile.cs" />
     <Compile Include="ConsoleCommands\Commands\SelectFile.cs" />
+    <Compile Include="ConsoleCommands\Commands\Settings.cs" />
+    <Compile Include="ConsoleCommands\Commands\SolutionCommands.cs" />
     <Compile Include="ConsoleCommands\ConsoleCommand.cs" />
     <Compile Include="ConsoleCommands\ConsoleCorePlugin.cs" />
     <Compile Include="ConsoleCommands\ConsoleShell.cs" />
@@ -53,6 +55,7 @@
     <Compile Include="ConsoleCommands\IConsoleProvider.cs" />
     <Compile Include="ConsoleCommands\ShellCommands\cd.cs" />
     <Compile Include="ConsoleCommands\ShellCommands\ls.cs" />
+    <Compile Include="ConsoleCommands\ShellCommands\mkdir.cs" />
     <Compile Include="ConsoleCommands\StandardConsoleProvider.cs" />
     <Compile Include="CoreSkyEditorPlugin.cs" />
     <Compile Include="Extensions\ExtensionHelper.cs" />
@@ -126,6 +129,7 @@
     <Compile Include="SkyEditorPlugin.cs" />
     <Compile Include="TestComponents\MemoryConsoleProvider.cs" />
     <Compile Include="TestComponents\MemoryIOProvider.cs" />
+    <Compile Include="TestComponents\TextPreprocessorProject.cs" />
     <Compile Include="TypeRegisteredEventArgs.cs" />
     <Compile Include="UI\ActionMenuItem.cs" />
     <Compile Include="UI\AnchorableViewModel.cs" />
