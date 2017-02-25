@@ -33,6 +33,8 @@ namespace SkyEditor.Core
             this._isIndeterminate = false;
             this._isCompleted = true;
 
+            this.RunningProgressReportables = new List<IReportProgress>();
+
             this.FileOpened += ApplicationViewModel_FileOpened;
             this.PropertyChanged += ApplicationViewModel_PropertyChanged;
         }
