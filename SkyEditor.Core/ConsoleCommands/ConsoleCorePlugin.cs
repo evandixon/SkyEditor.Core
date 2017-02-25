@@ -27,5 +27,10 @@ namespace SkyEditor.Core.ConsoleCommands
         {
             return new StandardConsoleProvider();
         }
+
+        public override ISettingsProvider GetSettingsProvider(PluginManager manager)
+        {
+            return SettingsProvider.Open("settings.json", manager);
+        }
     }
 }

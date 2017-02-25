@@ -13,10 +13,25 @@ namespace SkyEditor.Core.Settings
         /// <returns>A boolean indicating whether or not Development Mode is enabled.</returns>
         public static bool GetIsDevMode(this ISettingsProvider provider)
         {
-            var setting = provider.GetSetting(SettingNames.DevMode) as bool?;
-            if (setting.HasValue)
+            bool? output = null;
+
+            var setting = provider.GetSetting(SettingNames.DevMode);
+            if (setting is bool?)
             {
-                return setting.Value;
+                output = setting as bool?;
+            }
+            else if (setting is string)
+            {
+                bool parsed;
+                if (bool.TryParse(setting as string, out parsed))
+                {
+                    output = parsed;
+                }
+            }
+
+            if (output.HasValue)
+            {
+                return output.Value;
             }
             else
             {

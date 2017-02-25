@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SkyEditor.Core.Projects
@@ -13,7 +15,7 @@ namespace SkyEditor.Core.Projects
     /// <summary>
     /// Defines the common functionality of both projects and solutions
     /// </summary>
-    public abstract class ProjectBase : INotifyModified, IReportProgress, IOnDisk, ISavable, IDisposable
+    public abstract class ProjectBase : INotifyModified, IReportProgress, IOnDisk, ISavable, IIOProvider, IDisposable
     {
         /// <summary>
         /// Creates a new project
@@ -24,7 +26,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="projectType">Type of the project</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly created project</returns>
-        public static T CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
+        public async static Task<T> CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
         {
             // Create the instance
             var output = ReflectionHelpers.CreateInstance(projectType) as T;
@@ -42,6 +44,8 @@ namespace SkyEditor.Core.Projects
             output.CurrentPluginManager = manager;
             output.Name = projectName;
             output.Settings = new SettingsProvider(manager);
+
+            await output.Initialize();
             return output;
         }
 
@@ -94,12 +98,15 @@ namespace SkyEditor.Core.Projects
                 output.AddItem(item.Key, await item.Value);
             }
 
+            await output.Initialize();
+
             return output;
         }
 
         public ProjectBase()
         {
             Items = new Dictionary<string, IOnDisk>();
+            ResetWorkingDirectory();
         }
 
         #region Child Classes
@@ -470,7 +477,32 @@ namespace SkyEditor.Core.Projects
         /// <returns>A standardized path</returns>
         protected string FixPath(string path)
         {
-            return path.Replace('\\', '/').TrimEnd('/');
+            // Pass 1: properly format slashes
+            var pass1 = path.Replace('\\', '/').TrimEnd('/');
+
+            // Pass 2: apply working directory
+            string pass2;
+            if (pass1.StartsWith("/") || string.IsNullOrEmpty(pass1))
+            {
+                pass2 = pass1;
+            }
+            else
+            {
+                if (!WorkingDirectory.StartsWith("/"))
+                {
+                    WorkingDirectory = "/" + WorkingDirectory;
+                }
+                pass2 = FixPath(Path.Combine(WorkingDirectory, pass1));
+            }
+
+            // Pass 3: replace things like "." and in the future ".."
+            var pass3 = pass2.Replace("/./", "/"); // Takes care of things like /dir1/./dir2
+            if (pass3.EndsWith("/."))
+            {
+                pass3 = pass3.TrimEnd('.').TrimEnd('/');
+            }
+
+            return pass3;
         }
 
         /// <summary>
@@ -602,9 +634,8 @@ namespace SkyEditor.Core.Projects
         /// <returns>A boolean indicating whether or not the directory exists</returns>
         public bool DirectoryExists(string path)
         {
-            if (string.IsNullOrEmpty(path)) return true; // Root directory("") should always exist
-
             var fixedPath = FixPath(path).ToLowerInvariant();
+            if (string.IsNullOrEmpty(fixedPath)) return true; // Root directory("") should always exist            
             return Items.Any(x => x.Key.ToLowerInvariant() == fixedPath && x.Value == null);
         }
 
@@ -739,6 +770,160 @@ namespace SkyEditor.Core.Projects
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+        #endregion
+
+        #region IIOProvider Implementation
+
+        /// <summary>
+        /// The working directory, as needed by <see cref="IIOProvider"/>
+        /// </summary>
+        public string WorkingDirectory { get; set; }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        public void ResetWorkingDirectory()
+        {
+            WorkingDirectory = "/";
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual long GetFileLength(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual bool FileExists(string filename)
+        {
+            return ItemExists(filename);
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string[] GetFiles(string path, string searchPattern, bool topDirectoryOnly)
+        {
+            var files = GetItems(path, !topDirectoryOnly);
+            var matcher = new Regex(MemoryIOProvider.GetFileSearchRegex(searchPattern), RegexOptions.Compiled);
+            return files.Select(x => x.Key).Where(x => matcher.IsMatch(Path.GetFileName(x))).ToArray();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        string[] IIOProvider.GetDirectories(string path, bool topDirectoryOnly)
+        {
+            return GetDirectories(path, !topDirectoryOnly).ToArray();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual byte[] ReadAllBytes(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string ReadAllText(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void WriteAllBytes(string filename, byte[] data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void WriteAllText(string filename, string data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void CopyFile(string sourceFilename, string destinationFilename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void DeleteFile(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string GetTempFilename()
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string GetTempDirectory()
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual Stream OpenFile(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual Stream OpenFileReadOnly(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual Stream OpenFileWriteOnly(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
         #endregion
     }
 
