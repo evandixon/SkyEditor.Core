@@ -23,13 +23,38 @@ namespace SkyEditor.Core.Projects
         /// <typeparam name="T">Type of the project</typeparam>
         /// <param name="parentPath">Directory in which the project directory will be created</param>
         /// <param name="projectName">Name of the project</param>
+        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <returns>The newly created project</returns>
+        public static async Task<T> CreateProject<T>(string parentPath, string projectName, PluginManager manager) where T : ProjectBase
+        {
+            return await CreateProject(parentPath, projectName, typeof(T), manager) as T;
+        }
+
+        /// <summary>
+        /// Creates a new project
+        /// </summary>
+        /// <typeparam name="T">Type of the project</typeparam>
+        /// <param name="parentPath">Directory in which the project directory will be created</param>
+        /// <param name="projectName">Name of the project</param>
+        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <returns>The newly created project</returns>
+        public static async Task<T> CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
+        {
+            return await CreateProject(parentPath, projectName, projectType, manager) as T;
+        }
+
+        /// <summary>
+        /// Creates a new project
+        /// </summary>
+        /// <param name="parentPath">Directory in which the project directory will be created</param>
+        /// <param name="projectName">Name of the project</param>
         /// <param name="projectType">Type of the project</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly created project</returns>
-        public async static Task<T> CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
+        public static async Task<ProjectBase> CreateProject(string parentPath, string projectName, Type projectType, PluginManager manager)
         {
             // Create the instance
-            var output = ReflectionHelpers.CreateInstance(projectType) as T;
+            var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
 
             // Get the filename
             var filename = Path.Combine(parentPath, projectName, projectName + "." + output.ProjectFileExtension);
@@ -46,6 +71,8 @@ namespace SkyEditor.Core.Projects
             output.Settings = new SettingsProvider(manager);
 
             await output.Initialize();
+            output.LoadingTask = output.Load();
+
             return output;
         }
 
@@ -98,7 +125,7 @@ namespace SkyEditor.Core.Projects
                 output.AddItem(item.Key, await item.Value);
             }
 
-            await output.Initialize();
+            output.LoadingTask = output.Load();
 
             return output;
         }
@@ -368,9 +395,14 @@ namespace SkyEditor.Core.Projects
         {
             get
             {
-                return !IsBuilding;
+                return !IsBuilding && LoadingTask.IsCompleted;
             }
         }
+
+        /// <summary>
+        /// The task corresponding to the project's initialization.
+        /// </summary>
+        public Task LoadingTask { get; protected set; }
 
         #endregion
 
@@ -406,14 +438,12 @@ namespace SkyEditor.Core.Projects
                     file.Items.Add(FixPath(item.Key), null);
                 }
                 else
-                {
-                    var absolutePath = new Uri(item.Value.Filename);
-                    var otherPath = new Uri(Path.GetDirectoryName(Filename));
+                {                    
                     // Item
                     file.Items.Add(FixPath(item.Key),
                                new ItemValue
                                {
-                                   Filename = absolutePath.MakeRelativeUri(otherPath).LocalPath,
+                                   Filename = FileSystem.MakeRelativePath(item.Value.Filename, Path.GetDirectoryName(Filename)),
                                    AssemblyQualifiedTypeName = item.Value.GetType().AssemblyQualifiedName
                                });
                 }
@@ -422,6 +452,15 @@ namespace SkyEditor.Core.Projects
             Json.SerializeToFile(this.Filename, file, provider);
             FileSaved?.Invoke(this, new EventArgs());
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// The project directory
+        /// </summary>
+        /// <returns>The project directory</returns>
+        public virtual string GetRootDirectory()
+        {
+            return Path.GetDirectoryName(this.Filename);
         }
 
         #endregion
@@ -443,7 +482,7 @@ namespace SkyEditor.Core.Projects
         /// This function has two indended uses: loading small files into memory if needed and verifying correct initialization.  Ideally, <see cref="Initialize"/> will already have run, but circumstances (like previous exceptions, the user closing the application, or important files being deleted) may result in it being incomplete.  This function should fix incomplete initialization if that is the case.
         /// </remarks>
         public virtual Task Load()
-        {
+        {           
             return Task.CompletedTask;
         }
 
@@ -813,7 +852,7 @@ namespace SkyEditor.Core.Projects
         {
             var files = GetItems(path, !topDirectoryOnly);
             var matcher = new Regex(MemoryIOProvider.GetFileSearchRegex(searchPattern), RegexOptions.Compiled);
-            return files.Select(x => x.Key).Where(x => matcher.IsMatch(Path.GetFileName(x))).ToArray();
+            return files.Select(x => x.Key).Where(x => matcher.IsMatch(x)).ToArray();
         }
 
         /// <summary>

@@ -46,10 +46,14 @@ namespace SkyEditor.Core.TestComponents
 
             foreach (var part in asteriskParts)
             {
-                regexString.Append(GetFileSearchRegexQuestionMarkOnly(part));
-                if (part != asteriskParts[asteriskParts.Length - 1])
+                if (string.IsNullOrEmpty(part))
                 {
+                    // Asterisk
                     regexString.Append(".*");
+                }
+                else
+                {
+                    regexString.Append(GetFileSearchRegexQuestionMarkOnly(part));
                 }
             }
 
@@ -133,9 +137,15 @@ namespace SkyEditor.Core.TestComponents
 
         public virtual string[] GetFiles(string path, string searchPattern, bool topDirectoryOnly)
         {
-            path = FixPath(path);
-            var searchPatternRegex = new Regex(searchPattern);
-            return Files.Where(x => searchPatternRegex.IsMatch(x.Key) && x.Value != null).Select(x => x.Key).ToArray();
+            path = FixPath(path).ToLowerInvariant().TrimEnd('/') + "/";
+            var searchPatternRegex = new Regex(GetFileSearchRegex(searchPattern));
+            var filesInPath = Files.Where(x => x.Key.ToLowerInvariant().StartsWith(path));
+            if (topDirectoryOnly)
+            {
+                var slashCount = path.Count(x => x == '/');
+                filesInPath = filesInPath.Where(x => x.Key.Count(y => y == '/') == slashCount);
+            }
+            return filesInPath.Where(x => searchPatternRegex.IsMatch(x.Key) && x.Value != null).Select(x => x.Key).ToArray();
         }
 
         public string[] GetDirectories(string path, bool topDirectoryOnly)

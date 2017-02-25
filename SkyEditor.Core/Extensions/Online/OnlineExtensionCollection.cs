@@ -69,6 +69,7 @@ namespace SkyEditor.Core.Extensions.Online
         {
             if (ReferenceEquals(_childCollections, null))
             {
+                _childCollections = new List<OnlineExtensionCollection>();
                 foreach (var item in (await GetResponse().ConfigureAwait(false)).ChildCollections)
                 {
                     _childCollections.Add(new OnlineExtensionCollection(this.RootEndpoint, item.ID));

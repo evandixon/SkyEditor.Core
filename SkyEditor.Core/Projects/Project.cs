@@ -7,6 +7,8 @@ using System.Reflection;
 using SkyEditor.Core.Utilities;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using SkyEditor.Core.TestComponents;
 
 namespace SkyEditor.Core.Projects
 {
@@ -245,7 +247,7 @@ namespace SkyEditor.Core.Projects
         /// </summary>
         /// <param name="path">Project path of the desired file</param>
         /// <returns>Whether or not a file exists at the given project path</returns>
-        public bool FileExists(string path)
+        public override bool FileExists(string path)
         {
             return ItemExists(path);
         }
@@ -264,18 +266,9 @@ namespace SkyEditor.Core.Projects
         /// Deletes the given file
         /// </summary>
         /// <param name="path">Project path of the file to delete</param>
-        public virtual void DeleteFile(string path)
+        public override void DeleteFile(string path)
         {
             DeleteItem(path);
-        }
-
-        /// <summary>
-        /// The project directory
-        /// </summary>
-        /// <returns>The project directory</returns>
-        public virtual string GetRootDirectory()
-        {
-            return Path.GetDirectoryName(this.Filename);
         }
 
         /// <summary>

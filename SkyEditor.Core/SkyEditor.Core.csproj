@@ -130,6 +130,7 @@
     <Compile Include="TestComponents\MemoryConsoleProvider.cs" />
     <Compile Include="TestComponents\MemoryIOProvider.cs" />
     <Compile Include="TestComponents\TextPreprocessorProject.cs" />
+    <Compile Include="TestComponents\TextPreprocessorSolution.cs" />
     <Compile Include="TypeRegisteredEventArgs.cs" />
     <Compile Include="UI\ActionMenuItem.cs" />
     <Compile Include="UI\AnchorableViewModel.cs" />

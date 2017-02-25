@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.IO;
+﻿using Newtonsoft.Json;
+using SkyEditor.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace SkyEditor.Core.Utilities
         /// <returns>Json text that represents the given object.</returns>
         public static string Serialize(object obj)
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+            return JsonConvert.SerializeObject(obj);
         }
 
         /// <summary>
@@ -29,7 +30,7 @@ namespace SkyEditor.Core.Utilities
         /// <returns></returns>
         public static T Deserialize<T>(string json)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         /// <summary>
@@ -40,7 +41,7 @@ namespace SkyEditor.Core.Utilities
         /// <returns></returns>
         public static object Deserialize(Type type, string json)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject(json, type);
+            return JsonConvert.DeserializeObject(json, type);
         }
 
         /// <summary>
