@@ -60,6 +60,7 @@ namespace SkyEditor.Core.Tests.Projects
                 Assert.IsInstanceOfType(project, typeof(TextPreprocessorProject));
                 Assert.IsTrue(project.FileExists("/variables.txt"));
                 Assert.IsTrue(project.DirectoryExists("/files"));
+                Assert.IsNotNull(project.Settings, "Settings are null");
 
                 // Set up the project
                 project.CreateFile("/files", "File1.txt", typeof(TextFile));

@@ -66,6 +66,15 @@ namespace SkyEditor.Core
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
+        /// Raises the <see cref="PropertyChanged"/> event
+        /// </summary>
+        /// <param name="propertyName"></param>
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
         /// Raised when background loading has progressed
         /// </summary>
         public event EventHandler<ProgressReportedEventArgs> ProgressChanged;
