@@ -2,6 +2,7 @@
 using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +14,7 @@ namespace SkyEditor.Core.Projects
     /// <summary>
     /// Defines the common functionality of both projects and solutions
     /// </summary>
-    public abstract class ProjectBase : INotifyModified, IReportProgress, IOnDisk, ISavable, IDisposable
+    public abstract class ProjectBase : INotifyPropertyChanged, INotifyModified, IReportProgress, IOnDisk, ISavable, IDisposable
     {
         /// <summary>
         /// Creates a new project
@@ -160,6 +161,7 @@ namespace SkyEditor.Core.Projects
         /// Raised when the project file has been saved
         /// </summary>
         public event EventHandler FileSaved;
+        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
         #region Properties
@@ -217,6 +219,7 @@ namespace SkyEditor.Core.Projects
                 if (value)
                 {
                     Modified?.Invoke(this, new EventArgs());
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasUnsavedChanges)));
                 }
             }
         }
@@ -239,6 +242,7 @@ namespace SkyEditor.Core.Projects
                 {
                     _progress = value;
                     ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
                 }
             }
         }
@@ -259,6 +263,7 @@ namespace SkyEditor.Core.Projects
                 {
                     _message = value;
                     ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
                 }
             }
         }
@@ -279,6 +284,7 @@ namespace SkyEditor.Core.Projects
                 {
                     _isIndeterminate = value;
                     ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = IsIndeterminate, Message = Message, Progress = Progress });
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsIndeterminate)));
                 }
             }
         }
@@ -287,7 +293,23 @@ namespace SkyEditor.Core.Projects
         /// <summary>
         /// Whether or not the current build is complete
         /// </summary>
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted
+        {
+            get
+            {
+                return _isCompleted;
+            }
+            set
+            {
+                if (_isCompleted != value)
+                {
+                    _isCompleted = value;
+                    Completed?.Invoke(this, new EventArgs());
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
+                }
+            }
+        }
+        private bool _isCompleted;
 
         /// <summary>
         /// The status of the current build
