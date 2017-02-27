@@ -48,9 +48,9 @@ namespace SkyEditor.Core.Projects
             this.HasUnsavedChanges = true;
         }
 
-        protected override Task<IOnDisk> LoadProjectItem(ItemValue item)
+        protected override async Task<IOnDisk> LoadProjectItem(ItemValue item)
         {
-            throw new NotImplementedException();
+            return await ProjectBase.OpenProjectFile<Project>(item.Filename, CurrentPluginManager);
         }        
 
         /// <summary>
