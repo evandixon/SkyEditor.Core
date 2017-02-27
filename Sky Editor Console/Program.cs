@@ -14,7 +14,7 @@ namespace Sky_Editor_Console
                 manager.LoadCore(new ConsoleCorePlugin()).Wait();
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    appViewModel.CurrentConsoleShell.RunConsole().Wait();                    
+                    appViewModel.CurrentConsoleShell.RunConsole().Wait();
                 }
             }
         }

@@ -132,9 +132,9 @@ namespace SkyEditor.Core.Projects
         /// <param name="projectName">Name of the project</param>
         /// <param name="projectType">Type of the project</param>
         /// <param name="manager">Instance of the current plugin manager</param>
-        public virtual void CreateProject(string parentPath, string projectName, Type projectType, PluginManager manager)
+        public virtual async Task AddNewProject(string parentPath, string projectName, Type projectType, PluginManager manager)
         {
-            var p = ProjectBase.CreateProject<Project>(Path.Combine(Path.GetDirectoryName(this.Filename), parentPath.TrimStart('/')), projectName, projectType, manager);
+            var p = await ProjectBase.CreateProject<Project>(Path.Combine(Path.GetDirectoryName(this.Filename), parentPath.TrimStart('/')), projectName, projectType, manager);
             p.ParentSolution = this;
             AddProject(FixPath(parentPath) + "/" + projectName, p);
         }

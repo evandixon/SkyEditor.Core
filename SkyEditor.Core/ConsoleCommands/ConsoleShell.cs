@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.TestComponents;
+﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.TestComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -127,8 +128,9 @@ namespace SkyEditor.Core.ConsoleCommands
         /// </summary>
         /// <param name="commandName">Name of the command.</param>
         /// <param name="argumentString">String containing the arguments of the command, separated by spaces.  Use quotation marks to include spaces in a parameter.</param>
+        /// <param name="provider">The I/O provider to use with the command</param>
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
-        public async Task RunCommand(string commandName, string argumentString, bool reportErrorsToConsole = false)
+        public async Task RunCommand(string commandName, string argumentString, bool reportErrorsToConsole = false, IIOProvider provider = null)
         {
             // Split arg on spaces, while respecting quotation marks
             var args = new List<string>();
@@ -141,7 +143,7 @@ namespace SkyEditor.Core.ConsoleCommands
             }
 
             // Run the command
-            await RunCommand(commandName, args, reportErrorsToConsole).ConfigureAwait(false);
+            await RunCommand(commandName, args, reportErrorsToConsole, provider).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -150,12 +152,14 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="commandName">Name of the command.</param>
         /// <param name="arguments">Arguments of the command.</param>
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
-        public async Task RunCommand(string commandName, IEnumerable<string> arguments, bool reportErrorsToConsole = false)
+        public async Task RunCommand(string commandName, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IIOProvider provider = null)
         {
             try
             {
                 var command = AllCommands.Where(c => String.Compare(c.Key, commandName, StringComparison.CurrentCultureIgnoreCase) == 0).Select(c => c.Value).SingleOrDefault();
+                command.CurrentIOProvider = provider;
                 await command.MainAsync(arguments.ToArray()).ConfigureAwait(false);
+                command.CurrentIOProvider = null; // Reset to using the normal one
             }
             catch (Exception ex)
             {

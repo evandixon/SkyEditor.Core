@@ -70,8 +70,8 @@ namespace SkyEditor.Core.Tests.TestComponents
             byte[] testSequence = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             Provider.WriteAllBytes("/testFile.bin", testSequence);
 
-            dynamic read = Provider.ReadAllBytes("/testFile.bin");
-            Assert.AreEqual(testSequence, read);
+            var read = Provider.ReadAllBytes("/testFile.bin");
+            Assert.IsTrue(testSequence.SequenceEqual(read));
         }
 
         [TestMethod()]
@@ -81,8 +81,8 @@ namespace SkyEditor.Core.Tests.TestComponents
             string testSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZqbcdefghijklmnopqrstuvwxyz0123456789àèéêç";
             Provider.WriteAllText("/testFile.bin", testSequence);
 
-            dynamic read = Provider.ReadAllText("/testFile.bin");
-            Assert.AreEqual(testSequence, read);
+            var read = Provider.ReadAllText("/testFile.bin");
+            Assert.IsTrue(testSequence.SequenceEqual(read));
         }
 
         [TestMethod()]
@@ -164,6 +164,48 @@ namespace SkyEditor.Core.Tests.TestComponents
 
             Assert.IsTrue(Provider.FileExists("/testFile2.bin"), "File not copied.");
             Assert.AreEqual(testSequence, Provider.ReadAllBytes("/testFile2.bin"), "Copied file has incorrect contents.");
+        }
+
+        [TestMethod()]
+        [TestCategory(MemoryIOProviderCategory)]
+        public void GetFiles()
+        {
+            Provider.WriteAllText("/dir1/file1.txt", "");
+            Provider.WriteAllText("/dir1/file2.txt", "");
+            Provider.WriteAllText("/dir1/file3.txt", "");
+            Provider.WriteAllText("/dir1/file1.bin", "");
+            Provider.WriteAllText("/dir1/file2.bin", "");
+            Provider.WriteAllText("/dir1/file3.bin", "");
+            Provider.WriteAllText("/file1.txt", "");
+            Provider.WriteAllText("/file2.txt", "");
+            Provider.WriteAllText("/file3.txt", "");
+            Provider.WriteAllText("/file1.bin", "");
+            Provider.WriteAllText("/file2.bin", "");
+            Provider.WriteAllText("/file3.bin", "");
+            Provider.WriteAllText("/file.txt", "");
+
+            var allDir1 = Provider.GetFiles("/dir1", "*", false);
+            var antiRecursionBin = Provider.GetFiles("/", "*.bin", true);
+            var rootFiles = Provider.GetFiles("/", "file?.txt", true);
+
+            Assert.AreEqual(6, allDir1.Length);
+            Assert.IsTrue(allDir1.Any(x => x == "/dir1/file1.txt"));
+            Assert.IsTrue(allDir1.Any(x => x == "/dir1/file2.txt"));
+            Assert.IsTrue(allDir1.Any(x => x == "/dir1/file3.txt"));
+            Assert.IsTrue(allDir1.Any(x => x == "/dir1/file1.bin"));
+            Assert.IsTrue(allDir1.Any(x => x == "/dir1/file2.bin"));
+            Assert.IsTrue(allDir1.Any(x => x == "/dir1/file3.bin"));
+
+            Assert.AreEqual(3, antiRecursionBin.Length);
+            Assert.IsTrue(antiRecursionBin.Any(x => x == "/file1.bin"));
+            Assert.IsTrue(antiRecursionBin.Any(x => x == "/file2.bin"));
+            Assert.IsTrue(antiRecursionBin.Any(x => x == "/file3.bin"));
+
+            Assert.AreEqual(4, rootFiles.Length);
+            Assert.IsTrue(rootFiles.Any(x => x == "/file1.txt"));
+            Assert.IsTrue(rootFiles.Any(x => x == "/file2.txt"));
+            Assert.IsTrue(rootFiles.Any(x => x == "/file3.txt"));
+            Assert.IsTrue(rootFiles.Any(x => x == "/file.txt"));
         }
     }
 }

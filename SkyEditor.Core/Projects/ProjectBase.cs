@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SkyEditor.Core.Projects
@@ -14,7 +16,7 @@ namespace SkyEditor.Core.Projects
     /// <summary>
     /// Defines the common functionality of both projects and solutions
     /// </summary>
-    public abstract class ProjectBase : INotifyPropertyChanged, INotifyModified, IReportProgress, IOnDisk, ISavable, IDisposable
+    public abstract class ProjectBase : INotifyPropertyChanged, INotifyModified, IReportProgress, IOnDisk, ISavable, IIOProvider, IDisposable
     {
         /// <summary>
         /// Creates a new project
@@ -22,13 +24,38 @@ namespace SkyEditor.Core.Projects
         /// <typeparam name="T">Type of the project</typeparam>
         /// <param name="parentPath">Directory in which the project directory will be created</param>
         /// <param name="projectName">Name of the project</param>
+        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <returns>The newly created project</returns>
+        public static async Task<T> CreateProject<T>(string parentPath, string projectName, PluginManager manager) where T : ProjectBase
+        {
+            return await CreateProject(parentPath, projectName, typeof(T), manager) as T;
+        }
+
+        /// <summary>
+        /// Creates a new project
+        /// </summary>
+        /// <typeparam name="T">Type of the project</typeparam>
+        /// <param name="parentPath">Directory in which the project directory will be created</param>
+        /// <param name="projectName">Name of the project</param>
+        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <returns>The newly created project</returns>
+        public static async Task<T> CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
+        {
+            return await CreateProject(parentPath, projectName, projectType, manager) as T;
+        }
+
+        /// <summary>
+        /// Creates a new project
+        /// </summary>
+        /// <param name="parentPath">Directory in which the project directory will be created</param>
+        /// <param name="projectName">Name of the project</param>
         /// <param name="projectType">Type of the project</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly created project</returns>
-        public static T CreateProject<T>(string parentPath, string projectName, Type projectType, PluginManager manager) where T : ProjectBase
+        public static async Task<ProjectBase> CreateProject(string parentPath, string projectName, Type projectType, PluginManager manager)
         {
             // Create the instance
-            var output = ReflectionHelpers.CreateInstance(projectType) as T;
+            var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
 
             // Get the filename
             var filename = Path.Combine(parentPath, projectName, projectName + "." + output.ProjectFileExtension);
@@ -43,6 +70,10 @@ namespace SkyEditor.Core.Projects
             output.CurrentPluginManager = manager;
             output.Name = projectName;
             output.Settings = new SettingsProvider(manager);
+
+            await output.Initialize();
+            output.LoadingTask = output.Load();
+
             return output;
         }
 
@@ -95,7 +126,15 @@ namespace SkyEditor.Core.Projects
                 output.AddItem(item.Key, await item.Value);
             }
 
+            output.LoadingTask = output.Load();
+
             return output;
+        }
+
+        public ProjectBase()
+        {
+            Items = new Dictionary<string, IOnDisk>();
+            ResetWorkingDirectory();
         }
 
         #region Child Classes
@@ -378,9 +417,14 @@ namespace SkyEditor.Core.Projects
         {
             get
             {
-                return !IsBuilding;
+                return !IsBuilding && LoadingTask.IsCompleted;
             }
         }
+
+        /// <summary>
+        /// The task corresponding to the project's initialization.
+        /// </summary>
+        public Task LoadingTask { get; protected set; }
 
         #endregion
 
@@ -416,14 +460,12 @@ namespace SkyEditor.Core.Projects
                     file.Items.Add(FixPath(item.Key), null);
                 }
                 else
-                {
-                    var absolutePath = new Uri(item.Value.Filename);
-                    var otherPath = new Uri(Path.GetDirectoryName(Filename));
+                {                    
                     // Item
                     file.Items.Add(FixPath(item.Key),
                                new ItemValue
                                {
-                                   Filename = absolutePath.MakeRelativeUri(otherPath).LocalPath,
+                                   Filename = FileSystem.MakeRelativePath(item.Value.Filename, Path.GetDirectoryName(Filename)),
                                    AssemblyQualifiedTypeName = item.Value.GetType().AssemblyQualifiedName
                                });
                 }
@@ -432,6 +474,15 @@ namespace SkyEditor.Core.Projects
             Json.SerializeToFile(this.Filename, file, provider);
             FileSaved?.Invoke(this, new EventArgs());
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// The project directory
+        /// </summary>
+        /// <returns>The project directory</returns>
+        public virtual string GetRootDirectory()
+        {
+            return Path.GetDirectoryName(this.Filename);
         }
 
         #endregion
@@ -453,7 +504,7 @@ namespace SkyEditor.Core.Projects
         /// This function has two indended uses: loading small files into memory if needed and verifying correct initialization.  Ideally, <see cref="Initialize"/> will already have run, but circumstances (like previous exceptions, the user closing the application, or important files being deleted) may result in it being incomplete.  This function should fix incomplete initialization if that is the case.
         /// </remarks>
         public virtual Task Load()
-        {
+        {           
             return Task.CompletedTask;
         }
 
@@ -487,7 +538,32 @@ namespace SkyEditor.Core.Projects
         /// <returns>A standardized path</returns>
         protected string FixPath(string path)
         {
-            return path.Replace('\\', '/').TrimEnd('/');
+            // Pass 1: properly format slashes
+            var pass1 = path.Replace('\\', '/').TrimEnd('/');
+
+            // Pass 2: apply working directory
+            string pass2;
+            if (pass1.StartsWith("/") || string.IsNullOrEmpty(pass1))
+            {
+                pass2 = pass1;
+            }
+            else
+            {
+                if (!WorkingDirectory.StartsWith("/"))
+                {
+                    WorkingDirectory = "/" + WorkingDirectory;
+                }
+                pass2 = FixPath(Path.Combine(WorkingDirectory, pass1));
+            }
+
+            // Pass 3: replace things like "." and in the future ".."
+            var pass3 = pass2.Replace("/./", "/"); // Takes care of things like /dir1/./dir2
+            if (pass3.EndsWith("/."))
+            {
+                pass3 = pass3.TrimEnd('.').TrimEnd('/');
+            }
+
+            return pass3;
         }
 
         /// <summary>
@@ -524,7 +600,7 @@ namespace SkyEditor.Core.Projects
                 // fixedPath is /Test/
                 // Eliminate anything with more slashes than fixedPath
                 var currentSlashCount = fixedPath.Where(x => x == '/').Count();
-                return recursiveSelect.Where(x => x.Key.Where(c => c == '/').Count() > currentSlashCount)
+                return recursiveSelect.Where(x => x.Key.Where(c => c == '/').Count() == currentSlashCount)
                                       .OrderBy(x => x.Key, new DirectoryStructureComparer());
             }
         }
@@ -619,9 +695,8 @@ namespace SkyEditor.Core.Projects
         /// <returns>A boolean indicating whether or not the directory exists</returns>
         public bool DirectoryExists(string path)
         {
-            if (string.IsNullOrEmpty(path)) return true; // Root directory("") should always exist
-
             var fixedPath = FixPath(path).ToLowerInvariant();
+            if (string.IsNullOrEmpty(fixedPath)) return true; // Root directory("") should always exist            
             return Items.Any(x => x.Key.ToLowerInvariant() == fixedPath && x.Value == null);
         }
 
@@ -643,7 +718,7 @@ namespace SkyEditor.Core.Projects
         /// <returns>A boolean indicating whether or not a directory can be created inside the given directory</returns>
         public virtual bool CanCreateDirectory(string parentPath)
         {
-            return DirectoryExists(parentPath);
+            return true;
         }
 
         /// <summary>
@@ -652,14 +727,15 @@ namespace SkyEditor.Core.Projects
         /// <param name="path">Path of the new directory</param>
         public void CreateDirectory(string path)
         {
-            if (CanCreateDirectory(path))
+            var parentPath = Path.GetDirectoryName(path);
+            if (CanCreateDirectory(parentPath))
             {
                 var fixedPath = FixPath(path);
 
                 // Ensure parent directory exists
-                if (!string.IsNullOrEmpty(path)) // But only if it isn't the root
+                if (!string.IsNullOrEmpty(fixedPath)) // But only if it isn't the root
                 {
-                    CreateDirectory(Path.GetDirectoryName(path));
+                    CreateDirectory(parentPath);
                 }
 
                 // Create the directory
@@ -755,6 +831,160 @@ namespace SkyEditor.Core.Projects
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+        #endregion
+
+        #region IIOProvider Implementation
+
+        /// <summary>
+        /// The working directory, as needed by <see cref="IIOProvider"/>
+        /// </summary>
+        public string WorkingDirectory { get; set; }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        public void ResetWorkingDirectory()
+        {
+            WorkingDirectory = "/";
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual long GetFileLength(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual bool FileExists(string filename)
+        {
+            return ItemExists(filename);
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string[] GetFiles(string path, string searchPattern, bool topDirectoryOnly)
+        {
+            var files = GetItems(path, !topDirectoryOnly);
+            var matcher = new Regex(MemoryIOProvider.GetFileSearchRegex(searchPattern), RegexOptions.Compiled);
+            return files.Select(x => x.Key).Where(x => matcher.IsMatch(x)).ToArray();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        string[] IIOProvider.GetDirectories(string path, bool topDirectoryOnly)
+        {
+            return GetDirectories(path, !topDirectoryOnly).ToArray();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual byte[] ReadAllBytes(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string ReadAllText(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void WriteAllBytes(string filename, byte[] data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void WriteAllText(string filename, string data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void CopyFile(string sourceFilename, string destinationFilename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual void DeleteFile(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string GetTempFilename()
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual string GetTempDirectory()
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual Stream OpenFile(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual Stream OpenFileReadOnly(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// </summary>
+        /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
+        public virtual Stream OpenFileWriteOnly(string filename)
+        {
+            throw new NotSupportedException();
+        }
+
         #endregion
     }
 

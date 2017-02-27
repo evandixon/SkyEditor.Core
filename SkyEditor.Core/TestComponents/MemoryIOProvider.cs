@@ -16,6 +16,50 @@ namespace SkyEditor.Core.TestComponents
     public class MemoryIOProvider : IIOProvider
     {
 
+        /// <summary>
+        /// Gets a regular expression for the given search pattern for use with <see cref="GetFiles(string, string, bool)"/>.  Do not provide asterisks.
+        /// </summary>
+        private static StringBuilder GetFileSearchRegexQuestionMarkOnly(string searchPattern)
+        {
+            var parts = searchPattern.Split('?');
+            var regexString = new StringBuilder();
+            foreach (var item in parts)
+            {
+                regexString.Append(Regex.Escape(item));
+                if (item != parts[parts.Length - 1])
+                {
+                    regexString.Append(".?");
+                }
+            }
+            return regexString;
+        }
+
+        /// <summary>
+        /// Gets a regular expression for the given search pattern for use with <see cref="GetFiles(string, string, bool)"/>.
+        /// </summary>
+        /// <param name="searchPattern"></param>
+        /// <returns></returns>
+        public static string GetFileSearchRegex(string searchPattern)
+        {
+            var asteriskParts = searchPattern.Split('*');
+            var regexString = new StringBuilder(@"(.*)\/");
+
+            foreach (var part in asteriskParts)
+            {
+                if (string.IsNullOrEmpty(part))
+                {
+                    // Asterisk
+                    regexString.Append(".*");
+                }
+                else
+                {
+                    regexString.Append(GetFileSearchRegexQuestionMarkOnly(part));
+                }
+            }
+
+            return regexString.ToString();
+        }
+
         public MemoryIOProvider()
         {
             Files = new ConcurrentDictionary<string, byte[]>();
@@ -91,51 +135,17 @@ namespace SkyEditor.Core.TestComponents
             }
         }
 
-        /// <summary>
-        /// Gets a regular expression for the given search pattern for use with <see cref="GetFiles(string, string, bool)"/>.  Do not provide asterisks.
-        /// </summary>
-        private StringBuilder GetFileSearchRegexQuestionMarkOnly(string searchPattern)
-        {
-            var parts = searchPattern.Split('?');
-            var regexString = new StringBuilder();
-            foreach (var item in parts)
-            {
-                regexString.Append(Regex.Escape(item));
-                if (item != parts[parts.Length - 1])
-                {
-                    regexString.Append(".?");
-                }
-            }
-            return regexString;
-        }
-
-        /// <summary>
-        /// Gets a regular expression for the given search pattern for use with <see cref="GetFiles(string, string, bool)"/>.
-        /// </summary>
-        /// <param name="searchPattern"></param>
-        /// <returns></returns>
-        protected string GetFileSearchRegex(string searchPattern)
-        {
-            var asteriskParts = searchPattern.Split('*');
-            var regexString = new StringBuilder(@"(.*)\/");
-
-            foreach (var part in asteriskParts)
-            {
-                regexString.Append(GetFileSearchRegexQuestionMarkOnly(part));
-                if (part != asteriskParts[asteriskParts.Length - 1])
-                {
-                    regexString.Append(".*");
-                }
-            }
-
-            return regexString.ToString();
-        }
-
         public virtual string[] GetFiles(string path, string searchPattern, bool topDirectoryOnly)
         {
-            path = FixPath(path);
-            var searchPatternRegex = new Regex(searchPattern);
-            return Files.Where(x => searchPatternRegex.IsMatch(x.Key) && x.Value != null).Select(x => x.Key).ToArray();
+            path = FixPath(path).ToLowerInvariant().TrimEnd('/') + "/";
+            var searchPatternRegex = new Regex(GetFileSearchRegex(searchPattern));
+            var filesInPath = Files.Where(x => x.Key.ToLowerInvariant().StartsWith(path));
+            if (topDirectoryOnly)
+            {
+                var slashCount = path.Count(x => x == '/');
+                filesInPath = filesInPath.Where(x => x.Key.Count(y => y == '/') == slashCount);
+            }
+            return filesInPath.Where(x => searchPatternRegex.IsMatch(x.Key) && x.Value != null).Select(x => x.Key).ToArray();
         }
 
         public string[] GetDirectories(string path, bool topDirectoryOnly)

@@ -80,11 +80,29 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Directory already exists: &quot;{0}&quot;.
+        /// </summary>
+        internal static string Console_DirectoryAlreadyExists {
+            get {
+                return ResourceManager.GetString("Console_DirectoryAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Directory &quot;{0}&quot; does not exist.
         /// </summary>
         internal static string Console_DirectoryDoesNotExist {
             get {
                 return ResourceManager.GetString("Console_DirectoryDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: mkdir &lt;dir&gt;.
+        /// </summary>
+        internal static string Console_mkdir_Usage {
+            get {
+                return ResourceManager.GetString("Console_mkdir_Usage", resourceCulture);
             }
         }
         
@@ -148,6 +166,33 @@ namespace SkyEditor.Core.Properties {
         internal static string Console_SelectFile_Usage {
             get {
                 return ResourceManager.GetString("Console_SelectFile_Usage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: Settings &lt;Get|Set&gt; &lt;Key&gt; &lt;Value&gt;.
+        /// </summary>
+        internal static string Console_Settings_Usage {
+            get {
+                return ResourceManager.GetString("Console_Settings_Usage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No solution is loaded.
+        /// </summary>
+        internal static string Console_Solution_NoneLoaded {
+            get {
+                return ResourceManager.GetString("Console_Solution_NoneLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: Solution &lt;Create|Open&gt; OR Solution &lt;Any command to run&gt;.
+        /// </summary>
+        internal static string Console_Solution_Usage {
+            get {
+                return ResourceManager.GetString("Console_Solution_Usage", resourceCulture);
             }
         }
         

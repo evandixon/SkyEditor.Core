@@ -2,6 +2,7 @@
 using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
+using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;
 using System;
 using System.Collections.Generic;
@@ -112,7 +113,7 @@ namespace SkyEditor.Core
 
             manager.RegisterType<IFileOpener, OpenableFileOpener>();
             manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
-            manager.RegisterType<IFileSaver, SavableFileSaver>();
+            manager.RegisterType<IFileSaver, SavableFileSaver>();            
 
             manager.RegisterTypeRegister<IOpenableFile>();
             manager.RegisterTypeRegister<ICreatableFile>();
@@ -123,6 +124,11 @@ namespace SkyEditor.Core
             manager.RegisterType<IDetectableFileType, TextFile>();
 
             manager.RegisterIOFilter("*.txt", Properties.Resources.File_TextFile);
+
+            if (manager.CurrentSettingsProvider.GetIsDevMode())
+            {
+                manager.RegisterType<Solution, Solution>();
+            }
         }
     }
 }

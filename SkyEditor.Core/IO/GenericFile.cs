@@ -547,7 +547,12 @@ namespace SkyEditor.Core.IO
                 {
                     throw new OverflowException(Properties.Resources.IO_GenericFile_ErrorLengthTooLarge);
                 }
-                return InMemoryFile.Skip((int)index).Take(length).ToArray();
+                var buffer = new byte[length];
+                for (int i = 0; i < length; i++)
+                {
+                    buffer[i] = InMemoryFile[index + i];
+                }
+                return buffer;
             }
             else
             {
@@ -1445,7 +1450,7 @@ namespace SkyEditor.Core.IO
                     }
 
                     // Delete the temporary file if shadow copy is enabled, the current I/O provider is not null, the physical filename exists, and the physical filename is different than the logical one
-                    if (EnableShadowCopy && CurrentIOProvider != null && !string.IsNullOrEmpty(PhysicalFilename) && CurrentIOProvider.FileExists(PhysicalFilename) && Filename != PhysicalFilename)
+                    if (EnableShadowCopy && InMemoryFile == null && CurrentIOProvider != null && !string.IsNullOrEmpty(PhysicalFilename) && CurrentIOProvider.FileExists(PhysicalFilename) && Filename != PhysicalFilename)
                     {
                         CurrentIOProvider.DeleteFile(PhysicalFilename);
                     }

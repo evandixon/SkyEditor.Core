@@ -11,7 +11,7 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
         {
             base.Main(arguments);
 
-            var provider = CurrentApplicationViewModel.CurrentIOProvider;
+            var provider = CurrentIOProvider;
             var directory = ".";
             if (arguments.Length > 1)
             {
