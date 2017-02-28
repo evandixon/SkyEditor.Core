@@ -21,12 +21,12 @@ namespace SkyEditor.Core.TestComponents
 
         public override async Task Load()
         {
-            await base.Initialize();
+            await base.Load();
 
             // Add the variables file if it does not exist
             if (!ItemExists("/variables.txt"))
             {               
-                CreateFile("/", "variables.txt", typeof(TextFile));
+                await CreateFile("/", "variables.txt", typeof(TextFile));
 
                 var variablesFile = await GetFile("/variables.txt", IOHelper.PickFirstDuplicateMatchSelector, CurrentPluginManager) as TextFile;
                 variablesFile.CreateFile("variables.txt");

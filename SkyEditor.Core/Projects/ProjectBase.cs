@@ -115,7 +115,7 @@ namespace SkyEditor.Core.Projects
                 }
                 else
                 {
-                    // Item
+                    // Item                    
                     itemLoadTasks.Add(item.Key, output.LoadProjectItem(item.Value));
                 }
             }
@@ -141,7 +141,14 @@ namespace SkyEditor.Core.Projects
 
         protected class ItemValue : IOnDisk
         {
+            /// <summary>
+            /// Name of the type of item
+            /// </summary>
             public string AssemblyQualifiedTypeName { get; set; }
+
+            /// <summary>
+            /// Path of the file, relative to the solution directory
+            /// </summary>
             public string Filename { get; set; }
         }
 
@@ -462,18 +469,27 @@ namespace SkyEditor.Core.Projects
                 else
                 {                    
                     // Item
-                    file.Items.Add(FixPath(item.Key),
-                               new ItemValue
-                               {
-                                   Filename = FileSystem.MakeRelativePath(item.Value.Filename, Path.GetDirectoryName(Filename)),
-                                   AssemblyQualifiedTypeName = item.Value.GetType().AssemblyQualifiedName
-                               });
+                    file.Items.Add(FixPath(item.Key), GetSaveItemValue(item.Key));
                 }
             }
 
             Json.SerializeToFile(this.Filename, file, provider);
             FileSaved?.Invoke(this, new EventArgs());
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Gets info for saving a file
+        /// </summary>
+        /// <param name="itemPath">The file to save</param>
+        /// <returns>The info for use with saving the file</returns>
+        protected virtual ItemValue GetSaveItemValue(string itemPath)
+        {
+            return new ItemValue
+            {
+                Filename = FileSystem.MakeRelativePath(Items[itemPath].Filename, GetRootDirectory()),
+                AssemblyQualifiedTypeName = Items[itemPath].GetType().AssemblyQualifiedName
+            };
         }
 
         /// <summary>

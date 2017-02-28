@@ -21,5 +21,14 @@ namespace SkyEditor.Core.Tests.Utilities
             var relative = "/dir1/";
             Assert.AreEqual("file1", FileSystem.MakeRelativePath(target, relative));
         }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void MakeRelativePath_Spaces()
+        {
+            var target = "/dir1/file 1";
+            var relative = "/dir1/";
+            Assert.AreEqual("file 1", FileSystem.MakeRelativePath(target, relative));
+        }
     }
 }

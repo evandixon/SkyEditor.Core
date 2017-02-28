@@ -50,7 +50,8 @@ namespace SkyEditor.Core.Projects
 
         protected override async Task<IOnDisk> LoadProjectItem(ItemValue item)
         {
-            return await ProjectBase.OpenProjectFile<Project>(item.Filename, CurrentPluginManager);
+            var itemPath = Path.Combine(GetRootDirectory(), item.Filename);
+            return await ProjectBase.OpenProjectFile<Project>(itemPath, CurrentPluginManager);
         }        
 
         /// <summary>
@@ -83,13 +84,21 @@ namespace SkyEditor.Core.Projects
         /// <summary>
         /// Saves all the projects in the solution
         /// </summary>
-        /// <param name="provider"></param>
-        public virtual void SaveAllProjects(IIOProvider provider)
+        public virtual async Task SaveAllProjects()
         {
             foreach (var item in GetAllProjects())
             {
-                item.Save(provider);
+                await item.Save(CurrentPluginManager.CurrentIOProvider);
             }
+        }
+
+        /// <summary>
+        /// Saves the solution along with all projects
+        /// </summary>
+        public async Task SaveWithAllProjects()
+        {
+            await this.Save(CurrentPluginManager.CurrentIOProvider);
+            await this.SaveAllProjects();
         }
 
         /// <summary>

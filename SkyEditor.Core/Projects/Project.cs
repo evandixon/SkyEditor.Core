@@ -55,6 +55,15 @@ namespace SkyEditor.Core.Projects
             return Task.FromResult(new ProjectFileWrapper(this.Filename, item.Filename, item.AssemblyQualifiedTypeName) as IOnDisk);
         }
 
+        protected override ItemValue GetSaveItemValue(string itemPath)
+        {
+            return new ItemValue
+            {
+                Filename = FileSystem.MakeRelativePath(GetItem(itemPath).Filename, GetRootDirectory()),
+                AssemblyQualifiedTypeName = GetItem(itemPath).FileAssemblyQualifiedTypeName
+            };
+        }
+
         /// <summary>
         /// Gets the file at the given project path
         /// </summary>
@@ -119,7 +128,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="parentPath">Project directory inside which the file will be created</param>
         /// <param name="name">Name of the new file</param>
         /// <param name="fileType">Type of the new file</param>
-        public virtual void CreateFile(string parentPath, string name, Type fileType)
+        public virtual async Task CreateFile(string parentPath, string name, Type fileType)
         {
             if (!ReflectionHelpers.IsOfType(fileType, typeof(ICreatableFile).GetTypeInfo()))
             {
@@ -135,8 +144,9 @@ namespace SkyEditor.Core.Projects
             ICreatableFile fileObj = ReflectionHelpers.CreateInstance(fileType.GetTypeInfo()) as ICreatableFile;
             fileObj.CreateFile(name);
             fileObj.Filename = Path.Combine(Path.GetDirectoryName(this.Filename), parentPath.Replace("/", "\\").TrimStart("\\".ToCharArray()), name);
+            await fileObj.Save(CurrentPluginManager.CurrentIOProvider);
 
-            AddItem(fixedPath + "/" + name, new ProjectFileWrapper(this.Filename, fileObj.Filename, fileObj));
+            AddItem(fixedPath + "/" + name, new ProjectFileWrapper(this.Filename, Path.Combine(parentPath.Replace("/", "\\").TrimStart("\\".ToCharArray()), name), fileObj));
         }
 
         /// <summary>

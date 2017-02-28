@@ -19,6 +19,7 @@ namespace SkyEditor.Core.IO
         public virtual void CreateFile(string name)
         {
             this.Name = name;
+            this.Contents = string.Empty;
         }
 
         public virtual string GetDefaultExtension()
