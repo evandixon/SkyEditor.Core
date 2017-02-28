@@ -58,6 +58,8 @@
     <Compile Include="ConsoleCommands\ShellCommands\mkdir.cs" />
     <Compile Include="ConsoleCommands\StandardConsoleProvider.cs" />
     <Compile Include="CoreSkyEditorPlugin.cs" />
+    <Compile Include="ErrorInfo.cs" />
+    <Compile Include="ErrorType.cs" />
     <Compile Include="Extensions\ExtensionHelper.cs" />
     <Compile Include="Extensions\ExtensionInfo.cs" />
     <Compile Include="Extensions\ExtensionInstallResult.cs" />

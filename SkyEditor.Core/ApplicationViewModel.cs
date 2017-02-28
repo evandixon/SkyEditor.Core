@@ -34,6 +34,7 @@ namespace SkyEditor.Core
             this._isCompleted = true;
 
             this.RunningProgressReportables = new List<IReportProgress>();
+            this.Errors = new ObservableCollection<ErrorInfo>();
 
             this.FileOpened += ApplicationViewModel_FileOpened;
             this.PropertyChanged += ApplicationViewModel_PropertyChanged;
@@ -421,25 +422,29 @@ namespace SkyEditor.Core
         #region Task Watching
         private class TaskProgressReporterWrapper : IReportProgress
         {
-            public TaskProgressReporterWrapper(Task task)
+            public TaskProgressReporterWrapper(Task task, ApplicationViewModel appViewModel)
             {
                 IsCompleted = task.IsCompleted;
                 IsIndeterminate = true;
                 Message = Properties.Resources.UI_LoadingGeneric;
                 Progress = 0;
                 InnerTask = task;
+                CurrentApplicationViewModel = appViewModel;
             }
 
-            public TaskProgressReporterWrapper(Task task, string loadingMessage)
+            public TaskProgressReporterWrapper(Task task, string loadingMessage, ApplicationViewModel appViewModel)
             {
                 IsCompleted = task.IsCompleted;
                 IsIndeterminate = true;
                 Message = loadingMessage;
                 Progress = 0;
                 InnerTask = task;
+                CurrentApplicationViewModel = appViewModel;
             }
 
-            public Task InnerTask;
+            private ApplicationViewModel CurrentApplicationViewModel { get; set; }
+
+            public Task InnerTask { get; set; }
 
             public float Progress
             {
@@ -499,7 +504,14 @@ namespace SkyEditor.Core
 
             public async void Start()
             {
-                await InnerTask;
+                try
+                {
+                    await InnerTask;
+                }
+                catch (Exception ex)
+                {
+                    CurrentApplicationViewModel.ReportError(ex);
+                }                
                 IsCompleted = true;
                 Completed?.Invoke(this, new EventArgs());
             }
@@ -515,7 +527,7 @@ namespace SkyEditor.Core
         /// <remarks>This overload will never show determinate progress.</remarks>    
         public void ShowLoading(Task task)
         {
-            var wrapper = new TaskProgressReporterWrapper(task);
+            var wrapper = new TaskProgressReporterWrapper(task, this);
             wrapper.Start();
             ShowLoading(wrapper);
         }
@@ -528,7 +540,7 @@ namespace SkyEditor.Core
         /// <remarks>This overload will never show determinate progress.</remarks>
         public void ShowLoading(Task task, string loadingMessage)
         {
-            var wrapper = new TaskProgressReporterWrapper(task, loadingMessage);
+            var wrapper = new TaskProgressReporterWrapper(task, loadingMessage, this);
             wrapper.Start();
             ShowLoading(wrapper);
         }
@@ -630,6 +642,37 @@ namespace SkyEditor.Core
             }
         }
         #endregion
+
+        #region Errors
+
+        /// <summary>
+        /// The errors that have been reported
+        /// </summary>
+        public ObservableCollection<ErrorInfo> Errors { get; protected set; }
+
+        /// <summary>
+        /// Reports an error
+        /// </summary>
+        /// <param name="error">The error to be reported</param>
+        public void ReportError(ErrorInfo error)
+        {
+            Errors.Add(error);
+        }
+
+        /// <summary>
+        /// Reports an error
+        /// </summary>
+        /// <param name="exception">The error to be reported</param>
+        public void ReportError(Exception exception)
+        {
+            Errors.Add(new ErrorInfo(exception));
+        }
+
+        public void ClearErrors()
+        {
+            Errors.Clear();
+        }
+#endregion
 
         #region Functions
 
