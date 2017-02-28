@@ -9,7 +9,7 @@ namespace SkyEditor.Core.Utilities
     /// <summary>
     /// Runs a provided delegate function or sub repeatedly and asynchronously in the style of a For statement.
     /// </summary>
-    public class AsyncFor
+    public class AsyncFor : IReportProgress
     {
         public AsyncFor()
         {
@@ -25,7 +25,8 @@ namespace SkyEditor.Core.Utilities
         /// <summary>
         /// Raised when the progress of the batch operation changes
         /// </summary>
-        public event EventHandler LoadingStatusChanged;
+        public event EventHandler<ProgressReportedEventArgs> ProgressChanged;
+        public event EventHandler Completed;
 
         #region Properties
 
@@ -62,11 +63,24 @@ namespace SkyEditor.Core.Utilities
             set
             {
                 _completedTasks = value;
-                LoadingStatusChanged?.Invoke(this, new EventArgs());
+                ProgressChanged?.Invoke(this, new ProgressReportedEventArgs() { Progress = Progress, IsIndeterminate = false });
+                if (CompletedTasks == TotalTasks)
+                {
+                    IsCompleted = true;
+                    Completed?.Invoke(this, new EventArgs());
+                }
             }
         }
         int _completedTasks;
         object _completedTasksLock = new object();
+
+        public float Progress => CompletedTasks / TotalTasks;
+
+        public string Message => string.Empty;
+
+        public bool IsIndeterminate => false;
+
+        public bool IsCompleted { get; protected set; }
 
         #endregion
 
