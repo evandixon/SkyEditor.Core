@@ -51,7 +51,9 @@ namespace SkyEditor.Core.Projects
         protected override async Task<IOnDisk> LoadProjectItem(ItemValue item)
         {
             var itemPath = Path.Combine(GetRootDirectory(), item.Filename);
-            return await ProjectBase.OpenProjectFile<Project>(itemPath, CurrentPluginManager);
+            var project = await ProjectBase.OpenProjectFile<Project>(itemPath, CurrentPluginManager);
+            project.ParentSolution = this;
+            return project;
         }        
 
         /// <summary>
@@ -108,7 +110,7 @@ namespace SkyEditor.Core.Projects
         /// <returns></returns>
         public virtual IEnumerable<Project> GetProjectsByName(string Name)
         {
-            return from p in GetAllProjects() where p.Name.ToLower() == Name.ToLower() select p;
+            return GetAllProjects().Where(x => string.Compare(x.Name, Name, true) == 0);
         }
 
         #region Solution Logical Filesystem
@@ -130,6 +132,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="project">Project to add</param>
         public void AddProject(string path, Project project)
         {
+            project.ParentSolution = this;
             AddItem(path, project);
             ProjectAdded?.Invoke(this, new ProjectAddedEventArgs { Path = path, Project = project });
         }
