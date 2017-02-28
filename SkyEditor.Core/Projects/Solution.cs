@@ -145,6 +145,8 @@ namespace SkyEditor.Core.Projects
         {
             var p = await ProjectBase.CreateProject<Project>(Path.Combine(Path.GetDirectoryName(this.Filename), parentPath.TrimStart('/')), projectName, projectType, manager);
             p.ParentSolution = this;
+            await p.Initialize();
+            await p.Load();
             AddProject(FixPath(parentPath) + "/" + projectName, p);
         }
 
@@ -158,6 +160,7 @@ namespace SkyEditor.Core.Projects
         {
             var p = await ProjectBase.OpenProjectFile<Project>(projectFilename, manager);
             p.ParentSolution = this;
+            await p.Load();
             AddProject(FixPath(parentPath) + "/" + p.Name, p);
         }
 

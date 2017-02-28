@@ -47,6 +47,7 @@ namespace SkyEditor.Core.Tests.Projects
                 // Create the solution
                 var solution = await ProjectBase.CreateProject<TextPreprocessorSolution>("/projects", "Test Solution", manager);
                 await solution.Save(provider);
+                await solution.Initialize();
                 await solution.LoadingTask;
 
                 // Verify files were created correctly
@@ -57,6 +58,7 @@ namespace SkyEditor.Core.Tests.Projects
                 // Verify project was created correctly
                 var project = solution.GetProject("/Text Preprocessor Project");
                 Assert.IsNotNull(project);
+                Assert.AreSame(solution, project.ParentSolution);
                 Assert.IsInstanceOfType(project, typeof(TextPreprocessorProject));
                 Assert.IsTrue(project.FileExists("/variables.txt"));
                 Assert.IsTrue(project.DirectoryExists("/files"));
@@ -107,7 +109,8 @@ namespace SkyEditor.Core.Tests.Projects
                 var provider = manager.CurrentIOProvider;
 
                 // Create the solution
-                var solution = await ProjectBase.CreateProject<TextPreprocessorSolution>("/projects", "Test Solution", manager);                
+                var solution = await ProjectBase.CreateProject<TextPreprocessorSolution>("/projects", "Test Solution", manager);
+                await solution.Initialize();
                 await solution.LoadingTask;
 
                 // Set up the project

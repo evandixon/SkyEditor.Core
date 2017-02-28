@@ -71,9 +71,6 @@ namespace SkyEditor.Core.Projects
             output.Name = projectName;
             output.Settings = new SettingsProvider(manager);
 
-            await output.Initialize();
-            output.LoadingTask = output.Load();
-
             return output;
         }
 
@@ -125,8 +122,6 @@ namespace SkyEditor.Core.Projects
             {
                 output.AddItem(item.Key, await item.Value);
             }
-
-            output.LoadingTask = output.Load();
 
             return output;
         }
@@ -431,7 +426,18 @@ namespace SkyEditor.Core.Projects
         /// <summary>
         /// The task corresponding to the project's initialization.
         /// </summary>
-        public Task LoadingTask { get; protected set; }
+        public Task LoadingTask
+        {
+            get
+            {
+                if (_loadingTask == null)
+                {
+                    _loadingTask = Load();
+                }
+                return _loadingTask;
+            }
+        }
+        private Task _loadingTask;
 
         #endregion
 
