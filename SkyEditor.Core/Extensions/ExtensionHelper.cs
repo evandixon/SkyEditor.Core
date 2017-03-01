@@ -105,7 +105,7 @@ namespace SkyEditor.Core.Extensions
             var tempDir = provider.GetTempDirectory();
 
             //Ensure it contains no files
-            await FileSystem.EnsureDirectoryEmpty(tempDir, provider).ConfigureAwait(false);
+            await FileSystem.EnsureDirectoryExistsEmpty(tempDir, provider).ConfigureAwait(false);
 
             //Extract the given zip file to it
             await Zip.UnzipDir(extensionZipPath, tempDir, provider);

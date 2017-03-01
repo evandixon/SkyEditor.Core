@@ -39,15 +39,18 @@ namespace SkyEditor.Core.Utilities
         }
 
         /// <summary>
-        /// Ensures a directory is empty
+        /// Ensures a directory exists and is empty
         /// </summary>
         /// <param name="directoryName">Path of the directory</param>
         /// <param name="provider">I/O provider containing the directory</param>
-        public static async Task EnsureDirectoryEmpty(string directoryName, IIOProvider provider)
+        public static async Task EnsureDirectoryExistsEmpty(string directoryName, IIOProvider provider)
         {
 
             // Delete the main directory (to delete all child directories)
-            provider.DeleteDirectory(directoryName);
+            if (provider.DirectoryExists(directoryName))
+            {
+                provider.DeleteDirectory(directoryName);
+            }            
 
             // Wait until it is fully deleted (because it seems IO.Directory.Delete is asynchronous, and can't be awaited directly)
             await Task.Run(new Action(() =>
