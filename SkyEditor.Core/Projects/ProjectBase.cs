@@ -674,7 +674,7 @@ namespace SkyEditor.Core.Projects
             }
 
             var parentDir = FixPath(Path.GetDirectoryName(path));
-            if (!string.IsNullOrEmpty(parentDir) && DirectoryExists(parentDir))
+            if (!string.IsNullOrEmpty(parentDir) && !DirectoryExists(parentDir))
             {
                 CreateDirectory(parentDir);
             }
