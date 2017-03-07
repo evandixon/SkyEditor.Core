@@ -584,6 +584,15 @@ namespace SkyEditor.Core
                     if (RunningProgressReportables.Any(x => x.IsIndeterminate))
                     {
                         IsIndeterminate = true;
+
+                        if (RunningProgressReportables.Count > 1)
+                        {
+                            Message = Properties.Resources.UI_LoadingGeneric;
+                        }
+                        else
+                        {
+                            Message = RunningProgressReportables.First().Message;
+                        }
                     }
                     else
                     {
@@ -637,6 +646,7 @@ namespace SkyEditor.Core
                 if (RunningProgressReportables.Count == 0)
                 {
                     IsCompleted = true;
+                    IsIndeterminate = false;
                     Completed?.Invoke(this, new EventArgs());
                 }
             }
