@@ -277,7 +277,7 @@ namespace SkyEditor.Core.Utilities
         /// <param name="delegateFunction">The function to asynchronously run</param>
         /// <param name="collection">The collection to be enumerated</param>
         /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
-        public async Task RunFor(ForItem delegateSub, int startValue, int endValue, int stepCount = 0)
+        public async Task RunFor(ForItem delegateSub, int startValue, int endValue, int stepCount = 1)
         {
             await RunFor(i =>
             {
