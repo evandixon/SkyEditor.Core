@@ -27,8 +27,9 @@ namespace SkyEditor.Core.UI
 
         protected bool IsPropertyTypeSupported(TypeInfo type)
         {
-            var supportedTypes = new[] { typeof(string).GetTypeInfo(), typeof(int).GetTypeInfo() };
-            return supportedTypes.Contains(type);
+            return true;
+            //var supportedTypes = new[] { typeof(string).GetTypeInfo(), typeof(int).GetTypeInfo() };
+            //return supportedTypes.Contains(type);
             //Todo: add check for custom interface
         }
 
