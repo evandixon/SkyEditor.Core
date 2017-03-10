@@ -7,15 +7,11 @@ namespace SkyEditor.Core.Settings
 {
     public static class ISettingsProviderExtensions
     {
-        /// <summary>
-        /// Determines whether or not Development Mode is enabled.
-        /// </summary>
-        /// <returns>A boolean indicating whether or not Development Mode is enabled.</returns>
-        public static bool GetIsDevMode(this ISettingsProvider provider)
+        private static bool GetBooleanSetting(ISettingsProvider provider, string settingName, bool defaultValue)
         {
             bool? output = null;
 
-            var setting = provider.GetSetting(SettingNames.DevMode);
+            var setting = provider.GetSetting(settingName);
             if (setting is bool?)
             {
                 output = setting as bool?;
@@ -36,12 +32,21 @@ namespace SkyEditor.Core.Settings
             else
             {
                 // Return default if not set
-#if DEBUG
-                return true;
-#else
-                return false;
-#endif
+                return defaultValue;
             }
+        }
+
+        /// <summary>
+        /// Determines whether or not Development Mode is enabled.
+        /// </summary>
+        /// <returns>A boolean indicating whether or not Development Mode is enabled.</returns>
+        public static bool GetIsDevMode(this ISettingsProvider provider)
+        {
+#if DEBUG
+            return GetBooleanSetting(provider, SettingNames.DevMode, true);
+#else
+            return GetBooleanSetting(provider, SettingNames.DevMode, false);
+#endif
         }
 
         /// <summary>
@@ -129,6 +134,62 @@ namespace SkyEditor.Core.Settings
             var settings = GetFilesScheduledForDeletion(provider);
             settings.Remove(path);
             provider.SetSetting(SettingNames.DirectoriesForDeletion, path);
+        }
+
+        /// <summary>
+        /// Gets the endpoint URLs of the currently configured online extension collections
+        /// </summary>
+        public static IList<string> GetExtensionCollections(this ISettingsProvider provider)
+        {
+            var setting = provider.GetSetting(SettingNames.OnlineExtensionCollections) as IList<string>;
+            if (setting == null)
+            {
+                setting = new List<string>();
+                setting.Add(BuildSettings.DefaultExtensionCollection);
+                provider.SetSetting(SettingNames.OnlineExtensionCollections, setting);
+            }
+            return setting;
+        }
+
+        /// <summary>
+        /// Sets the endpoint URLs of the currently configured online extension collections
+        /// </summary>
+        /// <param name="value">IList containing the endpoint URLs of the extension collections</param>
+        public static void SetExtensionCollections(this ISettingsProvider provider, IList<string> value)
+        {
+            provider.SetSetting(SettingNames.OnlineExtensionCollections, value);
+        }
+
+        /// <summary>
+        /// Gets whether or not to check for extension updates
+        /// </summary>
+        public static bool GetCheckExtensionUpdates(this ISettingsProvider provider)
+        {
+            return GetBooleanSetting(provider, SettingNames.CheckExtensionUpdates, true);
+        }
+
+        /// <summary>
+        /// Sets whether or not to check for extension updates
+        /// </summary>
+        public static void SetCheckExtensionUpdates(this ISettingsProvider provider, bool value)
+        {
+            provider.SetSetting(SettingNames.CheckExtensionUpdates, value);
+        }
+
+        /// <summary>
+        /// Gets whether or not to automatically update extensions
+        /// </summary>
+        public static bool GetAutoUpdateExtensions(this ISettingsProvider provider)
+        {
+            return GetBooleanSetting(provider, SettingNames.AutoUpdateExtensions, true);
+        }
+
+        /// <summary>
+        /// Sets whether or not to automatically update extensions
+        /// </summary>
+        public static void SetAutoUpdateExtensions(this ISettingsProvider provider, bool value)
+        {
+            provider.SetSetting(SettingNames.AutoUpdateExtensions, value);
         }
     }
 }
