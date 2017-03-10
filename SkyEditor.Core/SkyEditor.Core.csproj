@@ -46,7 +46,7 @@
     <Compile Include="ConsoleCommands\Commands\ListProperties.cs" />
     <Compile Include="ConsoleCommands\Commands\OpenFile.cs" />
     <Compile Include="ConsoleCommands\Commands\SelectFile.cs" />
-    <Compile Include="ConsoleCommands\Commands\Settings.cs" />
+    <Compile Include="ConsoleCommands\Commands\SettingCommand.cs" />
     <Compile Include="ConsoleCommands\Commands\SolutionCommands.cs" />
     <Compile Include="ConsoleCommands\ConsoleCommand.cs" />
     <Compile Include="ConsoleCommands\ConsoleCorePlugin.cs" />

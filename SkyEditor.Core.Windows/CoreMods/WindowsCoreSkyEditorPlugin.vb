@@ -18,8 +18,8 @@ Namespace CoreMods
         Public Overrides Sub Load(manager As PluginManager)
             MyBase.Load(manager)
 
-            manager.RegisterType(GetType(ConsoleCommand), GetType(DistPrep))
-            manager.RegisterType(GetType(ConsoleCommand), GetType(GeneratePluginExtensions))
+            manager.RegisterType(Of ConsoleCommand, DistPrep)()
+            manager.RegisterType(Of ConsoleCommand, GeneratePluginExtensions)()
         End Sub
 
         Public Overrides Function IsPluginLoadingEnabled() As Boolean

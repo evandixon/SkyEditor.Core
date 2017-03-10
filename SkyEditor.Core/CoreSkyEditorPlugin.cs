@@ -1,4 +1,6 @@
 ﻿using SkyEditor.Core.ConsoleCommands;
+using SkyEditor.Core.ConsoleCommands.Commands;
+using SkyEditor.Core.ConsoleCommands.ShellCommands;
 using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
@@ -113,7 +115,22 @@ namespace SkyEditor.Core
 
             manager.RegisterType<IFileOpener, OpenableFileOpener>();
             manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
-            manager.RegisterType<IFileSaver, SavableFileSaver>();            
+            manager.RegisterType<IFileSaver, SavableFileSaver>();
+
+            // Console Commands
+            manager.RegisterType<ConsoleCommand, InstallExtension>();
+            manager.RegisterType<ConsoleCommand, ListFiles>();
+            manager.RegisterType<ConsoleCommand, ListPlugins>();
+            manager.RegisterType<ConsoleCommand, ListProperties>();
+            manager.RegisterType<ConsoleCommand, OpenFile>();
+            manager.RegisterType<ConsoleCommand, SelectFile>();
+            manager.RegisterType<ConsoleCommand, SettingCommand>();
+            manager.RegisterType<ConsoleCommand, SolutionCommands>();
+
+            // Shell Console Commands
+            manager.RegisterType<ConsoleCommand, cd>();
+            manager.RegisterType<ConsoleCommand, ls>();
+            manager.RegisterType<ConsoleCommand, mkdir>();
 
             manager.RegisterTypeRegister<IOpenableFile>();
             manager.RegisterTypeRegister<ICreatableFile>();

@@ -8,8 +8,9 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
     /// <summary>
     /// Sets a setting
     /// </summary>
-    public class Settings : ConsoleCommand
+    public class SettingCommand : ConsoleCommand
     {
+        public override string CommandName => "setting";
         public override async Task MainAsync(string[] arguments)
         {
             if (arguments.Length >= 3)
