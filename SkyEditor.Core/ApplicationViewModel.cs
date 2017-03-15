@@ -658,6 +658,8 @@ namespace SkyEditor.Core
                 {
                     IsCompleted = true;
                     IsIndeterminate = false;
+                    Progress = 1;
+                    Message = Properties.Resources.UI_Ready;
                     Completed?.Invoke(this, new EventArgs());
                 }
             }
