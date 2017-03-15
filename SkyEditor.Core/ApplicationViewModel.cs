@@ -528,8 +528,8 @@ namespace SkyEditor.Core
         public void ShowLoading(Task task)
         {
             var wrapper = new TaskProgressReporterWrapper(task, this);
-            wrapper.Start();
             ShowLoading(wrapper);
+            wrapper.Start();            
         }
 
         /// <summary>
@@ -541,8 +541,8 @@ namespace SkyEditor.Core
         public void ShowLoading(Task task, string loadingMessage)
         {
             var wrapper = new TaskProgressReporterWrapper(task, loadingMessage, this);
-            wrapper.Start();
             ShowLoading(wrapper);
+            wrapper.Start();            
         }
 
         /// <summary>
@@ -576,6 +576,7 @@ namespace SkyEditor.Core
 
         private void UpdateLoadingStatus()
         {
+            bool requiresCleanup = false;
             lock (_loadingStatusLock)
             {
                 lock (_loadingReportablesLock)
@@ -626,10 +627,20 @@ namespace SkyEditor.Core
                             Message = RunningProgressReportables.First().Message;
                         }
                     }
+
+                    // Cleanup if needed
+                    if (RunningProgressReportables.Any(x => x.IsCompleted))
+                    {
+                        requiresCleanup = true;
+                    }
                 }
             }
 
             ProgressChanged?.Invoke(this, new ProgressReportedEventArgs { IsIndeterminate = this.IsIndeterminate, Message = this.Message, Progress = this.Progress });
+            if (requiresCleanup)
+            {
+                CleanupCompletedTasks();
+            }
         }
 
         private void CleanupCompletedTasks()
