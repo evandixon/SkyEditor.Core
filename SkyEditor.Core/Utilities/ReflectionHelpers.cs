@@ -229,15 +229,16 @@ namespace SkyEditor.Core.Utilities
             {
                 foreach (var item in resxNames)
                 {
-                    manager = new ResourceManager(item.Replace(".resource", ""), parent);
+                    manager = new ResourceManager(item.Replace(".resources", ""), parent);
                     friendlyName = manager.GetString(type.FullName.Replace(".", "_"));
 
                     if (friendlyName != null) break;
                 }
             }
-            catch (MissingManifestResourceException)
+            catch (MissingManifestResourceException ex)
             {
                 // Can't find the resouce file.  Default to just using the type name, or keep searching for resource files
+                Console.WriteLine(ex.ToString());
             }
 
             return friendlyName ?? type.FullName;

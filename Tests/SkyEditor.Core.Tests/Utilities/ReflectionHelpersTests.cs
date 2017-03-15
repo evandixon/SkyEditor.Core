@@ -153,14 +153,14 @@ namespace SkyEditor.Core.Tests.Utilities
         [TestCategory(ReflectionHelperCategory)]
         public void GetTypeFriendlyNameTests()
         {
-            //Due to the nature of this function (reflection to find an entry in a resource file), we cannot fully test it.
-            //Therefore, the only requirement to pass the test is that we return a string that is not null or empty.
-            //The rest must be tested manually
-
+            // Test default names
             Assert.IsFalse(string.IsNullOrWhiteSpace(ReflectionHelpers.GetTypeFriendlyName(typeof(ReflectionHelpersTests))));
             Assert.IsFalse(string.IsNullOrWhiteSpace(ReflectionHelpers.GetTypeFriendlyName(typeof(int))));
             Assert.IsFalse(string.IsNullOrWhiteSpace(ReflectionHelpers.GetTypeFriendlyName(typeof(GenericFile))));
             Assert.IsFalse(string.IsNullOrWhiteSpace(ReflectionHelpers.GetTypeFriendlyName(typeof(Solution))));
+
+            // Test the pre-defined friendly name for TestHelpers
+            Assert.AreEqual("Test Helper Class", ReflectionHelpers.GetTypeFriendlyName(typeof(TestHelpers)));
         }
     }
 }

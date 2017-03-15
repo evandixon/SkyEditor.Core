@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationViewModel.cs" />
+    <Compile Include="BuildSettings.cs" />
     <Compile Include="ConsoleCommands\Commands\InstallExtension.cs" />
     <Compile Include="ConsoleCommands\Commands\ListFiles.cs" />
     <Compile Include="ConsoleCommands\Commands\ListPlugins.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Utilities\ParsedAssemblyQualifiedName.cs" />
     <Compile Include="Utilities\ProgressReportedEventArgs.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Utilities\SemanticVersion.cs" />
     <Compile Include="Utilities\Zip.cs" />
   </ItemGroup>
   <ItemGroup>

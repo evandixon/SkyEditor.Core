@@ -126,4 +126,7 @@
   <data name="ConsoleTests_TestRunConsole_Output" xml:space="preserve">
     <value>~/ $ The following commands are available:%nTestConsoleCommand%n~/ $ Unknown command "blarg".%n~/ $ Unknown command "testconsolecommand2".%n~/ $ True%nTestConsoleCommand%nexit%n~/ $ </value>
   </data>
+  <data name="SkyEditor_Core_Tests_TestHelpers" xml:space="preserve">
+    <value>Test Helper Class</value>
+  </data>
 </root>
