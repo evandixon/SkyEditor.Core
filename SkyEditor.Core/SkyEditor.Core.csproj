@@ -177,11 +177,6 @@
   <ItemGroup>
     <Folder Include="CorePluginDefinitions\" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Runtime.Loader">
-      <HintPath>..\packages\System.Runtime.Loader.4.3.0\lib\netstandard1.5\System.Runtime.Loader.dll</HintPath>
-    </Reference>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
