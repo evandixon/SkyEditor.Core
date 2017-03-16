@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Settings;
+using SkyEditor.Core.CorePluginDefinitions;
 
 namespace SkyEditor.Core.Tests
 {
-    public class AutoLoadTestCoreMod : CoreSkyEditorPlugin
+    public class AutoLoadTestCoreMod : DotNetCoreSkyEditorPlugin
     {
         public override string Credits
         {
