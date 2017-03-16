@@ -94,7 +94,7 @@ namespace SkyEditor.Core
         /// <returns>A boolean indicating whether or not plugin loading is enabled.</returns>
         public virtual bool IsPluginLoadingEnabled()
         {
-            return true;
+            return false;
         }
 
         /// <summary>

@@ -18,6 +18,10 @@ Namespace CoreMods
             Return WindowsReflectionHelpers.LoadAssembly(assemblyPath)
         End Function
 
+        Public Overrides Function IsPluginLoadingEnabled() As Boolean
+            Return True
+        End Function
+
     End Class
 
 End Namespace

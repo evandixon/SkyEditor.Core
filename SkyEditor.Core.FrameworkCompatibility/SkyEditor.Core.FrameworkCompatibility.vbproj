@@ -81,7 +81,7 @@
     <Compile Include="SettingsExtension.vb" />
     <Compile Include="Utilities\AssemblyReflectionManager.vb" />
     <Compile Include="Utilities\AssemblyReflectionProxy.vb" />
-    <Compile Include="CoreMods\ConsoleCoreMod.vb" />
+    <Compile Include="CorePluginDefinitions\ConsoleCoreMod.vb" />
     <Compile Include="Internal\ConsoleManager.vb" />
     <Compile Include="Processes\ConsoleApp.vb" />
     <Compile Include="EnvironmentPaths.vb" />
@@ -94,7 +94,7 @@
     <Compile Include="Processes\ProcessStatus.vb" />
     <Compile Include="Processes\StatusChangedEventArgs.vb" />
     <Compile Include="Utilities\RedistributionHelpers.vb" />
-    <Compile Include="CoreMods\WindowsCoreSkyEditorPlugin.vb" />
+    <Compile Include="CorePluginDefinitions\WindowsCoreSkyEditorPlugin.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

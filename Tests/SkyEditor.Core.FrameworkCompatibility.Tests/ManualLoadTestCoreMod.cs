@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 
-namespace SkyEditor.Core.Tests
+namespace SkyEditor.Core.FrameworkCompatibility.Tests
 {
     public class ManualLoadTestCoreMod : CoreSkyEditorPlugin
     {

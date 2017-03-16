@@ -14,6 +14,11 @@ namespace SkyEditor.Core.CorePluginDefinitions
     /// </summary>
     public abstract class DotNetCoreSkyEditorPlugin : CoreSkyEditorPlugin
     {
+        public override bool IsPluginLoadingEnabled()
+        {
+            return true;
+        }
+
         public override Assembly LoadAssembly(string assemblyPath)
         {
             if (!Path.IsPathRooted(assemblyPath))

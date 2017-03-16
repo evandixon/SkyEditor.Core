@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SkyEditor.Core.Tests
+namespace SkyEditor.Core.FrameworkCompatibility.Tests
 {
     [TestClass]
     public class PluginManagerTests
