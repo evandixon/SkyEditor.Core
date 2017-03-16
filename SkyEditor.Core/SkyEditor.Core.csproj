@@ -58,6 +58,7 @@
     <Compile Include="ConsoleCommands\ShellCommands\ls.cs" />
     <Compile Include="ConsoleCommands\ShellCommands\mkdir.cs" />
     <Compile Include="ConsoleCommands\StandardConsoleProvider.cs" />
+    <Compile Include="CorePluginDefinitions\DotNetCoreSkyEditorPlugin.cs" />
     <Compile Include="CoreSkyEditorPlugin.cs" />
     <Compile Include="ErrorInfo.cs" />
     <Compile Include="ErrorType.cs" />
@@ -174,9 +175,7 @@
       <LastGenOutput>SettingNames.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CorePluginDefinitions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

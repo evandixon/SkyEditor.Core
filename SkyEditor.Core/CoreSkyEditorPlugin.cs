@@ -122,7 +122,7 @@ namespace SkyEditor.Core
         /// <exception cref="BadImageFormatException">Thrown when the assembly is not a valid .Net assembly.</exception>
         public virtual Assembly LoadAssembly(string assemblyPath)
         {
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            throw new NotSupportedException();
         }
 
         public override void Load(PluginManager manager)

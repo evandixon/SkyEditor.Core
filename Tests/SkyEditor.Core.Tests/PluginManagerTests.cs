@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SkyEditor.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace SkyEditor.Core.Tests
     {
         private const string TestCategory = "Plugin Manager Tests";
 
-        public CoreSkyEditorPlugin core { get; set; }
-        public PluginManager manager { get; set; }
+        public CoreSkyEditorPlugin Core { get; set; }
+        public PluginManager Manager { get; set; }
 
         [TestMethod]
         [TestCategory(TestCategory)]
@@ -36,14 +37,14 @@ namespace SkyEditor.Core.Tests
         [TestCategory(TestCategory)]
         public async Task CoreModInPlugins()
         {
-            core = new BasicTestCoreMod();
-            manager = new PluginManager();
-            await manager.LoadCore(core);
+            Core = new BasicTestCoreMod();
+            Manager = new PluginManager();
+            await Manager.LoadCore(Core);
 
-            Assert.IsTrue(manager.GetPlugins().Contains(core));
-            Assert.IsNotNull(manager.CurrentIOProvider);
-            Assert.IsNotNull(manager.CurrentSettingsProvider);
-            Assert.IsNotNull(manager.CurrentConsoleProvider);
+            Assert.IsTrue(Manager.GetPlugins().Contains(Core));
+            Assert.IsNotNull(Manager.CurrentIOProvider);
+            Assert.IsNotNull(Manager.CurrentSettingsProvider);
+            Assert.IsNotNull(Manager.CurrentConsoleProvider);
         }
 
 
@@ -51,14 +52,24 @@ namespace SkyEditor.Core.Tests
         [TestCategory(TestCategory)]
         public async Task ManualPluginLoad()
         {
-            core = new ManualLoadTestCoreMod();
-            manager = new PluginManager();
-            await manager.LoadCore(core);
+            Core = new ManualLoadTestCoreMod();
+            Manager = new PluginManager();
+            await Manager.LoadCore(Core);
 
-            var plugins = manager.GetPlugins();
+            var plugins = Manager.GetPlugins();
             Assert.AreEqual(1, plugins.Where(x => x is ManualLoadPlugin.BasicTestCoreMod).Count());
         }
 
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task AutoPluginLoad()
+        {
+            Core = new AutoLoadTestCoreMod();
+            Manager = new PluginManager();
+            await Manager.LoadCore(Core);
 
+            var plugins = Manager.GetPlugins();
+            Assert.AreEqual(1, plugins.Where(x => x.PluginName == "auto-load-plugin").Count());
+        }
     }
 }

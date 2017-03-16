@@ -8,7 +8,7 @@ using SkyEditor.Core;
 
 namespace AutoLoadPlugin
 {
-    public class BasicTestCoreMod : CoreSkyEditorPlugin
+    public class BasicTestMod : SkyEditorPlugin
     {
         public override string Credits
         {
@@ -30,23 +30,8 @@ namespace AutoLoadPlugin
         {
             get
             {
-                return "plugin";
+                return "auto-load-plugin";
             }
-        }
-
-        public override string GetExtensionDirectory()
-        {
-            return "/extensions";
-        }
-
-        public override IIOProvider GetIOProvider()
-        {
-            return new MemoryIOProvider();
-        }
-
-        public override ISettingsProvider GetSettingsProvider(PluginManager manager)
-        {
-            return SettingsProvider.Open("/settings.json", manager);
         }
     }
 }
