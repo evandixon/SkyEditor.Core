@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualLoadPlugin", "Tests\M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLoadPlugin", "Tests\AutoLoadPlugin\AutoLoadPlugin.csproj", "{4F714264-5A5B-4B7C-B7AB-48CAB3719EEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sky Editor Console", "Sky Editor Console\Sky Editor Console.csproj", "{0EB22436-53AF-427E-B2D6-350F51F17960}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{4F714264-5A5B-4B7C-B7AB-48CAB3719EEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F714264-5A5B-4B7C-B7AB-48CAB3719EEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F714264-5A5B-4B7C-B7AB-48CAB3719EEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EB22436-53AF-427E-B2D6-350F51F17960}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EB22436-53AF-427E-B2D6-350F51F17960}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EB22436-53AF-427E-B2D6-350F51F17960}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EB22436-53AF-427E-B2D6-350F51F17960}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
