@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
-using SkyEditor.Core.Settings;
-using SkyEditor.Core.CorePluginDefinitions;
+using SkyEditor.Core;
 
-namespace SkyEditor.Core.Tests
+namespace AutoLoadPlugin.FrameworkCompatibility
 {
-    public class AutoLoadTestCoreMod : DotNetCoreSkyEditorPlugin
+    public class BasicTestMod : SkyEditorPlugin
     {
         public override string Credits
         {
@@ -31,15 +30,8 @@ namespace SkyEditor.Core.Tests
         {
             get
             {
-                return "plugin";
+                return "auto-load-plugin";
             }
-        }
-
-        public override ISettingsProvider GetSettingsProvider(PluginManager manager)
-        {
-            var provider = base.GetSettingsProvider(manager);
-            provider.SetIsDevMode(true);
-            return provider;
         }
     }
 }

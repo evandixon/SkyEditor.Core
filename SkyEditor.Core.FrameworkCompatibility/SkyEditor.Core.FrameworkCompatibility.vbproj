@@ -7,12 +7,13 @@
     <ProjectGuid>{8238A6A2-76AF-4741-8564-D1D2A4B067BB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>SkyEditor.Core</RootNamespace>
-    <AssemblyName>SkyEditor.Core.Windows</AssemblyName>
+    <AssemblyName>SkyEditor.Core.FrameworkCompatibility</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,7 +21,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>SkyEditor.Core.Windows.xml</DocumentationFile>
+    <DocumentationFile>SkyEditor.Core.FrameworkCompatibility.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -29,7 +30,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>SkyEditor.Core.Windows.xml</DocumentationFile>
+    <DocumentationFile>SkyEditor.Core.FrameworkCompatibility.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -139,12 +140,12 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="SkyEditor.Core.Windows.nuspec" />
+    <None Include="SkyEditor.Core.FrameworkCompatibility.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SkyEditor.Core\SkyEditor.Core.csproj">
-      <Project>{11eeeb65-532c-41ae-9340-7c82b3f6357c}</Project>
-      <Name>SkyEditor.Core</Name>
+    <ProjectReference Include="..\SkyEditor.Core\SkyEditor.Core %28Portable%29.csproj">
+      <Project>{4985bc22-88b5-422d-a0d3-b772470b2aa8}</Project>
+      <Name>SkyEditor.Core %28Portable%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

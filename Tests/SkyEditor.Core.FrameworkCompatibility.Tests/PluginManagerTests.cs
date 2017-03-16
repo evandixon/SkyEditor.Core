@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using ManualLoadPlugin.FrameworkCompatibility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkyEditor.Core.Settings;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace SkyEditor.Core.Tests
             await Manager.LoadCore(Core);
 
             var plugins = Manager.GetPlugins();
-            Assert.AreEqual(1, plugins.Where(x => x is ManualLoadPlugin.BasicTestCoreMod).Count());
+            Assert.AreEqual(1, plugins.Where(x => x is BasicTestCoreMod).Count());
         }
 
         [TestMethod]

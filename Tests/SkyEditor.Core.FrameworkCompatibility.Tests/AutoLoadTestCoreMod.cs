@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
-using SkyEditor.Core;
+using SkyEditor.Core.Settings;
 
-namespace AutoLoadPlugin
+namespace SkyEditor.Core.Tests
 {
-    public class BasicTestCoreMod : CoreSkyEditorPlugin
+    public class AutoLoadTestCoreMod : CoreSkyEditorPlugin
     {
         public override string Credits
         {
@@ -34,19 +34,11 @@ namespace AutoLoadPlugin
             }
         }
 
-        public override string GetExtensionDirectory()
-        {
-            return "/extensions";
-        }
-
-        public override IIOProvider GetIOProvider()
-        {
-            return new MemoryIOProvider();
-        }
-
         public override ISettingsProvider GetSettingsProvider(PluginManager manager)
         {
-            return SettingsProvider.Open("/settings.json", manager);
+            var provider = base.GetSettingsProvider(manager);
+            provider.SetIsDevMode(true);
+            return provider;
         }
     }
 }
