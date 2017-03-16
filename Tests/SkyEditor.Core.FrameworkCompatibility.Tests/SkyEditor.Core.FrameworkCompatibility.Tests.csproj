@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.props" Condition="Exists('..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.props')" />
-  <Import Project="..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.props" Condition="Exists('..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -61,9 +60,9 @@
       <Project>{8238a6a2-76af-4741-8564-d1d2a4b067bb}</Project>
       <Name>SkyEditor.Core.FrameworkCompatibility</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj">
-      <Project>{41127f90-b22c-4c70-9e3a-fd5bd89ef38a}</Project>
-      <Name>SkyEditor.Core</Name>
+    <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core %28Portable%29.csproj">
+      <Project>{4985bc22-88b5-422d-a0d3-b772470b2aa8}</Project>
+      <Name>SkyEditor.Core %28Portable%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -75,11 +74,8 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.props'))" />
-    <Error Condition="!Exists('..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets'))" />
     <Error Condition="!Exists('..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.props'))" />
     <Error Condition="!Exists('..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.targets'))" />
   </Target>
-  <Import Project="..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\..\SkyEditor.Core\packages\MSTest.TestAdapter.1.1.11\build\net45\MSTest.TestAdapter.targets')" />
   <Import Project="..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\..\packages\MSTest.TestAdapter.1.1.13\build\net45\MSTest.TestAdapter.targets')" />
 </Project>

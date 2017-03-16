@@ -44,9 +44,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj">
-      <Project>{41127f90-b22c-4c70-9e3a-fd5bd89ef38a}</Project>
-      <Name>SkyEditor.Core</Name>
+    <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core %28Portable%29.csproj">
+      <Project>{4985bc22-88b5-422d-a0d3-b772470b2aa8}</Project>
+      <Name>SkyEditor.Core %28Portable%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
