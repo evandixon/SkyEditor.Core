@@ -64,6 +64,10 @@
       <Project>{4985bc22-88b5-422d-a0d3-b772470b2aa8}</Project>
       <Name>SkyEditor.Core %28Portable%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ManualLoadPlugin.FrameworkCompatibility\ManualLoadPlugin.FrameworkCompatibility.csproj">
+      <Project>{9d0eb92a-50af-45f7-b794-f3aab7796530}</Project>
+      <Name>ManualLoadPlugin.FrameworkCompatibility</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
