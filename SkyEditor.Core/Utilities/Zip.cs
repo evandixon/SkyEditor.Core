@@ -49,7 +49,6 @@ namespace SkyEditor.Core.Utilities
         /// <param name="provider">I/O provider containing the zip file and the input directory</param>
         public static async Task ZipDir(string inputDir, string zipFilename, IIOProvider provider)
         {
-            var inputUri = new Uri(inputDir);
             using (var archive = provider.OpenFile(zipFilename))
             {
                 using (var zip = new ZipArchive(archive, ZipArchiveMode.Create))
@@ -58,8 +57,7 @@ namespace SkyEditor.Core.Utilities
                     {
                         using (var file = provider.OpenFileReadOnly(filename))
                         {
-                            var fileUri = new Uri(filename);
-                            var entry = zip.CreateEntry(fileUri.MakeRelativeUri(inputUri).LocalPath, CompressionLevel.Optimal);
+                            var entry = zip.CreateEntry(FileSystem.MakeRelativePath(filename, inputDir), CompressionLevel.Optimal);
                             using (var entryStream = entry.Open())
                             {
                                 await file.CopyToAsync(entryStream);

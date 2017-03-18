@@ -239,16 +239,28 @@ namespace SkyEditor.Core.TestComponents
 
         public Stream OpenFile(string filename)
         {
+            if (!FileExists(filename))
+            {
+                WriteAllBytes(filename, new byte[] { });
+            }
             return new MemoryStream(ReadAllBytes(FixPath(filename)), true);
         }
 
         public Stream OpenFileReadOnly(string filename)
         {
+            if (!FileExists(filename))
+            {
+                WriteAllBytes(filename, new byte[] { });
+            }
             return new MemoryStream(ReadAllBytes(FixPath(filename)), false);
         }
 
         public Stream OpenFileWriteOnly(string filename)
         {
+            if (!FileExists(filename))
+            {
+                WriteAllBytes(filename, new byte[] { });
+            }
             return new MemoryStream(ReadAllBytes(FixPath(filename)), true);
         }
 

@@ -89,6 +89,11 @@ namespace SkyEditor.Core.Extensions
         public List<string> ExtensionFiles { get; set; }
 
         /// <summary>
+        /// List of extension dependencies that must be satisfied before installing this extension
+        /// </summary>
+        public List<ExtensionDependency> Dependencies { get; set; }
+
+        /// <summary>
         /// Whether or not the extension is installed
         /// </summary>
         public bool IsInstalled { get; set; }
