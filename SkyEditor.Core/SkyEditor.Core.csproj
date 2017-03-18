@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Version>4.1.0</Version>
+    <Version>4.1.0-*</Version>
     <Description>Plugin and MVVM framework</Description>
   </PropertyGroup>
 
