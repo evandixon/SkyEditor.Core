@@ -45,6 +45,7 @@
     <Compile Include="ConsoleCommands\Commands\ListFiles.cs" />
     <Compile Include="ConsoleCommands\Commands\ListPlugins.cs" />
     <Compile Include="ConsoleCommands\Commands\ListProperties.cs" />
+    <Compile Include="ConsoleCommands\Commands\Notes.cs" />
     <Compile Include="ConsoleCommands\Commands\OpenFile.cs" />
     <Compile Include="ConsoleCommands\Commands\SelectFile.cs" />
     <Compile Include="ConsoleCommands\Commands\SettingCommand.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="CoreSkyEditorPlugin.cs" />
     <Compile Include="ErrorInfo.cs" />
     <Compile Include="ErrorType.cs" />
+    <Compile Include="Extensions\ExtensionDependency.cs" />
     <Compile Include="Extensions\ExtensionHelper.cs" />
     <Compile Include="Extensions\ExtensionInfo.cs" />
     <Compile Include="Extensions\ExtensionInstallResult.cs" />
@@ -69,12 +71,17 @@
     <Compile Include="Extensions\IExtensionCollection.cs" />
     <Compile Include="Extensions\InstalledExtensionCollection.cs" />
     <Compile Include="Extensions\LocalExtensionCollection.cs" />
+    <Compile Include="Extensions\NoteExtension.cs" />
     <Compile Include="Extensions\Online\ExtensionCollectionModel.cs" />
     <Compile Include="Extensions\Online\OnlineCollectionInfo.cs" />
     <Compile Include="Extensions\Online\OnlineExtensionCollection.cs" />
     <Compile Include="Extensions\Online\RootCollectionResponse.cs" />
     <Compile Include="Extensions\PluginExtensionType.cs" />
     <Compile Include="IO\DetectableFileTypeDetector.cs" />
+    <Compile Include="IO\FileTemplates\FileTemplate.cs" />
+    <Compile Include="IO\FileTemplates\FileTemplateExtensionCollection.cs" />
+    <Compile Include="IO\FileTemplates\FileTemplateInfo.cs" />
+    <Compile Include="IO\FileTemplates\IPlaceholderApplier.cs" />
     <Compile Include="IO\FileTypeDetectionResult.cs" />
     <Compile Include="IO\GenericFile.cs" />
     <Compile Include="IO\ICreatableFile.cs" />
@@ -102,6 +109,7 @@
     <Compile Include="Projects\DirectoryStructureComparer.cs" />
     <Compile Include="Projects\ItemAddedEventArgs.cs" />
     <Compile Include="Projects\ItemRemovedEventArgs.cs" />
+    <Compile Include="Projects\NoteProject.cs" />
     <Compile Include="Projects\Project.cs" />
     <Compile Include="Projects\ProjectAddedEventArgs.cs" />
     <Compile Include="Projects\ProjectBase.cs" />
