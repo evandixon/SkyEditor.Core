@@ -64,7 +64,7 @@ namespace SkyEditor.Core.Extensions
             extensions.AddRange(base.GetExtensions(manager));
             if (manager.CurrentSettingsProvider.GetIsDevMode())
             {
-                //Load the development plugins
+                // Load the development plugins
                 var devDir = GetDevDirectory();
                 ExtensionInfo info = new ExtensionInfo();
                 info.ID = Guid.Empty.ToString();
@@ -115,11 +115,6 @@ namespace SkyEditor.Core.Extensions
         {
             CurrentPluginManager.CurrentSettingsProvider.ScheduleDirectoryForDeletion(GetExtensionDirectory(extensionID));
             return Task.FromResult(ExtensionUninstallResult.RestartRequired);
-        }
-
-        public override Task<IEnumerable<IExtensionCollection>> GetChildCollections(PluginManager manager)
-        {
-            return Task.FromResult(Enumerable.Empty<IExtensionCollection>());
         }
 
     }
