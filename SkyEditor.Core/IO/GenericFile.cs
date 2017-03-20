@@ -685,6 +685,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="length">Length of the range to read.</param>
+        /// <param name="value">The data to write</param>
         public void Write(long index, int length, byte[] value)
         {
             if (IsReadOnly)
@@ -726,6 +727,39 @@ namespace SkyEditor.Core.IO
                     lock (_fileAccessLock)
                     {
                         Write(index, length, value);
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// Writes a range of bytes to the file.  Not thread-safe.
+        /// </summary>
+        /// <param name="index">Index from which to retrieve the byte.</param>
+        /// <param name="value">The data to write</param>
+        public void Write(long index, byte[] value)
+        {
+            Write(index, value.Length, value);
+        }
+
+        /// <summary>
+        /// Writes a range of bytes to the file.  Thread-safe.
+        /// </summary>
+        /// <param name="index">Index from which to retrieve the byte.</param>
+        /// <param name="value">The data to write</param>
+        public async Task WriteAsync(long index, byte[] value)
+        {
+            if (IsThreadSafe)
+            {
+                Write(index, value);
+            }
+            else
+            {
+                await Task.Run(() =>
+                {
+                    lock (_fileAccessLock)
+                    {
+                        Write(index, value);
                     }
                 });
             }
@@ -1373,6 +1407,41 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
+        /// Writes a string with the given encoding to the given offset of the file.  Not thread-safe
+        /// </summary>
+        /// <param name="index">Index of the file to write</param>
+        /// <param name="e">The encoding to use</param>
+        /// <param name="value">The string to write.  The entire string will be written without an ending null character.</param>
+        public void WriteString(long index, Encoding e, string value)
+        {
+            Write(index, e.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes a string with the given encoding to the given offset of the file.  Thread-safe.
+        /// </summary>
+        /// <param name="index">Index of the file to write</param>
+        /// <param name="e">The encoding to use</param>
+        /// <param name="value">The string to write.  The entire string will be written without an ending null character.</param>
+        public async Task WriteStringAsync(long index, Encoding e, string value)
+        {
+            if (IsThreadSafe)
+            {
+                WriteString(index, e, value);
+            }
+            else
+            {
+                await Task.Run(() =>
+                {
+                    lock (_fileAccessLock)
+                    {
+                        WriteString(index, e, value);
+                    }
+                });
+            }
+        }
+
+        /// <summary>
         /// Reads a null-terminated string using the given encoding.  This method is not thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the string</param>
@@ -1411,6 +1480,43 @@ namespace SkyEditor.Core.IO
                     lock (_fileAccessLock)
                     {
                         return ReadNullTerminatedString(index, e);
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// Writes a string with the given encoding to the given offset of the file.  Not thread-safe
+        /// </summary>
+        /// <param name="index">Index of the file to write</param>
+        /// <param name="e">The encoding to use</param>
+        /// <param name="value">The string to write.  The entire string will be written with an ending null character.</param>
+        public void WriteNullTerminatedString(long index, Encoding e, string value)
+        {
+            var data = e.GetBytes(value);
+            Write(index, data);
+            Write(index + data.Length, 0);
+        }
+
+        /// <summary>
+        /// Writes a string with the given encoding to the given offset of the file.  Thread-safe.
+        /// </summary>
+        /// <param name="index">Index of the file to write</param>
+        /// <param name="e">The encoding to use</param>
+        /// <param name="value">The string to write.  The entire string will be written with an ending null character.</param>
+        public async Task WriteNullTerminatedStringAsync(long index, Encoding e, string value)
+        {
+            if (IsThreadSafe)
+            {
+                WriteNullTerminatedString(index, e, value);
+            }
+            else
+            {
+                await Task.Run(() =>
+                {
+                    lock (_fileAccessLock)
+                    {
+                        WriteNullTerminatedString(index, e, value);
                     }
                 });
             }

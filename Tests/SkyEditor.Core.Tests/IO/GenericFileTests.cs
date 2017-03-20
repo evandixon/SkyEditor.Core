@@ -1076,6 +1076,62 @@ namespace SkyEditor.Core.Tests.IO
                 Assert.AreEqual("Pokémon", await f.ReadNullTerminatedStringAsync(0, Encoding.UTF8));
             }
         }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void WriteString_Sync()
+        {
+            using (var f = new GenericFile())
+            {
+                var original = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x01 };
+                f.CreateFile(original);
+                f.WriteString(0, Encoding.UTF8, "Pokémon");
+                f.WriteString(9, Encoding.UTF8, "1234567");
+                Assert.IsTrue(new byte[] { 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x01, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x01 }.SequenceEqual(f.Read()));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task WriteString_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                var original = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x01 };
+                f.CreateFile(original);
+                await f.WriteStringAsync(0, Encoding.UTF8, "Pokémon");
+                await f.WriteStringAsync(9, Encoding.UTF8, "1234567");
+                Assert.IsTrue(new byte[] { 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x01, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x01 }.SequenceEqual(await f.ReadAsync()));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void WriteNullTerminatedString_Sync()
+        {
+            using (var f = new GenericFile())
+            {
+                var original = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x01 };
+                f.CreateFile(original);
+                f.WriteNullTerminatedString(0, Encoding.UTF8, "Pokémon");
+                f.WriteNullTerminatedString(9, Encoding.UTF8, "1234567");
+                Assert.IsTrue(new byte[] { 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x00, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x00 }.SequenceEqual(f.Read()));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task WriteNullTerminatedString_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                var original = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x01 };
+                f.CreateFile(original);
+                await f.WriteNullTerminatedStringAsync(0, Encoding.UTF8, "Pokémon");
+                await f.WriteNullTerminatedStringAsync(9, Encoding.UTF8, "1234567");
+                Assert.IsTrue(new byte[] { 0x50, 0x6F, 0x6B, 0xC3, 0xA9, 0x6D, 0x6F, 0x6E, 0x00, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x00 }.SequenceEqual(await f.ReadAsync()));
+            }
+        }
         #endregion
 
     }
