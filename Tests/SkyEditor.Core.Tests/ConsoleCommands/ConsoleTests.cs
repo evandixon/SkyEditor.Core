@@ -98,7 +98,8 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
             public override void Load(PluginManager manager)
             {
-                base.Load(manager);
+                // Do NOT load base.  That would register more console commands than wanted here.
+                // base.Load(manager);
                 manager.RegisterType<ConsoleCommand, TestConsoleCommand>();
             }
         }

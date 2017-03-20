@@ -11,8 +11,8 @@
 namespace SkyEditor.Core.Settings {
     using System;
     using System.Reflection;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -62,6 +62,24 @@ namespace SkyEditor.Core.Settings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SkyEditor.Core.Settings.AutoUpdateExtensions.
+        /// </summary>
+        internal static string AutoUpdateExtensions {
+            get {
+                return ResourceManager.GetString("AutoUpdateExtensions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SkyEditor.Core.Settings.CheckExtensionUpdates.
+        /// </summary>
+        internal static string CheckExtensionUpdates {
+            get {
+                return ResourceManager.GetString("CheckExtensionUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SkyEditor.Core.Settings.IsDevMode.
         /// </summary>
         internal static string DevMode {
@@ -85,6 +103,15 @@ namespace SkyEditor.Core.Settings {
         internal static string FilesForDeletion {
             get {
                 return ResourceManager.GetString("FilesForDeletion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SkyEditor.Core.Settings.OnlineExtensionCollections.
+        /// </summary>
+        internal static string OnlineExtensionCollections {
+            get {
+                return ResourceManager.GetString("OnlineExtensionCollections", resourceCulture);
             }
         }
     }

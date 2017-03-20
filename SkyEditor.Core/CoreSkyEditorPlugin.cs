@@ -1,4 +1,6 @@
 ﻿using SkyEditor.Core.ConsoleCommands;
+using SkyEditor.Core.ConsoleCommands.Commands;
+using SkyEditor.Core.ConsoleCommands.ShellCommands;
 using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
@@ -6,8 +8,10 @@ using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 
 namespace SkyEditor.Core
@@ -18,11 +22,34 @@ namespace SkyEditor.Core
     public abstract class CoreSkyEditorPlugin : SkyEditorPlugin
     {
 
+        #region Environment Paths
+
+        protected virtual string GetRootResourceDirectory()
+        {
+            string path = "Resources";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
+
+        protected virtual string GetSettingsFilename()
+        {
+            return Path.Combine(GetRootResourceDirectory(), "settings.json");
+        }
+
+        #endregion
+
         /// <summary>
         /// Creates an instance of the <see cref="IIOProvider"/> for the application environment.
         /// </summary>
         /// <returns>An instance of the <see cref="IIOProvider"/> for the application environment.</returns>
-        public abstract IIOProvider GetIOProvider();
+        /// <remarks>Defaults to <see cref="PhysicalIOProvider"/> unless overridden.</remarks>
+        public virtual IIOProvider GetIOProvider()
+        {
+            return new PhysicalIOProvider();
+        }
 
         /// <summary>
         /// Creates an instance of the <see cref="ISettingsProvider"/> for the application environment.
@@ -31,7 +58,7 @@ namespace SkyEditor.Core
         /// <returns>An instance of the <see cref="ISettingsProvider"/> for the application environment.</returns>
         public virtual ISettingsProvider GetSettingsProvider(PluginManager manager)
         {
-            return new SettingsProvider(manager);
+            return SettingsProvider.Open(GetSettingsFilename(), manager);
         }
 
         /// <summary>
@@ -40,7 +67,7 @@ namespace SkyEditor.Core
         /// <returns>An instance of the <see cref="IConsoleProvider"/> for the application environment.</returns>
         public virtual IConsoleProvider GetConsoleProvider()
         {
-            return new DummyConsoleProvider();
+            return new StandardConsoleProvider();
         }
 
         /// <summary>
@@ -56,7 +83,10 @@ namespace SkyEditor.Core
         /// Gets the full path of the directory inside the current IO provider where extensions are stored.
         /// </summary>
         /// <returns>tThe full path of the directory inside the current IO provider where extensions are stored.</returns>
-        public abstract string GetExtensionDirectory();
+        public virtual string GetExtensionDirectory()
+        {
+            return Path.Combine(GetRootResourceDirectory(), "Extensions");
+        }
 
         /// <summary>
         /// Gets whether or not to enable dynamicaly loading plugins.
@@ -113,7 +143,22 @@ namespace SkyEditor.Core
 
             manager.RegisterType<IFileOpener, OpenableFileOpener>();
             manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
-            manager.RegisterType<IFileSaver, SavableFileSaver>();            
+            manager.RegisterType<IFileSaver, SavableFileSaver>();
+
+            // Console Commands
+            manager.RegisterType<ConsoleCommand, InstallExtension>();
+            manager.RegisterType<ConsoleCommand, ListFiles>();
+            manager.RegisterType<ConsoleCommand, ListPlugins>();
+            manager.RegisterType<ConsoleCommand, ListProperties>();
+            manager.RegisterType<ConsoleCommand, OpenFile>();
+            manager.RegisterType<ConsoleCommand, SelectFile>();
+            manager.RegisterType<ConsoleCommand, SettingCommand>();
+            manager.RegisterType<ConsoleCommand, SolutionCommands>();
+
+            // Shell Console Commands
+            manager.RegisterType<ConsoleCommand, cd>();
+            manager.RegisterType<ConsoleCommand, ls>();
+            manager.RegisterType<ConsoleCommand, mkdir>();
 
             manager.RegisterTypeRegister<IOpenableFile>();
             manager.RegisterTypeRegister<ICreatableFile>();

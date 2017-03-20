@@ -29,7 +29,7 @@ namespace SkyEditor.Core.Extensions
         /// <summary>
         /// Gets the <see cref="LocalExtensionCollection"/> with the given type name
         /// </summary>
-        /// <param name="extensionTypeName">Name of the type of the extension</param>
+        /// <param name="extensionTypeName">Name of the type of the extension bank</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>An instance of <see cref="ExtensionType"/> corresponsing to <paramref name="extensionTypeName"/>, or null if it cannot be found</returns>
         public static LocalExtensionCollection GetExtensionBank(string extensionTypeName, PluginManager manager)
@@ -49,6 +49,25 @@ namespace SkyEditor.Core.Extensions
                 }
             }
             return ExtensionBanks[extensionTypeName];
+        }
+
+        /// <summary>
+        /// Gets the <see cref="LocalExtensionCollection"/> with the given type name
+        /// </summary>
+        /// <typeparam name="T">Type of the extension bank</typeparam>
+        /// <param name="manager">Instance of the current plugin manager</param>
+        /// <returns>An instance of <see cref="ExtensionType"/> corresponsing to <paramref name="extensionTypeName"/>, or null if it cannot be found</returns>
+        public static T GetExtensionBank<T>(PluginManager manager) where T : LocalExtensionCollection
+        {
+            var extensionTypeName = typeof(T).AssemblyQualifiedName;
+            if (!ExtensionBanks.ContainsKey(extensionTypeName))
+            {
+                var extensionType = typeof(T);
+                var bank = ReflectionHelpers.CreateInstance(extensionType) as LocalExtensionCollection;
+                bank.CurrentPluginManager = manager;
+                ExtensionBanks.Add(extensionTypeName, bank);
+            }
+            return ExtensionBanks[extensionTypeName] as T;
         }
 
         /// <summary>

@@ -180,6 +180,11 @@ namespace SkyEditor.Core
                             }
                         }
                     }
+                    catch (FileLoadException)
+                    {
+                        // The assembly is a bad assembly.  We can continue loading plugins, but not with this
+                        FailedPluginLoads.Add(item);
+                    }
                     catch (BadImageFormatException)
                     {
                         // The assembly is a bad assembly.  We can continue loading plugins, but not with this

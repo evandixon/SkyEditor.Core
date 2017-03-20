@@ -80,6 +80,7 @@ namespace SkyEditor.Core.Utilities
             }
             var absolutePath = new Uri("file://" + targetPath.Replace('\\','/'));
             var otherPath = new Uri("file://" + otherPathString);
+
             return Uri.UnescapeDataString(otherPath.MakeRelativeUri(absolutePath).OriginalString);
         }
     }

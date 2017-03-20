@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.Settings;
+using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -63,7 +64,7 @@ namespace SkyEditor.Core.Extensions
             extensions.AddRange(base.GetExtensions(manager));
             if (manager.CurrentSettingsProvider.GetIsDevMode())
             {
-                //Load the development plugins
+                // Load the development plugins
                 var devDir = GetDevDirectory();
                 ExtensionInfo info = new ExtensionInfo();
                 info.ID = Guid.Empty.ToString();
@@ -73,6 +74,7 @@ namespace SkyEditor.Core.Extensions
                 info.IsInstalled = true;
                 info.IsEnabled = true;
                 info.Version = Properties.Resources.PluginDevExtVersion;
+                
                 if (manager.CurrentIOProvider.DirectoryExists(devDir))
                 {
                     foreach (var item in manager.CurrentIOProvider.GetFiles(devDir, "*.dll", true))
@@ -82,6 +84,22 @@ namespace SkyEditor.Core.Extensions
                     foreach (var item in manager.CurrentIOProvider.GetFiles(devDir, "*.exe", true))
                     {
                         info.ExtensionFiles.Add(Path.GetFileName(item));
+                    }
+
+                    if (info.ExtensionFiles.Count == 0)
+                    {
+                        // Look in each subdirectory if the root was empty
+                        foreach (var dir in manager.CurrentIOProvider.GetDirectories(devDir, true))
+                        {
+                            foreach (var item in manager.CurrentIOProvider.GetFiles(dir, "*.dll", true))
+                            {
+                                info.ExtensionFiles.Add(dir + "/" + Path.GetFileName(item));
+                            }
+                            foreach (var item in manager.CurrentIOProvider.GetFiles(dir, "*.exe", true))
+                            {
+                                info.ExtensionFiles.Add(dir + "/" + Path.GetFileName(item));
+                            }
+                        }
                     }
                 }
                 extensions.Add(info);
@@ -97,11 +115,6 @@ namespace SkyEditor.Core.Extensions
         {
             CurrentPluginManager.CurrentSettingsProvider.ScheduleDirectoryForDeletion(GetExtensionDirectory(extensionID));
             return Task.FromResult(ExtensionUninstallResult.RestartRequired);
-        }
-
-        public override Task<IEnumerable<IExtensionCollection>> GetChildCollections(PluginManager manager)
-        {
-            return Task.FromResult(Enumerable.Empty<IExtensionCollection>());
         }
 
     }

@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4985BC22-88B5-422D-A0D3-B772470B2AA8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SkyEditor.Core</RootNamespace>
+    <AssemblyName>SkyEditor.Core</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="project.json" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApplicationViewModel.cs" />
+    <Compile Include="BuildSettings.cs" />
+    <Compile Include="ConsoleCommands\Commands\InstallExtension.cs" />
+    <Compile Include="ConsoleCommands\Commands\ListFiles.cs" />
+    <Compile Include="ConsoleCommands\Commands\ListPlugins.cs" />
+    <Compile Include="ConsoleCommands\Commands\ListProperties.cs" />
+    <Compile Include="ConsoleCommands\Commands\Notes.cs" />
+    <Compile Include="ConsoleCommands\Commands\OpenFile.cs" />
+    <Compile Include="ConsoleCommands\Commands\SelectFile.cs" />
+    <Compile Include="ConsoleCommands\Commands\SettingCommand.cs" />
+    <Compile Include="ConsoleCommands\Commands\SolutionCommands.cs" />
+    <Compile Include="ConsoleCommands\ConsoleCommand.cs" />
+    <Compile Include="ConsoleCommands\ConsoleCorePlugin.cs" />
+    <Compile Include="ConsoleCommands\ConsoleShell.cs" />
+    <Compile Include="ConsoleCommands\DummyConsoleProvider.cs" />
+    <Compile Include="ConsoleCommands\IConsoleProvider.cs" />
+    <Compile Include="ConsoleCommands\ShellCommands\cd.cs" />
+    <Compile Include="ConsoleCommands\ShellCommands\ls.cs" />
+    <Compile Include="ConsoleCommands\ShellCommands\mkdir.cs" />
+    <Compile Include="ConsoleCommands\StandardConsoleProvider.cs" />
+    <Compile Include="CorePluginDefinitions\DotNetCoreSkyEditorPlugin.cs" />
+    <Compile Include="CoreSkyEditorPlugin.cs" />
+    <Compile Include="ErrorInfo.cs" />
+    <Compile Include="ErrorType.cs" />
+    <Compile Include="Extensions\ExtensionDependency.cs" />
+    <Compile Include="Extensions\ExtensionHelper.cs" />
+    <Compile Include="Extensions\ExtensionInfo.cs" />
+    <Compile Include="Extensions\ExtensionInstallResult.cs" />
+    <Compile Include="Extensions\ExtensionUninstallResult.cs" />
+    <Compile Include="Extensions\IExtensionCollection.cs" />
+    <Compile Include="Extensions\InstalledExtensionCollection.cs" />
+    <Compile Include="Extensions\LocalExtensionCollection.cs" />
+    <Compile Include="Extensions\NoteExtension.cs" />
+    <Compile Include="Extensions\Online\ExtensionCollectionModel.cs" />
+    <Compile Include="Extensions\Online\OnlineCollectionInfo.cs" />
+    <Compile Include="Extensions\Online\OnlineExtensionCollection.cs" />
+    <Compile Include="Extensions\Online\RootCollectionResponse.cs" />
+    <Compile Include="Extensions\PluginExtensionType.cs" />
+    <Compile Include="IO\DetectableFileTypeDetector.cs" />
+    <Compile Include="IO\FileTemplates\FileTemplate.cs" />
+    <Compile Include="IO\FileTemplates\FileTemplateExtensionCollection.cs" />
+    <Compile Include="IO\FileTemplates\FileTemplateInfo.cs" />
+    <Compile Include="IO\FileTemplates\IPlaceholderApplier.cs" />
+    <Compile Include="IO\FileTypeDetectionResult.cs" />
+    <Compile Include="IO\GenericFile.cs" />
+    <Compile Include="IO\ICreatableFile.cs" />
+    <Compile Include="IO\IDetectableFileType.cs" />
+    <Compile Include="IO\IDirectoryTypeDetector.cs" />
+    <Compile Include="IO\IFileOpener.cs" />
+    <Compile Include="IO\IFileSaver.cs" />
+    <Compile Include="IO\IFileTypeDetector.cs" />
+    <Compile Include="IO\IIOProvider.cs" />
+    <Compile Include="IO\INotifyModified.cs" />
+    <Compile Include="IO\IOHelper.cs" />
+    <Compile Include="IO\IOnDisk.cs" />
+    <Compile Include="IO\IOpenableFile.cs" />
+    <Compile Include="IO\ISavable.cs" />
+    <Compile Include="IO\ISavableAs.cs" />
+    <Compile Include="IO\OpenableFileOpener.cs" />
+    <Compile Include="IO\PhysicalIOProvider.cs" />
+    <Compile Include="IO\SavableFileSaver.cs" />
+    <Compile Include="IO\TextFile.cs" />
+    <Compile Include="ISettingsProvider.cs" />
+    <Compile Include="PluginManager.cs" />
+    <Compile Include="Projects\BuildStatus.cs" />
+    <Compile Include="Projects\DirectoryCreatedEventArgs.cs" />
+    <Compile Include="Projects\DirectoryDeletedEventArgs.cs" />
+    <Compile Include="Projects\DirectoryStructureComparer.cs" />
+    <Compile Include="Projects\ItemAddedEventArgs.cs" />
+    <Compile Include="Projects\ItemRemovedEventArgs.cs" />
+    <Compile Include="Projects\NoteProject.cs" />
+    <Compile Include="Projects\Project.cs" />
+    <Compile Include="Projects\ProjectAddedEventArgs.cs" />
+    <Compile Include="Projects\ProjectBase.cs" />
+    <Compile Include="Projects\ProjectCircularReferenceException.cs" />
+    <Compile Include="Projects\ProjectFileAddedEventArgs.cs" />
+    <Compile Include="Projects\ProjectFileWrapper.cs" />
+    <Compile Include="Projects\ProjectRemovedEventArgs.cs" />
+    <Compile Include="Projects\ProjectRemovingEventArgs.cs" />
+    <Compile Include="Projects\Solution.cs" />
+    <Compile Include="Projects\UnsupportedProject.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.fr.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.fr.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsProvider.cs" />
+    <Compile Include="Settings\ISettingsProviderExtensions.cs" />
+    <Compile Include="Settings\SettingNames.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SettingNames.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SkyEditorPlugin.cs" />
+    <Compile Include="TestComponents\MemoryConsoleProvider.cs" />
+    <Compile Include="TestComponents\MemoryIOProvider.cs" />
+    <Compile Include="TestComponents\TextPreprocessorProject.cs" />
+    <Compile Include="TestComponents\TextPreprocessorSolution.cs" />
+    <Compile Include="TypeRegisteredEventArgs.cs" />
+    <Compile Include="UI\ActionMenuItem.cs" />
+    <Compile Include="UI\AnchorableViewModel.cs" />
+    <Compile Include="UI\FileClosedEventArgs.cs" />
+    <Compile Include="UI\FileClosingEventArgs.cs" />
+    <Compile Include="UI\FileOpenedEventArgs.cs" />
+    <Compile Include="UI\FileViewModel.cs" />
+    <Compile Include="UI\GenericViewModel.cs" />
+    <Compile Include="UI\HeaderUpdatedEventArgs.cs" />
+    <Compile Include="UI\IViewControl.cs" />
+    <Compile Include="UI\MenuAction.cs" />
+    <Compile Include="UI\MenuItemInfo.cs" />
+    <Compile Include="UI\ReflectionViewModel.cs" />
+    <Compile Include="UI\RelayCommand.cs" />
+    <Compile Include="UI\UIHelper.cs" />
+    <Compile Include="Utilities\AsyncFor.cs" />
+    <Compile Include="Utilities\FileSystem.cs" />
+    <Compile Include="Utilities\INamed.cs" />
+    <Compile Include="Utilities\IReportProgress.cs" />
+    <Compile Include="Utilities\Json.cs" />
+    <Compile Include="Utilities\ParsedAssemblyQualifiedName.cs" />
+    <Compile Include="Utilities\ProgressReportedEventArgs.cs" />
+    <Compile Include="Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Utilities\SemanticVersion.cs" />
+    <Compile Include="Utilities\Zip.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.fr.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.fr.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings\SettingNames.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SettingNames.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
