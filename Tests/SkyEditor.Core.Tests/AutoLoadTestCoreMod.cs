@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Settings;
-using SkyEditor.Core.CorePluginDefinitions;
+using SkyEditor.Core.PluginLoaderCore;
 
 namespace SkyEditor.Core.Tests
 {

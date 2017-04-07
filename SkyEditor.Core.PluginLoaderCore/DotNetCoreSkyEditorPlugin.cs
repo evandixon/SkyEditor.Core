@@ -7,7 +7,7 @@ using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SkyEditor.Core.CorePluginDefinitions
+namespace SkyEditor.Core.PluginLoaderCore
 {
     /// <summary>
     /// The base class of a plugin that runs on .Net Core
