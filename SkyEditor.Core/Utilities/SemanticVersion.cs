@@ -160,5 +160,10 @@ namespace SkyEditor.Core.Utilities
             var other = obj as SemanticVersion;
             return other != null && this.Major == other.Major && this.Minor == other.Minor && this.Patch == other.Patch && this.Build == other.Build && this.PreReleaseTag == other.PreReleaseTag && this.Metadata == other.Metadata;
         }
+
+        public override int GetHashCode()
+        {
+            return this.Major.GetHashCode() ^ this.Minor.GetHashCode() ^ this.Patch.GetHashCode() ^ this.Build.GetHashCode() ^ this.PreReleaseTag.GetHashCode() ^ this.Metadata.GetHashCode();
+        }
     }
 }
