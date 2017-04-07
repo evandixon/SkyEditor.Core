@@ -59,7 +59,6 @@
     <Compile Include="ConsoleCommands\ShellCommands\ls.cs" />
     <Compile Include="ConsoleCommands\ShellCommands\mkdir.cs" />
     <Compile Include="ConsoleCommands\StandardConsoleProvider.cs" />
-    <Compile Include="CorePluginDefinitions\DotNetCoreSkyEditorPlugin.cs" />
     <Compile Include="CoreSkyEditorPlugin.cs" />
     <Compile Include="ErrorInfo.cs" />
     <Compile Include="ErrorType.cs" />
