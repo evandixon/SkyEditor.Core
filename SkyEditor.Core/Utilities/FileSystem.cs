@@ -29,8 +29,11 @@ namespace SkyEditor.Core.Utilities
                 }
             }
 
-            AsyncFor f = new AsyncFor();
-            f.RunSynchronously = false;
+            AsyncFor f = new AsyncFor
+            {
+                RunSynchronously = false
+            };
+
             await f.RunForEach(files, path =>
             {
                 string dest = path.Replace(sourceDirectory, destinationDirectory);
@@ -50,7 +53,7 @@ namespace SkyEditor.Core.Utilities
             if (provider.DirectoryExists(directoryName))
             {
                 provider.DeleteDirectory(directoryName);
-            }            
+            }
 
             // Wait until it is fully deleted (because it seems IO.Directory.Delete is asynchronous, and can't be awaited directly)
             await Task.Run(new Action(() =>
@@ -78,7 +81,7 @@ namespace SkyEditor.Core.Utilities
             {
                 otherPathString += "/";
             }
-            var absolutePath = new Uri("file://" + targetPath.Replace('\\','/'));
+            var absolutePath = new Uri("file://" + targetPath.Replace('\\', '/'));
             var otherPath = new Uri("file://" + otherPathString);
 
             return Uri.UnescapeDataString(otherPath.MakeRelativeUri(absolutePath).OriginalString);

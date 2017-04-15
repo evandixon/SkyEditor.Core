@@ -91,7 +91,18 @@ namespace SkyEditor.Core.Extensions.Online
 
         public async Task<IEnumerable<ExtensionInfo>> GetExtensions(int skip, int take, PluginManager manager)
         {
-            var responseRaw = await Client.GetStringAsync((await GetResponse().ConfigureAwait(false)).GetExtensionListEndpoint + $"/{skip}/{take}");
+            bool serverSidePaging = (await GetResponse().ConfigureAwait(false)).EnablePaging;
+            string pagingUrlExtension;
+            if (serverSidePaging)
+            {
+                pagingUrlExtension = $"/{skip}/{take}";                
+            }
+            else
+            {
+                pagingUrlExtension = string.Empty;
+            }
+
+            var responseRaw = await Client.GetStringAsync((await GetResponse().ConfigureAwait(false)).GetExtensionListEndpoint + pagingUrlExtension);
             var response = Json.Deserialize<List<OnlineExtensionInfo>>(responseRaw);
 
             int i = skip;
@@ -110,7 +121,14 @@ namespace SkyEditor.Core.Extensions.Online
                 i++;
             }
 
-            return response;
+            if (serverSidePaging)
+            {
+                return response;
+            }
+            else
+            {
+                return response.Skip(skip).Take(take);
+            }
         }
 
         public async Task<ExtensionInstallResult> InstallExtension(string extensionID, string version, PluginManager manager)

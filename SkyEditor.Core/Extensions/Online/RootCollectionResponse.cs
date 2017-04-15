@@ -14,5 +14,6 @@ namespace SkyEditor.Core.Extensions.Online
         public int ExtensionCount { get; set; }
         public string GetExtensionListEndpoint { get; set; }
         public string DownloadExtensionEndpoint { get; set; }
+        public bool EnablePaging { get; internal set; }
     }
 }
