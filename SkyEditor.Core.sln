@@ -3,28 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core", "SkyEditor.Core\SkyEditor.Core.csproj", "{BB24A2F7-759B-4092-84CF-9FF3131B7D4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyEditor.Core", "SkyEditor.Core\SkyEditor.Core.csproj", "{BB24A2F7-759B-4092-84CF-9FF3131B7D4D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1828C80A-B664-42F3-8183-B31219DFEF5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core.Tests", "Tests\SkyEditor.Core.Tests\SkyEditor.Core.Tests.csproj", "{AC8FBB99-A78C-4234-96D5-F912DC91F8BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyEditor.Core.Tests", "Tests\SkyEditor.Core.Tests\SkyEditor.Core.Tests.csproj", "{AC8FBB99-A78C-4234-96D5-F912DC91F8BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualLoadPlugin", "Tests\ManualLoadPlugin\ManualLoadPlugin.csproj", "{F500D302-0049-43DC-8229-DDA43B07A655}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManualLoadPlugin", "Tests\ManualLoadPlugin\ManualLoadPlugin.csproj", "{F500D302-0049-43DC-8229-DDA43B07A655}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLoadPlugin", "Tests\AutoLoadPlugin\AutoLoadPlugin.csproj", "{4F714264-5A5B-4B7C-B7AB-48CAB3719EEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoLoadPlugin", "Tests\AutoLoadPlugin\AutoLoadPlugin.csproj", "{4F714264-5A5B-4B7C-B7AB-48CAB3719EEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sky Editor Console", "Sky Editor Console\Sky Editor Console.csproj", "{0EB22436-53AF-427E-B2D6-350F51F17960}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sky Editor Console", "Sky Editor Console\Sky Editor Console.csproj", "{0EB22436-53AF-427E-B2D6-350F51F17960}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{391F044B-DF9E-4DA4-A3B4-96E342EFE031}"
 	ProjectSection(SolutionItems) = preProject
 		README.MD = README.MD
 	EndProjectSection
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SkyEditor.Core.FrameworkCompatibility", "SkyEditor.Core.FrameworkCompatibility\SkyEditor.Core.FrameworkCompatibility.vbproj", "{8238A6A2-76AF-4741-8564-D1D2A4B067BB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoLoadPlugin.FrameworkCompatibility", "Tests\AutoLoadPlugin.FrameworkCompatibility\AutoLoadPlugin.FrameworkCompatibility.csproj", "{F9F05F41-B0B3-4ED6-8C00-ED2B67537CB1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualLoadPlugin.FrameworkCompatibility", "Tests\ManualLoadPlugin.FrameworkCompatibility\ManualLoadPlugin.FrameworkCompatibility.csproj", "{9D0EB92A-50AF-45F7-B794-F3AAB7796530}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyEditor.Core.FrameworkCompatibility.Tests", "Tests\SkyEditor.Core.FrameworkCompatibility.Tests\SkyEditor.Core.FrameworkCompatibility.Tests.csproj", "{766CE747-2028-422E-9975-C92E2149CD16}"
 EndProject
@@ -54,18 +48,6 @@ Global
 		{0EB22436-53AF-427E-B2D6-350F51F17960}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EB22436-53AF-427E-B2D6-350F51F17960}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EB22436-53AF-427E-B2D6-350F51F17960}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8238A6A2-76AF-4741-8564-D1D2A4B067BB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F9F05F41-B0B3-4ED6-8C00-ED2B67537CB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9F05F41-B0B3-4ED6-8C00-ED2B67537CB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9F05F41-B0B3-4ED6-8C00-ED2B67537CB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9F05F41-B0B3-4ED6-8C00-ED2B67537CB1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D0EB92A-50AF-45F7-B794-F3AAB7796530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D0EB92A-50AF-45F7-B794-F3AAB7796530}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D0EB92A-50AF-45F7-B794-F3AAB7796530}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D0EB92A-50AF-45F7-B794-F3AAB7796530}.Release|Any CPU.Build.0 = Release|Any CPU
 		{766CE747-2028-422E-9975-C92E2149CD16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{766CE747-2028-422E-9975-C92E2149CD16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{766CE747-2028-422E-9975-C92E2149CD16}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -78,8 +60,6 @@ Global
 		{AC8FBB99-A78C-4234-96D5-F912DC91F8BD} = {1828C80A-B664-42F3-8183-B31219DFEF5D}
 		{F500D302-0049-43DC-8229-DDA43B07A655} = {1828C80A-B664-42F3-8183-B31219DFEF5D}
 		{4F714264-5A5B-4B7C-B7AB-48CAB3719EEC} = {1828C80A-B664-42F3-8183-B31219DFEF5D}
-		{F9F05F41-B0B3-4ED6-8C00-ED2B67537CB1} = {1828C80A-B664-42F3-8183-B31219DFEF5D}
-		{9D0EB92A-50AF-45F7-B794-F3AAB7796530} = {1828C80A-B664-42F3-8183-B31219DFEF5D}
 		{766CE747-2028-422E-9975-C92E2149CD16} = {1828C80A-B664-42F3-8183-B31219DFEF5D}
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-﻿using ManualLoadPlugin.FrameworkCompatibility;
+﻿using ManualLoadPlugin;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkyEditor.Core.Settings;
 using System;

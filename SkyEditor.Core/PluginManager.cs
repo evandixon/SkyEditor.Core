@@ -630,6 +630,17 @@ namespace SkyEditor.Core
         {
             return Plugins.ToList();
         }
+
+        /// <summary>
+        /// Instructs all plugins to prepare for distribution
+        /// </summary>
+        public void PreparePluginsForDistribution()
+        {
+            foreach (var item in Plugins)
+            {
+                item.PrepareForDistribution(this);
+            }
+        }
         #endregion
 
         #region IDisposable Support

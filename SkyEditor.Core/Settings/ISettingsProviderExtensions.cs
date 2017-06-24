@@ -137,7 +137,7 @@ namespace SkyEditor.Core.Settings
         }
 
         /// <summary>
-        /// Gets the endpoint URLs of the currently configured online extension collections
+        /// Gets the endpoint URLs of the currently-configured online extension collections
         /// </summary>
         public static IList<string> GetExtensionCollections(this ISettingsProvider provider)
         {
@@ -152,12 +152,34 @@ namespace SkyEditor.Core.Settings
         }
 
         /// <summary>
-        /// Sets the endpoint URLs of the currently configured online extension collections
+        /// Sets the endpoint URLs of the currently-configured online extension collections
         /// </summary>
         /// <param name="value">IList containing the endpoint URLs of the extension collections</param>
         public static void SetExtensionCollections(this ISettingsProvider provider, IList<string> value)
         {
             provider.SetSetting(SettingNames.OnlineExtensionCollections, value);
+        }
+
+        /// <summary>
+        /// Adds the given endpoint to the currently-configured online extension collections
+        /// </summary>
+        /// <param name="url">Endpoint of the online extension collection</param>
+        public static void AddExtensionCollection(this ISettingsProvider provider, string url)
+        {
+            var collections = GetExtensionCollections(provider);
+            collections.Add(url);
+            SetExtensionCollections(provider, collections);
+        }
+
+        /// <summary>
+        /// Removes the given endpoint from the currently-configured online extension collections
+        /// </summary>
+        /// <param name="url">Endpoint of the online extension collection</param>
+        public static void RemoveExtensionCollection(this ISettingsProvider provider, string url)
+        {
+            var collections = GetExtensionCollections(provider);
+            collections.Remove(url);
+            SetExtensionCollections(provider, collections);
         }
 
         /// <summary>

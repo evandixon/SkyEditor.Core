@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Settings;
-using SkyEditor.Core.CoreMods;
 
 namespace SkyEditor.Core.FrameworkCompatibility.Tests
 {
-    public class AutoLoadTestCoreMod : WindowsCoreSkyEditorPlugin
+    public class AutoLoadTestCoreMod : CoreSkyEditorPlugin
     {
         public override string Credits
         {
@@ -33,6 +32,11 @@ namespace SkyEditor.Core.FrameworkCompatibility.Tests
             {
                 return "plugin";
             }
+        }
+
+        public override string GetExtensionDirectory()
+        {
+            return base.GetExtensionDirectory();
         }
 
         public override ISettingsProvider GetSettingsProvider(PluginManager manager)

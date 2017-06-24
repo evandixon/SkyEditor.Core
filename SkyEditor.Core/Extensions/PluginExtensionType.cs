@@ -11,17 +11,18 @@ namespace SkyEditor.Core.Extensions
 {
     public class PluginExtensionType : LocalExtensionCollection
     {
+        public const string PluginsInternalName = "Plugins";
 
         public override Task<string> GetName()
         {
-            return Task.FromResult("Plugins");
+            return Task.FromResult(PluginsInternalName);
         }
 
         public override string InternalName
         {
             get
             {
-                return "Plugins";
+                return PluginsInternalName;
             }
         }
 

@@ -52,7 +52,7 @@ namespace SkyEditor.Core.FrameworkCompatibility.Tests
         {
             base.Load(manager);
 
-            manager.LoadRequiredPlugin(new ManualLoadPlugin.FrameworkCompatibility.BasicTestCoreMod(), this);
+            manager.LoadRequiredPlugin(new ManualLoadPlugin.BasicTestCoreMod(), this);
         }
     }
 }

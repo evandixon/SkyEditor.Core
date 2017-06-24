@@ -6,6 +6,7 @@ using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;
+using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -96,6 +97,8 @@ namespace SkyEditor.Core
         {
 #if NETSTANDARD1_5
             return true;
+#elif NET462
+            return true;
 #else
             return false;
 #endif
@@ -133,6 +136,8 @@ namespace SkyEditor.Core
             }
             
             return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+#elif NET462
+            return ReflectionHelpers.LoadAssembly(assemblyPath);
 #else
             throw new NotSupportedException();
 #endif
@@ -167,6 +172,7 @@ namespace SkyEditor.Core
             manager.RegisterType<ConsoleCommand, SelectFile>();
             manager.RegisterType<ConsoleCommand, SettingCommand>();
             manager.RegisterType<ConsoleCommand, SolutionCommands>();
+            manager.RegisterType<ConsoleCommand, DistPrep>();
 
             // Shell Console Commands
             manager.RegisterType<ConsoleCommand, cd>();

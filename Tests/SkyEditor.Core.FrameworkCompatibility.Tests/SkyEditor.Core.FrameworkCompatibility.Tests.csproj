@@ -55,17 +55,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SkyEditor.Core.FrameworkCompatibility\SkyEditor.Core.FrameworkCompatibility.vbproj">
-      <Project>{8238a6a2-76af-4741-8564-d1d2a4b067bb}</Project>
-      <Name>SkyEditor.Core.FrameworkCompatibility</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj">
       <Project>{bb24a2f7-759b-4092-84cf-9ff3131b7d4d}</Project>
       <Name>SkyEditor.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ManualLoadPlugin.FrameworkCompatibility\ManualLoadPlugin.FrameworkCompatibility.csproj">
-      <Project>{9d0eb92a-50af-45f7-b794-f3aab7796530}</Project>
-      <Name>ManualLoadPlugin.FrameworkCompatibility</Name>
+    <ProjectReference Include="..\ManualLoadPlugin\ManualLoadPlugin.csproj">
+      <Project>{f500d302-0049-43dc-8229-dda43b07a655}</Project>
+      <Name>ManualLoadPlugin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
