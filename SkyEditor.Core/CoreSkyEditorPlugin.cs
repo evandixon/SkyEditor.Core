@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 
 namespace SkyEditor.Core
@@ -93,7 +94,11 @@ namespace SkyEditor.Core
         /// <returns>A boolean indicating whether or not plugin loading is enabled.</returns>
         public virtual bool IsPluginLoadingEnabled()
         {
+#if NETSTANDARD1_5
+            return true;
+#else
             return false;
+#endif
         }
 
         /// <summary>
@@ -121,7 +126,16 @@ namespace SkyEditor.Core
         /// <exception cref="BadImageFormatException">Thrown when the assembly is not a valid .Net assembly.</exception>
         public virtual Assembly LoadAssembly(string assemblyPath)
         {
+#if NETSTANDARD1_5
+            if (!Path.IsPathRooted(assemblyPath))
+            {
+                assemblyPath = Path.Combine(Directory.GetCurrentDirectory(), assemblyPath);
+            }
+            
+            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+#else
             throw new NotSupportedException();
+#endif
         }
 
         public override void Load(PluginManager manager)

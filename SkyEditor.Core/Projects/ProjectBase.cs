@@ -52,7 +52,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="projectType">Type of the project</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly created project</returns>
-        public static async Task<ProjectBase> CreateProject(string parentPath, string projectName, Type projectType, PluginManager manager)
+        public static Task<ProjectBase> CreateProject(string parentPath, string projectName, Type projectType, PluginManager manager)
         {
             // Create the instance
             var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
@@ -71,7 +71,7 @@ namespace SkyEditor.Core.Projects
             output.Name = projectName;
             output.Settings = new SettingsProvider(manager);
 
-            return output;
+            return Task.FromResult(output);
         }
 
         /// <summary>

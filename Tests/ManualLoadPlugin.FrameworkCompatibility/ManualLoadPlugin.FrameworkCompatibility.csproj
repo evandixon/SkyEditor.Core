@@ -36,7 +36,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -44,9 +43,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core %28Portable%29.csproj">
-      <Project>{4985bc22-88b5-422d-a0d3-b772470b2aa8}</Project>
-      <Name>SkyEditor.Core %28Portable%29</Name>
+    <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj">
+      <Project>{bb24a2f7-759b-4092-84cf-9ff3131b7d4d}</Project>
+      <Name>SkyEditor.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

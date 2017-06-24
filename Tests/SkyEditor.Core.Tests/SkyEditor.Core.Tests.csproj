@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SkyEditor.Core.PluginLoaderCore\SkyEditor.Core.PluginLoaderCore.csproj" />
     <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj" />
     <ProjectReference Include="..\ManualLoadPlugin\ManualLoadPlugin.csproj" />
   </ItemGroup>
