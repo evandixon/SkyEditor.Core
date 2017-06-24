@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net462</TargetFrameworks>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <VersionPrefix>4.1.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
     <Description>Plugin and MVVM framework</Description>
