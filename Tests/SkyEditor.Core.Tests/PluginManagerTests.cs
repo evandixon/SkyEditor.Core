@@ -18,7 +18,7 @@ namespace SkyEditor.Core.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task LoadCoreArgumentNull()
+        public async Task LoadCoreArgumentNull_NetCore()
         {
             var manager = new PluginManager();
             try
@@ -35,7 +35,7 @@ namespace SkyEditor.Core.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task CoreModInPlugins()
+        public async Task CoreModInPlugins_NetCore()
         {
             Core = new BasicTestCoreMod();
             Manager = new PluginManager();
@@ -50,7 +50,7 @@ namespace SkyEditor.Core.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task ManualPluginLoad()
+        public async Task ManualPluginLoad_NetCore()
         {
             Core = new ManualLoadTestCoreMod();
             Manager = new PluginManager();
@@ -62,7 +62,7 @@ namespace SkyEditor.Core.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task AutoPluginLoad()
+        public async Task AutoPluginLoad_NetCore()
         {
             Core = new AutoLoadTestCoreMod();
             Manager = new PluginManager();

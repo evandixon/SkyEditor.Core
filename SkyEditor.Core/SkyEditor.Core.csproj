@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.5</TargetFramework>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <TargetFrameworks>netstandard1.5;net462</TargetFrameworks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <VersionPrefix>4.1.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
     <Description>Plugin and MVVM framework</Description>
@@ -19,6 +19,13 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.2" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <Reference Include="System.Deployment" />
   </ItemGroup>
 
   <ItemGroup>

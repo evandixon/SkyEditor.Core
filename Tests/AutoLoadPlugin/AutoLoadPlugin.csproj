@@ -1,16 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFrameworks>netstandard1.5;net462</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'netstandard1.5'">
     <OutputPath>..\SkyEditor.Core.Tests\bin\Debug\netcoreapp1.1\Resources\Extensions\Plugins\Development\</OutputPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' And '$(TargetFramework)' == 'netstandard1.5'">
     <OutputPath>..\SkyEditor.Core.Tests\bin\Release\netcoreapp1.1\Resources\Extensions\Plugins\Development\</OutputPath>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'net462'">
+    <OutputPath>..\SkyEditor.Core.Tests\bin\Debug\net462\Resources\Extensions\Plugins\Development\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' And '$(TargetFramework)' == 'net462'">
+    <OutputPath>..\SkyEditor.Core.Tests\bin\Release\net462\Resources\Extensions\Plugins\Development\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="project.lock.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj" />

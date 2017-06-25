@@ -1,4 +1,4 @@
-﻿using ManualLoadPlugin.FrameworkCompatibility;
+﻿using ManualLoadPlugin;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkyEditor.Core.Settings;
 using System;
@@ -19,7 +19,7 @@ namespace SkyEditor.Core.FrameworkCompatibility.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task LoadCoreArgumentNull()
+        public async Task LoadCoreArgumentNull_NetFramework()
         {
             var manager = new PluginManager();
             try
@@ -36,7 +36,7 @@ namespace SkyEditor.Core.FrameworkCompatibility.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task CoreModInPlugins()
+        public async Task CoreModInPlugins_NetFramework()
         {
             Core = new BasicTestCoreMod();
             Manager = new PluginManager();
@@ -51,7 +51,7 @@ namespace SkyEditor.Core.FrameworkCompatibility.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task ManualPluginLoad()
+        public async Task ManualPluginLoad_NetFramework()
         {
             Core = new ManualLoadTestCoreMod();
             Manager = new PluginManager();
@@ -63,7 +63,7 @@ namespace SkyEditor.Core.FrameworkCompatibility.Tests
 
         [TestMethod]
         [TestCategory(TestCategory)]
-        public async Task AutoPluginLoad()
+        public async Task AutoPluginLoad_NetFramework()
         {
             Core = new AutoLoadTestCoreMod();
             Manager = new PluginManager();

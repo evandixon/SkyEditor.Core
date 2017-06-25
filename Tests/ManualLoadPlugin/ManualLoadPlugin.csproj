@@ -1,8 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFrameworks>netstandard1.5;net462</TargetFrameworks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="project.lock.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\SkyEditor.Core\SkyEditor.Core.csproj" />
