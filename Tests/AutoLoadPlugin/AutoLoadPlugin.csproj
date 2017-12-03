@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' And '$(TargetFramework)' == 'netstandard1.5'">
-    <OutputPath>..\SkyEditor.Core.Tests\bin\Release\netcoreapp1.1\Resources\Extensions\Plugins\Development\</OutputPath>
+    <OutputPath>..\SkyEditor.Core.Tests\bin\Release\netcoreapp2.0\Resources\Extensions\Plugins\Development\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'net462'">
