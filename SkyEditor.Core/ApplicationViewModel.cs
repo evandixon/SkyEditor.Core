@@ -706,18 +706,24 @@ namespace SkyEditor.Core
         /// <param name="filters">A collection containing the extensions to put in the string.</param>
         /// <param name="addSupportedFilesEntry">Whether or not to add a "Supported Files" entry to the filter.</param>
         /// <param name="allowAllFiles">Whether or not to add an "All Files" entry to the filters.</param>
+        /// <param name="addSolutionFilter">Whether to include Sky Editor Solution files in the filter.</param>
         /// <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
-        public string GetIOFilter(ICollection<string> filters, bool addSupportedFilesEntry, bool allowAllFiles)
+        public string GetIOFilter(ICollection<string> filters, bool addSupportedFilesEntry, bool allowAllFiles, bool addSolutionFilter)
         {
             // Register any unregistered filters
             foreach (var item in filters.Where(f => !CurrentPluginManager.IOFilters.ContainsKey(f)))
             {
                 CurrentPluginManager.IOFilters.Add(item, string.Format(Properties.Resources.UI_UnknownFileRegisterTemplate, item.Trim('*').Trim('.').ToUpper()));
-            }
+            }           
 
             // Generate the IO Filter string
             var fullFilter = new StringBuilder();
             var usableFilters = CurrentPluginManager.IOFilters.Where(x => filters.Contains(x.Key)).ToDictionary(x => x.Key, y => y.Value);
+
+            if (addSolutionFilter)
+            {
+                usableFilters.Add("*.skysln", Properties.Resources.File_SkyEditorSolution);
+            }
 
             if (addSupportedFilesEntry)
             {
@@ -738,20 +744,22 @@ namespace SkyEditor.Core
         /// <summary>
         /// Gets the IO filter string for use with an OpenFileDialog or a SaveFileDialog.
         /// </summary>
+        /// <param name="addSolutionFilter">Whether to include Sky Editor Solution files in the filter.</param>
         /// <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
-        public string GetIOFilter()
+        public string GetIOFilter(bool addSolutionFilter = false)
         {
-            return GetIOFilter(CurrentPluginManager.IOFilters.Keys, true, true);
+            return GetIOFilter(CurrentPluginManager.IOFilters.Keys, true, true, addSolutionFilter);
         }
 
         /// <summary>
         /// Gets the IO filter string for use with an OpenFileDialog or a SaveFileDialog.
         /// </summary>
         /// <param name="filters">A collection containing the extensions to put in the string.</param>
+        /// <param name="addSolutionFilter">Whether to include Sky Editor Solution files in the filter.</param>
         /// <returns>A string that can be used directly with the filter of an OpenFileDialog or a SaveFileDialog.</returns>
-        public string GetIOFilter(ICollection<string> filters)
+        public string GetIOFilter(ICollection<string> filters, bool addSolutionFilter = false)
         {
-            return GetIOFilter(filters, true, true);
+            return GetIOFilter(filters, true, true, addSolutionFilter);
         }
 
         #endregion
@@ -888,7 +896,21 @@ namespace SkyEditor.Core
                         if (ReferenceEquals(OpenFiles[i], file))
                         {
                             OpenFiles[i].Dispose();
-                            OpenFiles.RemoveAt(i);
+
+                            var openFilesCount = OpenFiles.Count;
+                            try
+                            {
+                                OpenFiles.RemoveAt(i);
+                            }
+                            catch (NullReferenceException)
+                            {
+                                // There's been a bug in a dependency where OpenFiles.RemoveAt fails because of UI stuff.
+                                // If the same exception is encountered, and the file has actually been removed, then ignore it.
+                                if (openFilesCount <= OpenFiles.Count) // OpenFiles.Count should have decreased by 1. If it has not, then throw the exception.
+                                {
+                                    throw;
+                                }                                
+                            }                            
                         }
                     }
 
