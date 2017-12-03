@@ -42,8 +42,25 @@ namespace SkyEditor.Core.Tests
                 manager.RegisterIOFilter("*.txt", "Text Files");
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var filter = appViewModel.GetIOFilter(new string[] { "*.txt" }, true, true);
+                    var filter = appViewModel.GetIOFilter(new string[] { "*.txt" }, true, true, false);
                     Assert.AreEqual("Supported Files|*.txt|Text Files|*.txt|All Files|*.*", filter);
+                }
+            }
+        }
+
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task GetIOFilters_SpecificExtensionWithSupportedFileAndAllFileAndSolution()
+        {
+            using (var manager = new PluginManager())
+            {
+                await manager.LoadCore(new CoreMod());
+                manager.RegisterIOFilter("*.txt", "Text Files");
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    var filter = appViewModel.GetIOFilter(new string[] { "*.txt" }, true, true, true);
+                    Assert.AreEqual("Supported Files|*.txt;*.skysln|Text Files|*.txt|Sky Editor Solution|*.skysln|All Files|*.*", filter);
                 }
             }
         }
