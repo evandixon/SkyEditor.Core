@@ -439,7 +439,7 @@ namespace SkyEditor.Core.IO
         /// Reads all the data in the file.  Not thread-safe.
         /// </summary>
         /// <returns>An array of byte containing the contents of the file.</returns>
-        public byte[] Read()
+        private byte[] ReadInternal()
         {
             if (InMemoryFile != null)
             {
@@ -459,11 +459,30 @@ namespace SkyEditor.Core.IO
         /// Reads all the data in the file.  Thread-safe.
         /// </summary>
         /// <returns>An array of byte containing the contents of the file.</returns>
+        public byte[] Read()
+        {
+            if (IsThreadSafe)
+            {
+                return ReadInternal();
+            }
+            else
+            {
+                lock (_fileAccessLock)
+                {
+                    return ReadInternal();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads all the data in the file.  Thread-safe.
+        /// </summary>
+        /// <returns>An array of byte containing the contents of the file.</returns>
         public async Task<byte[]> ReadAsync()
         {
             if (IsThreadSafe)
             {
-                return Read();
+                return ReadInternal();
             }
             else
             {
@@ -471,7 +490,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        return Read();
+                        return ReadInternal();
                     }
                 });
             }
@@ -482,7 +501,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <returns>A byte equal to the byte at the given index in the file.</returns>
-        public byte Read(long index)
+        private byte ReadInternal(long index)
         {
             if (InMemoryFile != null)
             {
@@ -515,11 +534,31 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <returns>A byte equal to the byte at the given index in the file.</returns>
+        public byte Read(long index)
+        {
+            if (IsThreadSafe)
+            {
+                return ReadInternal(index);
+            }
+            else
+            {
+                lock (_fileAccessLock)
+                {
+                    return ReadInternal(index);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads a byte from the file.  Thread-safe
+        /// </summary>
+        /// <param name="index">Index from which to retrieve the byte.</param>
+        /// <returns>A byte equal to the byte at the given index in the file.</returns>
         public async Task<byte> ReadAsync(long index)
         {
             if (IsThreadSafe)
             {
-                return Read(index);
+                return ReadInternal(index);
             }
             else
             {
@@ -527,7 +566,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        return Read(index);
+                        return ReadInternal(index);
                     }
                 });
             }
@@ -539,7 +578,7 @@ namespace SkyEditor.Core.IO
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="length">Lengt of the range to read.</param>
         /// <returns>A byte equal to the byte at the given index in the file.</returns>
-        public byte[] Read(long index, int length)
+        private byte[] ReadInternal(long index, int length)
         {
             if (InMemoryFile != null)
             {
@@ -569,11 +608,32 @@ namespace SkyEditor.Core.IO
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="length">Lengt of the range to read.</param>
         /// <returns>A byte equal to the byte at the given index in the file.</returns>
+        public byte[] Read(long index, int length)
+        {
+            if (IsThreadSafe)
+            {
+                return ReadInternal(index, length);
+            }
+            else
+            {          
+                lock (_fileAccessLock)
+                {
+                    return ReadInternal(index, length);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads a range of bytes from the file.  Thread-safe.
+        /// </summary>
+        /// <param name="index">Index from which to retrieve the byte.</param>
+        /// <param name="length">Lengt of the range to read.</param>
+        /// <returns>A byte equal to the byte at the given index in the file.</returns>
         public async Task<byte[]> ReadAsync(long index, int length)
         {
             if (IsThreadSafe)
             {
-                return Read(index, length);
+                return ReadInternal(index, length);
             }
             else
             {
@@ -581,7 +641,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        return Read(index, length);
+                        return ReadInternal(index, length);
                     }
                 });
             }
@@ -590,7 +650,7 @@ namespace SkyEditor.Core.IO
         /// <summary>
         /// Writes over all the data in the file.  Not thread-safe.
         /// </summary>
-        public void Write(byte[] value)
+        private void WriteInternal(byte[] value)
         {
             if (IsReadOnly)
             {
@@ -616,11 +676,30 @@ namespace SkyEditor.Core.IO
         /// Writes over all the data in the file.  Not thread-safe.
         /// </summary>
         /// <returns>An array of byte containing the contents of the file.</returns>
+        public void Write(byte[] value)
+        {
+            if (IsThreadSafe)
+            {
+                WriteInternal(value);
+            }
+            else
+            {                
+                lock (_fileAccessLock)
+                {
+                    WriteInternal(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes over all the data in the file.  Not thread-safe.
+        /// </summary>
+        /// <returns>An array of byte containing the contents of the file.</returns>
         public async Task WriteAsync(byte[] value)
         {
             if (IsThreadSafe)
             {
-                Write(value);
+                WriteInternal(value);
             }
             else
             {
@@ -628,7 +707,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        Write(value);
+                        WriteInternal(value);
                     }
                 });
             }
@@ -639,7 +718,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="value">The data to write</param>
-        public void Write(long index, byte value)
+        private void WriteInternal(long index, byte value)
         {
             if (IsReadOnly)
             {
@@ -662,11 +741,31 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="value">The data to write</param>
+        public void Write(long index, byte value)
+        {
+            if (IsThreadSafe)
+            {
+                WriteInternal(index, value);
+            }
+            else
+            {
+                lock (_fileAccessLock)
+                {
+                    WriteInternal(index, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes a byte to the file.  Thread-safe
+        /// </summary>
+        /// <param name="index">Index from which to retrieve the byte.</param>
+        /// <param name="value">The data to write</param>
         public async Task WriteAsync(long index, byte value)
         {
             if (IsThreadSafe)
             {
-                Write(index, value);
+                WriteInternal(index, value);
             }
             else
             {
@@ -674,7 +773,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        Write(index, value);
+                        WriteInternal(index, value);
                     }
                 });
             }
@@ -686,7 +785,7 @@ namespace SkyEditor.Core.IO
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="length">Length of the range to read.</param>
         /// <param name="value">The data to write</param>
-        public void Write(long index, int length, byte[] value)
+        private void WriteInternal(long index, int length, byte[] value)
         {
             if (IsReadOnly)
             {
@@ -714,11 +813,32 @@ namespace SkyEditor.Core.IO
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="length">Length of the range to read.</param>
         /// <param name="value">The data to write</param>
+        public void Write(long index, int length, byte[] value)
+        {
+            if (IsThreadSafe)
+            {
+                WriteInternal(index, length, value);
+            }
+            else
+            {
+                lock (_fileAccessLock)
+                {
+                    WriteInternal(index, length, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes a range of bytes to the file.  Thread-safe.
+        /// </summary>
+        /// <param name="index">Index from which to retrieve the byte.</param>
+        /// <param name="length">Length of the range to read.</param>
+        /// <param name="value">The data to write</param>
         public async Task WriteAsync(long index, int length, byte[] value)
         {
             if (IsThreadSafe)
             {
-                Write(index, length, value);
+                WriteInternal(index, length, value);
             }
             else
             {
@@ -726,14 +846,14 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        Write(index, length, value);
+                        WriteInternal(index, length, value);
                     }
                 });
             }
         }
 
         /// <summary>
-        /// Writes a range of bytes to the file.  Not thread-safe.
+        /// Writes a range of bytes to the file.  Thread-safe.
         /// </summary>
         /// <param name="index">Index from which to retrieve the byte.</param>
         /// <param name="value">The data to write</param>
@@ -766,7 +886,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Reads an unsigned byte from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// Reads an unsigned byte from the current position (<see cref="Position"/>), then advances the current position.  This function is thread-safe.
         /// </summary>
         /// <returns>The integer from the given location</returns>
         public byte ReadByte()
@@ -788,7 +908,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes a byte to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
+        /// Writes a byte to the current position (<see cref="Position"/>), then advances the current position.  This function is thread-safe.
         /// </summary>
         public void WriteByte(byte value)
         {
@@ -815,7 +935,7 @@ namespace SkyEditor.Core.IO
         /// <remarks>Currently, the data of size <paramref name="length"/> is buffered in memory, and will error if there is insufficient memory.
         ///
         /// To avoid threading issues, this function will synchronously block using SyncLock until the operation is complete.</remarks>
-        public void CopyTo(Stream destination, long index, int length)
+        private void CopyToInternal(Stream destination, long index, int length)
         {
             if (destination == null)
             {
@@ -848,11 +968,36 @@ namespace SkyEditor.Core.IO
         /// <remarks>Currently, the data of size <paramref name="length"/> is buffered in memory, and will error if there is insufficient memory.
         ///
         /// To avoid threading issues, this function will synchronously block using SyncLock until the operation is complete.</remarks>
+        public void CopyTo(Stream destination, long index, int length)
+        {
+            if (IsThreadSafe)
+            {
+                CopyToInternal(destination, index, length);
+            }
+            else
+            {                
+                lock (_fileAccessLock)
+                {
+                    CopyToInternal(destination, index, length);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Copies data into the given stream.  Thread-safe.
+        /// </summary>
+        /// <param name="destination">Stream to which to copy data.</param>
+        /// <param name="index">Index of the data to start reading from the <see cref="GenericFile"/>.</param>
+        /// <param name="length">Number of bytes to copy into the destination stream.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="destination"/> is null.</exception>
+        /// <remarks>Currently, the data of size <paramref name="length"/> is buffered in memory, and will error if there is insufficient memory.
+        ///
+        /// To avoid threading issues, this function will synchronously block using SyncLock until the operation is complete.</remarks>
         public async Task CopyToAsync(Stream destination, long index, int length)
         {
             if (IsThreadSafe)
             {
-                CopyTo(destination, index, length);
+                CopyToInternal(destination, index, length);
             }
             else
             {
@@ -860,7 +1005,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        CopyTo(destination, index, length);
+                        CopyToInternal(destination, index, length);
                     }
                 });
             }
@@ -874,7 +1019,7 @@ namespace SkyEditor.Core.IO
         /// <param name="fileIndex">Index of the file where data should be written.</param>
         /// <param name="length">Length in bytes of the data to write.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="source"/> is null</exception>
-        public void CopyFrom(Stream source, long sourceIndex, long fileIndex, int length)
+        private void CopyFromInternal(Stream source, long sourceIndex, long fileIndex, int length)
         {
             if (source == null)
             {
@@ -909,11 +1054,34 @@ namespace SkyEditor.Core.IO
         /// <param name="fileIndex">Index of the file where data should be written.</param>
         /// <param name="length">Length in bytes of the data to write.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="source"/> is null</exception>
+        public void CopyFrom(Stream source, long sourceIndex, long fileIndex, int length)
+        {
+            if (IsThreadSafe)
+            {
+                CopyFromInternal(source, sourceIndex, fileIndex, length);
+            }
+            else
+            {                
+                lock (_fileAccessLock)
+                {
+                    CopyFromInternal(source, sourceIndex, fileIndex, length);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads data from the given stream.
+        /// </summary>
+        /// <param name="source">Stream from which to read data.</param>
+        /// <param name="sourceIndex">Index of the stream to read data.</param>
+        /// <param name="fileIndex">Index of the file where data should be written.</param>
+        /// <param name="length">Length in bytes of the data to write.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="source"/> is null</exception>
         public async Task CopyFromAsync(Stream source, long sourceIndex, long fileIndex, int length)
         {
             if (IsThreadSafe)
             {
-                CopyFrom(source, sourceIndex, fileIndex, length);
+                CopyFromInternal(source, sourceIndex, fileIndex, length);
             }
             else
             {
@@ -921,7 +1089,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        CopyFrom(source, sourceIndex, fileIndex, length);
+                        CopyFromInternal(source, sourceIndex, fileIndex, length);
                     }
                 });
             }
@@ -932,7 +1100,7 @@ namespace SkyEditor.Core.IO
         #region Integer Read/Write
 
         /// <summary>
-        /// Reads a signed 16 bit little endian integer.  This function is not thread-safe.
+        /// Reads a signed 16 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
@@ -963,7 +1131,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Reads a signed 32 bit little endian integer.  This function is not thread-safe.
+        /// Reads a signed 32 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
@@ -994,7 +1162,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Reads a signed 64 bit little endian integer.  This function is not thread-safe.
+        /// Reads a signed 64 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
@@ -1025,7 +1193,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Reads an unsigned 16 bit little endian integer.  This function is not thread-safe.
+        /// Reads an unsigned 16 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
@@ -1056,7 +1224,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Reads an unsigned 32 bit little endian integer.  This function is not thread-safe.
+        /// Reads an unsigned 32 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
@@ -1087,7 +1255,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Reads an unsigned 64 bit little endian integer.  This function is not thread-safe.
+        /// Reads an unsigned 64 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to read.</param>
         /// <returns>The integer from the given location</returns>
@@ -1118,7 +1286,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes a signed 16 bit little endian integer.  This function is not thread-safe.
+        /// Writes a signed 16 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
@@ -1148,7 +1316,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes a signed 32 bit little endian integer.  This function is not thread-safe.
+        /// Writes a signed 32 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
@@ -1177,7 +1345,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes a signed 64 bit little endian integer.  This function is not thread-safe.
+        /// Writes a signed 64 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
@@ -1206,7 +1374,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes an unsigned 16 bit little endian integer.  This function is not thread-safe.
+        /// Writes an unsigned 16 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
@@ -1236,7 +1404,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes an unsigned 32 bit little endian integer.  This function is not thread-safe.
+        /// Writes an unsigned 32 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
@@ -1266,7 +1434,7 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes an unsigned 64 bit little endian integer.  This function is not thread-safe.
+        /// Writes an unsigned 64 bit little endian integer.  This function is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the integer to write.</param>
         /// <param name="value">The integer to write</param>
@@ -1299,7 +1467,7 @@ namespace SkyEditor.Core.IO
         #region String Interaction
 
         /// <summary>
-        /// Reads a UTF-16 string.  This method is not thread-safe.
+        /// Reads a UTF-16 string.  This method is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the string</param>
         /// <param name="length">Length in characters of the string</param>
@@ -1317,24 +1485,11 @@ namespace SkyEditor.Core.IO
         /// <returns>The UTF-16 string at the given offset</returns>
         public async Task<string> ReadUnicodeStringAsync(long index, int length)
         {
-            if (IsThreadSafe)
-            {
-                return ReadUnicodeString(index, length);
-            }
-            else
-            {
-                return await Task.Run(() =>
-                {
-                    lock (_fileAccessLock)
-                    {
-                        return ReadUnicodeString(index, length);
-                    }
-                });
-            }
+            return Encoding.Unicode.GetString(await ReadAsync(index, length * 2), 0, length * 2);
         }
 
         /// <summary>
-        /// Reads a null-terminated UTF-16 string.  This method is not thread-safe.
+        /// Reads a null-terminated UTF-16 string.  This method is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the string</param>
         /// <returns>The UTF-16 string</returns>
@@ -1355,20 +1510,12 @@ namespace SkyEditor.Core.IO
         /// <returns>The UTF-16 string</returns>
         public async Task<string> ReadNullTerminatedUnicodeStringAsync(long index)
         {
-            if (IsThreadSafe)
+            int length = 0;
+            while (await ReadAsync(index + length * 2) != 0 || await ReadAsync(index + length * 2 + 1) != 0)
             {
-                return ReadNullTerminatedUnicodeString(index);
+                length += 1;
             }
-            else
-            {
-                return await Task.Run(() =>
-                {
-                    lock (_fileAccessLock)
-                    {
-                        return ReadNullTerminatedUnicodeString(index);
-                    }
-                });
-            }
+            return ReadUnicodeString(index, length);
         }
 
         /// <summary>
@@ -1390,24 +1537,11 @@ namespace SkyEditor.Core.IO
         /// <returns>The UTF-16 string at the given offset</returns>
         public async Task<string> ReadStringAsync(long index, int length, Encoding e)
         {
-            if (IsThreadSafe)
-            {
-                return ReadString(index, length, e);
-            }
-            else
-            {
-                return await Task.Run(() =>
-                {
-                    lock (_fileAccessLock)
-                    {
-                        return ReadString(index, length, e);
-                    }
-                });
-            }
+            return e.GetString(await ReadAsync(index, length), 0, length);
         }
 
         /// <summary>
-        /// Writes a string with the given encoding to the given offset of the file.  Not thread-safe
+        /// Writes a string with the given encoding to the given offset of the file.  Thread-safe
         /// </summary>
         /// <param name="index">Index of the file to write</param>
         /// <param name="e">The encoding to use</param>
@@ -1425,24 +1559,11 @@ namespace SkyEditor.Core.IO
         /// <param name="value">The string to write.  The entire string will be written without an ending null character.</param>
         public async Task WriteStringAsync(long index, Encoding e, string value)
         {
-            if (IsThreadSafe)
-            {
-                WriteString(index, e, value);
-            }
-            else
-            {
-                await Task.Run(() =>
-                {
-                    lock (_fileAccessLock)
-                    {
-                        WriteString(index, e, value);
-                    }
-                });
-            }
+            await WriteAsync(index, e.GetBytes(value));
         }
 
         /// <summary>
-        /// Reads a null-terminated string using the given encoding.  This method is not thread-safe.
+        /// Reads a null-terminated string using the given encoding.  This method is thread-safe.
         /// </summary>
         /// <param name="offset">Offset of the string</param>
         /// <returns>The string at the given location</returns>
@@ -1458,7 +1579,6 @@ namespace SkyEditor.Core.IO
                 length += 1;
             }
 
-
             return ReadString(index, length, e);
         }
 
@@ -1469,20 +1589,31 @@ namespace SkyEditor.Core.IO
         /// <returns>The string at the given location</returns>
         public async Task<string> ReadNullTerminatedStringAsync(long index, Encoding e)
         {
-            if (IsThreadSafe)
+            // The null character we're looking for
+            var nullCharSequence = e.GetBytes(Convert.ToChar(0x0).ToString());
+
+            // Find the length of the string as determined by the location of the null-char sequence
+            int length = 0;
+            while (!(await ReadAsync(index + length * nullCharSequence.Length, nullCharSequence.Length)).All(x => x == 0))
             {
-                return ReadNullTerminatedString(index, e);
+                length += 1;
             }
-            else
-            {
-                return await Task.Run(() =>
-                {
-                    lock (_fileAccessLock)
-                    {
-                        return ReadNullTerminatedString(index, e);
-                    }
-                });
-            }
+
+            return ReadString(index, length, e);
+        }
+
+        /// <summary>
+        /// Writes a string with the given encoding to the given offset of the file.  Not thread-safe
+        /// </summary>
+        /// <param name="index">Index of the file to write</param>
+        /// <param name="e">The encoding to use</param>
+        /// <param name="value">The string to write.  The entire string will be written with an ending null character.</param>
+        private void WriteNullTerminatedStringInternal(long index, Encoding e, string value)
+        {
+            var nullChar = e.GetBytes(new[] { Convert.ToChar(0) });
+            var data = e.GetBytes(value);
+            WriteInternal(index, data.Length, data);
+            WriteInternal(index + data.Length, nullChar.Length, nullChar);
         }
 
         /// <summary>
@@ -1493,9 +1624,17 @@ namespace SkyEditor.Core.IO
         /// <param name="value">The string to write.  The entire string will be written with an ending null character.</param>
         public void WriteNullTerminatedString(long index, Encoding e, string value)
         {
-            var data = e.GetBytes(value);
-            Write(index, data);
-            Write(index + data.Length, 0);
+            if (IsThreadSafe)
+            {
+                WriteNullTerminatedStringInternal(index, e, value);
+            }
+            else
+            {                
+                lock (_fileAccessLock)
+                {
+                    WriteNullTerminatedStringInternal(index, e, value);
+                }   
+            }
         }
 
         /// <summary>
@@ -1508,7 +1647,7 @@ namespace SkyEditor.Core.IO
         {
             if (IsThreadSafe)
             {
-                WriteNullTerminatedString(index, e, value);
+                WriteNullTerminatedStringInternal(index, e, value);
             }
             else
             {
@@ -1516,7 +1655,7 @@ namespace SkyEditor.Core.IO
                 {
                     lock (_fileAccessLock)
                     {
-                        WriteNullTerminatedString(index, e, value);
+                        WriteNullTerminatedStringInternal(index, e, value);
                     }
                 });
             }
