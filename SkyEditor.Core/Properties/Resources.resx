@@ -247,4 +247,10 @@
   <data name="Console_Solution_Usage" xml:space="preserve">
     <value>Usage: Solution &lt;Create|Open&gt; OR Solution &lt;Any command to run&gt;</value>
   </data>
+  <data name="Wizard_Console_NullCommand" xml:space="preserve">
+    <value>This step does not have a console command defined and will be skipped.</value>
+  </data>
+  <data name="Wizard_Console_Step" xml:space="preserve">
+    <value>Step {0}:</value>
+  </data>
 </root>

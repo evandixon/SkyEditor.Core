@@ -1,10 +1,13 @@
-﻿using SkyEditor.Core.Utilities;
+﻿using SkyEditor.Core.ConsoleCommands;
+using SkyEditor.Core.IO;
+using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SkyEditor.Core.UI
 {
@@ -13,16 +16,21 @@ namespace SkyEditor.Core.UI
     /// </summary>
     public abstract class Wizard : INotifyPropertyChanged
     {
-        public Wizard()
+        public Wizard(ApplicationViewModel applicationViewModel)
         {
             StepsInternal = new ObservableCollection<IWizardStepViewModel>();
-            Steps = new ReadOnlyObservableCollection<IWizardStepViewModel>(StepsInternal);
+            CurrentApplicationViewModel = applicationViewModel;
         }
 
         /// <summary>
         /// Raised when a property is changed
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// The application ViewModel with which this wizard is associated
+        /// </summary>
+        public ApplicationViewModel CurrentApplicationViewModel { get; private set; }
 
         /// <summary>
         /// Read-only collection of all wizard steps
@@ -104,5 +112,32 @@ namespace SkyEditor.Core.UI
             CurrentStep = Steps[CurrentStepIndex + 1];
         }
 
+        /// <summary>
+        /// Runs the wizard in a console
+        /// </summary>
+        public async Task RunInConsole(ConsoleShell shell, bool reportErrorsToConsole = false, IIOProvider provider = null)
+        {
+            foreach (var item in Steps)
+            {
+                CurrentStep = item; // In case any event handlers are listening
+
+                ConsoleWriteLine(string.Format(Properties.Resources.Wizard_Console_Step, CurrentStepIndex + 1));
+                var command = CurrentStep.GetConsoleCommand();
+                if (command != null)
+                {
+                    await shell.RunCommand(command, Enumerable.Empty<string>(), reportErrorsToConsole, provider);
+                }
+                else
+                {
+                    ConsoleWriteLine(Properties.Resources.Wizard_Console_NullCommand);
+                }
+                ConsoleWriteLine("");
+            }
+        }
+
+        private void ConsoleWriteLine(string line)
+        {
+            CurrentApplicationViewModel.CurrentPluginManager.CurrentConsoleProvider.WriteLine(line);
+        }
     }
 }

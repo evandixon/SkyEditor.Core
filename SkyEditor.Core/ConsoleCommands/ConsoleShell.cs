@@ -154,9 +154,20 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
         public async Task RunCommand(string commandName, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IIOProvider provider = null)
         {
+            var command = AllCommands.Where(c => String.Compare(c.Key, commandName, StringComparison.CurrentCultureIgnoreCase) == 0).Select(c => c.Value).SingleOrDefault();
+            await RunCommand(command, arguments, reportErrorsToConsole, provider);
+        }
+
+        /// <summary>
+        /// Runs the given command with the given arguments.
+        /// </summary>
+        /// <param name="commandName">Name of the command.</param>
+        /// <param name="arguments">Arguments of the command.</param>
+        /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
+        public async Task RunCommand(ConsoleCommand command, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IIOProvider provider = null)
+        {
             try
             {
-                var command = AllCommands.Where(c => String.Compare(c.Key, commandName, StringComparison.CurrentCultureIgnoreCase) == 0).Select(c => c.Value).SingleOrDefault();
                 command.CurrentIOProvider = provider;
                 await command.MainAsync(arguments.ToArray()).ConfigureAwait(false);
                 command.CurrentIOProvider = null; // Reset to using the normal one
