@@ -20,7 +20,7 @@ namespace SkyEditor.Core.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -445,6 +445,24 @@ namespace SkyEditor.Core.Properties {
         internal static string Utilities_AsyncFor_ErrorStepCount0 {
             get {
                 return ResourceManager.GetString("Utilities_AsyncFor_ErrorStepCount0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This step does not have a console command defined and will be skipped..
+        /// </summary>
+        internal static string Wizard_Console_NullCommand {
+            get {
+                return ResourceManager.GetString("Wizard_Console_NullCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Step {0} - {1}:.
+        /// </summary>
+        internal static string Wizard_Console_Step {
+            get {
+                return ResourceManager.GetString("Wizard_Console_Step", resourceCulture);
             }
         }
     }
