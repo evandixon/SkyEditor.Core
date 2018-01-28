@@ -13,6 +13,12 @@ namespace SkyEditor.Core.UI
     /// <remarks>It is up to the main application and the appropriate plugin to supply a user interface for this view model</remarks>
     public interface IWizardStepViewModel : INamed
     {
+
+        /// <summary>
+        /// Whether or not the current step is complete and proceeding is allowed
+        /// </summary>
+        bool IsComplete { get; }
+
         /// <summary>
         /// Gets a console command (<see cref="ConsoleCommand"/>) that can be used to run this wizard step in the console.
         /// </summary>

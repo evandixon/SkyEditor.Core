@@ -19,7 +19,7 @@ namespace SkyEditor.Core.UI
         public Wizard(ApplicationViewModel applicationViewModel)
         {
             StepsInternal = new ObservableCollection<IWizardStepViewModel>();
-            CurrentApplicationViewModel = applicationViewModel;
+            CurrentApplicationViewModel = applicationViewModel ?? throw new ArgumentNullException(nameof(applicationViewModel));
         }
 
         /// <summary>
@@ -96,11 +96,11 @@ namespace SkyEditor.Core.UI
 
         public int CurrentStepIndex => CurrentStep != null ? Steps.IndexOf(CurrentStep) : -1;
 
-        public abstract bool CanGoForward { get; }
+        public virtual bool CanGoForward => CurrentStep.IsComplete && Steps.Count > CurrentStepIndex + 1;
 
         public virtual bool CanGoBack => CurrentStepIndex > 0;
 
-        public virtual bool IsComplete => CurrentStepIndex == Steps.Count - 1;
+        public virtual bool IsComplete => CurrentStepIndex == Steps.Count - 1 && CurrentStep.IsComplete;
 
         public void GoForward()
         {
@@ -112,6 +112,16 @@ namespace SkyEditor.Core.UI
             CurrentStep = Steps[CurrentStepIndex + 1];
         }
 
+        public void GoBack()
+        {
+            if (!CanGoBack || CurrentStepIndex == 0)
+            {
+                return;
+            }
+
+            CurrentStep = Steps[CurrentStepIndex - 1];
+        }
+
         /// <summary>
         /// Runs the wizard in a console
         /// </summary>
@@ -121,7 +131,7 @@ namespace SkyEditor.Core.UI
             {
                 CurrentStep = item; // In case any event handlers are listening
 
-                ConsoleWriteLine(string.Format(Properties.Resources.Wizard_Console_Step, CurrentStepIndex + 1));
+                ConsoleWriteLine(string.Format(Properties.Resources.Wizard_Console_Step, CurrentStepIndex + 1, CurrentStep.Name));
                 var command = CurrentStep.GetConsoleCommand();
                 if (command != null)
                 {
