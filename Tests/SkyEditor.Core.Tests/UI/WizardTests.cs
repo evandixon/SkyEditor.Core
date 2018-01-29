@@ -28,6 +28,8 @@ namespace SkyEditor.Core.Tests.UI
             public AddingWizardTerm1 Term1Step { get; set; }
             public AddingWizardTerm2 Term2Step { get; set; }
             public AddingWizardResultView ResultStep { get; set; }
+
+            public override string Name => "Adding Wizard";
         }
 
         public class AddingWizardTerm1 : IWizardStepViewModel
