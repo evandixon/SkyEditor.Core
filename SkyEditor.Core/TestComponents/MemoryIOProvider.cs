@@ -13,7 +13,7 @@ namespace SkyEditor.Core.TestComponents
     /// <summary>
     /// Implementation of <see cref="IIOProvider"/> that stores virtual files in memory.
     /// </summary>
-    public class MemoryIOProvider : IIOProvider
+    public class MemoryIOProvider : IMountableIOProvider
     {
 
         /// <summary>
@@ -65,6 +65,7 @@ namespace SkyEditor.Core.TestComponents
             Files = new ConcurrentDictionary<string, byte[]>();
             tempCounter = 0;
             ResetWorkingDirectory();
+            CreateDirectory("/");
         }
 
         protected ConcurrentDictionary<string, byte[]> Files { get; set; }
@@ -73,11 +74,22 @@ namespace SkyEditor.Core.TestComponents
         private object tempCounterLock = new object();
 
 
-        public string WorkingDirectory { get; set; }
+        public string WorkingDirectory
+        {
+            get
+            {
+                return _workingDirectory;
+            }
+            set
+            {
+                _workingDirectory = FixPath(value);
+            }
+        }
+        private string _workingDirectory;
 
         public void ResetWorkingDirectory()
         {
-            WorkingDirectory = "/";
+            _workingDirectory = "/";
         }
 
         /// <summary>
@@ -86,16 +98,28 @@ namespace SkyEditor.Core.TestComponents
         /// <param name="path">The path to standardize.  Can be relative to the working directory (<see cref="WorkingDirectory"/>) or absolute</param>
         /// <returns>The standardized absolute path</returns>
         protected string FixPath(string path)
-        {
-            var fixedPath = path.Replace('\\', '/');
-            if (fixedPath.StartsWith("/"))
+        { 
+            var mountParts = path.Split(new[] { ':' }, 2);
+            path = (mountParts.Length > 1 ? mountParts[1] : mountParts[0]);
+
+            var fixedPath = WorkingDirectory;
+            foreach (var part in path.Replace('\\', '/').Split('/'))
             {
-                return fixedPath;
-            }
-            else
-            {
-                return WorkingDirectory.Replace('\\', '/').TrimEnd('/') + "/" + fixedPath;
-            }
+                if (part == ".")
+                {
+                    // Do nothing
+                }
+                else if (part == "..")
+                {
+                    fixedPath = Path.GetDirectoryName(fixedPath);
+                }
+                else
+                {
+                    fixedPath = Path.Combine(fixedPath, part);
+                }
+            }         
+            
+            return fixedPath.Replace('\\', '/');
         }
 
         #region IIO Provider Implementation
@@ -150,7 +174,7 @@ namespace SkyEditor.Core.TestComponents
 
         public string[] GetDirectories(string path, bool topDirectoryOnly)
         {
-            var pathLower = FixPath(path.ToLowerInvariant() + "/");
+            var pathLower = FixPath(path.ToLowerInvariant().TrimEnd('/'));
             return Files.Where(x => x.Key.ToLowerInvariant().StartsWith(pathLower) && x.Value == null).Select(x => x.Key).ToArray();
         }
 

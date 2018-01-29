@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using SkyEditor.Core.IO;
+using SkyEditor.Core.TestComponents;
 
 namespace SkyEditor.Core.ConsoleCommands
 {
@@ -20,7 +21,9 @@ namespace SkyEditor.Core.ConsoleCommands
 
         public override IIOProvider GetIOProvider()
         {
-            return new PhysicalIOProvider();
+            var provider = new CompositeIOProvider(new PhysicalIOProvider());
+            provider.MountProvider("ram", new MemoryIOProvider());
+            return provider;
         }
 
         public override IConsoleProvider GetConsoleProvider()
