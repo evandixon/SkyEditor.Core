@@ -1698,11 +1698,10 @@ namespace SkyEditor.Core.IO
                     if (EnableShadowCopy && InMemoryFile == null && CurrentIOProvider != null && !string.IsNullOrEmpty(PhysicalFilename) && CurrentIOProvider.FileExists(PhysicalFilename) && Filename != PhysicalFilename)
                     {
                         CurrentIOProvider.DeleteFile(PhysicalFilename);
-                    }
+                    }                    
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
+                InMemoryFile = null;
 
                 disposedValue = true;
             }

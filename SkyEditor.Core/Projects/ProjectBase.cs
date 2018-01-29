@@ -1,5 +1,6 @@
 ﻿using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.Core.UI;
 using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,9 @@ namespace SkyEditor.Core.Projects
         /// <param name="projectType">Type of the project</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly created project</returns>
+        /// <remarks>
+        /// The caller should be sure to run through the initialization wizard (<see cref="InitializationWizard"/>) before doing anything else.
+        /// </remarks>
         public static Task<ProjectBase> CreateProject(string parentPath, string projectName, Type projectType, PluginManager manager)
         {
             // Create the instance
@@ -437,6 +441,17 @@ namespace SkyEditor.Core.Projects
             }
         }
         private Task _loadingTask;
+
+        /// <summary>
+        /// The wizard that needs to be performed to complete initialization, or null if not applicable.
+        /// </summary>
+        /// <remarks>This can be ignored if the wizard is not required (<see cref="RequiresInitializationWizard"/>)</remarks>
+        public Wizard InitializationWizard { get; protected set; }
+
+        /// <summary>
+        /// Whether the initialization wizard needs to be performed
+        /// </summary>
+        public virtual bool RequiresInitializationWizard => InitializationWizard != null;
 
         #endregion
 

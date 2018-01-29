@@ -30,6 +30,11 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 
                         CurrentApplicationViewModel.CurrentSolution = await ProjectBase.CreateProject<Solution>(CurrentIOProvider.WorkingDirectory, arguments[2], solutionType, CurrentApplicationViewModel.CurrentPluginManager);
 
+                        if (CurrentApplicationViewModel.CurrentSolution.RequiresInitializationWizard)
+                        {
+                            await CurrentApplicationViewModel.CurrentSolution.InitializationWizard.RunInConsole(CurrentApplicationViewModel.CurrentConsoleShell, true, CurrentIOProvider);
+                        }
+
                         break;
                     case "open":
                         if (arguments.Length > 2)

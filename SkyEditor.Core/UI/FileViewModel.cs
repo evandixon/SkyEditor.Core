@@ -492,10 +492,13 @@ namespace SkyEditor.Core.UI
                     {
                         // Dispose of the underlying model if applicable
                         (_model as IDisposable)?.Dispose();
-                    }                   
+                    }                    
 
                     // Dispose of view models
                     ResetViewModels();
+
+                    // Set the model property to null to remove event handlers
+                    Model = null;
                 }
 
                 disposedValue = true;

@@ -456,5 +456,23 @@ namespace SkyEditor.Core.Properties {
                 return ResourceManager.GetString("Utilities_AsyncFor_ErrorStepCount0", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This step does not have a console command defined and will be skipped..
+        /// </summary>
+        internal static string Wizard_Console_NullCommand {
+            get {
+                return ResourceManager.GetString("Wizard_Console_NullCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Step {0} - {1}:.
+        /// </summary>
+        internal static string Wizard_Console_Step {
+            get {
+                return ResourceManager.GetString("Wizard_Console_Step", resourceCulture);
+            }
+        }
     }
 }

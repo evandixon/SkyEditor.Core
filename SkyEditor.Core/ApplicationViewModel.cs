@@ -610,7 +610,7 @@ namespace SkyEditor.Core
                         }
                         else
                         {
-                            RunningProgressReportables.Select(x => x.Progress).Aggregate((x, y) => x * y);
+                            Progress = RunningProgressReportables.Select(x => x.Progress).Aggregate((x, y) => x * y);
                         }
 
                         // Update message
