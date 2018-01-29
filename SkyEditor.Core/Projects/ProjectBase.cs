@@ -77,11 +77,10 @@ namespace SkyEditor.Core.Projects
         /// <summary>
         /// Opens a project
         /// </summary>
-        /// <typeparam name="T">Type of the project to load</typeparam>
         /// <param name="filename">Path of the project file</param>
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>The newly-opened project</returns>
-        public static async Task<T> OpenProjectFile<T>(string filename, PluginManager manager) where T : ProjectBase
+        public static async Task<ProjectBase> OpenProjectFile(string filename, PluginManager manager)
         {
             // Open the file
             var file = Json.DeserializeFromFile<ProjectFile>(filename, manager.CurrentIOProvider);
@@ -91,11 +90,11 @@ namespace SkyEditor.Core.Projects
             if (projectType == null)
             {
                 // Can't find the type.  Use a dummy one so basic loading can continue.
-                projectType = typeof(UnsupportedProject).GetTypeInfo();
+                projectType = typeof(UnsupportedProjectBase).GetTypeInfo();
             }
 
             // Create the project & load basic info
-            var output = ReflectionHelpers.CreateInstance(projectType) as T;
+            var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
             output.Filename = filename;
             output.CurrentPluginManager = manager;
             output.Name = file.Name;

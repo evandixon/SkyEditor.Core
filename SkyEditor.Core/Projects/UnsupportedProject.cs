@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using SkyEditor.Core.IO;
 
 namespace SkyEditor.Core.Projects
 {
     /// <summary>
     /// Represents a project that cannot be loaded due to an invalid type
     /// </summary>
-    public class UnsupportedProject : ProjectBase
+    public class UnsupportedProject : Project
     {
-        public override string ProjectFileExtension => Project.ProjectFileExt;
-
-        protected override Task<IOnDisk> LoadProjectItem(ItemValue item)
+        public UnsupportedProject()
         {
-            return Task.FromResult<IOnDisk>(item);
+        }
+
+        public UnsupportedProject(UnsupportedProjectBase unsupportedBase)
+        {
+            Settings = unsupportedBase.Settings;
+            Filename = unsupportedBase.Filename;
+            Name = unsupportedBase.Name;
         }
     }
 }

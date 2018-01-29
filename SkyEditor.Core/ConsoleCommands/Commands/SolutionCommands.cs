@@ -34,7 +34,15 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                     case "open":
                         if (arguments.Length > 2)
                         {
-                            CurrentApplicationViewModel.CurrentSolution = await ProjectBase.OpenProjectFile<Solution>(arguments[2], CurrentApplicationViewModel.CurrentPluginManager);
+                            var solution = await ProjectBase.OpenProjectFile(arguments[2], CurrentApplicationViewModel.CurrentPluginManager) as Solution;
+                            if (solution != null)
+                            {
+                                CurrentApplicationViewModel.CurrentSolution = solution;
+                            }
+                            else
+                            {
+                                Console.WriteLine(Properties.Resources.Console_Solution_Open_InvalidType);
+                            }
                         }
                         else
                         {

@@ -247,4 +247,7 @@
   <data name="Console_Solution_Usage" xml:space="preserve">
     <value>Usage: Solution &lt;Create|Open&gt; OR Solution &lt;Any command to run&gt;</value>
   </data>
+  <data name="Console_Solution_Open_InvalidType" xml:space="preserve">
+    <value>Invalid solution file</value>
+  </data>
 </root>

@@ -51,9 +51,18 @@ namespace SkyEditor.Core.Projects
         protected override async Task<IOnDisk> LoadProjectItem(ItemValue item)
         {
             var itemPath = Path.Combine(GetRootDirectory(), item.Filename);
-            var project = await ProjectBase.OpenProjectFile<Project>(itemPath, CurrentPluginManager);
-            project.ParentSolution = this;
-            return project;
+            var projectBase = await ProjectBase.OpenProjectFile(itemPath, CurrentPluginManager);
+            if (projectBase is Project project)
+            {
+                project.ParentSolution = this;
+                return project;
+            }
+            else if (projectBase is UnsupportedProjectBase unsupportedBase)
+            {
+                var unsupportedProject = new UnsupportedProject(unsupportedBase);
+                unsupportedProject.ParentSolution = this;
+                return unsupportedProject;
+            }            
         }        
 
         /// <summary>
