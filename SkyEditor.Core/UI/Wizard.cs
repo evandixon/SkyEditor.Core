@@ -14,7 +14,7 @@ namespace SkyEditor.Core.UI
     /// <summary>
     /// Controller for a workflow of user interface steps
     /// </summary>
-    public abstract class Wizard : INotifyPropertyChanged
+    public abstract class Wizard : INotifyPropertyChanged, INamed
     {
         public Wizard(ApplicationViewModel applicationViewModel)
         {
@@ -96,11 +96,18 @@ namespace SkyEditor.Core.UI
 
         public int CurrentStepIndex => CurrentStep != null ? Steps.IndexOf(CurrentStep) : -1;
 
+        public string CurrentStepDisplayName => string.Format(Properties.Resources.Wizard_StepDisplayName, CurrentStepIndex + 1, CurrentStep.Name);
+
         public virtual bool CanGoForward => CurrentStep.IsComplete && Steps.Count > CurrentStepIndex + 1;
 
         public virtual bool CanGoBack => CurrentStepIndex > 0;
 
         public virtual bool IsComplete => CurrentStepIndex == Steps.Count - 1 && CurrentStep.IsComplete;
+
+        /// <summary>
+        /// Name of the wizard
+        /// </summary>
+        public abstract string Name { get; }
 
         public void GoForward()
         {
@@ -131,7 +138,7 @@ namespace SkyEditor.Core.UI
             {
                 CurrentStep = item; // In case any event handlers are listening
 
-                ConsoleWriteLine(string.Format(Properties.Resources.Wizard_Console_Step, CurrentStepIndex + 1, CurrentStep.Name));
+                ConsoleWriteLine(CurrentStepDisplayName);
                 var command = CurrentStep.GetConsoleCommand();
                 if (command != null)
                 {

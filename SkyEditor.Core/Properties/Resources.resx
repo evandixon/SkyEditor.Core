@@ -250,8 +250,8 @@
   <data name="Wizard_Console_NullCommand" xml:space="preserve">
     <value>This step does not have a console command defined and will be skipped.</value>
   </data>
-  <data name="Wizard_Console_Step" xml:space="preserve">
-    <value>Step {0} - {1}:</value>
+  <data name="Wizard_StepDisplayName" xml:space="preserve">
+    <value>Step {0} - {1}</value>
     <comment>{0} is the step number, and {1} is the friendly name</comment>
   </data>
   <data name="Console_Solution_Open_InvalidType" xml:space="preserve">

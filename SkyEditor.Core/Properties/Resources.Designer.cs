@@ -467,11 +467,11 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Step {0} - {1}:.
+        ///   Looks up a localized string similar to Step {0} - {1}.
         /// </summary>
-        internal static string Wizard_Console_Step {
+        internal static string Wizard_StepDisplayName {
             get {
-                return ResourceManager.GetString("Wizard_Console_Step", resourceCulture);
+                return ResourceManager.GetString("Wizard_StepDisplayName", resourceCulture);
             }
         }
     }
