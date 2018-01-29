@@ -63,6 +63,10 @@ namespace SkyEditor.Core.Projects
                 unsupportedProject.ParentSolution = this;
                 return unsupportedProject;
             }            
+            else
+            {
+                throw new Exception("Got an unknown kind of unsupported project");
+            }
         }        
 
         /// <summary>
@@ -168,12 +172,20 @@ namespace SkyEditor.Core.Projects
         /// <param name="parentPath">Solution directory in which to add the project</param>
         /// <param name="projectFilename">Physical path of the project file</param>
         /// <param name="manager">Instance of the current plugin manager</param>
-        public virtual async Task AddExistingProject(string parentPath, string projectFilename, PluginManager manager)
+        public virtual async Task<bool> AddExistingProject(string parentPath, string projectFilename, PluginManager manager)
         {
-            var p = await ProjectBase.OpenProjectFile<Project>(projectFilename, manager);
-            p.ParentSolution = this;
-            await p.Load();
-            AddProject(FixPath(parentPath) + "/" + p.Name, p);
+            var p = await ProjectBase.OpenProjectFile(projectFilename, manager);
+            if (p is Project project)
+            {
+                project.ParentSolution = this;
+                await project.Load();
+                AddProject(FixPath(parentPath) + "/" + project.Name, project);
+                return true;
+            }            
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>

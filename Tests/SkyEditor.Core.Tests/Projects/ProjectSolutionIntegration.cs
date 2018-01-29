@@ -120,7 +120,7 @@ namespace SkyEditor.Core.Tests.Projects
                 await solution.SaveWithAllProjects();
 
                 // Re-open the solution
-                var solution2 = await ProjectBase.OpenProjectFile<TextPreprocessorSolution>("/projects/Test Solution/Test Solution.skysln", manager);
+                var solution2 = await ProjectBase.OpenProjectFile("/projects/Test Solution/Test Solution.skysln", manager) as TextPreprocessorSolution;
                 
                 // Verify project was opened correctly
                 var project2 = solution2.GetProject("/Text Preprocessor Project");
