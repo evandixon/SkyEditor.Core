@@ -86,6 +86,7 @@ namespace SkyEditor.Core.UI
                 {
                     _currentStep = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStep)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStepDisplayName)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoForward)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoBack)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsComplete)));
