@@ -115,9 +115,13 @@ namespace SkyEditor.Core.UI
                 {
                     output = Path.GetFileName((Model as IOnDisk).Filename);
                 }
-                else
+                else if (Model != null)
                 {
                     output = ReflectionHelpers.GetTypeFriendlyName(Model.GetType());
+                }
+                else
+                {
+                    output = Properties.Resources.UI_FileViewModel_NullTitle;
                 }
 
                 // Indicate if the file has been modified

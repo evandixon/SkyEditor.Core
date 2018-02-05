@@ -395,6 +395,15 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (Unknown).
+        /// </summary>
+        internal static string UI_FileViewModel_NullTitle {
+            get {
+                return ResourceManager.GetString("UI_FileViewModel_NullTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installed Extensions.
         /// </summary>
         internal static string UI_InstalledExtension {

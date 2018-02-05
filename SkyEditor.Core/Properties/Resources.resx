@@ -257,4 +257,7 @@
   <data name="Console_Solution_Open_InvalidType" xml:space="preserve">
     <value>Invalid solution file</value>
   </data>
+  <data name="UI_FileViewModel_NullTitle" xml:space="preserve">
+    <value>(Unknown)</value>
+  </data>
 </root>
