@@ -443,19 +443,22 @@ namespace SkyEditor.Core.Projects
         private Task _loadingTask;
 
         /// <summary>
-        /// The wizard that needs to be performed to complete initialization, or null if not applicable.
-        /// </summary>
-        /// <remarks>This can be ignored if the wizard is not required (<see cref="RequiresInitializationWizard"/>)</remarks>
-        public Wizard InitializationWizard { get; protected set; }
-
-        /// <summary>
         /// Whether the initialization wizard needs to be performed
         /// </summary>
-        public virtual bool RequiresInitializationWizard => InitializationWizard != null;
+        public virtual bool RequiresInitializationWizard => false;
 
         #endregion
 
         #region Functions
+
+        /// <summary>
+        /// Creates a new instance of the wizard that needs to be performed to complete initialization, or null if not applicable.
+        /// </summary>
+        /// <remarks>This can be ignored if the wizard is not required (<see cref="RequiresInitializationWizard"/>)</remarks>
+        public virtual Wizard GetInitializationWizard()
+        {
+            return null;
+        }
 
         #region Project Open/Save
 

@@ -32,7 +32,8 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 
                         if (CurrentApplicationViewModel.CurrentSolution.RequiresInitializationWizard)
                         {
-                            await CurrentApplicationViewModel.CurrentSolution.InitializationWizard.RunInConsole(CurrentApplicationViewModel.CurrentConsoleShell, true, CurrentIOProvider);
+                            var initWizard = CurrentApplicationViewModel.CurrentSolution.GetInitializationWizard();
+                            await initWizard.RunInConsole(CurrentApplicationViewModel.CurrentConsoleShell, true, CurrentIOProvider);
                         }
 
                         break;
