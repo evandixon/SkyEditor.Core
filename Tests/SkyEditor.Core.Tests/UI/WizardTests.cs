@@ -14,7 +14,7 @@ namespace SkyEditor.Core.Tests.UI
 
         public class AddingWizard : Wizard
         {
-            public AddingWizard(ApplicationViewModel applicationViewModel) : base(applicationViewModel)
+            public AddingWizard(PluginManager pluginManager) : base(pluginManager)
             {
                 Term1Step = new AddingWizardTerm1();
                 Term2Step = new AddingWizardTerm2();
@@ -84,20 +84,17 @@ namespace SkyEditor.Core.Tests.UI
         }        
 
         public PluginManager CurrentPluginManager { get; set; }
-        public ApplicationViewModel CurrentApplicationViewModel { get; set; }
 
         [TestInitialize]
         public void Initialize()
         {
             CurrentPluginManager = new PluginManager();
             CurrentPluginManager.LoadCore(new BasicTestCoreMod()).Wait();
-            CurrentApplicationViewModel = new ApplicationViewModel(CurrentPluginManager);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            CurrentApplicationViewModel.Dispose();
             CurrentPluginManager.Dispose();
         }        
 
@@ -105,7 +102,7 @@ namespace SkyEditor.Core.Tests.UI
         [TestCategory(TestCategory)]
         public void TestWizardForwardWorkflow()
         {
-            var wizard = new AddingWizard(CurrentApplicationViewModel);
+            var wizard = new AddingWizard(CurrentPluginManager);
 
             Assert.AreEqual(3, wizard.Steps.Count, "Wizard does not have the correct number of steps");
 
@@ -156,7 +153,7 @@ namespace SkyEditor.Core.Tests.UI
         [TestCategory(TestCategory)]
         public void WizardCantGoTooFarForward()
         {
-            var wizard = new AddingWizard(CurrentApplicationViewModel);
+            var wizard = new AddingWizard(CurrentPluginManager);
 
             Assert.AreEqual(3, wizard.Steps.Count, "Wizard does not have the correct number of steps");
 
@@ -188,7 +185,7 @@ namespace SkyEditor.Core.Tests.UI
         [TestCategory(TestCategory)]
         public void TestWizardBackwardWorkflow()
         {
-            var wizard = new AddingWizard(CurrentApplicationViewModel);
+            var wizard = new AddingWizard(CurrentPluginManager);
 
             Assert.AreEqual(3, wizard.Steps.Count, "Wizard does not have the correct number of steps");
 
@@ -234,7 +231,7 @@ namespace SkyEditor.Core.Tests.UI
         [TestCategory(TestCategory)]
         public void WizardCantGoTooFarBackward()
         {
-            var wizard = new AddingWizard(CurrentApplicationViewModel);
+            var wizard = new AddingWizard(CurrentPluginManager);
 
             Assert.AreEqual(3, wizard.Steps.Count, "Wizard does not have the correct number of steps");
 

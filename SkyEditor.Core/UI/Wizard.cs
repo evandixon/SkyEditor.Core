@@ -16,10 +16,10 @@ namespace SkyEditor.Core.UI
     /// </summary>
     public abstract class Wizard : INotifyPropertyChanged, INamed
     {
-        public Wizard(ApplicationViewModel applicationViewModel)
+        public Wizard(PluginManager currentPluginManager)
         {
             StepsInternal = new ObservableCollection<IWizardStepViewModel>();
-            CurrentApplicationViewModel = applicationViewModel ?? throw new ArgumentNullException(nameof(applicationViewModel));
+            CurrentPluginManager = currentPluginManager ?? throw new ArgumentNullException(nameof(currentPluginManager));
         }
 
         /// <summary>
@@ -27,10 +27,7 @@ namespace SkyEditor.Core.UI
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
-        /// <summary>
-        /// The application ViewModel with which this wizard is associated
-        /// </summary>
-        public ApplicationViewModel CurrentApplicationViewModel { get; private set; }
+        public PluginManager CurrentPluginManager { get; private set; }
 
         /// <summary>
         /// Read-only collection of all wizard steps
@@ -155,7 +152,7 @@ namespace SkyEditor.Core.UI
 
         private void ConsoleWriteLine(string line)
         {
-            CurrentApplicationViewModel.CurrentPluginManager.CurrentConsoleProvider.WriteLine(line);
+            CurrentPluginManager.CurrentConsoleProvider.WriteLine(line);
         }
     }
 }
