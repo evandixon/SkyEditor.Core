@@ -81,12 +81,22 @@ namespace SkyEditor.Core.UI
             {
                 if (!ReferenceEquals(_currentStep, value))
                 {
+                    if (_currentStep != null && _currentStep is INotifyPropertyChanged oldNotifyPropertyChanged)
+                    {
+                        oldNotifyPropertyChanged.PropertyChanged -= CurrentStep_PropertyChanged;
+                    }
+
                     _currentStep = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStep)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStepDisplayName)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoForward)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoBack)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsComplete)));
+
+                    if (_currentStep != null && _currentStep is INotifyPropertyChanged newNotifyPropertyChanged)
+                    {
+                        newNotifyPropertyChanged.PropertyChanged += CurrentStep_PropertyChanged;
+                    }
                 }
             }
         }
@@ -153,6 +163,16 @@ namespace SkyEditor.Core.UI
         private void ConsoleWriteLine(string line)
         {
             CurrentPluginManager.CurrentConsoleProvider.WriteLine(line);
+        }
+
+        private void CurrentStep_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IWizardStepViewModel.IsComplete))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoForward)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanGoBack)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsComplete)));
+            }
         }
     }
 }
