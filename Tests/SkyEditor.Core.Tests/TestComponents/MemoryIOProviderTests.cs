@@ -207,5 +207,37 @@ namespace SkyEditor.Core.Tests.TestComponents
             Assert.IsTrue(rootFiles.Any(x => x == "/file3.txt"));
             Assert.IsTrue(rootFiles.Any(x => x == "/file.txt"));
         }
+
+        [TestMethod()]
+        [TestCategory(MemoryIOProviderCategory)]
+        public void GetTempFilename_NotNull()
+        {
+            var tempFilename = Provider.GetTempFilename();
+            Assert.IsNotNull(tempFilename);
+        }
+
+        [TestMethod()]
+        [TestCategory(MemoryIOProviderCategory)]
+        public void GetTempFilename_FileExists()
+        {
+            var tempFilename = Provider.GetTempFilename();
+            Assert.IsTrue(Provider.FileExists(tempFilename), "Temp file does not exist");
+        }
+
+        [TestMethod()]
+        [TestCategory(MemoryIOProviderCategory)]
+        public void GetTempDirectory_NotNull()
+        {
+            var tempDirectory = Provider.GetTempDirectory();
+            Assert.IsNotNull(tempDirectory);
+        }
+
+        [TestMethod()]
+        [TestCategory(MemoryIOProviderCategory)]
+        public void GetTempDirectory_FileExists()
+        {
+            var tempDirectory = Provider.GetTempDirectory();
+            Assert.IsTrue(Provider.DirectoryExists(tempDirectory), "Temp directory does not exist");
+        }
     }
 }

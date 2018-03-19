@@ -228,7 +228,7 @@ namespace SkyEditor.Core.TestComponents
             string dirname = null;
             lock (tempCounterLock)
             {
-                while (dirname != null || FileExists(dirname))
+                while (dirname == null || DirectoryExists(dirname))
                 {
                     dirname = "/temp/" + tempCounter++.ToString();
                 }
