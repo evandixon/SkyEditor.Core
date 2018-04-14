@@ -828,6 +828,49 @@ namespace SkyEditor.Core.Projects
 
         #endregion
 
+        #region Progress Watching
+
+        /// <summary>
+        /// Starts watching the progress report token, relaying progress reports to the current build progress. IMPORTANT: Be sure to call <see cref="UnwatchProgressReportToken(ProgressReportToken)"/> when compelted to properly dispose of event handlers and prevent memory leaks.
+        /// </summary>
+        /// <param name="token">The token to watch</param>
+        /// <param name="relayComplete">Whether to relay the Completed event</param>
+        public void WatchProgressReportToken(ProgressReportToken token, bool relayComplete)
+        {
+            if (token == null)
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+
+            token.ProgressChanged += ProgressReportToken_OnProgressChanged;
+            
+            if (relayComplete)
+            {
+                token.Completed += ProgressReportToken_OnCompleted;
+            }
+        }
+
+        /// <summary>
+        /// Removes event handlers made with <see cref="WatchProgressReportToken(ProgressReportToken, bool)"/>
+        /// </summary>
+        /// <param name="token">The token whose event handlers should be removed</param>
+        public void UnwatchProgressReportToken(ProgressReportToken token)
+        {
+            token.ProgressChanged -= ProgressReportToken_OnProgressChanged;
+            token.Completed -= ProgressReportToken_OnCompleted;
+        }
+
+        private void ProgressReportToken_OnProgressChanged(object sender, ProgressReportedEventArgs e)
+        {
+            ProgressChanged?.Invoke(this, e);
+        }
+
+        private void ProgressReportToken_OnCompleted(object sender, EventArgs e)
+        {
+            Completed?.Invoke(this, e);
+        }
+        #endregion
+
         #endregion
 
         #region IDisposable Support
