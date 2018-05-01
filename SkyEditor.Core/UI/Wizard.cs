@@ -4,6 +4,7 @@ using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,7 @@ namespace SkyEditor.Core.UI
         public Wizard(PluginManager currentPluginManager)
         {
             StepsInternal = new ObservableCollection<IWizardStepViewModel>();
+            StepsInternal.CollectionChanged += StepsInternal_CollectionChanged;
             CurrentPluginManager = currentPluginManager ?? throw new ArgumentNullException(nameof(currentPluginManager));
         }
 
@@ -72,7 +74,8 @@ namespace SkyEditor.Core.UI
             {
                 if (_currentStep == null && Steps.Any())
                 {
-                    _currentStep = Steps.First();
+                    // Call property setter to set event handlers too
+                    CurrentStep = Steps.First();
                 }
 
                 return _currentStep;
@@ -163,6 +166,18 @@ namespace SkyEditor.Core.UI
         private void ConsoleWriteLine(string line)
         {
             CurrentPluginManager.CurrentConsoleProvider.WriteLine(line);
+        }
+
+        private void StepsInternal_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add &&
+                e.NewItems.Count > 0 &&
+                e.NewItems[0] is IWizardStepViewModel newStep &&
+                _currentStep == null) // Compare to _currentStep instead of CurrentStep to avoid side effect
+            {
+                // Now we WANT to call CurrentStep to set event handlers
+                CurrentStep = newStep;
+            }
         }
 
         private void CurrentStep_PropertyChanged(object sender, PropertyChangedEventArgs e)

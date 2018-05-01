@@ -3,6 +3,7 @@ using SkyEditor.Core.ConsoleCommands;
 using SkyEditor.Core.UI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace SkyEditor.Core.Tests.UI
@@ -32,11 +33,26 @@ namespace SkyEditor.Core.Tests.UI
             public override string Name => "Adding Wizard";
         }
 
-        public class AddingWizardTerm1 : IWizardStepViewModel
+        public class AddingWizardTerm1 : IWizardStepViewModel, INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged;
+
             public string Name => "Term 1";
 
-            public int? Term1 { get; set; }
+            public int? Term1
+            {
+                get
+                {
+                    return _term1;
+                }
+                set
+                {
+                    _term1 = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Term1)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsComplete)));
+                }
+            }
+            private int? _term1;
 
             public bool IsComplete => Term1.HasValue;
 
@@ -46,11 +62,25 @@ namespace SkyEditor.Core.Tests.UI
             }
         }
 
-        public class AddingWizardTerm2 : IWizardStepViewModel
+        public class AddingWizardTerm2 : IWizardStepViewModel, INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged;
             public string Name => "Term 2";
 
-            public int? Term2 { get; set; }
+            public int? Term2
+            {
+                get
+                {
+                    return _term2;
+                }
+                set
+                {
+                    _term2 = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Term2)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsComplete)));
+                }
+            }
+            private int? _term2;
 
             public bool IsComplete => Term2.HasValue;
 
@@ -258,6 +288,68 @@ namespace SkyEditor.Core.Tests.UI
             wizard.GoBack();
 
             Assert.IsInstanceOfType(wizard.CurrentStep, typeof(AddingWizardTerm1));
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void WizardCallsPropertyChangedEventForCanGoNext()
+        {
+            // Arrange
+            var wizard = new AddingWizard(CurrentPluginManager);
+            var eventFired = false;
+            void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(wizard.CanGoForward))
+                {
+                    eventFired = true;
+                }
+            }
+            wizard.PropertyChanged += OnPropertyChanged;
+
+            // Sanity check
+            Assert.IsFalse(wizard.CanGoForward);
+
+            // Act
+            wizard.Term1Step.Term1 = 10;
+
+            // Assert
+            Assert.IsTrue(wizard.CanGoForward, "Wizard should be able to go forward");
+            Assert.IsTrue(eventFired, "Wizard.PropertyChanged did not fire for Wizard.CanGoForward");
+
+            // Cleanup
+            wizard.PropertyChanged -= OnPropertyChanged;
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void WizardCallsPropertyChangedEventForCanGoNextStep2()
+        {
+            // Arrange
+            var wizard = new AddingWizard(CurrentPluginManager);
+            var eventFired = false;
+            void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(wizard.CanGoForward))
+                {
+                    eventFired = true;
+                }
+            }
+            wizard.PropertyChanged += OnPropertyChanged;
+            wizard.Term1Step.Term1 = 10;
+            wizard.GoForward();
+
+            // Sanity check
+            Assert.IsFalse(wizard.CanGoForward);
+
+            // Act
+            wizard.Term2Step.Term2 = 10;
+
+            // Assert
+            Assert.IsTrue(wizard.CanGoForward, "Wizard should be able to go forward");
+            Assert.IsTrue(eventFired, "Wizard.PropertyChanged did not fire for Wizard.CanGoForward");
+
+            // Cleanup
+            wizard.PropertyChanged -= OnPropertyChanged;
         }
     }
 }
