@@ -90,8 +90,10 @@ namespace SkyEditor.Core.Tests.UI
             }
         }
 
-        public class AddingWizardResultView : IWizardStepViewModel
+        public class AddingWizardResultView : IWizardStepViewModel, INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged;
+
             public AddingWizardResultView(AddingWizard wizard)
             {
                 Wizard = wizard;
@@ -103,7 +105,20 @@ namespace SkyEditor.Core.Tests.UI
 
             public int Result => Wizard.Term1Step.Term1.Value + Wizard.Term2Step.Term2.Value;
 
-            public bool ResultApproved { get; set; }
+            public bool ResultApproved
+            {
+                get
+                {
+                    return _resultApproved;
+                }
+                set
+                {
+                    _resultApproved = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResultApproved)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsComplete)));
+                }
+            }
+            private bool _resultApproved;
 
             public bool IsComplete => ResultApproved;
 
@@ -310,6 +325,7 @@ namespace SkyEditor.Core.Tests.UI
             Assert.IsFalse(wizard.CanGoForward);
 
             // Act
+            eventFired = false;
             wizard.Term1Step.Term1 = 10;
 
             // Assert
@@ -342,11 +358,49 @@ namespace SkyEditor.Core.Tests.UI
             Assert.IsFalse(wizard.CanGoForward);
 
             // Act
+            eventFired = false;
             wizard.Term2Step.Term2 = 10;
 
             // Assert
             Assert.IsTrue(wizard.CanGoForward, "Wizard should be able to go forward");
             Assert.IsTrue(eventFired, "Wizard.PropertyChanged did not fire for Wizard.CanGoForward");
+
+            // Cleanup
+            wizard.PropertyChanged -= OnPropertyChanged;
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void WizardCallsPropertyChangedEventForCanFinish()
+        {
+            // Arrange
+            var wizard = new AddingWizard(CurrentPluginManager);
+            var eventFired = false;
+            void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(wizard.IsComplete))
+                {
+                    eventFired = true;
+                }
+            }
+            wizard.PropertyChanged += OnPropertyChanged;
+            wizard.Term1Step.Term1 = 10;
+            wizard.GoForward();
+            wizard.Term2Step.Term2 = 10;
+            wizard.GoForward();
+
+            // Sanity check
+            Assert.IsFalse(wizard.CanGoForward);
+            Assert.IsFalse(wizard.IsComplete);
+
+            // Act
+            eventFired = false;
+            wizard.ResultStep.ResultApproved = true;
+
+            // Assert
+            Assert.IsFalse(wizard.CanGoForward, "Wizard should not be able to go forward because it's the last step");
+            Assert.IsTrue(wizard.IsComplete, "Wizard should be complete.");
+            Assert.IsTrue(eventFired, "Wizard.PropertyChanged did not fire for Wizard.IsComplete");
 
             // Cleanup
             wizard.PropertyChanged -= OnPropertyChanged;
