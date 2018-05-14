@@ -419,6 +419,12 @@ namespace SkyEditor.Core
             if (!TypeRegistry.ContainsKey(type))
             {
                 TypeRegistry.Add(type, new List<TypeInfo>());
+
+                // Add the type to its own registry.
+                // The function will only add it if an instance can be created.
+                // This will happen automatically if assembly searching is enabled,
+                // but it needs to happen now to avoid issues where it doesn't exist until later, despite some things expecting it now.
+                RegisterType(type, type);
             }
         }
 
