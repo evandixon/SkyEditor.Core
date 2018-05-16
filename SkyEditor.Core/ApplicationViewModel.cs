@@ -712,11 +712,21 @@ namespace SkyEditor.Core
 
         private void RegisterSolutionEventHandlers(Solution solution)
         {
+            if (solution == null)
+            {
+                return;
+            }
+
             solution.ErrorReported += Solution_ErrorReported;
         }
 
         private void UnregisterSolutionEventHandlers(Solution solution)
         {
+            if (solution == null)
+            {
+                return;
+            }
+
             solution.ErrorReported -= Solution_ErrorReported;
         }
 

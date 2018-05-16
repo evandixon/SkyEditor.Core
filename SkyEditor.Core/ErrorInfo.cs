@@ -24,6 +24,11 @@ namespace SkyEditor.Core
             Message = innerException.ToString();
         }
 
+        public ErrorInfo(Project project)
+        {
+            SourceProject = project;
+        }
+
         /// <summary>
         /// The type of error
         /// </summary>

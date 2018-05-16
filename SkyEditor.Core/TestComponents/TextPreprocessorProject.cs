@@ -14,6 +14,8 @@ namespace SkyEditor.Core.TestComponents
     /// </summary>
     public class TextPreprocessorProject : Project
     {
+        public bool ReportInfoErrorOnBuild { get; set; }
+
         public virtual string GetOutputDirectory()
         {
             return Path.Combine(GetRootDirectory(), "output");
@@ -46,6 +48,11 @@ namespace SkyEditor.Core.TestComponents
 
         public override async Task Build()
         {
+            if (ReportInfoErrorOnBuild)
+            {
+                ReportError(new ErrorInfo(this) { Message = "Error reported because " + nameof(ReportInfoErrorOnBuild) + " is true.", Type = ErrorType.Info });
+            }
+
             var outputDirectory = GetOutputDirectory();
 
             // Parse the variables

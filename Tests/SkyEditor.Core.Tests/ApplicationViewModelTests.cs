@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.Core.Projects;
 
 namespace SkyEditor.Core.Tests
 {
@@ -79,6 +80,31 @@ namespace SkyEditor.Core.Tests
                     await appViewModel.OpenFile("/test.txt", IOHelper.PickFirstDuplicateMatchSelector);
                     Assert.IsNotNull(appViewModel.SelectedFile, "Selected File should not be null after a file is opened");
                 }     
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task TestProjectErrorsDetectedByApplicationViewModel()
+        {
+            using (var manager = new PluginManager())
+            {
+                await manager.LoadCore(new CoreMod());
+                using (var appViewModel = new ApplicationViewModel(manager))
+                {
+                    var solution = await ProjectBase.CreateProject<TextPreprocessorSolution>("/projects", "Test Solution", manager);
+                    await solution.Initialize();
+                    await solution.LoadingTask;
+
+                    (solution.GetProject("/Text Preprocessor Project") as TextPreprocessorProject).ReportInfoErrorOnBuild = true;
+                    appViewModel.CurrentSolution = solution;
+                    await appViewModel.CurrentSolution.Build();
+
+                    Assert.AreEqual(1, appViewModel.Errors.Count);
+                    var e = appViewModel.Errors[0];
+                    Assert.AreEqual(ErrorType.Info, e.Type);
+                    Assert.AreSame(solution.GetProject("/Text Preprocessor Project"), e.SourceProject, "Error did not originate from project.");
+                }
             }
         }
     }

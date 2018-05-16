@@ -185,6 +185,7 @@ namespace SkyEditor.Core.Projects
             p.ParentSolution = this;
             await p.Initialize();
             await p.Load();
+            RegisterProjectEventHandlers(p);
             AddProject(FixPath(parentPath) + "/" + projectName, p);
         }
 
