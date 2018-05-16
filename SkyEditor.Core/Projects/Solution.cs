@@ -43,9 +43,30 @@ namespace SkyEditor.Core.Projects
         public event EventHandler<ProjectRemovedEventArgs> ProjectRemoved;
         #endregion
 
+        #region Event Handlers
+
         private void Project_Modified(object sender, EventArgs e)
         {
             this.HasUnsavedChanges = true;
+        }
+
+        private void Project_ErrorReported(object sender, ProjectErrorReportedEventArgs e)
+        {
+            ReportError(e.ErrorInfo);
+        }
+
+        #endregion
+
+        private void RegisterProjectEventHandlers(Project project)
+        {
+            project.Modified += Project_Modified;
+            project.ErrorReported += Project_ErrorReported;
+        }
+
+        private void UnregisterProjectEventHandlers(Project project)
+        {
+            project.Modified -= Project_Modified;
+            project.ErrorReported -= Project_ErrorReported;
         }
 
         protected override async Task<IOnDisk> LoadProjectItem(ItemValue item)
@@ -55,6 +76,7 @@ namespace SkyEditor.Core.Projects
             if (projectBase is Project project)
             {
                 project.ParentSolution = this;
+                RegisterProjectEventHandlers(project);
                 return project;
             }
             else if (projectBase is UnsupportedProjectBase unsupportedBase)
@@ -200,7 +222,7 @@ namespace SkyEditor.Core.Projects
             ProjectRemoving?.Invoke(this, new ProjectRemovingEventArgs { Project = project, Path = fixedPath });
 
             DeleteItem(fixedPath);
-            project.Modified -= Project_Modified;
+            UnregisterProjectEventHandlers(project);
 
             project.Dispose();
 
@@ -362,5 +384,18 @@ namespace SkyEditor.Core.Projects
             this.Progress = built / toBuild.Count;
         }
         #endregion
+
+        protected override void Dispose(bool disposing)
+        {
+            // ProjectBase will dispose of the projects, but we want to remove all event handlers first
+
+            foreach (var project in GetAllProjects())
+            {
+                UnregisterProjectEventHandlers(project);
+            }
+
+            // Proceed to dispose of each project
+            base.Dispose(disposing);
+        }
     }
 }

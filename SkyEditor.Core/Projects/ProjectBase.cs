@@ -205,7 +205,16 @@ namespace SkyEditor.Core.Projects
         /// Raised when the project file has been saved
         /// </summary>
         public event EventHandler FileSaved;
+
+        /// <summary>
+        /// Raised when a property is changed
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Raised when an error is reported
+        /// </summary>
+        public event EventHandler<ProjectErrorReportedEventArgs> ErrorReported;
         #endregion
 
         #region Properties
@@ -458,6 +467,15 @@ namespace SkyEditor.Core.Projects
         public virtual Wizard GetInitializationWizard()
         {
             return null;
+        }
+
+        /// <summary>
+        /// Reports to the application that an error has occurred in the project.
+        /// </summary>
+        /// <param name="info">Information to describe the error</param>
+        protected void ReportError(ErrorInfo info)
+        {
+            ErrorReported?.Invoke(this, new ProjectErrorReportedEventArgs { ErrorInfo = info });
         }
 
         #region Project Open/Save

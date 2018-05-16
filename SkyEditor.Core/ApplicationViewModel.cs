@@ -155,6 +155,11 @@ namespace SkyEditor.Core
                 CloseFile(sender as FileViewModel);
             }
         }
+
+        private void Solution_ErrorReported(object sender, ProjectErrorReportedEventArgs e)
+        {
+            ReportError(e.ErrorInfo);
+        }
         #endregion
 
         #region Properties
@@ -282,11 +287,17 @@ namespace SkyEditor.Core
                 {
                     if (_currentSolution != null)
                     {
+                        UnregisterSolutionEventHandlers(_currentSolution);
                         _currentSolution.Dispose();
                     }
 
                     _currentSolution = value;
 
+                    if (_currentSolution != null)
+                    {
+                        RegisterSolutionEventHandlers(_currentSolution);
+                    }
+                    
                     SolutionChanged?.Invoke(this, new EventArgs());
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentSolution)));
                 }
@@ -698,6 +709,16 @@ namespace SkyEditor.Core
 #endregion
 
         #region Functions
+
+        private void RegisterSolutionEventHandlers(Solution solution)
+        {
+            solution.ErrorReported += Solution_ErrorReported;
+        }
+
+        private void UnregisterSolutionEventHandlers(Solution solution)
+        {
+            solution.ErrorReported -= Solution_ErrorReported;
+        }
 
         #region I/O Filters
         /// <summary>
@@ -1181,6 +1202,7 @@ namespace SkyEditor.Core
                 if (disposing)
                 {
                     // Dispose contained objects
+                    UnregisterSolutionEventHandlers(CurrentSolution);
                     CurrentSolution?.Dispose();
                     foreach (var item in OpenFiles)
                     {
