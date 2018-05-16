@@ -245,7 +245,60 @@ namespace SkyEditor.Core.Utilities
             return friendlyName ?? type.FullName;
         }
 
-#if NET462
+        /// <summary>
+        /// Loads the assembly located at the given path into the current AppDomain and returns it.
+        /// </summary>
+        /// <param name="assemblyPath">Full path of the assembly to load.</param>
+        /// <returns>The assembly that was loaded.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the current platform does not support loading assemblies from a specific path.</exception>
+        /// <exception cref="BadImageFormatException">Thrown when the assembly is not a valid .Net assembly.</exception>
+        public static Assembly LoadSingleAssembly(string assemblyPath)
+        {
+            if (!Path.IsPathRooted(assemblyPath))
+            {
+                assemblyPath = Path.Combine(Directory.GetCurrentDirectory(), assemblyPath);
+            }
+
+            return Assembly.LoadFrom(assemblyPath);
+        }
+
+        /// <summary>
+        /// Loads the assembly located at the given path into the current AppDomain and returns it.
+        /// If the assembly is already loaded, no action is taken besides returning it.
+        /// </summary>
+        /// <param name="assemblyPath">Full path of the assembly to load.</param>
+        /// <returns>The assembly that was loaded.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the current platform does not support loading assemblies from a specific path.</exception>
+        /// <exception cref="BadImageFormatException">Thrown when the assembly is not a valid .Net assembly.</exception>
+        public static Assembly LoadAssemblyWithDependencies(string path)
+        {
+            // First, check to see if it's already loaded
+            var name = AssemblyName.GetAssemblyName(path);
+            var candidateAssemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == name.Name);
+
+            if (candidateAssemblies.Any())
+            {
+                // It was loaded, then there's no point in loading it again. In some cases, it could cause more problems
+                return candidateAssemblies.First();
+            }
+            else
+            {
+                // Load it
+                AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+                var loadedAssembly = LoadSingleAssembly(path);
+
+                // Load the assembly's dependencies
+                // For some reason, this doesn't happen automatically for executables
+                foreach (var item in loadedAssembly.GetReferencedAssemblies())
+                {
+                    Assembly.Load(item);
+                }
+
+                AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
+                return loadedAssembly;
+            }
+        }
+
         /// <summary>
         /// Gets the full paths of all assemblies referenced by the given assembly
         /// </summary>
@@ -295,6 +348,7 @@ namespace SkyEditor.Core.Utilities
                 if (isLocal)
                 {
                     // Try to find the references of this reference
+                    
                     var currentAssembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == reference.FullName).FirstOrDefault();
 
                     if (currentAssembly == null)
@@ -317,7 +371,7 @@ namespace SkyEditor.Core.Utilities
                             var name = AssemblyName.GetAssemblyName(sourcePath);
                             if (reference.FullName == name.FullName)
                             {
-                                var a = LoadAssembly(sourcePath);
+                                var a = LoadSingleAssembly(sourcePath);
                                 if (a != null)
                                 {
                                     output.AddRange(GetAssemblyDependencies(a));
@@ -333,37 +387,7 @@ namespace SkyEditor.Core.Utilities
             }
             return output;
         }
-
-        public static Assembly LoadAssembly(string path)
-        {
-            // First, check to see if it's already loaded
-            var name = AssemblyName.GetAssemblyName(path);
-            var candidateAssemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == name.Name);
-
-            if (candidateAssemblies.Any())
-            {
-                // It was loaded, then there's no point in loading it again. In some cases, it could cause more problems
-                return candidateAssemblies.First();
-            }
-            else
-            {
-                // Load it
-                AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
-
-                var loadedAssembly = Assembly.LoadFrom(path);
-
-                // Load the assembly's dependencies
-                // For some reason, this doesn't happen automatically for executables
-                foreach (var item in loadedAssembly.GetReferencedAssemblies())
-                {
-                    Assembly.Load(item);
-                }
-
-                AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
-                return loadedAssembly;
-            }
-        }
-
+        
         private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs e)
         {
             var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => string.Equals(a.FullName, e.Name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
@@ -403,10 +427,9 @@ namespace SkyEditor.Core.Utilities
                 // Return the first assembly that has the requested name
                 return candidates.Select(x => new { AssemblyName = AssemblyName.GetAssemblyName(x), Location = x })
                     .Where(x => x.AssemblyName.FullName == e.Name)
-                    .Select(x => LoadAssembly(x.Location))
+                    .Select(x => LoadAssemblyWithDependencies(x.Location))
                     .FirstOrDefault();
             }
         }
-#endif
     }
 }

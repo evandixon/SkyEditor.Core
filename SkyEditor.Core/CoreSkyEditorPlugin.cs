@@ -95,7 +95,7 @@ namespace SkyEditor.Core
         /// <returns>A boolean indicating whether or not plugin loading is enabled.</returns>
         public virtual bool IsPluginLoadingEnabled()
         {
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
             return true;
 #elif NET462
             return true;
@@ -129,18 +129,7 @@ namespace SkyEditor.Core
         /// <exception cref="BadImageFormatException">Thrown when the assembly is not a valid .Net assembly.</exception>
         public virtual Assembly LoadAssembly(string assemblyPath)
         {
-#if NETSTANDARD1_5
-            if (!Path.IsPathRooted(assemblyPath))
-            {
-                assemblyPath = Path.Combine(Directory.GetCurrentDirectory(), assemblyPath);
-            }
-            
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#elif NET462
-            return ReflectionHelpers.LoadAssembly(assemblyPath);
-#else
-            throw new NotSupportedException();
-#endif
+            return ReflectionHelpers.LoadAssemblyWithDependencies(assemblyPath);
         }
 
         public override void Load(PluginManager manager)
