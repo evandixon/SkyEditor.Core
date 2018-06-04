@@ -31,6 +31,11 @@ namespace SkyEditor.Core.Utilities
                     {
                         using (var zipEntry = item.Open())
                         {
+                            if (!provider.DirectoryExists(Path.GetDirectoryName(Path.Combine(outputDir, item.FullName))))
+                            {
+                                provider.CreateDirectory(Path.GetDirectoryName(Path.Combine(outputDir, item.FullName)));
+                            }
+
                             using (var file = provider.OpenFileWriteOnly(Path.Combine(outputDir, item.FullName)))
                             {
                                 await zipEntry.CopyToAsync(file);
