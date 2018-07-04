@@ -119,15 +119,17 @@ namespace SkyEditor.Core.Tests.Utilities
         [TestCategory(ReflectionHelperCategory)]
         public void CanCreateInstanceTests()
         {
-            Assert.IsTrue(ReflectionHelpers.CanCreateInstance(typeof(ReflectionHelpersTests)), "Failed to indicate that ReflectionHelpersTests can have an instance created");
-            Assert.IsFalse(ReflectionHelpers.CanCreateInstance(typeof(CoreSkyEditorPlugin).GetTypeInfo()), "Incorrectly indicated an abstract class can have an instance created");
+            var manager = new PluginManager();
+            Assert.IsTrue(manager.CanCreateInstance(typeof(ReflectionHelpersTests)), "Failed to indicate that ReflectionHelpersTests can have an instance created");
+            Assert.IsFalse(manager.CanCreateInstance(typeof(CoreSkyEditorPlugin).GetTypeInfo()), "Incorrectly indicated an abstract class can have an instance created");
         }
 
         [TestMethod]
         [TestCategory(ReflectionHelperCategory)]
         public void CreateInstanceTests()
         {
-            var multi = ReflectionHelpers.CreateInstance(typeof(TestContainerClassMulti));
+            var manager = new PluginManager();
+            var multi = manager.CreateInstance(typeof(TestContainerClassMulti));
             Assert.IsNotNull(multi);
             Assert.IsInstanceOfType(multi, typeof(TestContainerClassMulti));
         }
@@ -140,7 +142,8 @@ namespace SkyEditor.Core.Tests.Utilities
             original.IntegerItem = 94;
             original.StringItem = "94";
 
-            var newInst = ReflectionHelpers.CreateNewInstance(original);
+            var manager = new PluginManager();
+            var newInst = manager.CreateNewInstance(original);
             Assert.IsNotNull(newInst);
             Assert.IsInstanceOfType(newInst, typeof(TestContainerClassMulti));
             Assert.AreNotEqual(94, ((TestContainerClassMulti)newInst).IntegerItem, "CreateNewInstance either cloned the class, or returned the same instance");

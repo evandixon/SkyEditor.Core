@@ -44,7 +44,7 @@ namespace SkyEditor.Core.Tests.UI
                 var testFile = new TextFile();
                 testFile.CreateFile("Test");
 
-                var testFileViewModel = new FileViewModel(testFile);
+                var testFileViewModel = new FileViewModel(testFile, manager);
                 Assert.AreEqual(false, testFileViewModel.CanSave(manager));
             }
         }
@@ -62,7 +62,7 @@ namespace SkyEditor.Core.Tests.UI
                 var testFile = new TextFile();
                 await testFile.OpenFile("/test.txt", manager.CurrentIOProvider);
 
-                var testFileViewModel = new FileViewModel(testFile);
+                var testFileViewModel = new FileViewModel(testFile, manager);
                 Assert.AreEqual(true, testFileViewModel.CanSave(manager));
             }
         }
@@ -78,7 +78,7 @@ namespace SkyEditor.Core.Tests.UI
                 var testFile = new TextFile();
                 testFile.CreateFile("Test");
 
-                var testFileViewModel = new FileViewModel(testFile);
+                var testFileViewModel = new FileViewModel(testFile, manager);
                 Assert.AreEqual(true, testFileViewModel.CanSaveAs(manager));
             }
         }
@@ -97,7 +97,7 @@ namespace SkyEditor.Core.Tests.UI
                 await testFile.OpenFile("/test.txt", manager.CurrentIOProvider);
                 testFile.Contents = "saved";
 
-                var testFileViewModel = new FileViewModel(testFile);
+                var testFileViewModel = new FileViewModel(testFile, manager);
                 await testFileViewModel.Save(manager);
                 Assert.AreEqual("saved", manager.CurrentIOProvider.ReadAllText("/test.txt"));
             }
@@ -115,7 +115,7 @@ namespace SkyEditor.Core.Tests.UI
                 testFile.CreateFile("Test");
                 testFile.Contents = "saved";
 
-                var testFileViewModel = new FileViewModel(testFile);
+                var testFileViewModel = new FileViewModel(testFile, manager);
                 await testFileViewModel.Save("/test.txt", manager);
                 Assert.AreEqual("saved", manager.CurrentIOProvider.ReadAllText("/test.txt"));
             }

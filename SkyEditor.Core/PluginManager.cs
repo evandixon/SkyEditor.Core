@@ -28,6 +28,12 @@ namespace SkyEditor.Core
             DependantPlugins = new Dictionary<SkyEditorPlugin, List<SkyEditorPlugin>>();
             DependantPluginLoadingQueue = new Queue<SkyEditorPlugin>();
             IOFilters = new Dictionary<string, string>();
+            RegisteredSingletons = new Dictionary<Type, Func<PluginManager, object>>();
+            RegisteredTransients = new Dictionary<Type, Func<PluginManager, object>>();
+            InitializedSingletons = new Dictionary<Type, object>();
+
+            // Everything created by this PluginManager gets to have a reference to it
+            AddSingleton(pluginManager => pluginManager);
         }
 
         #region Properties
@@ -103,6 +109,12 @@ namespace SkyEditor.Core
         /// </summary>
         public IConsoleProvider CurrentConsoleProvider { get; protected set; }
 
+        private Dictionary<Type, Func<PluginManager, object>> RegisteredTransients { get; set; }
+
+        private Dictionary<Type, Func<PluginManager, object>> RegisteredSingletons { get; set; }
+
+        private Dictionary<Type, object> InitializedSingletons { get; set; }
+
         #endregion
 
         #region Events
@@ -174,9 +186,9 @@ namespace SkyEditor.Core
                         if (assemblyActual != null)
                         {
                             PluginAssemblies.Add(assemblyActual);
-                            foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin).GetTypeInfo()) && ReflectionHelpers.CanCreateInstance(x)))
+                            foreach (var plg in assemblyActual.DefinedTypes.Where((x) => ReflectionHelpers.IsOfType(x, typeof(SkyEditorPlugin).GetTypeInfo()) && this.CanCreateInstance(x)))
                             {
-                                Plugins.Add(ReflectionHelpers.CreateInstance(plg) as SkyEditorPlugin);
+                                Plugins.Add(this.CreateInstance(plg) as SkyEditorPlugin);
                             }
                         }
                     }
@@ -212,7 +224,7 @@ namespace SkyEditor.Core
             {
                 var item = DependantPluginLoadingQueue.Dequeue();
                 var pluginType = item.GetType();
-                
+
                 // Determine if it has already been loaded
                 if (!Plugins.Where((x) => x.GetType() == pluginType).Any())
                 {
@@ -242,7 +254,7 @@ namespace SkyEditor.Core
                 {
                     LoadTypes(item);
                 }
-            }            
+            }
 
             PluginLoadComplete?.Invoke(this, new EventArgs());
         }
@@ -453,15 +465,15 @@ namespace SkyEditor.Core
             {
                 throw new ArgumentNullException(nameof(register));
             }
-            
+
             if (type == null)
             {
                 throw new ArgumentNullException(nameof(type));
             }
-           
+
             // Only register types that can be created
             // This excludes generic types, abstract classes, and interfaces.
-            if (ReflectionHelpers.CanCreateInstance(type))
+            if (this.CanCreateInstance(type))
             {
                 // Ensure the register was in fact registered
                 RegisterTypeRegister(register);
@@ -512,6 +524,7 @@ namespace SkyEditor.Core
         #endregion
 
         #region Functions
+
         #region Read Type Registry
 
         /// <summary>
@@ -534,7 +547,7 @@ namespace SkyEditor.Core
             }
             else
             {
-                var instance = ReflectionHelpers.CreateInstance(type);
+                var instance = this.CreateInstance(type);
                 TypeInstanceCache.Add(type, instance);
                 return instance;
             }
@@ -587,7 +600,7 @@ namespace SkyEditor.Core
                 throw new ArgumentNullException(nameof(baseType));
             }
 
-            return GetRegisteredTypes(baseType).Where((x) => ReflectionHelpers.CanCreateInstance(x)).Select((x) => GetCachedInstance(x));
+            return GetRegisteredTypes(baseType).Where((x) => this.CanCreateInstance(x)).Select((x) => GetCachedInstance(x));
         }
 
         /// <summary>
@@ -601,6 +614,262 @@ namespace SkyEditor.Core
         {
             return GetRegisteredObjects(typeof(T).GetTypeInfo()).Select(x => x as T);
         }
+        #endregion
+
+        #region Dependency Injection
+
+        /// <summary>
+        /// Registers a type that can be provided to dynamically-created objects in their constructor, created every time it is requested.
+        /// </summary>
+        /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
+        public void AddTransient<TAbstract, TInstantiate>() where TInstantiate : TAbstract where TAbstract : class
+        {
+            AddTransient<TAbstract>(_ => this.CreateInstance(typeof(TInstantiate)) as TAbstract);
+        }
+
+        /// <summary>
+        /// Registers a type that can be provided to dynamically-created objects in their constructor, created every time it is requested.
+        /// </summary>
+        /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
+        /// <param name="constructor">Function that creates the type to be provided</param>
+        public void AddTransient<TAbstract>(Func<PluginManager, TAbstract> constructor) where TAbstract : class
+        {
+            RegisteredTransients.Add(typeof(TAbstract), p => constructor(p));
+        }
+
+        /// <summary>
+        /// Registers a type that can be provided to dynamically-created objects in their constructor, created once then cached.
+        /// Creation will take place the first time it is needed
+        /// </summary>
+        /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
+        /// <param name="constructor">Function that creates the type to be provided</param>
+        public void AddSingleton<TAbstract, TInstantiate>() where TInstantiate : TAbstract where TAbstract : class
+        {
+            AddSingleton<TAbstract>(_ => this.CreateInstance(typeof(TInstantiate)) as TAbstract);
+        }
+
+        /// <summary>
+        /// Registers a type that can be provided to dynamically-created objects in their constructor, created once then cached.
+        /// Creation will take place the first time it is needed.
+        /// </summary>
+        /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
+        /// <param name="constructor">Function that creates the type to be provided</param>
+        public void AddSingleton<TAbstract>(Func<PluginManager, TAbstract> constructor) where TAbstract : class
+        {
+            RegisteredSingletons.Add(typeof(TAbstract), p => constructor(p));
+        }
+
+        /// <summary>
+        /// Gets a registered singleton or transient dependency, or null if the dependency could not be found
+        /// </summary>
+        /// <typeparam name="TAbstract">Type of the singleton or dependency</typeparam>
+        /// <remarks>
+        /// Services will be loaded if exists in this order:
+        /// - Initialized singletons
+        /// - Uninitialized singletons
+        /// - Transients
+        /// </remarks>
+        public TAbstract GetRequiredService<TAbstract>() where TAbstract : class
+        {
+            var serviceType = typeof(TAbstract);
+            return GetRequiredService(serviceType) as TAbstract;
+        }
+
+        /// <summary>
+        /// Gets a registered singleton or transient dependency, or null if the dependency could not be found
+        /// </summary>
+        /// <typeparam name="TAbstract">Type of the singleton or dependency</typeparam>
+        /// <remarks>
+        /// Services will be loaded if exists in this order:
+        /// - Initialized singletons
+        /// - Uninitialized singletons
+        /// - Transients
+        /// </remarks>
+        public object GetRequiredService(Type serviceType)
+        {
+            if (InitializedSingletons.ContainsKey(serviceType))
+            {
+                return InitializedSingletons[serviceType];
+            }
+            else if (RegisteredSingletons.ContainsKey(serviceType))
+            {
+                var instance = RegisteredSingletons[serviceType].Invoke(this);
+                InitializedSingletons.Add(serviceType, instance);
+                return instance;
+            }
+            else if (RegisteredTransients.ContainsKey(serviceType))
+            {
+                return RegisteredTransients[serviceType].Invoke(this);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the required service has been registered
+        /// </summary>
+        /// <typeparam name="TAbstract">Type of the singleton or dependency</typeparam>
+        /// <remarks>
+        /// Services will be loaded if exists in this order:
+        /// - Initialized singletons
+        /// - Uninitialized singletons
+        /// - Transients
+        /// </remarks>
+        public bool HasRequiredService<TAbstract>() where TAbstract : class
+        {
+            var serviceType = typeof(TAbstract);
+            return HasRequiredService(serviceType);
+        }
+
+        /// <summary>
+        /// Determines whether the required service has been registered
+        /// </summary>
+        /// <typeparam name="TAbstract">Type of the singleton or dependency</typeparam>
+        /// <remarks>
+        /// Services will be loaded if exists in this order:
+        /// - Initialized singletons
+        /// - Uninitialized singletons
+        /// - Transients
+        /// </remarks>
+        public bool HasRequiredService(Type serviceType)
+        {
+            if (InitializedSingletons.ContainsKey(serviceType))
+            {
+                return true;
+            }
+            else if (RegisteredSingletons.ContainsKey(serviceType))
+            {
+                return true;
+            }
+            else if (RegisteredTransients.ContainsKey(serviceType))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether or not <see cref="CreateInstance(TypeInfo)"/> can create an instance of this type.
+        /// </summary>
+        /// <param name="type">Type to check</param>
+        /// <returns>A boolean indicating whether or not an instance of this type can be created</returns>
+        /// <remarks>
+        /// Current criteria:
+        /// - Type must not be abstract
+        /// - Type must have a default constructor</remarks>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        public bool CanCreateInstance(TypeInfo type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return !type.IsAbstract && !type.IsInterface && type.DeclaredConstructors.Any(x =>
+                    {
+                        var parameters = x.GetParameters();
+                        return parameters.Length == 0 || parameters.All(p => HasRequiredService(p.ParameterType));
+                    });
+        }
+
+        /// <summary>
+        /// Determines whether or not <see cref="CreateInstance(TypeInfo)"/> can create an instance of this type.
+        /// </summary>
+        /// <param name="type">Type to check</param>
+        /// <returns>A boolean indicating whether or not an instance of this type can be created</returns>
+        /// <remarks>
+        /// Current criteria:
+        /// - Type must not be abstract
+        /// - Type must have a default constructor</remarks>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        public bool CanCreateInstance(Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+            return CanCreateInstance(type.GetTypeInfo());
+        }
+
+        /// <summary>
+        /// Creates a new instance of the given type
+        /// </summary>
+        /// <param name="type">Type to be created</param>
+        /// <returns>A new object of the given type</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        /// <remarks>The constructor with the most supported parameters will be used</remarks>
+        public object CreateInstance(TypeInfo type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            foreach (var constructor in type.GetConstructors().OrderByDescending(c => c.GetParameters().Length))
+            {
+                var parameters = constructor.GetParameters();
+                var parameterValues = new List<object>();
+                var useConstructor = true;
+
+                foreach (var parameter in parameters)
+                {
+                    var value = GetRequiredService(parameter.ParameterType);
+                    
+                    if (value == null)
+                    {
+                        useConstructor = false;
+                    }
+
+                    parameterValues.Add(value);
+                }
+
+                if (useConstructor)
+                {
+                    return constructor.Invoke(parameterValues.ToArray());
+                }
+            }
+
+            return Activator.CreateInstance(type.AsType());
+        }
+
+        /// <summary>
+        /// Creates a new instance of the given type
+        /// </summary>
+        /// <param name="type">Type to be created</param>
+        /// <returns>A new object of the given type</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        public object CreateInstance(Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return CreateInstance(type.GetTypeInfo());
+        }
+
+        /// <summary>
+        /// Creates a new instance of the type of the given object.
+        /// </summary>
+        /// <param name="target">Instance of the type of which to create a new instance</param>
+        /// <returns>A new object with the same type as <paramref name="target"/>.</returns>        
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="target"/> is null.</exception>
+        public object CreateNewInstance(object target)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            return CreateInstance(target.GetType().GetTypeInfo());
+        }
+
+
         #endregion
 
         /// <summary>

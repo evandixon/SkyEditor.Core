@@ -803,7 +803,7 @@ namespace SkyEditor.Core
         /// <returns>A new <see cref="FileViewModel"/> wrapper.</returns>
         protected virtual FileViewModel CreateViewModel(object model)
         {
-            FileViewModel output = new FileViewModel();
+            FileViewModel output = new FileViewModel(CurrentPluginManager);
             output.Model = model;
             return output;
         }

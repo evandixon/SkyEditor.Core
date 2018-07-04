@@ -193,7 +193,7 @@ namespace SkyEditor.Core.UI
                 m.ContextTargets = targets;
                 foreach (var action in item.ActionTypes)
                 {
-                    var a = ReflectionHelpers.CreateInstance(action) as MenuAction;
+                    var a = appViewModel.CurrentPluginManager.CreateInstance(action) as MenuAction;
                     a.CurrentApplicationViewModel = appViewModel;
                     m.Actions.Add(a);
                 }
@@ -311,7 +311,7 @@ namespace SkyEditor.Core.UI
             {
                 foreach (var view in item.Value)
                 {
-                    var tab = ReflectionHelpers.CreateNewInstance(view) as IViewControl;
+                    var tab = appViewModel.CurrentPluginManager.CreateNewInstance(view) as IViewControl;
                     tab.SetApplicationViewModel(appViewModel);
 
                     //Set the appropriate object
@@ -445,7 +445,7 @@ namespace SkyEditor.Core.UI
                 if (isMatch)
                 {
                     // Create another instance of etab, since etab is our cached, search-only instance.
-                    var tab = ReflectionHelpers.CreateNewInstance(etab) as IViewControl;
+                    var tab = appViewModel.CurrentPluginManager.CreateNewInstance(etab) as IViewControl;
                     tab.SetApplicationViewModel(appViewModel);
 
                     // Set the appropriate object

@@ -131,6 +131,7 @@ namespace SkyEditor.Core.Utilities
         /// - Type must not be abstract
         /// - Type must have a default constructor</remarks>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        [Obsolete("Call from a PluginManager to use dependency injection")]
         public static bool CanCreateInstance(TypeInfo type)
         {
             if (type == null)
@@ -151,6 +152,7 @@ namespace SkyEditor.Core.Utilities
         /// - Type must not be abstract
         /// - Type must have a default constructor</remarks>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        [Obsolete("Call from a PluginManager to use dependency injection")]
         public static bool CanCreateInstance(Type type)
         {
             if (type == null)
@@ -166,6 +168,7 @@ namespace SkyEditor.Core.Utilities
         /// <param name="type">Type to be created</param>
         /// <returns>A new object of the given type</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        [Obsolete("Call from a PluginManager to use dependency injection")]
         public static object CreateInstance(TypeInfo type)
         {
             if (type == null)
@@ -182,6 +185,7 @@ namespace SkyEditor.Core.Utilities
         /// <param name="type">Type to be created</param>
         /// <returns>A new object of the given type</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        [Obsolete("Call from a PluginManager to use dependency injection")]
         public static object CreateInstance(Type type)
         {
             if (type == null)
@@ -198,6 +202,7 @@ namespace SkyEditor.Core.Utilities
         /// <param name="target">Instance of the type of which to create a new instance</param>
         /// <returns>A new object with the same type as <paramref name="target"/>.</returns>        
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="target"/> is null.</exception>
+        [Obsolete("Call from a PluginManager to use dependency injection")]
         public static object CreateNewInstance(object target)
         {
             if (target == null)

@@ -17,15 +17,16 @@ namespace SkyEditor.Core.UI
     /// The view model for any model, especially models that represent open files
     /// </summary>
     public class FileViewModel : IDisposable, INotifyPropertyChanged, INotifyModified
-    {
+    {       
 
-        public FileViewModel()
+        public FileViewModel(PluginManager pluginManager)
         {
             IsFileModified = false;
             CloseCommand = new RelayCommand(new Action<object>(CloseAction));
+            CurrentPluginManager = pluginManager;
         }
 
-        public FileViewModel(object model) : this()
+        public FileViewModel(object model, PluginManager pluginManager) : this(pluginManager)
         {
             this.Model = model;
         }
@@ -214,6 +215,8 @@ namespace SkyEditor.Core.UI
         /// </summary>
         public Project ParentProject { get; set; }
 
+        private PluginManager CurrentPluginManager { get; }
+
         #endregion
 
         #region Functions
@@ -293,7 +296,7 @@ namespace SkyEditor.Core.UI
                     if (item.SupportsObject(Model))
                     {
                         // Create the view model
-                        var vm = ReflectionHelpers.CreateNewInstance(item) as GenericViewModel;
+                        var vm = CurrentPluginManager.CreateNewInstance(item) as GenericViewModel;
                         vm.SetApplicationViewModel(appViewModel);
                         vm.SetModel(Model);
                         ViewModels.Add(vm);
@@ -322,7 +325,7 @@ namespace SkyEditor.Core.UI
             }
             else
             {
-                var newInstance = ReflectionHelpers.CreateInstance(typeof(T)) as GenericViewModel;
+                var newInstance = CurrentPluginManager.CreateInstance(typeof(T)) as GenericViewModel;
                 if (newInstance.SupportsObject(Model))
                 {
                     newInstance.SetApplicationViewModel(appViewModel);
