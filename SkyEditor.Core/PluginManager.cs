@@ -1,8 +1,4 @@
-﻿// To-Do:
-// - Uncomment first bit in LoadCore
-// - Uncomment GetPluginPaths in Functions
-
-using SkyEditor.Core.ConsoleCommands;
+﻿using SkyEditor.Core.ConsoleCommands;
 using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.Settings;
@@ -33,7 +29,7 @@ namespace SkyEditor.Core
             InitializedSingletons = new Dictionary<Type, object>();
 
             // Everything created by this PluginManager gets to have a reference to it
-            AddSingleton(pluginManager => pluginManager);
+            AddSingletonDependency(pluginManager => pluginManager);
         }
 
         #region Properties
@@ -622,19 +618,19 @@ namespace SkyEditor.Core
         /// Registers a type that can be provided to dynamically-created objects in their constructor, created every time it is requested.
         /// </summary>
         /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
-        public void AddTransient<TAbstract, TInstantiate>() where TInstantiate : TAbstract where TAbstract : class
+        public void AddTransientDependency<TAbstract, TInstantiate>() where TInstantiate : TAbstract where TAbstract : class
         {
-            AddTransient<TAbstract>(_ => this.CreateInstance(typeof(TInstantiate)) as TAbstract);
+            AddTransientDependency<TAbstract>(_ => this.CreateInstance(typeof(TInstantiate)) as TAbstract);
         }
 
         /// <summary>
         /// Registers a type that can be provided to dynamically-created objects in their constructor, created every time it is requested.
         /// </summary>
-        /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
+        /// <typeparam name="T">Type to be provided to dynamically-created objects</typeparam>
         /// <param name="constructor">Function that creates the type to be provided</param>
-        public void AddTransient<TAbstract>(Func<PluginManager, TAbstract> constructor) where TAbstract : class
+        public void AddTransientDependency<T>(Func<PluginManager, T> constructor) where T : class
         {
-            RegisteredTransients.Add(typeof(TAbstract), p => constructor(p));
+            RegisteredTransients.Add(typeof(T), p => constructor(p));
         }
 
         /// <summary>
@@ -643,20 +639,30 @@ namespace SkyEditor.Core
         /// </summary>
         /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
         /// <param name="constructor">Function that creates the type to be provided</param>
-        public void AddSingleton<TAbstract, TInstantiate>() where TInstantiate : TAbstract where TAbstract : class
+        public void AddSingletonDependency<TAbstract, TInstantiate>() where TInstantiate : TAbstract where TAbstract : class
         {
-            AddSingleton<TAbstract>(_ => this.CreateInstance(typeof(TInstantiate)) as TAbstract);
+            AddSingletonDependency<TAbstract>(_ => this.CreateInstance(typeof(TInstantiate)) as TAbstract);
         }
 
         /// <summary>
         /// Registers a type that can be provided to dynamically-created objects in their constructor, created once then cached.
         /// Creation will take place the first time it is needed.
         /// </summary>
-        /// <typeparam name="TAbstract">Type to be provided to dynamically-created objects</typeparam>
+        /// <typeparam name="T">Type to be provided to dynamically-created objects</typeparam>
         /// <param name="constructor">Function that creates the type to be provided</param>
-        public void AddSingleton<TAbstract>(Func<PluginManager, TAbstract> constructor) where TAbstract : class
+        public void AddSingletonDependency<T>(Func<PluginManager, T> constructor) where T : class
         {
-            RegisteredSingletons.Add(typeof(TAbstract), p => constructor(p));
+            RegisteredSingletons.Add(typeof(T), p => constructor(p));
+        }
+
+        /// <summary>
+        /// Registers a type that can be provided to dynamically-created objects in their constructor.
+        /// </summary>
+        /// <typeparam name="T">Type to be provided to dynamically-created objects</typeparam>
+        /// <param name="value">Value to use for the singleton</param>
+        public void AddSingletonDependency<T>(T value) where T : class
+        {
+            InitializedSingletons.Add(typeof(T), value);
         }
 
         /// <summary>
@@ -669,10 +675,10 @@ namespace SkyEditor.Core
         /// - Uninitialized singletons
         /// - Transients
         /// </remarks>
-        public TAbstract GetRequiredService<TAbstract>() where TAbstract : class
+        public TAbstract GetRequiredDependency<TAbstract>() where TAbstract : class
         {
             var serviceType = typeof(TAbstract);
-            return GetRequiredService(serviceType) as TAbstract;
+            return GetRequiredDependency(serviceType) as TAbstract;
         }
 
         /// <summary>
@@ -685,7 +691,7 @@ namespace SkyEditor.Core
         /// - Uninitialized singletons
         /// - Transients
         /// </remarks>
-        public object GetRequiredService(Type serviceType)
+        public object GetRequiredDependency(Type serviceType)
         {
             if (InitializedSingletons.ContainsKey(serviceType))
             {
@@ -708,7 +714,7 @@ namespace SkyEditor.Core
         }
 
         /// <summary>
-        /// Determines whether the required service has been registered
+        /// Determines whether the required dependency has been registered
         /// </summary>
         /// <typeparam name="TAbstract">Type of the singleton or dependency</typeparam>
         /// <remarks>
@@ -717,14 +723,14 @@ namespace SkyEditor.Core
         /// - Uninitialized singletons
         /// - Transients
         /// </remarks>
-        public bool HasRequiredService<TAbstract>() where TAbstract : class
+        public bool HasRequiredDependency<TAbstract>() where TAbstract : class
         {
             var serviceType = typeof(TAbstract);
-            return HasRequiredService(serviceType);
+            return HasRequiredDependency(serviceType);
         }
 
         /// <summary>
-        /// Determines whether the required service has been registered
+        /// Determines whether the required dependency has been registered
         /// </summary>
         /// <typeparam name="TAbstract">Type of the singleton or dependency</typeparam>
         /// <remarks>
@@ -733,7 +739,7 @@ namespace SkyEditor.Core
         /// - Uninitialized singletons
         /// - Transients
         /// </remarks>
-        public bool HasRequiredService(Type serviceType)
+        public bool HasRequiredDependency(Type serviceType)
         {
             if (InitializedSingletons.ContainsKey(serviceType))
             {
@@ -773,7 +779,7 @@ namespace SkyEditor.Core
             return !type.IsAbstract && !type.IsInterface && type.DeclaredConstructors.Any(x =>
                     {
                         var parameters = x.GetParameters();
-                        return parameters.Length == 0 || parameters.All(p => HasRequiredService(p.ParameterType));
+                        return parameters.Length == 0 || parameters.All(p => HasRequiredDependency(p.ParameterType));
                     });
         }
 
@@ -818,7 +824,7 @@ namespace SkyEditor.Core
 
                 foreach (var parameter in parameters)
                 {
-                    var value = GetRequiredService(parameter.ParameterType);
+                    var value = GetRequiredDependency(parameter.ParameterType);
                     
                     if (value == null)
                     {
