@@ -8,9 +8,12 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
 {
     public class mkdir : ConsoleCommand
     {
-        public mkdir(IIOProvider provider) : base(provider)
+        public mkdir(IIOProvider provider)
         {
+            CurrentIOProvider = provider;
         }
+
+        protected IIOProvider CurrentIOProvider { get; }
 
         protected override void Main(string[] arguments)
         {

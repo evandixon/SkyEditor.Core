@@ -9,11 +9,13 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class InstallExtension : ConsoleCommand
     {
-        public InstallExtension(PluginManager manager, IIOProvider provider) : base(provider)
+        public InstallExtension(PluginManager manager, IIOProvider provider)
         {
             CurrentPluginManager = manager;
+            CurrentIOProvider = provider;
         }
 
+        protected IIOProvider CurrentIOProvider { get; }
         protected  PluginManager CurrentPluginManager { get; }
 
         public override async Task MainAsync(string[] arguments)

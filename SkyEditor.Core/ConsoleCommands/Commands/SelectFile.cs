@@ -8,7 +8,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class SelectFile : ConsoleCommand
     {
-        public SelectFile(ApplicationViewModel applicationViewModel, IIOProvider provider) : base(provider)
+        public SelectFile(ApplicationViewModel applicationViewModel)
         {
             CurrentApplicationViewModel = applicationViewModel;
         }

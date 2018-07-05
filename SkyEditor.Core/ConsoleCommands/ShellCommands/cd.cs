@@ -7,9 +7,12 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
 {
     public class cd : ConsoleCommand
     {
-        public cd(IIOProvider provider) : base(provider)
+        public cd(IIOProvider provider)
         {
+            CurrentIOProvider = provider;
         }
+
+        protected IIOProvider CurrentIOProvider { get; }
 
         protected override void Main(string[] arguments)
         {

@@ -9,7 +9,7 @@ namespace SkyEditor.Core.ConsoleCommands
 {
     public class DistPrep : ConsoleCommand
     {
-        public DistPrep(PluginManager pluginManager, IIOProvider provider) : base(provider)
+        public DistPrep(PluginManager pluginManager)
         {
             CurrentPluginManager = pluginManager;
         }

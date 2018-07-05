@@ -8,7 +8,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class ListFiles : ConsoleCommand
     {
-        public ListFiles(ApplicationViewModel applicationViewModel, IIOProvider provider) : base(provider)
+        public ListFiles(ApplicationViewModel applicationViewModel)
         {
             CurrentApplicationViewModel = applicationViewModel;
         }

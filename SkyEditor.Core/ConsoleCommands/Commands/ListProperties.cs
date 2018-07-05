@@ -8,7 +8,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class ListProperties : ConsoleCommand
     {
-        public ListProperties(ApplicationViewModel applicationViewModel, IIOProvider provider) : base(provider)
+        public ListProperties(ApplicationViewModel applicationViewModel)
         {
             CurrentApplicationViewModel = applicationViewModel;
         }

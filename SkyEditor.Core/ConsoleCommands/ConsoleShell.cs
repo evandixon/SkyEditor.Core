@@ -50,10 +50,11 @@ namespace SkyEditor.Core.ConsoleCommands
             return provider.GetStdOut();
         }
 
-        public ConsoleShell(ApplicationViewModel appViewModel)
+        public ConsoleShell(ApplicationViewModel appViewModel, PluginManager manager, IConsoleProvider consoleProvider)
         {
             CurrentApplicationViewModel = appViewModel;
-            Console = appViewModel.CurrentPluginManager.CurrentConsoleProvider;
+            CurrentPluginManager = manager;
+            Console = consoleProvider;
             AllCommands = new Dictionary<string, ConsoleCommand>();
             foreach (ConsoleCommand item in appViewModel.CurrentPluginManager.GetRegisteredObjects<ConsoleCommand>())
             {
@@ -62,7 +63,8 @@ namespace SkyEditor.Core.ConsoleCommands
             }
         }
 
-        protected ApplicationViewModel CurrentApplicationViewModel { get; set; }
+        protected ApplicationViewModel CurrentApplicationViewModel { get; }
+        protected PluginManager CurrentPluginManager { get; }
         protected Dictionary<string, ConsoleCommand> AllCommands { get; set; }
         protected IConsoleProvider Console { get; set; }
         protected Regex ParameterRegex => new Regex("(\\\".*?\\\")|\\S+", RegexOptions.Compiled);
@@ -128,7 +130,7 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="argumentString">String containing the arguments of the command, separated by spaces.  Use quotation marks to include spaces in a parameter.</param>
         /// <param name="provider">The I/O provider to use with the command</param>
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
-        public async Task RunCommand(string commandName, string argumentString, bool reportErrorsToConsole = false, IIOProvider provider = null)
+        public async Task RunCommand(string commandName, string argumentString, bool reportErrorsToConsole = false, IIOProvider ioProvider = null)
         {
             // Split arg on spaces, while respecting quotation marks
             var args = new List<string>();
@@ -141,7 +143,7 @@ namespace SkyEditor.Core.ConsoleCommands
             }
 
             // Run the command
-            await RunCommand(commandName, args, reportErrorsToConsole, provider).ConfigureAwait(false);
+            await RunCommand(commandName, args, reportErrorsToConsole, ioProvider).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -150,10 +152,14 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="commandName">Name of the command.</param>
         /// <param name="arguments">Arguments of the command.</param>
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
-        public async Task RunCommand(string commandName, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IIOProvider provider = null)
+        public async Task RunCommand(string commandName, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IIOProvider ioProvider = null)
         {
             var command = AllCommands.Where(c => String.Compare(c.Key, commandName, StringComparison.CurrentCultureIgnoreCase) == 0).Select(c => c.Value).SingleOrDefault();
-            await RunCommand(command, arguments, reportErrorsToConsole, provider);
+            if (ioProvider != null && CurrentPluginManager.CanCreateInstance(command.GetType()))
+            {
+                command = CurrentPluginManager.CreateNewInstance(command, ioProvider) as ConsoleCommand;
+            }
+            await RunCommand(command, arguments, reportErrorsToConsole);
         }
 
         /// <summary>
@@ -162,13 +168,11 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="commandName">Name of the command.</param>
         /// <param name="arguments">Arguments of the command.</param>
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
-        public async Task RunCommand(ConsoleCommand command, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IIOProvider provider = null)
+        public async Task RunCommand(ConsoleCommand command, IEnumerable<string> arguments, bool reportErrorsToConsole = false)
         {
             try
             {
-                command.CurrentIOProvider = provider;
                 await command.MainAsync(arguments.ToArray()).ConfigureAwait(false);
-                command.CurrentIOProvider = null; // Reset to using the normal one
             }
             catch (Exception ex)
             {

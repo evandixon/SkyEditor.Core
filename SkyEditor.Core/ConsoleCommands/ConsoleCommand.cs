@@ -10,11 +10,7 @@ namespace SkyEditor.Core.ConsoleCommands
     /// Command that can be run in the Sky Editor console
     /// </summary>
     public abstract class ConsoleCommand
-    {        
-        public ConsoleCommand(IIOProvider ioProvider)
-        {
-            _defaultIOProvider = ioProvider;
-        }
+    {
         
         public virtual IConsoleProvider Console { get; set; }
         public virtual string CommandName
@@ -24,31 +20,6 @@ namespace SkyEditor.Core.ConsoleCommands
                 return GetType().Name;
             }
         }
-
-        /// <summary>
-        /// The current I/O provider for the command.  May be different from the one used by <see cref="ApplicationViewModel"/>.
-        /// </summary>
-        /// <remarks>This can be used to run a command against a different I/O provider.  Set to null to reset to the default provider.</remarks>
-        public IIOProvider CurrentIOProvider
-        {
-            get
-            {
-                if (_currentIOProvider == null)
-                {
-                    return _defaultIOProvider;
-                }
-                else
-                {
-                    return _currentIOProvider;
-                }
-            }
-            set
-            {
-                _currentIOProvider = value;
-            }
-        }
-        private IIOProvider _defaultIOProvider;
-        private IIOProvider _currentIOProvider;
 
         /// <summary>
         /// The main method of the command.

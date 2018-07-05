@@ -10,14 +10,16 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class SolutionCommands : ConsoleCommand
     {
-        public SolutionCommands(ApplicationViewModel applicationViewModel, PluginManager pluginManager, IIOProvider provider) : base(provider)
+        public SolutionCommands(ApplicationViewModel applicationViewModel, PluginManager pluginManager, IIOProvider provider)
         {
             CurrentApplicationViewModel = applicationViewModel;
             CurrentPluginManager = pluginManager;
+            CurrentIOProvider = provider;
         }
 
         protected ApplicationViewModel CurrentApplicationViewModel { get; }
         protected PluginManager CurrentPluginManager { get; }
+        protected IIOProvider CurrentIOProvider { get; }
 
         public override string CommandName => "Solution";
         public override async Task MainAsync(string[] arguments)
@@ -43,7 +45,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                         if (CurrentApplicationViewModel.CurrentSolution.RequiresInitializationWizard)
                         {
                             var initWizard = CurrentApplicationViewModel.CurrentSolution.GetInitializationWizard();
-                            await initWizard.RunInConsole(CurrentApplicationViewModel.CurrentConsoleShell, true, CurrentIOProvider);
+                            await initWizard.RunInConsole(CurrentApplicationViewModel.CurrentConsoleShell, true);
                         }
 
                         break;

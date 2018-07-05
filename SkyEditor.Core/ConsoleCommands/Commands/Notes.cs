@@ -9,7 +9,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class Notes : ConsoleCommand
     {
-        public Notes(PluginManager currentPluginManager, IIOProvider provider) : base(provider)
+        public Notes(PluginManager currentPluginManager)
         {
             CurrentPluginManager = currentPluginManager;
         }

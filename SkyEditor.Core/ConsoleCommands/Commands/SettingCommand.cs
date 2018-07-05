@@ -11,11 +11,13 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
     /// </summary>
     public class SettingCommand : ConsoleCommand
     {
-        public SettingCommand(ISettingsProvider settingsProvider, IIOProvider ioProvider) : base(ioProvider)
+        public SettingCommand(ISettingsProvider settingsProvider, IIOProvider ioProvider)
         {
             CurrentSettingsProvider = settingsProvider;
+            CurrentIOProvider = ioProvider;
         }
         protected ISettingsProvider CurrentSettingsProvider { get; }
+        protected IIOProvider CurrentIOProvider { get; }
 
         public override string CommandName => "setting";
         public override async Task MainAsync(string[] arguments)

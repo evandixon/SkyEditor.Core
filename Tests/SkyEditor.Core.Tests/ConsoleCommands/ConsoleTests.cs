@@ -17,7 +17,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
         private const string ConsoleTestsCategory = "Console Tests";
         public class TestConsoleCommand : ConsoleCommand
         {
-            public TestConsoleCommand(PluginManager pluginManager, IIOProvider provider) : base(provider)
+            public TestConsoleCommand(PluginManager pluginManager)
             {
                 CurrentPluginManager = pluginManager;
             }
@@ -43,7 +43,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
         public class TestConsoleCommand2 : ConsoleCommand
         {
-            public TestConsoleCommand2(PluginManager pluginManager, IIOProvider provider) : base(provider)
+            public TestConsoleCommand2(PluginManager pluginManager)
             {
                 CurrentPluginManager = pluginManager;
             }
@@ -74,7 +74,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
         public class TestConsoleCommandException : ConsoleCommand
         {
-            public TestConsoleCommandException(IIOProvider provider) : base(provider)
+            public TestConsoleCommandException(IIOProvider provider)
             {
             }
 
@@ -201,7 +201,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
         [TestCategory(ConsoleTestsCategory)]
         public void DefaultCommandName()
         {
-            var x = new TestConsoleCommand(null, null);
+            var x = new TestConsoleCommand(null);
             Assert.AreEqual("TestConsoleCommand", x.CommandName);
         }
 
@@ -215,7 +215,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
             TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleShell), nameof(ConsoleShell.TestConsoleCommand), "appViewModel",
                 new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
-                new object[] { new TestConsoleCommand(null, null), null, new string[] { }, "" });
+                new object[] { new TestConsoleCommand(null), null, new string[] { }, "" });
         }
 
         [TestMethod]

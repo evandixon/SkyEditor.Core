@@ -10,7 +10,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class OpenFile : ConsoleCommand
     {
-        public OpenFile(ApplicationViewModel applicationViewModel, PluginManager currentPluginManager, IIOProvider provider) : base(provider)
+        public OpenFile(ApplicationViewModel applicationViewModel, PluginManager currentPluginManager)
         {
             CurrentApplicationViewModel = applicationViewModel;
             CurrentPluginManager = currentPluginManager;

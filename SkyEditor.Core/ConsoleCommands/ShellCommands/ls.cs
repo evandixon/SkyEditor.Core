@@ -8,9 +8,12 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
 {
     public class ls : ConsoleCommand
     {
-        public ls(IIOProvider provider) : base(provider)
+        public ls(IIOProvider provider)
         {
+            CurrentIOProvider = provider;
         }
+
+        protected IIOProvider CurrentIOProvider { get; }
 
         protected override void Main(string[] arguments)
         {

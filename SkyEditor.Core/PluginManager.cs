@@ -829,7 +829,51 @@ namespace SkyEditor.Core
                 foreach (var parameter in parameters)
                 {
                     var value = GetRequiredDependency(parameter.ParameterType);
-                    
+
+                    if (value == null)
+                    {
+                        useConstructor = false;
+                    }
+
+                    parameterValues.Add(value);
+                }
+
+                if (useConstructor)
+                {
+                    return constructor.Invoke(parameterValues.ToArray());
+                }
+            }
+
+            return Activator.CreateInstance(type.AsType());
+        }
+
+        /// <summary>
+        /// Creates a new instance of the given type
+        /// </summary>
+        /// <param name="type">Type to be created</param>
+        /// <param name="parameterOverrides">Parameters to use instead of registered services</param>
+        /// <returns>A new object of the given type</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        /// <remarks>The constructor with the most supported parameters will be used</remarks>
+        public object CreateInstance(TypeInfo type, params object[] parameterOverrides)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            foreach (var constructor in type.GetConstructors().OrderByDescending(c => c.GetParameters().Length))
+            {
+                var parameters = constructor.GetParameters();
+                var parameterValues = new List<object>();
+                var useConstructor = true;
+
+                foreach (var parameter in parameters)
+                {
+                    var overriddenValue = parameterOverrides.FirstOrDefault(p => p.GetType() == parameter.ParameterType);
+
+                    var value = overriddenValue ?? GetRequiredDependency(parameter.ParameterType);
+
                     if (value == null)
                     {
                         useConstructor = false;
@@ -872,6 +916,23 @@ namespace SkyEditor.Core
         public T CreateInstance<T>() where T : class
         {
             return CreateInstance(typeof(T)) as T;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the type of the given object.
+        /// </summary>
+        /// <param name="target">Instance of the type of which to create a new instance</param>        /// 
+        /// <param name="parameterOverrides">Parameters to use instead of registered services</param>
+        /// <returns>A new object with the same type as <paramref name="target"/>.</returns>        
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="target"/> is null.</exception>
+        public object CreateNewInstance(object target, params object[] parameterOverrides)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            return CreateInstance(target.GetType().GetTypeInfo(), parameterOverrides);
         }
 
         /// <summary>
