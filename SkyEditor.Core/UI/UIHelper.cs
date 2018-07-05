@@ -18,7 +18,7 @@ namespace SkyEditor.Core.UI
         /// <param name="target">Target of the menu item, or null if there is no target</param>
         /// <param name="pluginManager">Instance of the current application ViewModel.</param>
         /// <returns>A list of <see cref="MenuItemInfo"/> with each item's <see cref="MenuItemInfo.Children"/> correctly initialized</returns>
-        private static async Task<List<MenuItemInfo>> GetMenuItemInfo(bool isContextBased, bool isDevMode, object target, ApplicationViewModel appViewModel)
+        private static async Task<List<MenuItemInfo>> GetMenuItemInfo(bool isContextBased, bool isDevMode, object target, ApplicationViewModel appViewModel, PluginManager manager)
         {
             if (appViewModel == null)
             {
@@ -26,7 +26,7 @@ namespace SkyEditor.Core.UI
             }
 
             var menuItems = new List<MenuItemInfo>();
-            foreach (var actionInstance in appViewModel.CurrentPluginManager.GetRegisteredObjects<MenuAction>())
+            foreach (var actionInstance in manager.GetRegisteredObjects<MenuAction>())
             {
                 actionInstance.CurrentApplicationViewModel = appViewModel;
 
@@ -148,9 +148,9 @@ namespace SkyEditor.Core.UI
         /// <param name="isDevMode">Whether or not to get the dev-only menu items</param>
         /// <param name="appViewModel">Instance of the current application ViewModel</param>
         /// <returns>A list of <see cref="MenuItemInfo"/> with each item's <see cref="MenuItemInfo.Children"/> correctly initialized</returns>
-        public static async Task<List<MenuItemInfo>> GetMenuItemInfo(ApplicationViewModel appViewModel, bool isDevMode = false)
+        public static async Task<List<MenuItemInfo>> GetMenuItemInfo(ApplicationViewModel appViewModel, PluginManager manager, bool isDevMode = false)
         {
-            return await GetMenuItemInfo(false, isDevMode, null, appViewModel);
+            return await GetMenuItemInfo(false, isDevMode, null, appViewModel, manager);
         }
         /// <summary>
         /// Gets the currently registered MenuActions in heiarchy form.
@@ -159,9 +159,9 @@ namespace SkyEditor.Core.UI
         /// <param name="target">Target of the menu item, or null if there is no target</param>
         /// <param name="appViewModel">Instance of the current application ViewModel</param>
         /// <returns>A list of <see cref="MenuItemInfo"/> with each item's <see cref="MenuItemInfo.Children"/> correctly initialized</returns>
-        public static async Task<List<MenuItemInfo>> GetContextMenuItemInfo(object target, ApplicationViewModel appViewModel, bool isDevMode = false)
+        public static async Task<List<MenuItemInfo>> GetContextMenuItemInfo(object target, ApplicationViewModel appViewModel, PluginManager manager, bool isDevMode = false)
         {
-            return await GetMenuItemInfo(true, isDevMode, target, appViewModel);
+            return await GetMenuItemInfo(true, isDevMode, target, appViewModel, manager);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace SkyEditor.Core.UI
         /// <param name="appViewModel">Instance of the current application ViewModel</param>
         /// <param name="targets">Direct targets of the action, if applicable.  If Nothing, the application ViewModel will control the targets</param>
         /// <returns>A list of <see cref="ActionMenuItem"/> corresponding to the given menu item info (<paramref name="menuItemInfo"/>)</returns>
-        public static List<ActionMenuItem> GenerateLogicalMenuItems(IEnumerable<MenuItemInfo> menuItemInfo, ApplicationViewModel appViewModel, IEnumerable<object> targets)
+        public static List<ActionMenuItem> GenerateLogicalMenuItems(IEnumerable<MenuItemInfo> menuItemInfo, ApplicationViewModel appViewModel, PluginManager manager, IEnumerable<object> targets)
         {
             if (menuItemInfo == null)
             {
@@ -193,11 +193,11 @@ namespace SkyEditor.Core.UI
                 m.ContextTargets = targets;
                 foreach (var action in item.ActionTypes)
                 {
-                    var a = appViewModel.CurrentPluginManager.CreateInstance(action) as MenuAction;
+                    var a = manager.CreateInstance(action) as MenuAction;
                     a.CurrentApplicationViewModel = appViewModel;
                     m.Actions.Add(a);
                 }
-                foreach (var child in GenerateLogicalMenuItems(item.Children, appViewModel, targets))
+                foreach (var child in GenerateLogicalMenuItems(item.Children, appViewModel, manager, targets))
                 {
                     m.Children.Add(child);
                 }
@@ -225,9 +225,9 @@ namespace SkyEditor.Core.UI
         /// </summary>
         /// <param name="viewModel">The ViewModel that the view control will target</param>
         /// <returns>A single view control for the given view model</returns>
-        public static IViewControl GetViewControl(object viewModel, IEnumerable<Type> requestedTabTypes, ApplicationViewModel appViewModel)
+        public static IViewControl GetViewControl(object viewModel, IEnumerable<Type> requestedTabTypes, ApplicationViewModel appViewModel, PluginManager manager)
         {
-            return GetViewControlTabs(viewModel, requestedTabTypes, appViewModel).FirstOrDefault();
+            return GetViewControlTabs(viewModel, requestedTabTypes, appViewModel, manager).FirstOrDefault();
         }
 
         /// <summary>
@@ -236,18 +236,18 @@ namespace SkyEditor.Core.UI
         /// <param name="model">Object the IObjectControl should edit.</param>
         /// <param name="requestedTabTypes">Limits what types of iObjectControl should be returned.  If the iObjectControl is not of any type in this IEnumerable, it will not be used.  If empty or nothing, no constraints will be applied, which is not recommended because the iObjectControl could be made for a different environment (for example, a Windows Forms user control being used in a WPF environment).</param>
         /// <returns>An enumerable of view controls that target the given view model</returns>
-        public static IEnumerable<IViewControl> GetViewControlTabs(object viewModel, IEnumerable<Type> requestedTabTypes, ApplicationViewModel appViewModel)
+        public static IEnumerable<IViewControl> GetViewControlTabs(object viewModel, IEnumerable<Type> requestedTabTypes, ApplicationViewModel appViewModel, PluginManager manager)
         {
             var viewModels = appViewModel.GetViewModelsForModel(viewModel);
             if (viewModels != null && viewModels.Any())
             {
                 // Use the new method
-                return GetViewControlsByViewModel(viewModel, requestedTabTypes, appViewModel);
+                return GetViewControlsByViewModel(viewModel, requestedTabTypes, appViewModel, manager);
             }
             else
             {
                 // Use the legacy method
-                return GetViewControlsByView(viewModel, requestedTabTypes, appViewModel);
+                return GetViewControlsByView(viewModel, requestedTabTypes, appViewModel, manager);
             }
         }
 
@@ -259,7 +259,7 @@ namespace SkyEditor.Core.UI
         /// <param name="manager">Instance of the current plugin manager.</param>
         /// <returns>An IEnumerable of object controls for the given model.</returns>
         /// <remarks>This version of <see cref="GetRefreshedTabs(Object, IEnumerable(Of Type), PluginManager)"/> searches for view models, then finds paths to the views.</remarks>
-        private static IEnumerable<IViewControl> GetViewControlsByViewModel(object model, IEnumerable<Type> requestedTabTypes, ApplicationViewModel appViewModel)
+        private static IEnumerable<IViewControl> GetViewControlsByViewModel(object model, IEnumerable<Type> requestedTabTypes, ApplicationViewModel appViewModel, PluginManager manager)
         {
             Dictionary<object, List<IViewControl>> targetTabs = new Dictionary<object, List<IViewControl>>();
             var modelType = model.GetType().GetTypeInfo();
@@ -270,7 +270,7 @@ namespace SkyEditor.Core.UI
 
             // Get all tabs that could be used for the model, given the RequestedTabTypes constraint
             var availableTabs = from viewModel in viewModels
-                                from view in GetViewControls(appViewModel.CurrentPluginManager)
+                                from view in GetViewControls(manager)
                                 let viewModelSortOrder = viewModel is GenericViewModel ? ((viewModel as GenericViewModel).SortOrder) : 0
                                 where requestedTabTypes.Any(x => ReflectionHelpers.IsOfType(view, x.GetTypeInfo())) &&
                                 view.GetSupportedTypes().Any(x => ReflectionHelpers.IsOfType(viewModel.GetType().GetTypeInfo(), x)) &&
@@ -311,7 +311,7 @@ namespace SkyEditor.Core.UI
             {
                 foreach (var view in item.Value)
                 {
-                    var tab = appViewModel.CurrentPluginManager.CreateNewInstance(view) as IViewControl;
+                    var tab = manager.CreateNewInstance(view) as IViewControl;
                     tab.SetApplicationViewModel(appViewModel);
 
                     //Set the appropriate object
@@ -332,7 +332,7 @@ namespace SkyEditor.Core.UI
         /// <param name="appViewModel">Instance of the current application ViewModel.</param>
         /// <returns>An IEnumerable of object controls for the given model.</returns>
         /// <remarks>This version of <see cref="GetViewControls(Object, IEnumerable(Of Type), PluginManager)"/> searches for views, then finds paths to the model.</remarks>
-        private static IEnumerable<IViewControl> GetViewControlsByView(object viewModel, IEnumerable<Type> RequestedTabTypes, ApplicationViewModel appViewModel)
+        private static IEnumerable<IViewControl> GetViewControlsByView(object viewModel, IEnumerable<Type> RequestedTabTypes, ApplicationViewModel appViewModel, PluginManager manager)
         {
             if (viewModel == null)
             {
@@ -341,7 +341,7 @@ namespace SkyEditor.Core.UI
 
             var modelType = viewModel.GetType().GetTypeInfo();
             var allTabs = new List<IViewControl>();
-            var objControls = GetViewControls(appViewModel.CurrentPluginManager);
+            var objControls = GetViewControls(manager);
 
             foreach (var etab in objControls.Where(x => RequestedTabTypes.Any(y => ReflectionHelpers.IsOfType(x, y.GetTypeInfo()))).OrderBy(x => x.GetSortOrder(modelType, true)))
             {
@@ -445,7 +445,7 @@ namespace SkyEditor.Core.UI
                 if (isMatch)
                 {
                     // Create another instance of etab, since etab is our cached, search-only instance.
-                    var tab = appViewModel.CurrentPluginManager.CreateNewInstance(etab) as IViewControl;
+                    var tab = manager.CreateNewInstance(etab) as IViewControl;
                     tab.SetApplicationViewModel(appViewModel);
 
                     // Set the appropriate object

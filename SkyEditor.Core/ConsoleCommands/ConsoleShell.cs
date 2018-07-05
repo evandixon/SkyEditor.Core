@@ -56,7 +56,7 @@ namespace SkyEditor.Core.ConsoleCommands
             CurrentPluginManager = manager;
             Console = consoleProvider;
             AllCommands = new Dictionary<string, ConsoleCommand>();
-            foreach (ConsoleCommand item in appViewModel.CurrentPluginManager.GetRegisteredObjects<ConsoleCommand>())
+            foreach (ConsoleCommand item in manager.GetRegisteredObjects<ConsoleCommand>())
             {
                 item.Console = Console;
                 AllCommands.Add(item.CommandName, item);
@@ -65,6 +65,7 @@ namespace SkyEditor.Core.ConsoleCommands
 
         protected ApplicationViewModel CurrentApplicationViewModel { get; }
         protected PluginManager CurrentPluginManager { get; }
+        protected IIOProvider CurrentIOProvider { get; }
         protected Dictionary<string, ConsoleCommand> AllCommands { get; set; }
         protected IConsoleProvider Console { get; set; }
         protected Regex ParameterRegex => new Regex("(\\\".*?\\\")|\\S+", RegexOptions.Compiled);
@@ -79,7 +80,7 @@ namespace SkyEditor.Core.ConsoleCommands
             {
                 // Write bash-style working directory
                 Console.Write("~");
-                Console.Write(CurrentApplicationViewModel.CurrentPluginManager.CurrentIOProvider.WorkingDirectory);
+                Console.Write(CurrentIOProvider.WorkingDirectory);
                 Console.Write(" $ ");
 
                 // Accept input

@@ -283,7 +283,7 @@ namespace SkyEditor.Core.UI
                 ViewModels = new List<GenericViewModel>();
 
                 // Search for potential view models
-                var allViewModels = appViewModel.CurrentPluginManager.GetRegisteredObjects<GenericViewModel>();
+                var allViewModels = CurrentPluginManager.GetRegisteredObjects<GenericViewModel>();
                 foreach (var item in allViewModels)
                 {
                     // Set the plugin manager if needed

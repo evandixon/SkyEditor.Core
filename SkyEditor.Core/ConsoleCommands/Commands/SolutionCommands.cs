@@ -33,14 +33,14 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 
                         if (arguments.Length >= 4)
                         {
-                            solutionType = ReflectionHelpers.GetTypeByName(arguments[3], CurrentApplicationViewModel.CurrentPluginManager).AsType();
+                            solutionType = ReflectionHelpers.GetTypeByName(arguments[3], CurrentPluginManager).AsType();
                         }
                         else
                         {
                             solutionType = typeof(Solution);
                         }
 
-                        CurrentApplicationViewModel.CurrentSolution = await ProjectBase.CreateProject<Solution>(CurrentIOProvider.WorkingDirectory, arguments[2], solutionType, CurrentApplicationViewModel.CurrentPluginManager);
+                        CurrentApplicationViewModel.CurrentSolution = await ProjectBase.CreateProject<Solution>(CurrentIOProvider.WorkingDirectory, arguments[2], solutionType, CurrentPluginManager);
 
                         if (CurrentApplicationViewModel.CurrentSolution.RequiresInitializationWizard)
                         {

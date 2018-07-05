@@ -166,12 +166,12 @@ namespace SkyEditor.Core
         /// <summary>
         /// Instance of the current plugin manager
         /// </summary>
-        public PluginManager CurrentPluginManager { get; set; }
+        protected PluginManager CurrentPluginManager { get; }
 
         /// <summary>
         /// Instance of the current plugin manager's current I/O provider
         /// </summary>
-        public IIOProvider CurrentIOProvider
+        protected IIOProvider CurrentIOProvider
         {
             get
             {
@@ -967,7 +967,7 @@ namespace SkyEditor.Core
             {
                 _rootMenuItems = new ObservableCollection<ActionMenuItem>();
                 //Generate the menu items
-                foreach (var item in UIHelper.GenerateLogicalMenuItems(await UIHelper.GetMenuItemInfo(this, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode()), this, null))
+                foreach (var item in UIHelper.GenerateLogicalMenuItems(await UIHelper.GetMenuItemInfo(this, CurrentPluginManager, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode()), this, CurrentPluginManager, null))
                 {
                     _rootMenuItems.Add(item);
                 }
