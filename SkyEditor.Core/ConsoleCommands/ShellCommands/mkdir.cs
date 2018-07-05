@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.Core.IO;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,6 +8,10 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
 {
     public class mkdir : ConsoleCommand
     {
+        public mkdir(IIOProvider provider) : base(provider)
+        {
+        }
+
         protected override void Main(string[] arguments)
         {
             if (arguments.Length > 1)

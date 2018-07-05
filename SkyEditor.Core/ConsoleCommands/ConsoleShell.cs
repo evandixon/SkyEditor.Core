@@ -45,7 +45,6 @@ namespace SkyEditor.Core.ConsoleCommands
 
             var provider = new MemoryConsoleProvider();
             provider.StdIn.Append(stdIn);
-            command.CurrentApplicationViewModel = appViewModel;
             command.Console = provider;
             await command.MainAsync(arguments).ConfigureAwait(false);
             return provider.GetStdOut();
@@ -58,7 +57,6 @@ namespace SkyEditor.Core.ConsoleCommands
             AllCommands = new Dictionary<string, ConsoleCommand>();
             foreach (ConsoleCommand item in appViewModel.CurrentPluginManager.GetRegisteredObjects<ConsoleCommand>())
             {
-                item.CurrentApplicationViewModel = appViewModel;
                 item.Console = Console;
                 AllCommands.Add(item.CommandName, item);
             }

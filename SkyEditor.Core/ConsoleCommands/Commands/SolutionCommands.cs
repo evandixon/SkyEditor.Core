@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.Projects;
+﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.Projects;
 using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,15 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class SolutionCommands : ConsoleCommand
     {
+        public SolutionCommands(ApplicationViewModel applicationViewModel, PluginManager pluginManager, IIOProvider provider) : base(provider)
+        {
+            CurrentApplicationViewModel = applicationViewModel;
+            CurrentPluginManager = pluginManager;
+        }
+
+        protected ApplicationViewModel CurrentApplicationViewModel { get; }
+        protected PluginManager CurrentPluginManager { get; }
+
         public override string CommandName => "Solution";
         public override async Task MainAsync(string[] arguments)
         {
@@ -40,7 +50,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                     case "open":
                         if (arguments.Length > 2)
                         {
-                            var solution = await ProjectBase.OpenProjectFile(arguments[2], CurrentApplicationViewModel.CurrentPluginManager) as Solution;
+                            var solution = await ProjectBase.OpenProjectFile(arguments[2], CurrentPluginManager) as Solution;
                             if (solution != null)
                             {
                                 CurrentApplicationViewModel.CurrentSolution = solution;
@@ -58,7 +68,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                     case "save":
                         if (CurrentApplicationViewModel.CurrentSolution != null)
                         {
-                            await CurrentApplicationViewModel.CurrentSolution.Save(CurrentApplicationViewModel.CurrentIOProvider);
+                            await CurrentApplicationViewModel.CurrentSolution.Save(CurrentIOProvider);
                         }
                         else
                         {
@@ -77,6 +87,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                             {
                                 args = "";
                             }
+                            
                             await CurrentApplicationViewModel.CurrentConsoleShell.RunCommand(arguments[1], arguments[1] + " " + args, true, CurrentApplicationViewModel.CurrentSolution);
                         }
                         else

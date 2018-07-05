@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.UI;
+﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.UI;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +8,13 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class ListProperties : ConsoleCommand
     {
+        public ListProperties(ApplicationViewModel applicationViewModel, IIOProvider provider) : base(provider)
+        {
+            CurrentApplicationViewModel = applicationViewModel;
+        }
+
+        protected ApplicationViewModel CurrentApplicationViewModel { get; }
+
         protected override void Main(string[] arguments)
         {
             if (CurrentApplicationViewModel.SelectedFile != null)

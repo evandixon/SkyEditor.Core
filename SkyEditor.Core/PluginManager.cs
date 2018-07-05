@@ -210,7 +210,8 @@ namespace SkyEditor.Core
             // Load logical plugins
             PluginsLoading?.Invoke(this, new EventArgs());
 
-            foreach (var item in Plugins)
+            var coreType = core.GetType();
+            foreach (var item in Plugins.Where(p => p.GetType() != core.GetType()))
             {
                 item.Load(this);
             }
@@ -662,7 +663,10 @@ namespace SkyEditor.Core
         /// <param name="value">Value to use for the singleton</param>
         public void AddSingletonDependency<T>(T value) where T : class
         {
-            InitializedSingletons.Add(typeof(T), value);
+            if (!InitializedSingletons.ContainsKey(typeof(T)))
+            {
+                InitializedSingletons.Add(typeof(T), value);
+            }
         }
 
         /// <summary>
@@ -857,6 +861,17 @@ namespace SkyEditor.Core
             }
 
             return CreateInstance(type.GetTypeInfo());
+        }
+
+        /// <summary>
+        /// Creates a new instance of the given type
+        /// </summary>
+        /// <param name="type">Type to be created</param>
+        /// <returns>A new object of the given type</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is null.</exception>
+        public T CreateInstance<T>() where T : class
+        {
+            return CreateInstance(typeof(T)) as T;
         }
 
         /// <summary>

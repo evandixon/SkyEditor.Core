@@ -10,8 +10,12 @@ namespace SkyEditor.Core.ConsoleCommands
     /// Command that can be run in the Sky Editor console
     /// </summary>
     public abstract class ConsoleCommand
-    {
-        public virtual ApplicationViewModel CurrentApplicationViewModel { get; set; }
+    {        
+        public ConsoleCommand(IIOProvider ioProvider)
+        {
+            _defaultIOProvider = ioProvider;
+        }
+        
         public virtual IConsoleProvider Console { get; set; }
         public virtual string CommandName
         {
@@ -29,21 +33,22 @@ namespace SkyEditor.Core.ConsoleCommands
         {
             get
             {
-                if (_currentProvider == null)
+                if (_currentIOProvider == null)
                 {
-                    return CurrentApplicationViewModel.CurrentIOProvider;
+                    return _defaultIOProvider;
                 }
                 else
                 {
-                    return _currentProvider;
+                    return _currentIOProvider;
                 }
             }
             set
             {
-                _currentProvider = value;
+                _currentIOProvider = value;
             }
         }
-        private IIOProvider _currentProvider;
+        private IIOProvider _defaultIOProvider;
+        private IIOProvider _currentIOProvider;
 
         /// <summary>
         /// The main method of the command.

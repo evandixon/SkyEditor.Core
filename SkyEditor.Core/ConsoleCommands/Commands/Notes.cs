@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.Extensions;
+using SkyEditor.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,9 +9,15 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class Notes : ConsoleCommand
     {
+        public Notes(PluginManager currentPluginManager, IIOProvider provider) : base(provider)
+        {
+            CurrentPluginManager = currentPluginManager;
+        }
+
+        protected PluginManager CurrentPluginManager { get; }
         protected override void Main(string[] arguments)
         {
-            var notes = ExtensionHelper.GetExtensionBank<NoteExtension>(CurrentApplicationViewModel.CurrentPluginManager).GetNotes(CurrentApplicationViewModel.CurrentPluginManager);
+            var notes = ExtensionHelper.GetExtensionBank<NoteExtension>(CurrentPluginManager).GetNotes(CurrentPluginManager);
             foreach (var item in notes)
             {
                 Console.WriteLine($"{item.Key}: {item.Value}");

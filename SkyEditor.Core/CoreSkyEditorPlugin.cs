@@ -71,10 +71,10 @@ namespace SkyEditor.Core
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="IOUIManager"/> for the application environment.
+        /// Creates an instance of <see cref="ApplicationViewModel"/> for the application environment.
         /// </summary>
         /// <param name="manager">Instance of the current plugin manager.</param>
-        public virtual ApplicationViewModel GetIOUIManager(PluginManager manager)
+        public virtual ApplicationViewModel GetApplicationViewModel(PluginManager manager)
         {
             return new ApplicationViewModel(manager);
         }
@@ -134,6 +134,11 @@ namespace SkyEditor.Core
         public override void Load(PluginManager manager)
         {
             base.Load(manager);
+
+            manager.AddSingletonDependency(GetApplicationViewModel(manager));
+            manager.AddSingletonDependency(GetIOProvider());
+            manager.AddSingletonDependency(GetSettingsProvider(manager));
+            manager.AddSingletonDependency(GetConsoleProvider());
 
             manager.RegisterTypeRegister<IFileOpener>();
             manager.RegisterTypeRegister<IFileSaver>();

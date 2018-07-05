@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.Utilities;
+﻿using SkyEditor.Core.IO;
+using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +8,12 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class ListFiles : ConsoleCommand
     {
+        public ListFiles(ApplicationViewModel applicationViewModel, IIOProvider provider) : base(provider)
+        {
+            CurrentApplicationViewModel = applicationViewModel;
+        }
+
+        protected ApplicationViewModel CurrentApplicationViewModel { get; }
 
         protected override void Main(string[] arguments)
         {
