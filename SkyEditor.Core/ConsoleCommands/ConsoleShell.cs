@@ -50,11 +50,12 @@ namespace SkyEditor.Core.ConsoleCommands
             return provider.GetStdOut();
         }
 
-        public ConsoleShell(ApplicationViewModel appViewModel, PluginManager manager, IConsoleProvider consoleProvider)
+        public ConsoleShell(ApplicationViewModel appViewModel, PluginManager manager, IConsoleProvider consoleProvider, IIOProvider ioProvider)
         {
             CurrentApplicationViewModel = appViewModel;
             CurrentPluginManager = manager;
             Console = consoleProvider;
+            CurrentIOProvider = ioProvider;
             AllCommands = new Dictionary<string, ConsoleCommand>();
             foreach (ConsoleCommand item in manager.GetRegisteredObjects<ConsoleCommand>())
             {

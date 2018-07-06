@@ -421,7 +421,7 @@ namespace SkyEditor.Core
             {
                 if (_consoleShell == null)
                 {
-                    _consoleShell = new ConsoleShell(this, CurrentPluginManager, CurrentPluginManager.CurrentConsoleProvider);
+                    _consoleShell = new ConsoleShell(this, CurrentPluginManager, CurrentPluginManager.CurrentConsoleProvider, CurrentIOProvider);
                 }
                 return _consoleShell;
             }
