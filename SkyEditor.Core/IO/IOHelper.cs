@@ -62,6 +62,12 @@ namespace SkyEditor.Core.IO
             return manager.GetRegisteredTypes<IOpenableFile>();
         }
 
+        [Obsolete("Use the overload with a PluginManager parameter")]
+        public static ICreatableFile CreateNewFile(string newFileName, TypeInfo fileType)
+        {
+            return CreateNewFile(newFileName, fileType, new PluginManager());
+        }
+
         /// <summary>
         /// Creates a new file
         /// </summary>
@@ -70,7 +76,7 @@ namespace SkyEditor.Core.IO
         /// <returns>The newly created file</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="fileType"/> is null</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="fileType"/> does not implement <see cref="ICreatableFile"/> or if it cannot be instantiated (if it's an abstract class, interface, or lacks a default constructor).</exception>
-        public static ICreatableFile CreateNewFile(string newFileName, TypeInfo fileType)
+        public static ICreatableFile CreateNewFile(string newFileName, TypeInfo fileType, PluginManager pluginManager)
         {
             if (fileType == null)
             {
@@ -82,12 +88,12 @@ namespace SkyEditor.Core.IO
                 throw new ArgumentException(string.Format(Properties.Resources.Reflection_ErrorInvalidType, nameof(ICreatableFile)), nameof(fileType));
             }
 
-            if (!ReflectionHelpers.CanCreateInstance(fileType))
+            if (!pluginManager.CanCreateInstance(fileType))
             {
                 throw new ArgumentException(Properties.Resources.Reflection_ErrorNoDefaultConstructor, nameof(fileType));
             }
 
-            var file = ReflectionHelpers.CreateInstance(fileType) as ICreatableFile;
+            var file = pluginManager.CreateInstance(fileType) as ICreatableFile;
             file.CreateFile(newFileName);
             return file;
         }
@@ -124,7 +130,7 @@ namespace SkyEditor.Core.IO
                 throw new ArgumentException(string.Format(Properties.Resources.IO_ErrorNoFileOpener, fileType.ToString()), nameof(fileType));
             }
 
-            if (ReflectionHelpers.CanCreateInstance(fileType))
+            if (manager.CanCreateInstance(fileType))
             {
                 return await openers.OrderBy(x => x.GetUsagePriority(fileType)).First().OpenFile(fileType, filename, manager.CurrentIOProvider);
             }

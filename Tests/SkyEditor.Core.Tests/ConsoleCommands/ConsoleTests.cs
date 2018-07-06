@@ -17,10 +17,16 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
         private const string ConsoleTestsCategory = "Console Tests";
         public class TestConsoleCommand : ConsoleCommand
         {
+            public TestConsoleCommand(PluginManager pluginManager)
+            {
+                CurrentPluginManager = pluginManager;
+            }
+
+            protected PluginManager CurrentPluginManager { get; }
 
             protected override void Main(string[] arguments)
             {
-                Console.WriteLine(CurrentApplicationViewModel.CurrentPluginManager != null);
+                Console.WriteLine(CurrentPluginManager != null);
                 foreach (var item in arguments)
                 {
                     Console.WriteLine(item);
@@ -37,10 +43,16 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
         public class TestConsoleCommand2 : ConsoleCommand
         {
+            public TestConsoleCommand2(PluginManager pluginManager)
+            {
+                CurrentPluginManager = pluginManager;
+            }
+
+            protected PluginManager CurrentPluginManager { get; }
 
             protected override void Main(string[] arguments)
             {
-                Console.WriteLine(CurrentApplicationViewModel.CurrentPluginManager != null);
+                Console.WriteLine(CurrentPluginManager != null);
                 foreach (var item in arguments.Reverse())
                 {
                     Console.WriteLine(item);
@@ -62,6 +74,10 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
         public class TestConsoleCommandException : ConsoleCommand
         {
+            public TestConsoleCommandException(IIOProvider provider)
+            {
+            }
+
             protected override void Main(string[] arguments)
             {
                 throw new TestException();
@@ -100,6 +116,12 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
             {
                 // Do NOT load base.  That would register more console commands than wanted here.
                 // base.Load(manager);
+
+                manager.AddSingletonDependency(GetApplicationViewModel(manager));
+                manager.AddSingletonDependency(GetIOProvider());
+                manager.AddSingletonDependency(GetSettingsProvider(manager));
+                manager.AddSingletonDependency(GetConsoleProvider());
+
                 manager.RegisterType<ConsoleCommand, TestConsoleCommand>();
             }
         }
@@ -151,7 +173,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                 {
                     await manager.LoadCore(new BasicTestCoreMod());
 
-                    var command = new TestConsoleCommand();
+                    var command = manager.CreateInstance<TestConsoleCommand>();
 
                     Assert.AreEqual("True%ntest%narguments%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleShell.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
                 }
@@ -168,7 +190,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                 {
                     await manager.LoadCore(new BasicTestCoreMod());
 
-                    var command = new TestConsoleCommand2();
+                    var command = manager.CreateInstance<TestConsoleCommand2>();
 
                     Assert.AreEqual("True%narguments%ntest%nstandard%nin%n".Replace("%n", Environment.NewLine), ConsoleShell.TestConsoleCommand(command, appViewModel, new string[] { "test", "arguments" }, "standard\nin").Result);
                 }
@@ -179,7 +201,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
         [TestCategory(ConsoleTestsCategory)]
         public void DefaultCommandName()
         {
-            var x = new TestConsoleCommand();
+            var x = new TestConsoleCommand(null);
             Assert.AreEqual("TestConsoleCommand", x.CommandName);
         }
 
@@ -193,7 +215,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
             TestHelpers.TestStaticFunctionNullParameters(typeof(ConsoleShell), nameof(ConsoleShell.TestConsoleCommand), "appViewModel",
                 new Type[] { typeof(ConsoleCommand), typeof(ApplicationViewModel), typeof(string[]), typeof(string) },
-                new object[] { new TestConsoleCommand(), null, new string[] { }, "" });
+                new object[] { new TestConsoleCommand(null), null, new string[] { }, "" });
         }
 
         [TestMethod]

@@ -27,31 +27,6 @@ namespace SkyEditor.Core
         /// </summary>
         public virtual void Load(PluginManager manager)
         {
-            //// Load type registers
-            //manager.RegisterTypeRegister<ExtensionType>();
-            //manager.RegisterTypeRegister<Solution>();
-            //manager.RegisterTypeRegister<Project>();
-            //manager.RegisterTypeRegister<ICreatableFile>();
-            //manager.RegisterTypeRegister<IOpenableFile>();
-            //manager.RegisterTypeRegister<IDetectableFileType>();
-            //manager.RegisterTypeRegister<IDirectoryTypeDetector>();
-            //manager.RegisterTypeRegister<IFileTypeDetector>();
-            //manager.RegisterTypeRegister<MenuAction>();
-            //manager.RegisterTypeRegister<AnchorableViewModel>();
-            //manager.RegisterTypeRegister<GenericViewModel>();
-            //manager.RegisterTypeRegister<IFileOpener>();
-            //manager.RegisterTypeRegister<IFileSaver>();
-
-            //// Load types
-            //manager.RegisterType<IFileDetector, DetectableFileTypeDetector>();
-            //manager.RegisterType<IFileTypeDetector, ObjectFileDetector>();
-            //manager.RegisterType<IFileOpener, OpenableFileOpener>();
-            //manager.RegisterType<IFileSaver, SavableFileSaver>();
-            //manager.RegisterType<ExtensionType, PluginExtensionType>();
-            //manager.RegisterType<Solution, Solution>();
-            //manager.RegisterType<Project, Project>();
-            //manager.RegisterType<ConsoleCommandAsync, ConsoleCommands.UI.ViewFiles>();
-            //manager.RegisterType<ConsoleCommandAsync, ConsoleCommands.UI.ViewFileIndex>();
         }
 
         /// <summary>

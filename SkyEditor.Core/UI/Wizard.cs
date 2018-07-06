@@ -143,7 +143,7 @@ namespace SkyEditor.Core.UI
         /// <summary>
         /// Runs the wizard in a console
         /// </summary>
-        public async Task RunInConsole(ConsoleShell shell, bool reportErrorsToConsole = false, IIOProvider provider = null)
+        public async Task RunInConsole(ConsoleShell shell, bool reportErrorsToConsole = false)
         {
             foreach (var item in Steps)
             {
@@ -153,7 +153,7 @@ namespace SkyEditor.Core.UI
                 var command = CurrentStep.GetConsoleCommand();
                 if (command != null)
                 {
-                    await shell.RunCommand(command, Enumerable.Empty<string>(), reportErrorsToConsole, provider);
+                    await shell.RunCommand(command, Enumerable.Empty<string>(), reportErrorsToConsole);
                 }
                 else
                 {

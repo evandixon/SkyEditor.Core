@@ -10,6 +10,12 @@ namespace SkyEditor.Core.IO
     /// </summary>
     public class OpenableFileOpener : IFileOpener
     {
+        public OpenableFileOpener(PluginManager pluginManager)
+        {
+            CurrentPluginManager = pluginManager;
+        }
+
+        private PluginManager CurrentPluginManager { get; }
 
         /// <summary>
         /// Creates an instance of given type representing the file located at the given path
@@ -38,7 +44,7 @@ namespace SkyEditor.Core.IO
                 throw new ArgumentException(string.Format(Properties.Resources.Reflection_ErrorInvalidType, nameof(IOpenableFile)));
             }
 
-            var file = ReflectionHelpers.CreateInstance(fileType) as IOpenableFile;
+            var file = CurrentPluginManager.CreateInstance(fileType) as IOpenableFile;
             await file.OpenFile(filename, provider);
             return file;
         }

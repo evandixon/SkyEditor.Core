@@ -263,7 +263,7 @@ namespace SkyEditor.Core.Tests.UI
                 await manager.LoadCore(new CoreMod());
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var info = await UIHelper.GetMenuItemInfo(appViewModel, false);
+                    var info = await UIHelper.GetMenuItemInfo(appViewModel, manager, false);
                     Assert.AreEqual(2, info.Count);
                     Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(MenuActionA).GetTypeInfo())).Children.Count);
                     Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(MenuActionB).GetTypeInfo())).Children.Count);
@@ -280,7 +280,7 @@ namespace SkyEditor.Core.Tests.UI
                 await manager.LoadCore(new CoreMod());
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var info = await UIHelper.GetMenuItemInfo(appViewModel, true);
+                    var info = await UIHelper.GetMenuItemInfo(appViewModel, manager, true);
                     Assert.AreEqual(3, info.Count);
                     Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(MenuActionA).GetTypeInfo())).Children.Count);
                     Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(MenuActionB).GetTypeInfo())).Children.Count);
@@ -298,7 +298,7 @@ namespace SkyEditor.Core.Tests.UI
                 await manager.LoadCore(new CoreMod());
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var info = await UIHelper.GetContextMenuItemInfo("a string", appViewModel, false);
+                    var info = await UIHelper.GetContextMenuItemInfo("a string", appViewModel, manager, false);
                     Assert.AreEqual(2, info.Count, "Incorrect count for string target");
                     Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionA).GetTypeInfo())).Children.Count, "Incorrect count for string target");
                     Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionB).GetTypeInfo())).Children.Count, "Incorrect count for string target");
@@ -310,7 +310,7 @@ namespace SkyEditor.Core.Tests.UI
                 await manager.LoadCore(new CoreMod());
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var info = await UIHelper.GetContextMenuItemInfo(new UIHelperTests(), appViewModel, false);
+                    var info = await UIHelper.GetContextMenuItemInfo(new UIHelperTests(), appViewModel, manager, false);
                     Assert.AreEqual(2, info.Count, "Incorrect count for UIHelperTests target");
                     Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionATarget2).GetTypeInfo())).Children.Count, "Incorrect count for UIHelperTests target");
                     Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionBTarget2).GetTypeInfo())).Children.Count, "Incorrect count for UIHelperTests target");
@@ -328,7 +328,7 @@ namespace SkyEditor.Core.Tests.UI
                 await manager.LoadCore(new CoreMod());
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var info = await UIHelper.GetContextMenuItemInfo("a string", appViewModel, true);
+                    var info = await UIHelper.GetContextMenuItemInfo("a string", appViewModel, manager, true);
                     Assert.AreEqual(3, info.Count, "Incorrect count for string target");
                     Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionA).GetTypeInfo())).Children.Count, "Incorrect count for string target");
                     Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionB).GetTypeInfo())).Children.Count, "Incorrect count for string target");
@@ -341,7 +341,7 @@ namespace SkyEditor.Core.Tests.UI
                 await manager.LoadCore(new CoreMod());
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var info = await UIHelper.GetContextMenuItemInfo(new UIHelperTests(), appViewModel, true);
+                    var info = await UIHelper.GetContextMenuItemInfo(new UIHelperTests(), appViewModel, manager, true);
                     Assert.AreEqual(3, info.Count, "Incorrect count for UIHelperTests target");
                     Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionATarget2).GetTypeInfo())).Children.Count, "Incorrect count for UIHelperTests target");
                     Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionBTarget2).GetTypeInfo())).Children.Count, "Incorrect count for UIHelperTests target");
@@ -359,8 +359,8 @@ namespace SkyEditor.Core.Tests.UI
                 await manager.LoadCore(new CoreMod());
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
-                    var info = await UIHelper.GetContextMenuItemInfo("a string", appViewModel, true);
-                    var menuItems = UIHelper.GenerateLogicalMenuItems(info, appViewModel, new object[] { "a string" });
+                    var info = await UIHelper.GetContextMenuItemInfo("a string", appViewModel, manager, true);
+                    var menuItems = UIHelper.GenerateLogicalMenuItems(info, appViewModel, manager, new object[] { "a string" });
                     Assert.AreEqual(3, info.Count);
                     Assert.AreEqual(1, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionA).GetTypeInfo())).Children.Count);
                     Assert.AreEqual(0, info.FirstOrDefault(x => x.ActionTypes.Contains(typeof(ContextMenuActionB).GetTypeInfo())).Children.Count);

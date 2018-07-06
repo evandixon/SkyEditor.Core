@@ -11,7 +11,7 @@ namespace SkyEditor.Core.ConsoleCommands
     /// </summary>
     public abstract class ConsoleCommand
     {
-        public virtual ApplicationViewModel CurrentApplicationViewModel { get; set; }
+        
         public virtual IConsoleProvider Console { get; set; }
         public virtual string CommandName
         {
@@ -20,30 +20,6 @@ namespace SkyEditor.Core.ConsoleCommands
                 return GetType().Name;
             }
         }
-
-        /// <summary>
-        /// The current I/O provider for the command.  May be different from the one used by <see cref="ApplicationViewModel"/>.
-        /// </summary>
-        /// <remarks>This can be used to run a command against a different I/O provider.  Set to null to reset to the default provider.</remarks>
-        public IIOProvider CurrentIOProvider
-        {
-            get
-            {
-                if (_currentProvider == null)
-                {
-                    return CurrentApplicationViewModel.CurrentIOProvider;
-                }
-                else
-                {
-                    return _currentProvider;
-                }
-            }
-            set
-            {
-                _currentProvider = value;
-            }
-        }
-        private IIOProvider _currentProvider;
 
         /// <summary>
         /// The main method of the command.

@@ -45,20 +45,6 @@ namespace SkyEditor.Core.Tests.Utilities
             }
         }
 
-        public class TestContainerClassMulti
-        {
-
-            public string StringItem { get; set; }
-
-            public int IntegerItem { get; set; }
-
-            public TestContainerClassMulti()
-            {
-                StringItem = "Test!!!";
-                IntegerItem = 7;
-            }
-        }
-
         [TestMethod]
         [TestCategory(ReflectionHelperCategory)]
         public void IsOfType_TypeInfo()
@@ -113,41 +99,7 @@ namespace SkyEditor.Core.Tests.Utilities
                 Assert.IsNull(bogusType);
             }
 
-        }
-
-        [TestMethod]
-        [TestCategory(ReflectionHelperCategory)]
-        public void CanCreateInstanceTests()
-        {
-            Assert.IsTrue(ReflectionHelpers.CanCreateInstance(typeof(ReflectionHelpersTests)), "Failed to indicate that ReflectionHelpersTests can have an instance created");
-            Assert.IsFalse(ReflectionHelpers.CanCreateInstance(typeof(CoreSkyEditorPlugin).GetTypeInfo()), "Incorrectly indicated an abstract class can have an instance created");
-        }
-
-        [TestMethod]
-        [TestCategory(ReflectionHelperCategory)]
-        public void CreateInstanceTests()
-        {
-            var multi = ReflectionHelpers.CreateInstance(typeof(TestContainerClassMulti));
-            Assert.IsNotNull(multi);
-            Assert.IsInstanceOfType(multi, typeof(TestContainerClassMulti));
-        }
-
-        [TestMethod]
-        [TestCategory(ReflectionHelperCategory)]
-        public void CreateNewInstanceTests()
-        {
-            var original = new TestContainerClassMulti();
-            original.IntegerItem = 94;
-            original.StringItem = "94";
-
-            var newInst = ReflectionHelpers.CreateNewInstance(original);
-            Assert.IsNotNull(newInst);
-            Assert.IsInstanceOfType(newInst, typeof(TestContainerClassMulti));
-            Assert.AreNotEqual(94, ((TestContainerClassMulti)newInst).IntegerItem, "CreateNewInstance either cloned the class, or returned the same instance");
-
-            original.StringItem = "Altered";
-            Assert.AreNotEqual(original.StringItem, (TestContainerClassMulti)newInst, "CreateNewInstance did not create a new instance, instead returning the same instance");
-        }
+        }    
 
         [TestMethod]
         [TestCategory(ReflectionHelperCategory)]

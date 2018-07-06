@@ -109,7 +109,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenableFileOpener_FunctionalityTest()
         {
-            var opener = new OpenableFileOpener();
+            var opener = new OpenableFileOpener(new PluginManager());
             var provider = new MemoryIOProvider();
             provider.WriteAllText("/test.txt", "TEST");
 
@@ -128,7 +128,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenableFileOpener_InvalidType()
         {
-            var opener = new OpenableFileOpener();
+            var opener = new OpenableFileOpener(new PluginManager());
             var provider = new MemoryIOProvider();
             provider.WriteAllText("/test.txt", "TEST");
 
@@ -148,7 +148,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenableFileOpener_ArgumentNullCheck_fileType()
         {
-            var opener = new OpenableFileOpener();
+            var opener = new OpenableFileOpener(new PluginManager());
             var provider = new MemoryIOProvider();
             provider.WriteAllText("/test.txt", "TEST");
 
@@ -169,7 +169,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenableFileOpener_ArgumentNullCheck_filename()
         {
-            var opener = new OpenableFileOpener();
+            var opener = new OpenableFileOpener(new PluginManager());
             var provider = new MemoryIOProvider();
             provider.WriteAllText("/test.txt", "TEST");            
 
@@ -190,7 +190,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenableFileOpener_ArgumentNullCheck_provider()
         {
-            var opener = new OpenableFileOpener();
+            var opener = new OpenableFileOpener(new PluginManager());
             var provider = new MemoryIOProvider();
             provider.WriteAllText("/test.txt", "TEST");
 

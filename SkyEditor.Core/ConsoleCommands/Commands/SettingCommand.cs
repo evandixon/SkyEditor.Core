@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.Core.IO;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,20 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
     /// </summary>
     public class SettingCommand : ConsoleCommand
     {
+        public SettingCommand(ISettingsProvider settingsProvider, IIOProvider ioProvider)
+        {
+            CurrentSettingsProvider = settingsProvider;
+            CurrentIOProvider = ioProvider;
+        }
+        protected ISettingsProvider CurrentSettingsProvider { get; }
+        protected IIOProvider CurrentIOProvider { get; }
+
         public override string CommandName => "setting";
         public override async Task MainAsync(string[] arguments)
         {
             if (arguments.Length >= 3)
             {
-                var provider = CurrentApplicationViewModel.CurrentPluginManager.CurrentSettingsProvider;
+                var provider = CurrentSettingsProvider;
                 switch (arguments[1].ToLower())
                 {
                     case "get":
@@ -34,7 +43,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                         if (arguments.Length >= 4)
                         {
                             provider.SetSetting(arguments[2], arguments[3]);
-                            await provider.Save(CurrentApplicationViewModel.CurrentIOProvider);
+                            await provider.Save(CurrentIOProvider);
                         }
                         else
                         {

@@ -10,6 +10,15 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class OpenFile : ConsoleCommand
     {
+        public OpenFile(ApplicationViewModel applicationViewModel, PluginManager currentPluginManager)
+        {
+            CurrentApplicationViewModel = applicationViewModel;
+            CurrentPluginManager = currentPluginManager;
+        }
+
+        protected ApplicationViewModel CurrentApplicationViewModel { get; }
+        protected PluginManager CurrentPluginManager { get; }
+
         public FileTypeDetectionResult DuplicateMatchSelector(IEnumerable<FileTypeDetectionResult> matches)
         {
             var list = matches.ToList();
@@ -44,7 +53,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
             if (arguments.Length > 1)
             {
                 var filename = arguments[1];
-                var fileType = arguments.Length > 2 ? ReflectionHelpers.GetTypeByName(arguments[2], CurrentApplicationViewModel.CurrentPluginManager) : null;
+                var fileType = arguments.Length > 2 ? ReflectionHelpers.GetTypeByName(arguments[2], CurrentPluginManager) : null;
 
                 if (fileType == null)
                 {
