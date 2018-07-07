@@ -9,6 +9,11 @@ namespace SkyEditor.Core.UI
     /// </summary>
     public abstract class AnchorableViewModel
     {
+        public AnchorableViewModel(ApplicationViewModel viewModel)
+        {
+            CurrentApplicationViewModel = viewModel;
+        }
+
         /// <summary>
         /// Raised when the IO/UI Manager's solution changed
         /// </summary>
@@ -22,7 +27,7 @@ namespace SkyEditor.Core.UI
         /// <summary>
         /// The application ViewModel to which this anchorable view model belongs
         /// </summary>
-        public ApplicationViewModel CurrentApplicationViewModel
+        protected ApplicationViewModel CurrentApplicationViewModel
         {
             get
             {
@@ -49,7 +54,7 @@ namespace SkyEditor.Core.UI
                 CurrentIOUIManagerChanged?.Invoke(this, new EventArgs());
             }
         }
-        protected ApplicationViewModel _appViewModel;
+        private ApplicationViewModel _appViewModel;
 
         /// <summary>
         /// Unique identifier for the anchorable view model

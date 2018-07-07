@@ -15,8 +15,6 @@ namespace SkyEditor.Core.UI
             ActionPath = path.ToList();
         }
 
-        public event EventHandler CurrentApplicationViewModelChanged;
-
         /// <summary>
         /// Whether or not the menu action is a context menu action
         /// </summary>
@@ -26,26 +24,6 @@ namespace SkyEditor.Core.UI
         /// Names representing the location in a heiarchy of menu items
         /// </summary>
         public List<string> ActionPath { get; private set; }
-
-        /// <summary>
-        /// Instance of the current plugin manager
-        /// </summary>
-        public ApplicationViewModel CurrentApplicationViewModel
-        {
-            get
-            {
-                return _currentApplicationViewModel;
-            }
-            set
-            {
-                if (_currentApplicationViewModel != value)
-                {
-                    _currentApplicationViewModel = value;
-                    CurrentApplicationViewModelChanged?.Invoke(this, new EventArgs());
-                }
-            }
-        }
-        private ApplicationViewModel _currentApplicationViewModel;
 
         /// <summary>
         /// Whether or not visibility is independent from the action supporting the current target

@@ -28,8 +28,6 @@ namespace SkyEditor.Core.UI
             var menuItems = new List<MenuItemInfo>();
             foreach (var actionInstance in manager.GetRegisteredObjects<MenuAction>())
             {
-                actionInstance.CurrentApplicationViewModel = appViewModel;
-
                 //1: If this is a context menu, only get actions that support the target and are context based
                 //2: Ensure menu actions are only visible based on their environment: non-context in regular menu, context in context menu
                 //3: DevOnly menu actions are only supported if we're in dev mode.
@@ -193,9 +191,7 @@ namespace SkyEditor.Core.UI
                 m.ContextTargets = targets;
                 foreach (var action in item.ActionTypes)
                 {
-                    var a = manager.CreateInstance(action) as MenuAction;
-                    a.CurrentApplicationViewModel = appViewModel;
-                    m.Actions.Add(a);
+                    m.Actions.Add(manager.CreateInstance(action) as MenuAction);
                 }
                 foreach (var child in GenerateLogicalMenuItems(item.Children, appViewModel, manager, targets))
                 {

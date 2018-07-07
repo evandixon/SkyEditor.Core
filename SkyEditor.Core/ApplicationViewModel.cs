@@ -166,7 +166,7 @@ namespace SkyEditor.Core
         /// <summary>
         /// Instance of the current plugin manager
         /// </summary>
-        protected PluginManager CurrentPluginManager { get; }
+        public PluginManager CurrentPluginManager { get; }
 
         /// <summary>
         /// Instance of the current plugin manager's current I/O provider
