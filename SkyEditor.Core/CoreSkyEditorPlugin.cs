@@ -74,10 +74,24 @@ namespace SkyEditor.Core
         /// Creates an instance of <see cref="ApplicationViewModel"/> for the application environment.
         /// </summary>
         /// <param name="manager">Instance of the current plugin manager.</param>
-        public virtual ApplicationViewModel GetApplicationViewModel(PluginManager manager)
+        public virtual ApplicationViewModel CreateApplicationViewModel(PluginManager manager)
         {
             return new ApplicationViewModel(manager);
         }
+
+        /// <summary>
+        /// Gets a cached instance of <see cref="ApplicationViewModel"/> for the application environment, or creates one if it does not yet exist.
+        /// </summary>
+        /// <param name="manager">Instance of the current plugin manager.</param>
+        public ApplicationViewModel GetApplicationViewModel(PluginManager manager)
+        {
+            if (_appViewModel == null)
+            {
+                _appViewModel = CreateApplicationViewModel(manager);
+            }
+            return _appViewModel;
+        }
+        private ApplicationViewModel _appViewModel = null;
 
         /// <summary>
         /// Gets the full path of the directory inside the current IO provider where extensions are stored.
