@@ -833,6 +833,7 @@ namespace SkyEditor.Core
                     if (value == null)
                     {
                         useConstructor = false;
+                        break;
                     }
 
                     parameterValues.Add(value);
