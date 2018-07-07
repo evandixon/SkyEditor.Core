@@ -39,12 +39,6 @@ namespace SkyEditor.Core.UI
         bool IsModified { get; set; }
 
         /// <summary>
-        /// Updates the current reference to the current application ViewModel
-        /// </summary>
-        /// <param name="appViewModel">Instance of the current application ViewModel</param>
-        void SetApplicationViewModel(ApplicationViewModel appViewModel);
-
-        /// <summary>
         /// IEnumerable of every type of view model that the control can target.
         /// <see cref="ViewModel"/> will be of one of these types.
         /// </summary>

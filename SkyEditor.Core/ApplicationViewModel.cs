@@ -1194,7 +1194,6 @@ namespace SkyEditor.Core
             var targetType = anchorableViewModel.GetType().GetTypeInfo();
             if (!AnchorableViewModels.Any(x => ReflectionHelpers.IsOfType(x, targetType)))
             {
-                anchorableViewModel.CurrentApplicationViewModel = this;
                 AnchorableViewModels.Add(anchorableViewModel);
             }
         }

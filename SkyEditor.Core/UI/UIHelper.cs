@@ -308,7 +308,6 @@ namespace SkyEditor.Core.UI
                 foreach (var view in item.Value)
                 {
                     var tab = manager.CreateNewInstance(view) as IViewControl;
-                    tab.SetApplicationViewModel(appViewModel);
 
                     //Set the appropriate object
                     tab.ViewModel = item.Key;
@@ -340,9 +339,7 @@ namespace SkyEditor.Core.UI
             var objControls = GetViewControls(manager);
 
             foreach (var etab in objControls.Where(x => RequestedTabTypes.Any(y => ReflectionHelpers.IsOfType(x, y.GetTypeInfo()))).OrderBy(x => x.GetSortOrder(modelType, true)))
-            {
-
-                etab.SetApplicationViewModel(appViewModel);
+            {                
                 bool isMatch = false;
                 GenericViewModel currentViewModel = null;
 
@@ -442,7 +439,6 @@ namespace SkyEditor.Core.UI
                 {
                     // Create another instance of etab, since etab is our cached, search-only instance.
                     var tab = manager.CreateNewInstance(etab) as IViewControl;
-                    tab.SetApplicationViewModel(appViewModel);
 
                     // Set the appropriate object
                     if (currentViewModel != null)
