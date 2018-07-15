@@ -34,6 +34,11 @@ namespace SkyEditor.Core.IO
         /// <param name="file"></param>
         public GenericFile(GenericFile file)
         {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
             IsReadOnly = true; // Read-only to avoid modifying the other file
             if (file.InMemoryFile != null)
             {
@@ -44,6 +49,27 @@ namespace SkyEditor.Core.IO
                 this.FileReader = file.FileReader;
                 DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
             }
+        }
+
+        /// <summary>
+        /// Creates a new, read-only instance of <see cref="GenericFile"/> using the given data as the backing source
+        /// </summary>
+        /// <param name="file"></param>
+        public GenericFile(byte[] data)
+        {
+            IsReadOnly = true; // Read-only to avoid modifying the other file
+            this.InMemoryFile = data ?? throw new ArgumentNullException(nameof(data));
+        }
+
+        /// <summary>
+        /// Creates a new, read-only instance of <see cref="GenericFile"/> using the given stream as the backing source
+        /// </summary>
+        /// <param name="file"></param>
+        public GenericFile(Stream stream)
+        {
+            IsReadOnly = true; // Read-only to avoid modifying the other file
+            this.FileReader = stream ?? throw new ArgumentNullException(nameof(stream));
+            DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
         }
 
 
