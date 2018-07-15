@@ -42,6 +42,7 @@ namespace SkyEditor.Core.IO
             else
             {
                 this.FileReader = file.FileReader;
+                DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
             }
         }
 
@@ -103,6 +104,8 @@ namespace SkyEditor.Core.IO
             }
         }
         private Stream _fileReader;
+
+        private bool DisableDispose { get; }
 
         /// <summary>
         /// Used to ensure thread safety with <see cref="FileReader"/>
@@ -1715,7 +1718,7 @@ namespace SkyEditor.Core.IO
         {
             if (!disposedValue)
             {
-                if (disposing)
+                if (disposing && !DisableDispose)
                 {
                     // Dispose of the file reader
                     if (_fileReader != null)
