@@ -824,14 +824,14 @@ namespace SkyEditor.Core
         /// <param name="autoDetectSelector">Delegate function used to resolve duplicate auto-detection results.</param>
         /// <param name="disposeOnClose">True to call the file's dispose method (if IDisposable) when closed.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> is null.</exception>
-        public void OpenFile(GenericFile file, bool disposeOnClose)
+        public async Task OpenFile(GenericFile file, bool disposeOnClose)
         {
             if (file == null)
             {
                 throw new ArgumentNullException(nameof(file));
             }
 
-            var model = IOHelper.OpenFile(file, GetFileTypeDuplicateMatchSelector(), CurrentPluginManager);
+            var model = await IOHelper.OpenFile(file, GetFileTypeDuplicateMatchSelector(), CurrentPluginManager);
             OpenFile(model, disposeOnClose);
         }
 
