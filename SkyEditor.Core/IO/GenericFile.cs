@@ -11,13 +11,38 @@ namespace SkyEditor.Core.IO
     public class GenericFile : INamed, ICreatableFile, IOpenableFile, IOnDisk, ISavableAs, IDisposable
     {
 
+        /// <summary>
+        /// Creates a new instance of <see cref="GenericFile"/>
+        /// </summary>
         public GenericFile()
         {
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="GenericFile"/> using the data at the given file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="provider"></param>
         public GenericFile(string filename, IIOProvider provider)
         {
             OpenFileInternal(filename, provider);
+        }
+
+        /// <summary>
+        /// Creates a new, read-only instance of <see cref="GenericFile"/> using the given file as the backing source
+        /// </summary>
+        /// <param name="file"></param>
+        public GenericFile(GenericFile file)
+        {
+            IsReadOnly = true; // Read-only to avoid modifying the other file
+            if (file.InMemoryFile != null)
+            {
+                this.InMemoryFile = file.InMemoryFile;
+            }
+            else
+            {
+                this.FileReader = file.FileReader;
+            }
         }
 
 
@@ -71,6 +96,10 @@ namespace SkyEditor.Core.IO
                     }
                     return _fileReader;
                 }
+            }
+            set
+            {
+                _fileReader = value;
             }
         }
         private Stream _fileReader;
