@@ -131,7 +131,7 @@ namespace SkyEditor.Core.IO
         }
         private Stream _fileReader;
 
-        private bool DisableDispose { get; }
+        private bool DisableDispose { get; set; }
 
         /// <summary>
         /// Used to ensure thread safety with <see cref="FileReader"/>
@@ -381,6 +381,12 @@ namespace SkyEditor.Core.IO
             return Task.CompletedTask;
         }
 
+        public virtual Task OpenFile(GenericFile file)
+        {
+            OpenFileInternal(file);
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         /// Initializes the class to represent the data stored in the file at the given path
         /// </summary>
@@ -413,6 +419,36 @@ namespace SkyEditor.Core.IO
             else
             {
                 OpenFileInternalStream(filename, provider);
+            }
+        }
+
+        private void OpenFileInternal(GenericFile file)
+        {
+            if (IsReadOnly)
+            {
+                if (file.InMemoryFile != null)
+                {
+                    this.InMemoryFile = file.InMemoryFile;
+                }
+                else
+                {
+                    this.FileReader = file.FileReader;
+                    DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
+                }
+            }
+            else
+            {
+                if (file.InMemoryFile != null)
+                {
+                    this.InMemoryFile = file.InMemoryFile.ToArray(); // Copy the data
+                }
+                else
+                {
+                    this.InMemoryFile = new byte[file.FileReader.Length];
+                    file.FileReader.Seek(0, SeekOrigin.Begin);
+                    file.FileReader.Read(this.InMemoryFile, 0, this.InMemoryFile.Length);
+                    DisableDispose = false;
+                }
             }
         }
 
