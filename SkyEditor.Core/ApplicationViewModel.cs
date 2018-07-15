@@ -730,6 +730,15 @@ namespace SkyEditor.Core
             solution.ErrorReported -= Solution_ErrorReported;
         }
 
+        /// <summary>
+        /// Gets a delegate that can resolve duplicate types for file type detection
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IOHelper.DuplicateMatchSelector GetFileTypeDuplicateMatchSelector()
+        {
+            return IOHelper.PickFirstDuplicateMatchSelector;
+        }
+
         #region I/O Filters
         /// <summary>
         /// Gets the IO filter string for use with an OpenFileDialog or a SaveFileDialog.
@@ -809,6 +818,24 @@ namespace SkyEditor.Core
         }
 
         /// <summary>
+        /// Uses the data in the given file to create and open a model
+        /// </summary>
+        /// <param name="model">The model to open</param>
+        /// <param name="autoDetectSelector">Delegate function used to resolve duplicate auto-detection results.</param>
+        /// <param name="disposeOnClose">True to call the file's dispose method (if IDisposable) when closed.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> is null.</exception>
+        public void OpenFile(GenericFile file, bool disposeOnClose)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            var model = IOHelper.OpenFile(file, GetFileTypeDuplicateMatchSelector(), CurrentPluginManager);
+            OpenFile(model, disposeOnClose);
+        }
+
+        /// <summary>
         /// Opens the given file
         /// </summary>
         /// <param name="model">The model to open</param>
@@ -818,7 +845,7 @@ namespace SkyEditor.Core
         {
             if (model == null)
             {
-                throw (new ArgumentNullException(nameof(model)));
+                throw new ArgumentNullException(nameof(model));
             }
 
             if (!OpenFiles.Any(x => ReferenceEquals(x.Model, model)))
@@ -861,16 +888,15 @@ namespace SkyEditor.Core
         /// Opens a file from the given filename.
         /// </summary>
         /// <param name="filename">Full path of the file to open.</param>
-        /// <param name="autoDetectSelector">Delegate function used to resolve duplicate auto-detection results.</param>
         /// <remarks>This overload is intended to open files on disk that are not associated with a project, automatically determining the file type.
         /// To open a project file, use <see cref="OpenFile(Object, Project)"/>.
         /// To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
         /// To open a file using a specific type as the model, use <see cref="OpenFile(String, TypeInfo)"/>.
         ///
         /// When the file is closed, the underlying model will be disposed.</remarks>
-        public async Task OpenFile(string filename, IOHelper.DuplicateMatchSelector autoDetectSelector)
+        public async Task OpenFile(string filename)
         {
-            var model = await IOHelper.OpenFile(filename, autoDetectSelector, CurrentPluginManager);
+            var model = await IOHelper.OpenFile(filename, GetFileTypeDuplicateMatchSelector(), CurrentPluginManager);
 
             if (!OpenFiles.Any(x => ReferenceEquals(x.Model, model)))
             {
@@ -890,7 +916,7 @@ namespace SkyEditor.Core
         /// <remarks>This overload is intended to open files on disk, using a specific file type, that are not associated with a project.
         /// To open a project file, use <see cref="OpenFile(Object, Project)"/>.
         /// To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
-        /// To open a file, auto-detecting the file type, use <see cref="OpenFile(String, IOHelper.DuplicateMatchSelector)"/>.
+        /// To open a file, auto-detecting the file type, use <see cref="OpenFile(String)"/>.
         ///
         /// When the file is closed, the underlying model will be disposed.</remarks>
         public async Task OpenFile(string filename, TypeInfo modelType)

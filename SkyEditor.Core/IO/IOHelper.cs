@@ -149,7 +149,7 @@ namespace SkyEditor.Core.IO
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>An object that represents the given file, or <paramref name="file"/> if no such class could be found.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <see cref="file"/>, <paramref name="duplicateFileTypeSelector"/>, or <paramref name="manager"/> is null.</exception>
-        private static async Task<object> OpenFile(GenericFile file, DuplicateMatchSelector duplicateFileTypeSelector, PluginManager manager)
+        public static async Task<object> OpenFile(GenericFile file, DuplicateMatchSelector duplicateFileTypeSelector, PluginManager manager)
         {
             if (file == null)
             {

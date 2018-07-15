@@ -57,7 +57,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 
                 if (fileType == null)
                 {
-                    await CurrentApplicationViewModel.OpenFile(filename, new IOHelper.DuplicateMatchSelector(DuplicateMatchSelector));
+                    await CurrentApplicationViewModel.OpenFile(filename);
                 }
                 else
                 {
