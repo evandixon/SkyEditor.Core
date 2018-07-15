@@ -155,6 +155,7 @@ namespace SkyEditor.Core
             manager.AddSingletonDependency(GetConsoleProvider());
 
             manager.RegisterTypeRegister<IFileOpener>();
+            manager.RegisterTypeRegister<IFileFromGenericFileOpener>();
             manager.RegisterTypeRegister<IFileSaver>();
             manager.RegisterTypeRegister<IFileTypeDetector>();
             manager.RegisterTypeRegister<IDirectoryTypeDetector>();
@@ -167,6 +168,7 @@ namespace SkyEditor.Core
             manager.RegisterTypeRegister<IViewControl>();
 
             manager.RegisterType<IFileOpener, OpenableFileOpener>();
+            manager.RegisterType<IFileFromGenericFileOpener, OpenableFromGenericFileFileOpener>();
             manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
             manager.RegisterType<IFileSaver, SavableFileSaver>();
 
@@ -187,6 +189,7 @@ namespace SkyEditor.Core
             manager.RegisterType<ConsoleCommand, mkdir>();
 
             manager.RegisterTypeRegister<IOpenableFile>();
+            manager.RegisterTypeRegister<IOpenableFromGenericFile>();
             manager.RegisterTypeRegister<ICreatableFile>();
             manager.RegisterTypeRegister<IDetectableFileType>();
 
