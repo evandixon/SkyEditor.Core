@@ -43,7 +43,7 @@ namespace SkyEditor.Core.IO
 
             var model = CurrentPluginManager.CreateInstance(fileType) as IOpenableFromGenericFile;
             await model.OpenFile(file);
-            return file;
+            return model;
         }
 
         public bool SupportsType(TypeInfo fileType)
