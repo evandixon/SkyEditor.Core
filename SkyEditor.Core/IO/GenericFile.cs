@@ -424,6 +424,7 @@ namespace SkyEditor.Core.IO
 
         private void OpenFileInternal(GenericFile file)
         {
+            this.Name = file.Name;
             if (IsReadOnly)
             {
                 if (file.InMemoryFile != null)
