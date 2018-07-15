@@ -53,7 +53,7 @@ namespace SkyEditor.Core.IO
 
         public int GetUsagePriority(TypeInfo fileType)
         {
-            return 0;
+            return 1;
         }
     }
 }

@@ -186,7 +186,7 @@ namespace SkyEditor.Core.IO
                 var openers = new List<IBaseFileOpener>();
                 openers.AddRange(fileOpeners);
                 openers.AddRange(genericFileOpeners);
-                var fileOpener = openers.OrderBy(x => x.GetUsagePriority(type)).First();
+                var fileOpener = openers.OrderByDescending(x => x.GetUsagePriority(type)).First();
                 if (fileOpener is IFileOpener fromFileOpener)
                 {
                     return await fromFileOpener.OpenFile(type, file.Filename, manager.CurrentIOProvider);
