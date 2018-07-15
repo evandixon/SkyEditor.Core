@@ -48,7 +48,7 @@ namespace SkyEditor.Core.IO
 
         public bool SupportsType(TypeInfo fileType)
         {
-            return ReflectionHelpers.IsOfType(fileType, typeof(IOpenableFile).GetTypeInfo());
+            return ReflectionHelpers.IsOfType(fileType, typeof(IOpenableFromGenericFile).GetTypeInfo());
         }
 
         public int GetUsagePriority(TypeInfo fileType)
