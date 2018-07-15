@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 namespace SkyEditor.Core.IO
 {
     /// <summary>
-    /// Represents a class that can be opened from a file on disk
+    /// Represents a class that can be opened from an instance of <see cref="GenericFile"/>
     /// </summary>
-    public interface IOpenableFile
+    public interface IOpenableFromGenericFile
     {
-        Task OpenFile(string filename, IIOProvider provider);
+        Task OpenFile(GenericFile file);
     }
 }

@@ -6,18 +6,14 @@ using System.Threading.Tasks;
 
 namespace SkyEditor.Core.IO
 {
-    /// <summary>
-    /// Opens a file into a supported type
-    /// </summary>
-    public interface IFileOpener : IBaseFileOpener
+    public interface IFileFromGenericFileOpener : IBaseFileOpener
     {
         /// <summary>
         /// Creates an instance of fileType from the given filename
         /// </summary>
         /// <param name="fileType">Type of the file to open</param>
-        /// <param name="filename">Full path of the file to open</param>
-        /// <param name="provider">Instance of the current IO provider</param>
+        /// <param name="file">Data source of the file</param>
         /// <returns>An object representing the requested file</returns>
-        Task<object> OpenFile(TypeInfo fileType, string filename, IIOProvider provider);
+        Task<object> OpenFile(TypeInfo fileType, GenericFile file);
     }
 }

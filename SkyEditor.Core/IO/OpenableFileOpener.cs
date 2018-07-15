@@ -6,7 +6,7 @@ using System;
 namespace SkyEditor.Core.IO
 {
     /// <summary>
-    /// Opens files using file types that implement IOpenableFile
+    /// Opens files using file types that implement <see cref="IOpenableFile"/>
     /// </summary>
     public class OpenableFileOpener : IFileOpener
     {

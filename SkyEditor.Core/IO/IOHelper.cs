@@ -168,8 +168,12 @@ namespace SkyEditor.Core.IO
             }
 
             var type = await GetFileType(file, duplicateFileTypeSelector, manager);
-            var openers = manager.GetRegisteredObjects<IFileOpener>().Where(x => x.SupportsType(type));
-            if (type == null || !openers.Any())
+            var fileOpeners = manager.GetRegisteredObjects<IFileOpener>().Where(x => x.SupportsType(type));
+            var genericFileOpeners = manager.GetRegisteredObjects<IFileFromGenericFileOpener>().Where(x => x.SupportsType(type));
+            if (type == null 
+                ||
+                !(fileOpeners.Any() || genericFileOpeners.Any())
+                )
             {
                 // Nothing can model the file
                 // Re-open GenericFile so it's not readonly
@@ -179,7 +183,22 @@ namespace SkyEditor.Core.IO
             }
             else
             {
-                return await openers.OrderBy(x => x.GetUsagePriority(type)).First().OpenFile(type, file.Filename, manager.CurrentIOProvider);
+                var openers = new List<IBaseFileOpener>();
+                openers.AddRange(fileOpeners);
+                openers.AddRange(genericFileOpeners);
+                var fileOpener = openers.OrderBy(x => x.GetUsagePriority(type)).First();
+                if (fileOpener is IFileOpener fromFileOpener)
+                {
+                    return await fromFileOpener.OpenFile(type, file.Filename, manager.CurrentIOProvider);
+                }
+                else if (fileOpener is IFileFromGenericFileOpener fromGenericFileOpener)
+                {
+                    return await fromGenericFileOpener.OpenFile(type, file);
+                }
+                else
+                {
+                    throw new Exception("Unsupported IBaseFileOpener type: " + fileOpener.GetType().Name);
+                }
             }
         }
 
