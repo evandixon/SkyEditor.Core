@@ -1,6 +1,7 @@
 ﻿using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -294,7 +295,17 @@ namespace SkyEditor.Core.IO
             foreach (var detector in manager.GetRegisteredObjects<IFileTypeDetector>())
             {
                 // Start the file type detection
-                var detectTask = detector.DetectFileType(file, manager);
+                var detectTask = Task.Run(async () => {
+                    try
+                    {
+                        return await detector.DetectFileType(file, manager);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Encountered exception when using {detector.GetType().Name} to detect a file type: {ex.ToString()}");
+                        return new FileTypeDetectionResult[] { };
+                    }                   
+                }); 
 
                 // Add the task to a list of running detection tasks, so there is the option of running them asynchronously.
                 resultSetTasks.Add(detectTask);
@@ -302,7 +313,15 @@ namespace SkyEditor.Core.IO
                 // However, the file isn't necessarily thread-safe, so if it isn't, only one should be run at any one time
                 if (!file.IsThreadSafe)
                 {
-                    await detectTask;
+                    try
+                    {
+                        await detectTask;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Encountered exception when using {detector.GetType().Name} to detect a file type: {ex.ToString()}");
+                        continue;
+                    }
                 }
             }
 
