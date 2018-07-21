@@ -70,6 +70,15 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Solution &apos;{0}&apos; is not buildable.
+        /// </summary>
+        internal static string Console_Build_SolutionNotBuildable {
+            get {
+                return ResourceManager.GetString("Console_Build_SolutionNotBuildable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown command &quot;{0}&quot;..
         /// </summary>
         internal static string Console_CommandNotFound {
