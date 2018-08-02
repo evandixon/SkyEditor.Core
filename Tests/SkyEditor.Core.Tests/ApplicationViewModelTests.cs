@@ -77,7 +77,7 @@ namespace SkyEditor.Core.Tests
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
                     Assert.IsNull(appViewModel.SelectedFile, "Selected File should be null before any file is opened");
-                    await appViewModel.OpenFile("/test.txt", IOHelper.PickFirstDuplicateMatchSelector);
+                    await appViewModel.OpenFile("/test.txt");
                     Assert.IsNotNull(appViewModel.SelectedFile, "Selected File should not be null after a file is opened");
                 }     
             }

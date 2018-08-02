@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.Extensions;
+using SkyEditor.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,13 +9,22 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class InstallExtension : ConsoleCommand
     {
+        public InstallExtension(PluginManager manager, IIOProvider provider)
+        {
+            CurrentPluginManager = manager;
+            CurrentIOProvider = provider;
+        }
+
+        protected IIOProvider CurrentIOProvider { get; }
+        protected  PluginManager CurrentPluginManager { get; }
+
         public override async Task MainAsync(string[] arguments)
         {
             if (arguments.Length > 1)
             {
-                if (CurrentApplicationViewModel.CurrentPluginManager.CurrentIOProvider.FileExists(arguments[1]))
+                if (CurrentIOProvider.FileExists(arguments[1]))
                 {
-                    var result = await ExtensionHelper.InstallExtensionZip(arguments[1], CurrentApplicationViewModel.CurrentPluginManager).ConfigureAwait(false);
+                    var result = await ExtensionHelper.InstallExtensionZip(arguments[1], CurrentPluginManager).ConfigureAwait(false);
                     if (result == ExtensionInstallResult.Success)
                     {
                         Console.WriteLine("Extension install was successful.");

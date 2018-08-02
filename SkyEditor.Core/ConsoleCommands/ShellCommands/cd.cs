@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.Core.IO;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +7,13 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
 {
     public class cd : ConsoleCommand
     {
+        public cd(IIOProvider provider)
+        {
+            CurrentIOProvider = provider;
+        }
+
+        protected IIOProvider CurrentIOProvider { get; }
+
         protected override void Main(string[] arguments)
         {
             base.Main(arguments);

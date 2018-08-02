@@ -166,12 +166,12 @@ namespace SkyEditor.Core
         /// <summary>
         /// Instance of the current plugin manager
         /// </summary>
-        public PluginManager CurrentPluginManager { get; set; }
+        public PluginManager CurrentPluginManager { get; }
 
         /// <summary>
         /// Instance of the current plugin manager's current I/O provider
         /// </summary>
-        public IIOProvider CurrentIOProvider
+        protected IIOProvider CurrentIOProvider
         {
             get
             {
@@ -421,7 +421,7 @@ namespace SkyEditor.Core
             {
                 if (_consoleShell == null)
                 {
-                    _consoleShell = new ConsoleShell(this);
+                    _consoleShell = new ConsoleShell(this, CurrentPluginManager, CurrentPluginManager.CurrentConsoleProvider, CurrentIOProvider);
                 }
                 return _consoleShell;
             }
@@ -536,7 +536,7 @@ namespace SkyEditor.Core
         /// </summary>
         /// <param name="task"><see cref="Task"/> to add to the loading list.</param>
         /// <remarks>This overload will never show determinate progress.</remarks>    
-        public void ShowLoading(Task task)
+        public virtual void ShowLoading(Task task)
         {
             var wrapper = new TaskProgressReporterWrapper(task, this);
             ShowLoading(wrapper);
@@ -549,7 +549,7 @@ namespace SkyEditor.Core
         /// <param name="task"><see cref="Task"/> to add to the loading list.</param>
         /// <param name="loadingMessage">User-friendly loading message.  Usually what the task is doing.</param>
         /// <remarks>This overload will never show determinate progress.</remarks>
-        public void ShowLoading(Task task, string loadingMessage)
+        public virtual void ShowLoading(Task task, string loadingMessage)
         {
             var wrapper = new TaskProgressReporterWrapper(task, loadingMessage, this);
             ShowLoading(wrapper);
@@ -560,7 +560,7 @@ namespace SkyEditor.Core
         /// Adds the given <paramref name="task"/> to the list of currently loading tasks.
         /// </summary>
         /// <param name="task"><see cref="IReportProgress"/> to add to the loading list.</param>
-        public void ShowLoading(IReportProgress task)
+        public virtual void ShowLoading(IReportProgress task)
         {
             task.Completed += OnLoadingTaskCompleted;
             task.ProgressChanged += OnLoadingTaskProgressed;
@@ -688,7 +688,7 @@ namespace SkyEditor.Core
         /// Reports an error
         /// </summary>
         /// <param name="error">The error to be reported</param>
-        public void ReportError(ErrorInfo error)
+        public virtual void ReportError(ErrorInfo error)
         {
             Errors.Add(error);
         }
@@ -697,12 +697,12 @@ namespace SkyEditor.Core
         /// Reports an error
         /// </summary>
         /// <param name="exception">The error to be reported</param>
-        public void ReportError(Exception exception)
+        public virtual void ReportError(Exception exception)
         {
             Errors.Add(new ErrorInfo(exception));
         }
 
-        public void ClearErrors()
+        public virtual void ClearErrors()
         {
             Errors.Clear();
         }
@@ -728,6 +728,15 @@ namespace SkyEditor.Core
             }
 
             solution.ErrorReported -= Solution_ErrorReported;
+        }
+
+        /// <summary>
+        /// Gets a delegate that can resolve duplicate types for file type detection
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IOHelper.DuplicateMatchSelector GetFileTypeDuplicateMatchSelector()
+        {
+            return IOHelper.PickFirstDuplicateMatchSelector;
         }
 
         #region I/O Filters
@@ -803,9 +812,27 @@ namespace SkyEditor.Core
         /// <returns>A new <see cref="FileViewModel"/> wrapper.</returns>
         protected virtual FileViewModel CreateViewModel(object model)
         {
-            FileViewModel output = new FileViewModel();
+            FileViewModel output = new FileViewModel(CurrentPluginManager);
             output.Model = model;
             return output;
+        }
+
+        /// <summary>
+        /// Uses the data in the given file to create and open a model
+        /// </summary>
+        /// <param name="model">The model to open</param>
+        /// <param name="autoDetectSelector">Delegate function used to resolve duplicate auto-detection results.</param>
+        /// <param name="disposeOnClose">True to call the file's dispose method (if IDisposable) when closed.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> is null.</exception>
+        public virtual async Task OpenFile(GenericFile file, bool disposeOnClose)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            var model = await IOHelper.OpenFile(file, GetFileTypeDuplicateMatchSelector(), CurrentPluginManager);
+            OpenFile(model, disposeOnClose);
         }
 
         /// <summary>
@@ -814,11 +841,11 @@ namespace SkyEditor.Core
         /// <param name="model">The model to open</param>
         /// <param name="disposeOnClose">True to call the file's dispose method (if IDisposable) when closed.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> is null.</exception>
-        public void OpenFile(object model, bool disposeOnClose)
+        public virtual void OpenFile(object model, bool disposeOnClose)
         {
             if (model == null)
             {
-                throw (new ArgumentNullException(nameof(model)));
+                throw new ArgumentNullException(nameof(model));
             }
 
             if (!OpenFiles.Any(x => ReferenceEquals(x.Model, model)))
@@ -836,7 +863,7 @@ namespace SkyEditor.Core
         /// <param name="model">File to open</param>
         /// <param name="parentProject">Project the file belongs to.  If the file does not belong to a project, don't use this overload.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="model"/> or <paramref name="parentProject"/> is null.</exception>
-        public void OpenFile(object model, Project parentProject)
+        public virtual void OpenFile(object model, Project parentProject)
         {
             if (ReferenceEquals(model, null))
             {
@@ -861,16 +888,15 @@ namespace SkyEditor.Core
         /// Opens a file from the given filename.
         /// </summary>
         /// <param name="filename">Full path of the file to open.</param>
-        /// <param name="autoDetectSelector">Delegate function used to resolve duplicate auto-detection results.</param>
         /// <remarks>This overload is intended to open files on disk that are not associated with a project, automatically determining the file type.
         /// To open a project file, use <see cref="OpenFile(Object, Project)"/>.
         /// To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
         /// To open a file using a specific type as the model, use <see cref="OpenFile(String, TypeInfo)"/>.
         ///
         /// When the file is closed, the underlying model will be disposed.</remarks>
-        public async Task OpenFile(string filename, IOHelper.DuplicateMatchSelector autoDetectSelector)
+        public virtual async Task OpenFile(string filename)
         {
-            var model = await IOHelper.OpenFile(filename, autoDetectSelector, CurrentPluginManager);
+            var model = await IOHelper.OpenFile(filename, GetFileTypeDuplicateMatchSelector(), CurrentPluginManager);
 
             if (!OpenFiles.Any(x => ReferenceEquals(x.Model, model)))
             {
@@ -890,10 +916,10 @@ namespace SkyEditor.Core
         /// <remarks>This overload is intended to open files on disk, using a specific file type, that are not associated with a project.
         /// To open a project file, use <see cref="OpenFile(Object, Project)"/>.
         /// To open a file that is not necessarily on disk, use <see cref="OpenFile(Object, Boolean)"/>.
-        /// To open a file, auto-detecting the file type, use <see cref="OpenFile(String, IOHelper.DuplicateMatchSelector)"/>.
+        /// To open a file, auto-detecting the file type, use <see cref="OpenFile(String)"/>.
         ///
         /// When the file is closed, the underlying model will be disposed.</remarks>
-        public async Task OpenFile(string filename, TypeInfo modelType)
+        public virtual async Task OpenFile(string filename, TypeInfo modelType)
         {
             var model = await IOHelper.OpenFile(filename, modelType, CurrentPluginManager);
 
@@ -911,7 +937,7 @@ namespace SkyEditor.Core
         /// Closes the file
         /// </summary>
         /// <param name="File">File to close</param>
-        public void CloseFile(FileViewModel file)
+        public virtual void CloseFile(FileViewModel file)
         {
             if (file != null)
             {
@@ -961,13 +987,13 @@ namespace SkyEditor.Core
         /// Gets the top-level menu items.  Children are properly referenced.
         /// </summary>
         /// <returns>The top-level menu items</returns>
-        public async Task<ObservableCollection<ActionMenuItem>> GetRootMenuItems()
+        public virtual async Task<ObservableCollection<ActionMenuItem>> GetRootMenuItems()
         {
             if (_rootMenuItems == null)
             {
                 _rootMenuItems = new ObservableCollection<ActionMenuItem>();
                 //Generate the menu items
-                foreach (var item in UIHelper.GenerateLogicalMenuItems(await UIHelper.GetMenuItemInfo(this, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode()), this, null))
+                foreach (var item in UIHelper.GenerateLogicalMenuItems(await UIHelper.GetMenuItemInfo(this, CurrentPluginManager, CurrentPluginManager.CurrentSettingsProvider.GetIsDevMode()), this, CurrentPluginManager, null))
                 {
                     _rootMenuItems.Add(item);
                 }
@@ -986,7 +1012,7 @@ namespace SkyEditor.Core
         /// </summary>
         /// <param name="model">The model for which to find the <see cref="FileViewModel"/>.</param>
         /// <returns>The <see cref="FileViewModel"/> wrapping <paramref name="model"/>, <paramref name="model"/> if it is itself a <see cref="FileViewModel"/>, or null if it does not exist.</returns>
-        public FileViewModel GetFileViewModelForModel(object model)
+        public virtual FileViewModel GetFileViewModelForModel(object model)
         {
             var fvm = OpenFiles.FirstOrDefault(x => ReferenceEquals(x.Model, model));
             if (fvm == null)
@@ -1004,7 +1030,7 @@ namespace SkyEditor.Core
         /// </summary>
         /// <param name="model">Model for which to get the view models.</param>
         /// <returns>An IEnumerable of view models that support the given model, or null if the model is not an open file.</returns>
-        public IEnumerable<GenericViewModel> GetViewModelsForModel(object model)
+        public virtual IEnumerable<GenericViewModel> GetViewModelsForModel(object model)
         {
             var file = GetFileViewModelForModel(model);
             if (file != null)
@@ -1059,7 +1085,7 @@ namespace SkyEditor.Core
         /// Gets the targets for the given menu action
         /// </summary>
         /// <param name="action">The action for which to retrieve the targets</param>
-        public async Task<IEnumerable<object>> GetMenuActionTargets(MenuAction action)
+        public virtual async Task<IEnumerable<object>> GetMenuActionTargets(MenuAction action)
         {
             List<object> targets = new List<object>();
 
@@ -1189,12 +1215,11 @@ namespace SkyEditor.Core
         /// Adds the given anchorable ViewModel to the list of open anchorable ViewModels
         /// </summary>
         /// <param name="model">The anchorable view model to add</param>
-        public void ShowAnchorable(AnchorableViewModel anchorableViewModel)
+        public virtual void ShowAnchorable(AnchorableViewModel anchorableViewModel)
         {
             var targetType = anchorableViewModel.GetType().GetTypeInfo();
             if (!AnchorableViewModels.Any(x => ReflectionHelpers.IsOfType(x, targetType)))
             {
-                anchorableViewModel.CurrentApplicationViewModel = this;
                 AnchorableViewModels.Add(anchorableViewModel);
             }
         }

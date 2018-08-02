@@ -260,4 +260,7 @@
   <data name="UI_FileViewModel_NullTitle" xml:space="preserve">
     <value>(Unknown)</value>
   </data>
+  <data name="Console_Build_SolutionNotBuildable" xml:space="preserve">
+    <value>Solution '{0}' is not buildable</value>
+  </data>
 </root>

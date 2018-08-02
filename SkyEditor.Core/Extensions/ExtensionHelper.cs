@@ -39,7 +39,7 @@ namespace SkyEditor.Core.Extensions
                 var extensionType = ReflectionHelpers.GetTypeByName(extensionTypeName, manager);
                 if (extensionType != null)
                 {
-                    var bank = ReflectionHelpers.CreateInstance(extensionType) as LocalExtensionCollection;
+                    var bank = manager.CreateInstance(extensionType) as LocalExtensionCollection;
                     bank.CurrentPluginManager = manager;
                     ExtensionBanks.Add(extensionTypeName, bank);
                 }
@@ -63,7 +63,7 @@ namespace SkyEditor.Core.Extensions
             if (!ExtensionBanks.ContainsKey(extensionTypeName))
             {
                 var extensionType = typeof(T);
-                var bank = ReflectionHelpers.CreateInstance(extensionType) as LocalExtensionCollection;
+                var bank = manager.CreateInstance(extensionType) as LocalExtensionCollection;
                 bank.CurrentPluginManager = manager;
                 ExtensionBanks.Add(extensionTypeName, bank);
             }

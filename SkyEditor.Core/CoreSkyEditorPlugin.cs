@@ -71,13 +71,27 @@ namespace SkyEditor.Core
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="IOUIManager"/> for the application environment.
+        /// Creates an instance of <see cref="ApplicationViewModel"/> for the application environment.
         /// </summary>
         /// <param name="manager">Instance of the current plugin manager.</param>
-        public virtual ApplicationViewModel GetIOUIManager(PluginManager manager)
+        public virtual ApplicationViewModel CreateApplicationViewModel(PluginManager manager)
         {
             return new ApplicationViewModel(manager);
         }
+
+        /// <summary>
+        /// Gets a cached instance of <see cref="ApplicationViewModel"/> for the application environment, or creates one if it does not yet exist.
+        /// </summary>
+        /// <param name="manager">Instance of the current plugin manager.</param>
+        public ApplicationViewModel GetApplicationViewModel(PluginManager manager)
+        {
+            if (_appViewModel == null)
+            {
+                _appViewModel = CreateApplicationViewModel(manager);
+            }
+            return _appViewModel;
+        }
+        private ApplicationViewModel _appViewModel = null;
 
         /// <summary>
         /// Gets the full path of the directory inside the current IO provider where extensions are stored.
@@ -135,7 +149,13 @@ namespace SkyEditor.Core
         {
             base.Load(manager);
 
+            manager.AddSingletonDependency(GetApplicationViewModel(manager));
+            manager.AddSingletonDependency(GetIOProvider());
+            manager.AddSingletonDependency(GetSettingsProvider(manager));
+            manager.AddSingletonDependency(GetConsoleProvider());
+
             manager.RegisterTypeRegister<IFileOpener>();
+            manager.RegisterTypeRegister<IFileFromGenericFileOpener>();
             manager.RegisterTypeRegister<IFileSaver>();
             manager.RegisterTypeRegister<IFileTypeDetector>();
             manager.RegisterTypeRegister<IDirectoryTypeDetector>();
@@ -148,6 +168,7 @@ namespace SkyEditor.Core
             manager.RegisterTypeRegister<IViewControl>();
 
             manager.RegisterType<IFileOpener, OpenableFileOpener>();
+            manager.RegisterType<IFileFromGenericFileOpener, OpenableFromGenericFileFileOpener>();
             manager.RegisterType<IFileTypeDetector, DetectableFileTypeDetector>();
             manager.RegisterType<IFileSaver, SavableFileSaver>();
 
@@ -168,6 +189,7 @@ namespace SkyEditor.Core
             manager.RegisterType<ConsoleCommand, mkdir>();
 
             manager.RegisterTypeRegister<IOpenableFile>();
+            manager.RegisterTypeRegister<IOpenableFromGenericFile>();
             manager.RegisterTypeRegister<ICreatableFile>();
             manager.RegisterTypeRegister<IDetectableFileType>();
 

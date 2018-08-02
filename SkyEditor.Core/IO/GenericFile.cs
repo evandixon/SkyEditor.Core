@@ -11,13 +11,65 @@ namespace SkyEditor.Core.IO
     public class GenericFile : INamed, ICreatableFile, IOpenableFile, IOnDisk, ISavableAs, IDisposable
     {
 
+        /// <summary>
+        /// Creates a new instance of <see cref="GenericFile"/>
+        /// </summary>
         public GenericFile()
         {
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="GenericFile"/> using the data at the given file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="provider"></param>
         public GenericFile(string filename, IIOProvider provider)
         {
             OpenFileInternal(filename, provider);
+        }
+
+        /// <summary>
+        /// Creates a new, read-only instance of <see cref="GenericFile"/> using the given file as the backing source
+        /// </summary>
+        /// <param name="file"></param>
+        public GenericFile(GenericFile file)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            IsReadOnly = true; // Read-only to avoid modifying the other file
+            if (file.InMemoryFile != null)
+            {
+                this.InMemoryFile = file.InMemoryFile;
+            }
+            else
+            {
+                this.FileReader = file.FileReader;
+                DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
+            }
+        }
+
+        /// <summary>
+        /// Creates a new, read-only instance of <see cref="GenericFile"/> using the given data as the backing source
+        /// </summary>
+        /// <param name="file"></param>
+        public GenericFile(byte[] data)
+        {
+            IsReadOnly = true; // Read-only to avoid modifying the other file
+            this.InMemoryFile = data ?? throw new ArgumentNullException(nameof(data));
+        }
+
+        /// <summary>
+        /// Creates a new, read-only instance of <see cref="GenericFile"/> using the given stream as the backing source
+        /// </summary>
+        /// <param name="file"></param>
+        public GenericFile(Stream stream)
+        {
+            IsReadOnly = true; // Read-only to avoid modifying the other file
+            this.FileReader = stream ?? throw new ArgumentNullException(nameof(stream));
+            DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
         }
 
 
@@ -72,8 +124,14 @@ namespace SkyEditor.Core.IO
                     return _fileReader;
                 }
             }
+            set
+            {
+                _fileReader = value;
+            }
         }
         private Stream _fileReader;
+
+        private bool DisableDispose { get; set; }
 
         /// <summary>
         /// Used to ensure thread safety with <see cref="FileReader"/>
@@ -323,6 +381,12 @@ namespace SkyEditor.Core.IO
             return Task.CompletedTask;
         }
 
+        public virtual Task OpenFile(GenericFile file)
+        {
+            OpenFileInternal(file);
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         /// Initializes the class to represent the data stored in the file at the given path
         /// </summary>
@@ -355,6 +419,37 @@ namespace SkyEditor.Core.IO
             else
             {
                 OpenFileInternalStream(filename, provider);
+            }
+        }
+
+        private void OpenFileInternal(GenericFile file)
+        {
+            this.Name = file.Name;
+            if (IsReadOnly)
+            {
+                if (file.InMemoryFile != null)
+                {
+                    this.InMemoryFile = file.InMemoryFile;
+                }
+                else
+                {
+                    this.FileReader = file.FileReader;
+                    DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
+                }
+            }
+            else
+            {
+                if (file.InMemoryFile != null)
+                {
+                    this.InMemoryFile = file.InMemoryFile.ToArray(); // Copy the data
+                }
+                else
+                {
+                    this.InMemoryFile = new byte[file.FileReader.Length];
+                    file.FileReader.Seek(0, SeekOrigin.Begin);
+                    file.FileReader.Read(this.InMemoryFile, 0, this.InMemoryFile.Length);
+                    DisableDispose = false;
+                }
             }
         }
 
@@ -1686,7 +1781,7 @@ namespace SkyEditor.Core.IO
         {
             if (!disposedValue)
             {
-                if (disposing)
+                if (disposing && !DisableDispose)
                 {
                     // Dispose of the file reader
                     if (_fileReader != null)

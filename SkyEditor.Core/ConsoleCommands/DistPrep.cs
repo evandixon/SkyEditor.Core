@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.Core.IO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,16 @@ namespace SkyEditor.Core.ConsoleCommands
 {
     public class DistPrep : ConsoleCommand
     {
+        public DistPrep(PluginManager pluginManager)
+        {
+            CurrentPluginManager = pluginManager;
+        }
+        
+        protected PluginManager CurrentPluginManager { get; }
+
         public override async Task MainAsync(string[] arguments)
         {
-            CurrentApplicationViewModel.CurrentPluginManager.PreparePluginsForDistribution();
+            CurrentPluginManager.PreparePluginsForDistribution();
             await base.MainAsync(arguments);
         }
     }

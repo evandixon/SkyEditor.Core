@@ -54,25 +54,18 @@ namespace SkyEditor.Core.Utilities
         /// The number of tasks that have been completed.
         /// </summary>
         /// <returns></returns>
-        private int CompletedTasks
+        public int CompletedTasks
         {
             get
             {
                 return _completedTasks;
             }
-            set
+            private set
             {
-                _completedTasks = value;
-                ProgressChanged?.Invoke(this, new ProgressReportedEventArgs() { Progress = Progress, IsIndeterminate = false });
-                if (CompletedTasks == TotalTasks)
-                {
-                    IsCompleted = true;
-                    Completed?.Invoke(this, new EventArgs());
-                }
+                _completedTasks = value;                
             }
         }
         int _completedTasks;
-        object _completedTasksLock = new object();
 
         public float Progress => CompletedTasks / TotalTasks;
 
@@ -83,6 +76,19 @@ namespace SkyEditor.Core.Utilities
         public bool IsCompleted { get; protected set; }
 
         #endregion
+
+        protected void IncrementCompletedTasks()
+        {
+            Interlocked.Increment(ref _completedTasks);
+
+            ProgressChanged?.Invoke(this, new ProgressReportedEventArgs() { Progress = Progress, IsIndeterminate = false });
+            if (CompletedTasks == TotalTasks)
+            {
+                IsCompleted = true;
+                Completed?.Invoke(this, new EventArgs());
+            }
+        }
+
 
         #region Core Functions
 
@@ -123,10 +129,7 @@ namespace SkyEditor.Core.Utilities
                     var tTask = Task.Run(async () =>
                     {
                         await delegateFunction(item);
-                        lock (_completedTasksLock)
-                        {
-                            CompletedTasks += 1;
-                        }
+                        IncrementCompletedTasks();
                     });
 
                     // Either wait for it or move on
@@ -224,10 +227,7 @@ namespace SkyEditor.Core.Utilities
                     var tTask = Task.Run(async () =>
                     {
                         await delegateFunction(item);
-                        lock (_completedTasksLock)
-                        {
-                            CompletedTasks += 1;
-                        }
+                        IncrementCompletedTasks();
                     });
 
                     // Increment for the next run

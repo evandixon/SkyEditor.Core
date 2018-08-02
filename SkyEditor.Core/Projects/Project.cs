@@ -141,7 +141,7 @@ namespace SkyEditor.Core.Projects
 
             var fixedPath = FixPath(parentPath);
 
-            ICreatableFile fileObj = ReflectionHelpers.CreateInstance(fileType.GetTypeInfo()) as ICreatableFile;
+            ICreatableFile fileObj = CurrentPluginManager.CreateInstance(fileType.GetTypeInfo()) as ICreatableFile;
             fileObj.CreateFile(name);
             fileObj.Filename = Path.Combine(Path.GetDirectoryName(this.Filename), parentPath.Replace("/", "\\").TrimStart("\\".ToCharArray()), name);
             await fileObj.Save(CurrentPluginManager.CurrentIOProvider);

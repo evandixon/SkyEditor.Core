@@ -411,7 +411,7 @@ namespace SkyEditor.Core.Tests.IO
             await manager.LoadCore(new TestCoreMod());
 
             // Assert
-            var newFile = IOHelper.CreateNewFile("Test", typeof(CreatableTextFile).GetTypeInfo());
+            var newFile = IOHelper.CreateNewFile("Test", typeof(CreatableTextFile).GetTypeInfo(), manager);
             Assert.IsNotNull(newFile);
             Assert.IsInstanceOfType(newFile, typeof(CreatableTextFile));
             Assert.AreEqual("Test", newFile.Name);
@@ -428,7 +428,7 @@ namespace SkyEditor.Core.Tests.IO
             // Assert
             try
             {
-                var newFile = IOHelper.CreateNewFile("Test", typeof(OpenableTextFile).GetTypeInfo());
+                var newFile = IOHelper.CreateNewFile("Test", typeof(OpenableTextFile).GetTypeInfo(), manager);
             }
             catch (ArgumentException)
             {
@@ -453,7 +453,7 @@ namespace SkyEditor.Core.Tests.IO
             // Assert
             try
             {
-                var newFile = IOHelper.CreateNewFile("Test", typeof(NoDefaultConstructorCreatableFile).GetTypeInfo());
+                var newFile = IOHelper.CreateNewFile("Test", typeof(NoDefaultConstructorCreatableFile).GetTypeInfo(), manager);
             }
             catch (ArgumentException)
             {

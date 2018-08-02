@@ -59,7 +59,7 @@ namespace SkyEditor.Core.Projects
         public static Task<ProjectBase> CreateProject(string parentPath, string projectName, Type projectType, PluginManager manager)
         {
             // Create the instance
-            var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
+            var output = manager.CreateInstance(projectType) as ProjectBase;
 
             // Get the filename
             var filename = Path.Combine(parentPath, projectName, projectName + "." + output.ProjectFileExtension);
@@ -98,7 +98,7 @@ namespace SkyEditor.Core.Projects
             }
 
             // Create the project & load basic info
-            var output = ReflectionHelpers.CreateInstance(projectType) as ProjectBase;
+            var output = manager.CreateInstance(projectType) as ProjectBase;
             output.Filename = filename;
             output.CurrentPluginManager = manager;
             output.Name = file.Name;

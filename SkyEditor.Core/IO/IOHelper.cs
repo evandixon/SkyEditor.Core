@@ -1,6 +1,7 @@
 ﻿using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -62,6 +63,12 @@ namespace SkyEditor.Core.IO
             return manager.GetRegisteredTypes<IOpenableFile>();
         }
 
+        [Obsolete("Use the overload with a PluginManager parameter")]
+        public static ICreatableFile CreateNewFile(string newFileName, TypeInfo fileType)
+        {
+            return CreateNewFile(newFileName, fileType, new PluginManager());
+        }
+
         /// <summary>
         /// Creates a new file
         /// </summary>
@@ -70,7 +77,7 @@ namespace SkyEditor.Core.IO
         /// <returns>The newly created file</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="fileType"/> is null</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="fileType"/> does not implement <see cref="ICreatableFile"/> or if it cannot be instantiated (if it's an abstract class, interface, or lacks a default constructor).</exception>
-        public static ICreatableFile CreateNewFile(string newFileName, TypeInfo fileType)
+        public static ICreatableFile CreateNewFile(string newFileName, TypeInfo fileType, PluginManager pluginManager)
         {
             if (fileType == null)
             {
@@ -82,12 +89,12 @@ namespace SkyEditor.Core.IO
                 throw new ArgumentException(string.Format(Properties.Resources.Reflection_ErrorInvalidType, nameof(ICreatableFile)), nameof(fileType));
             }
 
-            if (!ReflectionHelpers.CanCreateInstance(fileType))
+            if (!pluginManager.CanCreateInstance(fileType))
             {
                 throw new ArgumentException(Properties.Resources.Reflection_ErrorNoDefaultConstructor, nameof(fileType));
             }
 
-            var file = ReflectionHelpers.CreateInstance(fileType) as ICreatableFile;
+            var file = pluginManager.CreateInstance(fileType) as ICreatableFile;
             file.CreateFile(newFileName);
             return file;
         }
@@ -124,7 +131,7 @@ namespace SkyEditor.Core.IO
                 throw new ArgumentException(string.Format(Properties.Resources.IO_ErrorNoFileOpener, fileType.ToString()), nameof(fileType));
             }
 
-            if (ReflectionHelpers.CanCreateInstance(fileType))
+            if (manager.CanCreateInstance(fileType))
             {
                 return await openers.OrderBy(x => x.GetUsagePriority(fileType)).First().OpenFile(fileType, filename, manager.CurrentIOProvider);
             }
@@ -143,7 +150,7 @@ namespace SkyEditor.Core.IO
         /// <param name="manager">Instance of the current plugin manager</param>
         /// <returns>An object that represents the given file, or <paramref name="file"/> if no such class could be found.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <see cref="file"/>, <paramref name="duplicateFileTypeSelector"/>, or <paramref name="manager"/> is null.</exception>
-        private static async Task<object> OpenFile(GenericFile file, DuplicateMatchSelector duplicateFileTypeSelector, PluginManager manager)
+        public static async Task<object> OpenFile(GenericFile file, DuplicateMatchSelector duplicateFileTypeSelector, PluginManager manager)
         {
             if (file == null)
             {
@@ -161,8 +168,12 @@ namespace SkyEditor.Core.IO
             }
 
             var type = await GetFileType(file, duplicateFileTypeSelector, manager);
-            var openers = manager.GetRegisteredObjects<IFileOpener>().Where(x => x.SupportsType(type));
-            if (type == null || !openers.Any())
+            var fileOpeners = manager.GetRegisteredObjects<IFileOpener>().Where(x => x.SupportsType(type));
+            var genericFileOpeners = manager.GetRegisteredObjects<IFileFromGenericFileOpener>().Where(x => x.SupportsType(type));
+            if (type == null 
+                ||
+                !(fileOpeners.Any() || genericFileOpeners.Any())
+                )
             {
                 // Nothing can model the file
                 // Re-open GenericFile so it's not readonly
@@ -172,7 +183,22 @@ namespace SkyEditor.Core.IO
             }
             else
             {
-                return await openers.OrderBy(x => x.GetUsagePriority(type)).First().OpenFile(type, file.Filename, manager.CurrentIOProvider);
+                var openers = new List<IBaseFileOpener>();
+                openers.AddRange(fileOpeners);
+                openers.AddRange(genericFileOpeners);
+                var fileOpener = openers.OrderByDescending(x => x.GetUsagePriority(type)).First();
+                if (fileOpener is IFileOpener fromFileOpener)
+                {
+                    return await fromFileOpener.OpenFile(type, file.Filename, manager.CurrentIOProvider);
+                }
+                else if (fileOpener is IFileFromGenericFileOpener fromGenericFileOpener)
+                {
+                    return await fromGenericFileOpener.OpenFile(type, file);
+                }
+                else
+                {
+                    throw new Exception("Unsupported IBaseFileOpener type: " + fileOpener.GetType().Name);
+                }
             }
         }
 
@@ -288,7 +314,17 @@ namespace SkyEditor.Core.IO
             foreach (var detector in manager.GetRegisteredObjects<IFileTypeDetector>())
             {
                 // Start the file type detection
-                var detectTask = detector.DetectFileType(file, manager);
+                var detectTask = Task.Run(async () => {
+                    try
+                    {
+                        return await detector.DetectFileType(file, manager);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Encountered exception when using {detector.GetType().Name} to detect a file type: {ex.ToString()}");
+                        return new FileTypeDetectionResult[] { };
+                    }                   
+                }); 
 
                 // Add the task to a list of running detection tasks, so there is the option of running them asynchronously.
                 resultSetTasks.Add(detectTask);
@@ -296,7 +332,15 @@ namespace SkyEditor.Core.IO
                 // However, the file isn't necessarily thread-safe, so if it isn't, only one should be run at any one time
                 if (!file.IsThreadSafe)
                 {
-                    await detectTask;
+                    try
+                    {
+                        await detectTask;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Encountered exception when using {detector.GetType().Name} to detect a file type: {ex.ToString()}");
+                        continue;
+                    }
                 }
             }
 

@@ -10,7 +10,6 @@
 
 namespace SkyEditor.Core.Properties {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -40,7 +39,7 @@ namespace SkyEditor.Core.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Properties.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SkyEditor.Core.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -67,6 +66,15 @@ namespace SkyEditor.Core.Properties {
         internal static string Console_AvailableCommands {
             get {
                 return ResourceManager.GetString("Console_AvailableCommands", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Solution &apos;{0}&apos; is not buildable.
+        /// </summary>
+        internal static string Console_Build_SolutionNotBuildable {
+            get {
+                return ResourceManager.GetString("Console_Build_SolutionNotBuildable", resourceCulture);
             }
         }
         
