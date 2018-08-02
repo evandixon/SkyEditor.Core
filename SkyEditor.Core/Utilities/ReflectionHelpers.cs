@@ -430,8 +430,10 @@ namespace SkyEditor.Core.Utilities
                 }
 
                 // Return the first assembly that has the requested name
+                var desiredName = new AssemblyName(e.Name);
                 return candidates.Select(x => new { AssemblyName = AssemblyName.GetAssemblyName(x), Location = x })
-                    .Where(x => x.AssemblyName.FullName == e.Name)
+                    .Where(x => x.AssemblyName.Name == desiredName.Name)          
+                    .OrderByDescending(x => x.AssemblyName.Version)
                     .Select(x => LoadAssemblyWithDependencies(x.Location))
                     .FirstOrDefault();
             }

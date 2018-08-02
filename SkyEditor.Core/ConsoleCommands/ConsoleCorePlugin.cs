@@ -13,11 +13,6 @@ namespace SkyEditor.Core.ConsoleCommands
 
         public override string Credits { get; }
 
-        public override string GetExtensionDirectory()
-        {
-            return "extensions";
-        }
-
         public override IIOProvider GetIOProvider()
         {
             return new PhysicalIOProvider();
