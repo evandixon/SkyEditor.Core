@@ -400,8 +400,31 @@ namespace SkyEditor.Core.IO
 
                 // Try to load file in memory
                 try
-                {
+                {                    
                     contents = provider.ReadAllBytes(filename);
+                }
+                catch (IOException)
+                {
+                    if (provider is PhysicalIOProvider)
+                    {
+                        if (File.Exists(filename) && (new FileInfo(filename)).Length > int.MaxValue)
+                        {
+                            // File is too large.  Use stream instead.
+                            OpenFileInternalStream(filename, provider);
+                            return;
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    else
+                    {
+                        // Got an I/O exception and we're not sure if we're using the PhysicalIOProvider or not
+                        // Let's assume it's because of the 2GB limit and use a stream
+                        OpenFileInternalStream(filename, provider);
+                        return;
+                    }
                 }
                 catch (OutOfMemoryException)
                 {

@@ -3,6 +3,7 @@ using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,6 +61,37 @@ namespace SkyEditor.Core.Tests.IO
 
             Assert.AreEqual(4, file.Length, "Failed to determine length.");
             Assert.IsTrue(file.Read().SequenceEqual(new byte[] { 0, 1, 2, 3 }), "Failed to read sample data.");
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task OpenFile_FallsBackToStreamIfFileOver2GB()
+        {
+            // Create a file that's too big
+            // If we tried to do it in memory, it would require over 2GB of RAM.
+            // This isn't practical and won't work on all machines, so let's use the filesystem instead
+            // It's a safer bet we'll have over 2GB of disk space than  over 2GB of RAM
+            var provider = new PhysicalIOProvider();
+            var filename = "a2GBfile.bin";
+
+            if (!File.Exists(filename) || (new FileInfo(filename)).Length <= (long)int.MaxValue + 1)
+            {
+                using (var stream = provider.OpenFileWriteOnly(filename))
+                {
+                    var buffer = new byte[50000];
+                    stream.SetLength((long)int.MaxValue + 1);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    while (stream.Position < stream.Length) {
+                        await stream.WriteAsync(buffer, 0, buffer.Length);
+                    }
+                }
+            }            
+
+            // Now on with the test
+            var file = new GenericFile();
+            file.EnableInMemoryLoad = true;
+            await file.OpenFile(filename, provider);
+            Assert.IsFalse(file.IsThreadSafe); // No thread safety indicates we're using an underlying stream
         }
 
         #region Low-level Access
