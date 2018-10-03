@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace SkyEditor.Core.IO
 {
     public class GenericFile : INamed, ICreatableFile, IOpenableFile, IOnDisk, ISavableAs, IDisposable
     {
+
+        #region Constructors
 
         /// <summary>
         /// Creates a new instance of <see cref="GenericFile"/>
@@ -40,9 +43,9 @@ namespace SkyEditor.Core.IO
             }
 
             IsReadOnly = true; // Read-only to avoid modifying the other file
-            if (file.InMemoryFile != null)
+            if (file._inMemoryFile != null)
             {
-                this.InMemoryFile = file.InMemoryFile;
+                this._inMemoryFile = file._inMemoryFile;
             }
             else
             {
@@ -58,7 +61,7 @@ namespace SkyEditor.Core.IO
         public GenericFile(byte[] data)
         {
             IsReadOnly = true; // Read-only to avoid modifying the other file
-            this.InMemoryFile = data ?? throw new ArgumentNullException(nameof(data));
+            this._inMemoryFile = data ?? throw new ArgumentNullException(nameof(data));
         }
 
         /// <summary>
@@ -72,7 +75,8 @@ namespace SkyEditor.Core.IO
             DisableDispose = true; // We don't want to dispose a file stream that doesn't belong to us
         }
 
-
+        #endregion
+        
         #region Events
         /// <summary>
         /// Raised when the file is being saved
@@ -93,9 +97,18 @@ namespace SkyEditor.Core.IO
         protected IIOProvider CurrentIOProvider { get; set; }
 
         /// <summary>
+        /// A memory mapped file object representing the loaded file. This is the preferred way to load data.
+        /// </summary>
+        private MemoryMappedFile MemoryMappedFile { get; set; }
+
+        private string MemoryMappedFilename { get; set; }
+
+        private IMemoryMappedIOProvider MemoryMappedProvider { get; set; }
+
+        /// <summary>
         /// The raw data of the file, if the file has been loaded in memory.  Null if <see cref="FileReader"/> is in use.
         /// </summary>
-        private byte[] InMemoryFile;
+        private byte[] _inMemoryFile;
 
         /// <summary>
         /// The underlying stream used to read and write to the file.  Null if <see cref="InMemoryFile"/> is in use.
@@ -104,7 +117,7 @@ namespace SkyEditor.Core.IO
         {
             get
             {
-                if (InMemoryFile != null)
+                if (_inMemoryFile != null || MemoryMappedFile != null)
                 {
                     return null;
                 }
@@ -139,45 +152,68 @@ namespace SkyEditor.Core.IO
         private object _fileAccessLock = new object();
 
         /// <summary>
-        /// The length of the file
+        /// The length of the file.
         /// </summary>
-        /// <exception cref="IOException">Thrown if the value is changed when <see cref="IsReadOnly"/> is true, or if the file is not loaded in memory and the length set fails.</exception>
-        /// <exception cref="OverflowException">Thrown if the value is greater than <see cref="int.MaxValue"/> when the file is loaded in memory.</exception>
         public long Length
         {
             get
             {
-                if (InMemoryFile != null)
+                if (MemoryMappedFile != null)
                 {
-                    return InMemoryFile.Length;
+                    return MemoryMappedFile.CreateViewAccessor().Capacity;
+                }
+                else if (_inMemoryFile != null)
+                {
+                    return _inMemoryFile.Length;
                 }
                 else
                 {
                     return FileReader.Length;
                 }
             }
-            set
-            {
-                if (IsReadOnly)
-                {
-                    throw new IOException(Properties.Resources.IO_ErrorReadOnly);
-                }
+        }
 
-                if (InMemoryFile != null)
+        /// <summary>
+        /// Sets the length of the file. This function is not thread safe.
+        /// </summary>
+        /// <param name="value">New length of the file</param>
+        /// <exception cref="IOException">Thrown if the value is changed when <see cref="IsReadOnly"/> is true, or if the file is not loaded in memory and the length set fails.</exception>
+        /// <exception cref="OverflowException">Thrown if the value is greater than <see cref="int.MaxValue"/> when the file is loaded in memory.</exception>
+
+        public void SetLength(long value)
+        {
+            if (IsReadOnly)
+            {
+                throw new IOException(Properties.Resources.IO_ErrorReadOnly);
+            }
+
+            if (MemoryMappedFile != null)
+            {
+                // We can't change the size of memory mapped files directly.
+                // What we can do is abandon our current file, resize it with a stream, then reopen it.
+                // So... (takes deep breath)... here we go
+
+                MemoryMappedFile.Dispose();
+                using (var tempFilestream = MemoryMappedProvider.OpenFile(MemoryMappedFilename))
                 {
-                    if (value > int.MaxValue)
-                    {
-                        throw new OverflowException(Properties.Resources.IO_GenericFile_ErrorLengthTooLarge);
-                    }
-                    else
-                    {
-                        Array.Resize(ref InMemoryFile, (int)value);
-                    }
+                    tempFilestream.SetLength(value);
+                }
+                MemoryMappedFile = MemoryMappedProvider.OpenMemoryMappedFile(MemoryMappedFilename);
+            }
+            else if (_inMemoryFile != null)
+            {
+                if (value > int.MaxValue)
+                {
+                    throw new OverflowException(Properties.Resources.IO_GenericFile_ErrorLengthTooLarge);
                 }
                 else
                 {
-                    FileReader.SetLength(value);
+                    Array.Resize(ref _inMemoryFile, (int)value);
                 }
+            }
+            else
+            {
+                FileReader.SetLength(value);
             }
         }
 
@@ -228,6 +264,11 @@ namespace SkyEditor.Core.IO
         public bool IsReadOnly { get; set; }
 
         /// <summary>
+        /// Whether or not to attempt to use a memory mapped file to load data. This is an experimental feature.
+        /// </summary>
+        public bool EnableMemoryMappedFileLoading { get; set; } = false;
+
+        /// <summary>
         /// Whether or not to make a shadow copy of the file before loading it.
         /// </summary>
         public bool EnableShadowCopy
@@ -273,7 +314,7 @@ namespace SkyEditor.Core.IO
         {
             get
             {
-                return InMemoryFile != null;
+                return MemoryMappedFile != null || _inMemoryFile != null;
             }
         }
         #endregion
@@ -319,11 +360,28 @@ namespace SkyEditor.Core.IO
         public void CreateFile(GenericFile otherFile)
         {
             CreateFileInternal(otherFile.Name, Array.Empty<byte>(), otherFile.EnableInMemoryLoad, otherFile.CurrentIOProvider);
-            this.Length = otherFile.Length;
+            SetLength(otherFile.Length);
 
-            if (otherFile.EnableInMemoryLoad)
+            if (otherFile.MemoryMappedFile != null)
             {
-                this.InMemoryFile = otherFile.InMemoryFile.Clone() as byte[];
+                // We don't want to change the source file
+                // To-do: figure out how to use a temp file to store the memory mapped data
+                var otherViewAccessor = otherFile.MemoryMappedFile.CreateViewAccessor();
+                if (otherViewAccessor.Capacity < int.MaxValue)
+                {
+                    this._inMemoryFile = otherFile.Read();
+                }
+                else
+                {
+                    var otherReader = otherFile.MemoryMappedFile.CreateViewStream();
+                    otherReader.Seek(0, SeekOrigin.Begin);
+                    FileReader.Seek(0, SeekOrigin.Begin);
+                    otherReader.CopyTo(FileReader);
+                }
+            }
+            else if (otherFile._inMemoryFile != null)
+            {
+                this._inMemoryFile = otherFile._inMemoryFile.Clone() as byte[];
             }
             else
             {
@@ -355,10 +413,12 @@ namespace SkyEditor.Core.IO
             {
                 this.CurrentIOProvider = provider;
             }
+            
+            // Don't try creating a memory mapped file since we're starting with an array
 
             if (enableInMemoryLoad)
             {
-                InMemoryFile = contents;
+                _inMemoryFile = contents;
             }
             else
             {
@@ -394,7 +454,13 @@ namespace SkyEditor.Core.IO
         /// <param name="provider">Instance of the I/O provider that stores the file</param>
         private void OpenFileInternal(string filename, IIOProvider provider)
         {
-            if (EnableInMemoryLoad)
+            if (EnableMemoryMappedFileLoading && provider is IMemoryMappedIOProvider memoryMappedProvider)
+            {
+                this.MemoryMappedFile = memoryMappedProvider.OpenMemoryMappedFile(filename);
+                this.MemoryMappedFilename = filename;
+                this.MemoryMappedProvider = memoryMappedProvider;
+            }
+            else if (EnableInMemoryLoad)
             {
                 byte[] contents;
 
@@ -434,7 +500,7 @@ namespace SkyEditor.Core.IO
                 }
 
                 // Load succeeded
-                InMemoryFile = contents;
+                _inMemoryFile = contents;
                 this.Filename = filename;
                 this.PhysicalFilename = filename;
                 this.CurrentIOProvider = provider;
@@ -450,9 +516,17 @@ namespace SkyEditor.Core.IO
             this.Name = file.Name;
             if (IsReadOnly)
             {
-                if (file.InMemoryFile != null)
+                // Since we're not going to change anything,
+                // It's safe to share the same references as the other file
+                if (file.MemoryMappedFile != null)
                 {
-                    this.InMemoryFile = file.InMemoryFile;
+                    this.MemoryMappedFile = file.MemoryMappedFile;
+                    this.MemoryMappedFilename = file.MemoryMappedFilename;
+                    this.MemoryMappedProvider = file.MemoryMappedProvider;
+                }
+                if (file._inMemoryFile != null)
+                {
+                    this._inMemoryFile = file._inMemoryFile;
                 }
                 else
                 {
@@ -462,17 +536,7 @@ namespace SkyEditor.Core.IO
             }
             else
             {
-                if (file.InMemoryFile != null)
-                {
-                    this.InMemoryFile = file.InMemoryFile.ToArray(); // Copy the data
-                }
-                else
-                {
-                    this.InMemoryFile = new byte[file.FileReader.Length];
-                    file.FileReader.Seek(0, SeekOrigin.Begin);
-                    file.FileReader.Read(this.InMemoryFile, 0, this.InMemoryFile.Length);
-                    DisableDispose = false;
-                }
+                this._inMemoryFile = file.Read().Clone() as byte[];
             }
         }
 
@@ -513,11 +577,30 @@ namespace SkyEditor.Core.IO
         public virtual async Task Save(string filename, IIOProvider provider)
         {
             FileSaving?.Invoke(this, new EventArgs());
-            if (InMemoryFile != null)
+            if (MemoryMappedFile != null)
             {
-                provider.WriteAllBytes(filename, InMemoryFile);
+                if (MemoryMappedFilename == filename)
+                {
+                    // Trying to save to the current file
+                    // To-do: determine if the file flushes automatically
+                }
+                else
+                {
+                    var memoryMappedStream = MemoryMappedFile.CreateViewStream();
+                    if (!string.IsNullOrEmpty(filename) && filename != PhysicalFilename)
+                    {
+                        using (var dest = provider.OpenFileWriteOnly(filename))
+                        {
+                            await memoryMappedStream.CopyToAsync(dest);
+                        }
+                    }
+                }
             }
-            else
+            else if (_inMemoryFile != null)
+            {
+                provider.WriteAllBytes(filename, _inMemoryFile);
+            }
+            else if (FileReader != null)
             {
                 FileReader.Seek(0, SeekOrigin.Begin);
                 FileReader.Flush();
@@ -529,6 +612,11 @@ namespace SkyEditor.Core.IO
                     }
                 }
             }
+            else
+            {
+                throw new InvalidOperationException(Properties.Resources.IO_GenericFile_IOWithoutHavingOpened);
+            }
+
             this.Filename = filename;
             FileSaved?.Invoke(this, new EventArgs());
         }
@@ -559,9 +647,15 @@ namespace SkyEditor.Core.IO
         /// <returns>An array of byte containing the contents of the file.</returns>
         private byte[] ReadInternal()
         {
-            if (InMemoryFile != null)
+            if (MemoryMappedFile != null)
             {
-                return InMemoryFile;
+                var buffer = new byte[Length];
+                MemoryMappedFile.CreateViewAccessor().ReadArray(0, buffer, 0, buffer.Length);
+                return buffer;
+            }
+            else if (_inMemoryFile != null)
+            {
+                return _inMemoryFile;
             }
             else
             {
@@ -621,18 +715,22 @@ namespace SkyEditor.Core.IO
         /// <returns>A byte equal to the byte at the given index in the file.</returns>
         private byte ReadInternal(long index)
         {
-            if (InMemoryFile != null)
+            if (MemoryMappedFile != null)
             {
-                if (InMemoryFile.Length > index)
+                return MemoryMappedFile.CreateViewAccessor(index, 1).ReadByte(0);
+            }
+            else if (_inMemoryFile != null)
+            {
+                if (_inMemoryFile.Length > index)
                 {
-                    return InMemoryFile[index];
+                    return _inMemoryFile[index];
                 }
                 else
                 {
-                    throw new IndexOutOfRangeException(string.Format(Properties.Resources.IO_GenericFile_OutOfRange, index, InMemoryFile.Length));
+                    throw new IndexOutOfRangeException(string.Format(Properties.Resources.IO_GenericFile_OutOfRange, index, _inMemoryFile.Length));
                 }
             }
-            else
+            else if (FileReader != null)
             {
                 FileReader.Seek(index, SeekOrigin.Begin);
                 var b = FileReader.ReadByte();
@@ -642,8 +740,12 @@ namespace SkyEditor.Core.IO
                 }
                 else
                 {
-                    throw new IndexOutOfRangeException(string.Format(Properties.Resources.IO_GenericFile_OutOfRange, index, InMemoryFile.Length));
+                    throw new IndexOutOfRangeException(string.Format(Properties.Resources.IO_GenericFile_OutOfRange, index, FileReader.Length));
                 }
+            }
+            else
+            {
+                throw new InvalidOperationException(Properties.Resources.IO_GenericFile_IOWithoutHavingOpened);
             }
         }
 
@@ -698,7 +800,13 @@ namespace SkyEditor.Core.IO
         /// <returns>A byte equal to the byte at the given index in the file.</returns>
         private byte[] ReadInternal(long index, int length)
         {
-            if (InMemoryFile != null)
+            if (MemoryMappedFile != null)
+            {
+                var buffer = new byte[length];
+                MemoryMappedFile.CreateViewAccessor(index, length).ReadArray(0, buffer, 0, buffer.Length);
+                return buffer;
+            }
+            else if (_inMemoryFile != null)
             {
                 if (index > int.MaxValue)
                 {
@@ -707,16 +815,20 @@ namespace SkyEditor.Core.IO
                 var buffer = new byte[length];
                 for (int i = 0; i < length; i++)
                 {
-                    buffer[i] = InMemoryFile[index + i];
+                    buffer[i] = _inMemoryFile[index + i];
                 }
                 return buffer;
             }
-            else
+            else if (FileReader != null)
             {
                 byte[] buffer = new byte[length];
                 FileReader.Seek(index, SeekOrigin.Begin);
                 FileReader.Read(buffer, 0, length);
                 return buffer;
+            }
+            else
+            {
+                throw new InvalidOperationException(Properties.Resources.IO_GenericFile_IOWithoutHavingOpened);
             }
         }
 
@@ -775,11 +887,15 @@ namespace SkyEditor.Core.IO
                 throw new IOException(Properties.Resources.IO_ErrorReadOnly);
             }
 
-            if (InMemoryFile != null)
+            if (MemoryMappedFile != null)
             {
-                InMemoryFile = value;
+                MemoryMappedFile.CreateViewAccessor().WriteArray(0, value, 0, value.Length);
             }
-            else
+            else if (_inMemoryFile != null)
+            {
+                _inMemoryFile = value;
+            }
+            else if (FileReader != null)
             {
                 if (Length > int.MaxValue)
                 {
@@ -787,6 +903,10 @@ namespace SkyEditor.Core.IO
                 }
                 FileReader.Seek(0, SeekOrigin.Begin);
                 FileReader.Write(value, 0, (int)Length);
+            }
+            else
+            {
+                throw new InvalidOperationException(Properties.Resources.IO_GenericFile_IOWithoutHavingOpened);
             }
         }
 
@@ -843,14 +963,22 @@ namespace SkyEditor.Core.IO
                 throw new IOException(Properties.Resources.IO_ErrorReadOnly);
             }
 
-            if (InMemoryFile != null)
+            if (MemoryMappedFile != null)
             {
-                InMemoryFile[index] = value;
+                MemoryMappedFile.CreateViewAccessor().Write(0, value);
             }
-            else
+            else if (_inMemoryFile != null)
+            {
+                _inMemoryFile[index] = value;
+            }
+            else if (FileReader != null)
             {
                 FileReader.Seek(index, SeekOrigin.Begin);
                 FileReader.WriteByte(value);
+            }
+            else
+            {
+                throw new InvalidOperationException(Properties.Resources.IO_GenericFile_IOWithoutHavingOpened);
             }
         }
 
@@ -910,18 +1038,26 @@ namespace SkyEditor.Core.IO
                 throw new IOException(Properties.Resources.IO_ErrorReadOnly);
             }
 
-            if (InMemoryFile != null)
+            if (MemoryMappedFile != null)
+            {
+                MemoryMappedFile.CreateViewAccessor(index, length).WriteArray(0, value, 0, length);
+            }
+            else if (_inMemoryFile != null)
             {
                 if (index > int.MaxValue)
                 {
                     throw new OverflowException(Properties.Resources.IO_GenericFile_ErrorLengthTooLarge);
                 }
-                value.Take(length).ToArray().CopyTo(InMemoryFile, (int)index);
+                Array.Copy(value, 0, _inMemoryFile, index, length);
             }
-            else
+            else if (FileReader != null)
             {
                 FileReader.Seek(index, SeekOrigin.Begin);
                 FileReader.Write(value, 0, length);
+            }
+            else
+            {
+                throw new InvalidOperationException(Properties.Resources.IO_GenericFile_IOWithoutHavingOpened);
             }
         }
 
@@ -1060,14 +1196,20 @@ namespace SkyEditor.Core.IO
                 throw new ArgumentNullException(nameof(destination));
             }
 
-            if (InMemoryFile == null)
+            if (MemoryMappedFile != null)
+            {
+                var buffer = new byte[length];
+                MemoryMappedFile.CreateViewAccessor(index, length).ReadArray(0, buffer, 0, length);
+                destination.Write(buffer, 0, length);
+            }
+            else if (_inMemoryFile != null)
             {
                 if (index > int.MaxValue)
                 {
                     throw new OverflowException(Properties.Resources.IO_GenericFile_ErrorLengthTooLarge);
                 }
 
-                destination.Write(InMemoryFile, (int)index, (int)length);
+                destination.Write(_inMemoryFile, (int)index, length);
             }
             else
             {
@@ -1148,19 +1290,27 @@ namespace SkyEditor.Core.IO
             source.Seek(sourceIndex, SeekOrigin.Begin);
             source.Read(buffer, 0, length);
 
-            if (InMemoryFile == null)
+            if (MemoryMappedFile != null)
+            {
+                MemoryMappedFile.CreateViewAccessor(fileIndex, length).WriteArray(0, buffer, 0, length);
+            }
+            else if (_inMemoryFile == null)
             {
                 if (fileIndex > int.MaxValue)
                 {
                     throw new OverflowException(Properties.Resources.IO_GenericFile_ErrorLengthTooLarge);
                 }
 
-                buffer.CopyTo(InMemoryFile, (int)fileIndex);
+                buffer.CopyTo(_inMemoryFile, (int)fileIndex);
             }
-            else
+            else if (FileReader != null)
             {
                 FileReader.Seek(fileIndex, SeekOrigin.Begin);
                 FileReader.Write(buffer, 0, length);
+            }
+            else
+            {
+                throw new InvalidOperationException(Properties.Resources.IO_GenericFile_IOWithoutHavingOpened);
             }
         }
 
@@ -1806,20 +1956,24 @@ namespace SkyEditor.Core.IO
             {
                 if (disposing && !DisableDispose)
                 {
-                    // Dispose of the file reader
+                    if (MemoryMappedFile != null)
+                    {
+                        MemoryMappedFile.Dispose();
+                    }
+
                     if (_fileReader != null)
                     {
                         _fileReader.Dispose();
                     }
 
                     // Delete the temporary file if shadow copy is enabled, the current I/O provider is not null, the physical filename exists, and the physical filename is different than the logical one
-                    if (EnableShadowCopy && InMemoryFile == null && CurrentIOProvider != null && !string.IsNullOrEmpty(PhysicalFilename) && CurrentIOProvider.FileExists(PhysicalFilename) && Filename != PhysicalFilename)
+                    if (EnableShadowCopy && _inMemoryFile == null && CurrentIOProvider != null && !string.IsNullOrEmpty(PhysicalFilename) && CurrentIOProvider.FileExists(PhysicalFilename) && Filename != PhysicalFilename)
                     {
                         CurrentIOProvider.DeleteFile(PhysicalFilename);
                     }                    
                 }
 
-                InMemoryFile = null;
+                _inMemoryFile = null;
 
                 disposedValue = true;
             }

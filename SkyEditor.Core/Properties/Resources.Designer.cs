@@ -286,6 +286,15 @@ namespace SkyEditor.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempted to read or write data without having first opened or created the file..
+        /// </summary>
+        internal static string IO_GenericFile_IOWithoutHavingOpened {
+            get {
+                return ResourceManager.GetString("IO_GenericFile_IOWithoutHavingOpened", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Index &quot;{0}&quot; out of range.  Total length of file: &quot;{1}&quot;..
         /// </summary>
         internal static string IO_GenericFile_OutOfRange {
