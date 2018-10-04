@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Text;
 
 namespace SkyEditor.Core.IO
@@ -8,7 +9,7 @@ namespace SkyEditor.Core.IO
     /// <summary>
     /// Implementation of <see cref="IIOProvider"/> that wraps <see cref="System.IO.File"/> and <see cref="System.IO.Directory"/> (i.e. the physical file system).
     /// </summary>
-    public class PhysicalIOProvider : IIOProvider
+    public class PhysicalIOProvider : IIOProvider, IMemoryMappedIOProvider
     {
 
         public PhysicalIOProvider()
@@ -174,6 +175,11 @@ namespace SkyEditor.Core.IO
         public virtual string ReadAllText(string filename)
         {
             return File.ReadAllText(FixPath(filename));
+        }
+
+        public MemoryMappedFile OpenMemoryMappedFile(string filename)
+        {
+            return MemoryMappedFile.CreateFromFile(filename);
         }
     }
 }
