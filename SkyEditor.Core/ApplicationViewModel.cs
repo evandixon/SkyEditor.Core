@@ -1,5 +1,6 @@
 ﻿using SkyEditor.Core.ConsoleCommands;
 using SkyEditor.Core.IO;
+using SkyEditor.Core.IO.PluginInfrastructure;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;

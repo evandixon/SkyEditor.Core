@@ -3,6 +3,7 @@ using SkyEditor.Core.ConsoleCommands.Commands;
 using SkyEditor.Core.ConsoleCommands.ShellCommands;
 using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
+using SkyEditor.Core.IO.PluginInfrastructure;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;

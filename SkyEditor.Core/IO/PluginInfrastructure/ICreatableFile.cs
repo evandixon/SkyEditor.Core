@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SkyEditor.Core.IO
+namespace SkyEditor.Core.IO.PluginInfrastructure
 {
     /// <summary>
     /// Represents an object that can create a new file

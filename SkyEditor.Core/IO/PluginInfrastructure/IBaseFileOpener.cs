@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace SkyEditor.Core.IO
+namespace SkyEditor.Core.IO.PluginInfrastructure
 {
     public interface IBaseFileOpener
     {

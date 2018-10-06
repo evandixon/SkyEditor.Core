@@ -1,4 +1,5 @@
-﻿using SkyEditor.Core.Utilities;
+﻿using SkyEditor.Core.IO.PluginInfrastructure;
+using SkyEditor.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SkyEditor.Core.IO
 {
-    public class GenericFile : INamed, ICreatableFile, IOpenableFile, IOnDisk, ISavableAs, IDisposable
+    public class GenericFile : INamed, ICreatableFile, IOpenableFile, IOnDisk, IBinaryDataAccessor, ISavableAs, IDisposable
     {
 
         #region Constructors
@@ -1107,39 +1108,6 @@ namespace SkyEditor.Core.IO
         }
 
         /// <summary>
-        /// Writes a range of bytes to the file.  Thread-safe.
-        /// </summary>
-        /// <param name="index">Index from which to retrieve the byte.</param>
-        /// <param name="value">The data to write</param>
-        public void Write(long index, byte[] value)
-        {
-            Write(index, value.Length, value);
-        }
-
-        /// <summary>
-        /// Writes a range of bytes to the file.  Thread-safe.
-        /// </summary>
-        /// <param name="index">Index from which to retrieve the byte.</param>
-        /// <param name="value">The data to write</param>
-        public async Task WriteAsync(long index, byte[] value)
-        {
-            if (IsThreadSafe)
-            {
-                Write(index, value);
-            }
-            else
-            {
-                await Task.Run(() =>
-                {
-                    lock (_fileAccessLock)
-                    {
-                        Write(index, value);
-                    }
-                });
-            }
-        }
-
-        /// <summary>
         /// Reads an unsigned byte from the current position (<see cref="Position"/>), then advances the current position.  This function is thread-safe.
         /// </summary>
         /// <returns>The integer from the given location</returns>
@@ -1365,27 +1333,7 @@ namespace SkyEditor.Core.IO
 
         #endregion
 
-        #region Integer Read/Write
-
-        /// <summary>
-        /// Reads a signed 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public Int16 ReadInt16(long offset)
-        {
-            return BitConverter.ToInt16(Read(offset, 2), 0);
-        }
-
-        /// <summary>
-        /// Reads a signed 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public async Task<Int16> ReadInt16Async(long offset)
-        {
-            return BitConverter.ToInt16(await ReadAsync(offset, 2), 0);
-        }
+        #region Integer Read/Write        
 
         /// <summary>
         /// Reads the signed 16 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
@@ -1393,29 +1341,9 @@ namespace SkyEditor.Core.IO
         /// <returns>The integer from the current position</returns>
         public Int16 ReadInt16()
         {
-            var output = ReadInt16(Position);
+            var output = this.ReadInt16(Position);
             Position += 2;
             return output;
-        }
-
-        /// <summary>
-        /// Reads a signed 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public Int32 ReadInt32(long offset)
-        {
-            return BitConverter.ToInt32(Read(offset, 4), 0);
-        }
-
-        /// <summary>
-        /// Reads a signed 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public async Task<Int32> ReadInt32Async(long offset)
-        {
-            return BitConverter.ToInt32(await ReadAsync(offset, 4), 0);
         }
 
         /// <summary>
@@ -1424,29 +1352,9 @@ namespace SkyEditor.Core.IO
         /// <returns>The integer from the current position</returns>
         public Int32 ReadInt32()
         {
-            var output = ReadInt32(Position);
+            var output = this.ReadInt32(Position);
             Position += 4;
             return output;
-        }
-
-        /// <summary>
-        /// Reads a signed 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public Int64 ReadInt64(long offset)
-        {
-            return BitConverter.ToInt64(Read(offset, 8), 0);
-        }
-
-        /// <summary>
-        /// Reads a signed 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public async Task<Int64> ReadInt64Async(long offset)
-        {
-            return BitConverter.ToInt64(await ReadAsync(offset, 8), 0);
         }
 
         /// <summary>
@@ -1455,29 +1363,9 @@ namespace SkyEditor.Core.IO
         /// <returns>The integer from the current position</returns>
         public Int64 ReadInt64()
         {
-            var output = ReadInt64(Position);
+            var output = this.ReadInt64(Position);
             Position += 8;
             return output;
-        }
-
-        /// <summary>
-        /// Reads an unsigned 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public UInt16 ReadUInt16(long offset)
-        {
-            return BitConverter.ToUInt16(Read(offset, 2), 0);
-        }
-
-        /// <summary>
-        /// Reads an unsigned 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public async Task<UInt16> ReadUInt16Async(long offset)
-        {
-            return BitConverter.ToUInt16(await ReadAsync(offset, 2), 0);
         }
 
         /// <summary>
@@ -1486,29 +1374,9 @@ namespace SkyEditor.Core.IO
         /// <returns>The integer from the current position</returns>
         public UInt16 ReadUInt16()
         {
-            var output = ReadUInt16(Position);
+            var output = this.ReadUInt16(Position);
             Position += 2;
             return output;
-        }
-
-        /// <summary>
-        /// Reads an unsigned 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public UInt32 ReadUInt32(long offset)
-        {
-            return BitConverter.ToUInt32(Read(offset, 4), 0);
-        }
-
-        /// <summary>
-        /// Reads an unsigned 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public async Task<UInt32> ReadUInt32Async(long offset)
-        {
-            return BitConverter.ToUInt32(await ReadAsync(offset, 4), 0);
         }
 
         /// <summary>
@@ -1517,30 +1385,10 @@ namespace SkyEditor.Core.IO
         /// <returns>The integer from the current position</returns>
         public UInt32 ReadUInt32()
         {
-            var output = ReadUInt32(Position);
+            var output = this.ReadUInt32(Position);
             Position += 4;
             return output;
-        }
-
-        /// <summary>
-        /// Reads an unsigned 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public UInt64 ReadUInt64(long offset)
-        {
-            return BitConverter.ToUInt64(Read(offset, 8), 0);
-        }
-
-        /// <summary>
-        /// Reads an unsigned 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to read.</param>
-        /// <returns>The integer from the given location</returns>
-        public async Task<UInt64> ReadUInt64Async(int offset)
-        {
-            return BitConverter.ToUInt64(await ReadAsync(offset, 8), 0);
-        }
+        }        
 
         /// <summary>
         /// Reads the unsigned 64 bit little endian integer from the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
@@ -1548,29 +1396,9 @@ namespace SkyEditor.Core.IO
         /// <returns>The integer from the current position</returns>
         public UInt64 ReadUInt64()
         {
-            var output = ReadUInt64(Position);
+            var output = this.ReadUInt64(Position);
             Position += 8;
             return output;
-        }
-
-        /// <summary>
-        /// Writes a signed 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public void WriteInt16(long offset, Int16 value)
-        {
-            Write(offset, 2, BitConverter.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Writes a signed 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public async Task WriteInt16Async(long offset, Int16 value)
-        {
-            await WriteAsync(offset, 2, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1579,28 +1407,8 @@ namespace SkyEditor.Core.IO
         /// <param name="value">The integer to write</param>
         public void WriteInt16(Int16 value)
         {
-            WriteInt16(Position, value);
+            this.WriteInt16(Position, value);
             Position += 2;
-        }
-
-        /// <summary>
-        /// Writes a signed 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public void WriteInt32(long offset, Int32 value)
-        {
-            Write(offset, 4, BitConverter.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Writes a signed 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public async Task WriteInt32Async(long offset, Int32 value)
-        {
-            await WriteAsync(offset, 4, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1608,58 +1416,18 @@ namespace SkyEditor.Core.IO
         /// </summary>
         public void WriteInt32(Int32 value)
         {
-            WriteInt32(Position, value);
+            this.WriteInt32(Position, value);
             Position += 4;
         }
-
-        /// <summary>
-        /// Writes a signed 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public void WriteInt64(long offset, Int64 value)
-        {
-            Write(offset, 8, BitConverter.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Writes a signed 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public async Task WriteInt64Async(long offset, Int64 value)
-        {
-            await WriteAsync(offset, 8, BitConverter.GetBytes(value));
-        }
-
+        
         /// <summary>
         /// Writes the signed 64 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
         /// </summary>
         public void WriteInt64(Int64 value)
         {
-            WriteInt64(Position, value);
+            this.WriteInt64(Position, value);
             Position += 8;
-        }
-
-        /// <summary>
-        /// Writes an unsigned 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public void WriteUInt16(long offset, UInt16 value)
-        {
-            Write(offset, 2, BitConverter.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Writes an unsigned 16 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public async Task WriteUInt16Async(long offset, UInt16 value)
-        {
-            await WriteAsync(offset, 2, BitConverter.GetBytes(value));
-        }
+        }        
 
         /// <summary>
         /// Writes the unsigned 16 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
@@ -1667,28 +1435,8 @@ namespace SkyEditor.Core.IO
         /// <param name="value">The integer to write</param>
         public void WriteUInt16(UInt16 value)
         {
-            WriteUInt16(Position, value);
+            this.WriteUInt16(Position, value);
             Position += 2;
-        }
-
-        /// <summary>
-        /// Writes an unsigned 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public void WriteUInt32(long offset, UInt32 value)
-        {
-            Write(offset, 4, BitConverter.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Writes an unsigned 32 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public async Task WriteUInt32Async(long offset, UInt32 value)
-        {
-            await WriteAsync(offset, 4, BitConverter.GetBytes(value));
         }
 
         /// <summary>
@@ -1697,242 +1445,23 @@ namespace SkyEditor.Core.IO
         /// <param name="value">The integer to write</param>
         public void WriteUInt32(UInt32 value)
         {
-            WriteUInt32(Position, value);
+            this.WriteUInt32(Position, value);
             Position += 4;
         }
 
-        /// <summary>
-        /// Writes an unsigned 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public void WriteUInt64(long offset, UInt64 value)
-        {
-            Write(offset, 8, BitConverter.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Writes an unsigned 64 bit little endian integer.  This function is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the integer to write.</param>
-        /// <param name="value">The integer to write</param>
-        public async Task WriteUInt64Async(long offset, UInt64 value)
-        {
-            await WriteAsync(offset, 8, BitConverter.GetBytes(value));
-        }
-
+        
         /// <summary>
         /// Writes the unsigned 64 bit little endian integer to the current position (<see cref="Position"/>), then advances the current position.  This function is not thread-safe.
         /// </summary>
         /// <param name="value">The integer to write</param>
         public void WriteUInt64(UInt64 value)
         {
-            WriteUInt64(Position, value);
+            this.WriteUInt64(Position, value);
             Position += 8;
         }
         #endregion
 
-        #region String Interaction
-
-        /// <summary>
-        /// Reads a UTF-16 string.  This method is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <param name="length">Length in characters of the string</param>
-        /// <returns>The UTF-16 string at the given offset</returns>
-        public string ReadUnicodeString(long index, int length)
-        {
-            return Encoding.Unicode.GetString(Read(index, length * 2), 0, length * 2);
-        }
-
-        /// <summary>
-        /// Reads a UTF-16 string.  This method is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <param name="length">Length in characters of the string</param>
-        /// <returns>The UTF-16 string at the given offset</returns>
-        public async Task<string> ReadUnicodeStringAsync(long index, int length)
-        {
-            return Encoding.Unicode.GetString(await ReadAsync(index, length * 2), 0, length * 2);
-        }
-
-        /// <summary>
-        /// Reads a null-terminated UTF-16 string.  This method is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <returns>The UTF-16 string</returns>
-        public string ReadNullTerminatedUnicodeString(long index)
-        {
-            int length = 0;
-            while (Read(index + length * 2) != 0 || Read(index + length * 2 + 1) != 0)
-            {
-                length += 1;
-            }
-            return ReadUnicodeString(index, length);
-        }
-
-        /// <summary>
-        /// Reads a null-terminated UTF-16 string.  This method is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <returns>The UTF-16 string</returns>
-        public async Task<string> ReadNullTerminatedUnicodeStringAsync(long index)
-        {
-            int length = 0;
-            while (await ReadAsync(index + length * 2) != 0 || await ReadAsync(index + length * 2 + 1) != 0)
-            {
-                length += 1;
-            }
-            return ReadUnicodeString(index, length);
-        }
-
-        /// <summary>
-        /// Reads a string using the given encoding.  This method is not thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <param name="length">Length in characters of the string</param>
-        /// <returns>The UTF-16 string at the given offset</returns>
-        public string ReadString(long index, int length, Encoding e)
-        {
-            return e.GetString(Read(index, length), 0, length);
-        }
-
-        /// <summary>
-        /// Reads a string using the given encoding.  This method is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <param name="length">Length in characters of the string</param>
-        /// <returns>The UTF-16 string at the given offset</returns>
-        public async Task<string> ReadStringAsync(long index, int length, Encoding e)
-        {
-            return e.GetString(await ReadAsync(index, length), 0, length);
-        }
-
-        /// <summary>
-        /// Writes a string with the given encoding to the given offset of the file.  Thread-safe
-        /// </summary>
-        /// <param name="index">Index of the file to write</param>
-        /// <param name="e">The encoding to use</param>
-        /// <param name="value">The string to write.  The entire string will be written without an ending null character.</param>
-        public void WriteString(long index, Encoding e, string value)
-        {
-            Write(index, e.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Writes a string with the given encoding to the given offset of the file.  Thread-safe.
-        /// </summary>
-        /// <param name="index">Index of the file to write</param>
-        /// <param name="e">The encoding to use</param>
-        /// <param name="value">The string to write.  The entire string will be written without an ending null character.</param>
-        public async Task WriteStringAsync(long index, Encoding e, string value)
-        {
-            await WriteAsync(index, e.GetBytes(value));
-        }
-
-        /// <summary>
-        /// Reads a null-terminated string using the given encoding.  This method is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <returns>The string at the given location</returns>
-        public string ReadNullTerminatedString(long index, Encoding e)
-        {
-            // The null character we're looking for
-            var nullCharSequence = e.GetBytes(Convert.ToChar(0x0).ToString());
-
-            // Find the length of the string as determined by the location of the null-char sequence
-            int length = 0;
-            while (!Read(index + length * nullCharSequence.Length, nullCharSequence.Length).All(x => x == 0))
-            {
-                length += 1;
-            }
-
-            return ReadString(index, length, e);
-        }
-
-        /// <summary>
-        /// Reads a null-terminated using the given encoding.  This method is thread-safe.
-        /// </summary>
-        /// <param name="offset">Offset of the string</param>
-        /// <returns>The string at the given location</returns>
-        public async Task<string> ReadNullTerminatedStringAsync(long index, Encoding e)
-        {
-            // The null character we're looking for
-            var nullCharSequence = e.GetBytes(Convert.ToChar(0x0).ToString());
-
-            // Find the length of the string as determined by the location of the null-char sequence
-            int length = 0;
-            while (!(await ReadAsync(index + length * nullCharSequence.Length, nullCharSequence.Length)).All(x => x == 0))
-            {
-                length += 1;
-            }
-
-            return ReadString(index, length, e);
-        }
-
-        /// <summary>
-        /// Writes a string with the given encoding to the given offset of the file.  Not thread-safe
-        /// </summary>
-        /// <param name="index">Index of the file to write</param>
-        /// <param name="e">The encoding to use</param>
-        /// <param name="value">The string to write.  The entire string will be written with an ending null character.</param>
-        private void WriteNullTerminatedStringInternal(long index, Encoding e, string value)
-        {
-            var nullChar = e.GetBytes(new[] { Convert.ToChar(0) });
-            var data = e.GetBytes(value);
-            WriteInternal(index, data.Length, data);
-            WriteInternal(index + data.Length, nullChar.Length, nullChar);
-        }
-
-        /// <summary>
-        /// Writes a string with the given encoding to the given offset of the file.  Not thread-safe
-        /// </summary>
-        /// <param name="index">Index of the file to write</param>
-        /// <param name="e">The encoding to use</param>
-        /// <param name="value">The string to write.  The entire string will be written with an ending null character.</param>
-        public void WriteNullTerminatedString(long index, Encoding e, string value)
-        {
-            if (IsThreadSafe)
-            {
-                WriteNullTerminatedStringInternal(index, e, value);
-            }
-            else
-            {                
-                lock (_fileAccessLock)
-                {
-                    WriteNullTerminatedStringInternal(index, e, value);
-                }   
-            }
-        }
-
-        /// <summary>
-        /// Writes a string with the given encoding to the given offset of the file.  Thread-safe.
-        /// </summary>
-        /// <param name="index">Index of the file to write</param>
-        /// <param name="e">The encoding to use</param>
-        /// <param name="value">The string to write.  The entire string will be written with an ending null character.</param>
-        public async Task WriteNullTerminatedStringAsync(long index, Encoding e, string value)
-        {
-            if (IsThreadSafe)
-            {
-                WriteNullTerminatedStringInternal(index, e, value);
-            }
-            else
-            {
-                await Task.Run(() =>
-                {
-                    lock (_fileAccessLock)
-                    {
-                        WriteNullTerminatedStringInternal(index, e, value);
-                    }
-                });
-            }
-        }
-
         #endregion
-
-        #endregion
-
 
         public virtual string GetDefaultExtension()
         {
@@ -1943,7 +1472,6 @@ namespace SkyEditor.Core.IO
         {
             return null;
         }
-
 
         #endregion
 

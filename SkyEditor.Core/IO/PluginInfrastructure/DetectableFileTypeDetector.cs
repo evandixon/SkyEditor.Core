@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SkyEditor.Core.IO
+namespace SkyEditor.Core.IO.PluginInfrastructure
 {
     /// <summary>
     /// Detects the type of a file using all registered implementors of <see cref="IDetectableFileType"/>
