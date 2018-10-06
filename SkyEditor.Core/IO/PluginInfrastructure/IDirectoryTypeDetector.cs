@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SkyEditor.Core.IO
+namespace SkyEditor.Core.IO.PluginInfrastructure
 {
     /// <summary>
     /// Finds a type that can represent a directory, for use with a <see cref="IFileOpener"/>

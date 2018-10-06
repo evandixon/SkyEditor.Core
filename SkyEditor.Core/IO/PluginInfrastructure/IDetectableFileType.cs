@@ -1,7 +1,7 @@
 ﻿using SkyEditor.Core.IO;
 using System.Threading.Tasks;
 
-namespace SkyEditor.Core.IO
+namespace SkyEditor.Core.IO.PluginInfrastructure
 {
     /// <summary>
     /// Represents a class that can detect whether or not it is the same type as the given file

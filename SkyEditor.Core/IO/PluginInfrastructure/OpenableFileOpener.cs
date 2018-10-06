@@ -3,7 +3,7 @@ using SkyEditor.Core.Utilities;
 using System.Threading.Tasks;
 using System;
 
-namespace SkyEditor.Core.IO
+namespace SkyEditor.Core.IO.PluginInfrastructure
 {
     /// <summary>
     /// Opens files using file types that implement <see cref="IOpenableFile"/>

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.Core.IO.PluginInfrastructure;
 
 namespace SkyEditor.Core.Projects
 {

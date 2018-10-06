@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkyEditor.Core.IO;
+using SkyEditor.Core.IO.PluginInfrastructure;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Utilities;
 using System;
