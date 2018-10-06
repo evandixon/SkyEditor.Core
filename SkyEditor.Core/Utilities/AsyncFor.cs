@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static SkyEditor.Core.Utilities.AsyncFor;
 
 namespace SkyEditor.Core.Utilities
 {
@@ -13,7 +14,7 @@ namespace SkyEditor.Core.Utilities
     {
         public AsyncFor()
         {
-            BatchSize = int.MaxValue;
+            BatchSize = 0; // Unlimited
             RunningTasks = new List<Task>();
         }
 
@@ -36,7 +37,7 @@ namespace SkyEditor.Core.Utilities
         public bool RunSynchronously { get; set; }
 
         /// <summary>
-        /// The number of tasks to run at once.
+        /// The number of tasks to run at once, or 0 or negative for no limit
         /// </summary>
         public int BatchSize { get; set; }
 
@@ -118,7 +119,7 @@ namespace SkyEditor.Core.Utilities
             // While there's either more tasks to start or while there's still tasks running
             while (taskItemQueue.Count > 0 || (taskItemQueue.Count == 0 && RunningTasks.Count > 0))
             {
-                if (RunningTasks.Count < BatchSize && taskItemQueue.Count > 0)
+                if ((BatchSize < 1 || RunningTasks.Count < BatchSize) && taskItemQueue.Count > 0)
                 {
                     // We can run more tasks
 
@@ -185,6 +186,23 @@ namespace SkyEditor.Core.Utilities
         /// <param name="EndValue">The end value of the logical For statement</param>
         /// <param name="StepCount">How much to increment (or decrement if negative) the iterator of the logical For statement</param>
         /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public async Task RunForEach<T>(IEnumerable<T> collection, ForEachItem<T> delegateSub)
+        {
+            await RunForEach(collection, i =>
+            {
+                delegateSub(i);
+                return Task.CompletedTask;
+            });
+        }
+
+        /// <summary>
+        /// Asynchronously runs <see cref="delegateFunction"/> as a For statement would
+        /// </summary>
+        /// <param name="DelegateFunction">The function to asynchronously run</param>
+        /// <param name="StartValue">The start value of the logical For statement</param>
+        /// <param name="EndValue">The end value of the logical For statement</param>
+        /// <param name="StepCount">How much to increment (or decrement if negative) the iterator of the logical For statement</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
         public async Task RunFor(ForItemAsync delegateFunction, int startValue, int endValue, int stepCount = 1)
         {
             if (RunningTasks.Count > 0)
@@ -217,7 +235,7 @@ namespace SkyEditor.Core.Utilities
             while (nextI <= endValue || RunningTasks.Count > 0)
             {
                 // Add tasks if possible
-                if (nextI <= endValue && RunningTasks.Count < BatchSize)
+                if (nextI <= endValue && (BatchSize < 1 || RunningTasks.Count < BatchSize))
                 {
                     // We can run more tasks
 
@@ -271,11 +289,22 @@ namespace SkyEditor.Core.Utilities
         }
 
         /// <summary>
-        /// Asynchronously runs <paramref name="delegateFunction"/> for every item in the given collection
+        /// Asynchronously runs <see cref="delegateFunction"/> as a For statement would
         /// </summary>
-        /// <typeparam name="T">Type of the collection item</typeparam>
-        /// <param name="delegateFunction">The function to asynchronously run</param>
-        /// <param name="collection">The collection to be enumerated</param>
+        /// <param name="DelegateFunction">The function to asynchronously run</param>
+        /// <param name="StartValue">The start value of the logical For statement</param>
+        /// <param name="EndValue">The end value of the logical For statement</param>
+        /// <param name="StepCount">How much to increment (or decrement if negative) the iterator of the logical For statement</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public async Task RunFor(int startValue, int endValue, ForItemAsync delegateSub, int stepCount = 1) => await RunFor(delegateSub, startValue, endValue, stepCount);
+
+        /// <summary>
+        /// Asynchronously runs <see cref="delegateFunction"/> as a For statement would
+        /// </summary>
+        /// <param name="DelegateFunction">The function to asynchronously run</param>
+        /// <param name="StartValue">The start value of the logical For statement</param>
+        /// <param name="EndValue">The end value of the logical For statement</param>
+        /// <param name="StepCount">How much to increment (or decrement if negative) the iterator of the logical For statement</param>
         /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
         public async Task RunFor(ForItem delegateSub, int startValue, int endValue, int stepCount = 1)
         {
@@ -294,15 +323,170 @@ namespace SkyEditor.Core.Utilities
         /// <param name="EndValue">The end value of the logical For statement</param>
         /// <param name="StepCount">How much to increment (or decrement if negative) the iterator of the logical For statement</param>
         /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
-        public async Task RunForEach<T>(IEnumerable<T> collection, ForEachItem<T> delegateSub)
+        public async Task RunFor(int startValue, int endValue, ForItem delegateSub, int stepCount = 1) => await RunFor(delegateSub, startValue, endValue, stepCount);
+
+        #endregion
+
+        #region Static Functions
+
+        /// <summary>
+        /// Asynchronously runs <paramref name="delegateFunction"/> for every item in the given collection
+        /// </summary>
+        /// <typeparam name="T">Type of the collection item</typeparam>
+        /// <param name="collection">The collection to be enumerated</param>
+        /// <param name="delegateFunction">The function to asynchronously run</param>
+        /// <param name="runSynchronously">Whether or not to allow running multiple tasks at once. Defaults to false.</param>
+        /// <param name="batchSize">The maximum number of tasks to run at once, or 0 or negative for no limit.</param>
+        /// <param name="progressReportToken">Optional token to receive progress updates</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public static async Task ForEach<T>(IEnumerable<T> collection, ForEachItemAsync<T> delegateFunction, bool runSynchronously = false, int batchSize = 0, ProgressReportToken progressReportToken = null)
         {
-            await RunForEach(collection, i =>
+            void onProgressed(object sender, ProgressReportedEventArgs e)
+            {
+                progressReportToken.IsIndeterminate = e.IsIndeterminate;
+                progressReportToken.Progress = e.Progress;
+            }
+
+            void onComplete(object sender, EventArgs e)
+            {
+                progressReportToken.IsCompleted = true;
+            }
+
+            var a = new AsyncFor();
+            a.RunSynchronously = runSynchronously;
+            a.BatchSize = batchSize;
+
+            if (progressReportToken != null)
+            {
+                a.ProgressChanged += onProgressed;
+                a.Completed += onComplete;
+            }
+
+            await a.RunForEach(collection, delegateFunction);
+
+            if (progressReportToken != null)
+            {
+                a.ProgressChanged -= onProgressed;
+                a.Completed -= onComplete;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously runs <paramref name="delegateFunction"/> for every item in the given collection
+        /// </summary>
+        /// <typeparam name="T">Type of the collection item</typeparam>
+        /// <param name="collection">The collection to be enumerated</param>
+        /// <param name="delegateFunction">The function to asynchronously run</param>
+        /// <param name="runSynchronously">Whether or not to allow running multiple tasks at once. Defaults to false.</param>
+        /// <param name="batchSize">The maximum number of tasks to run at once, or 0 or negative for no limit.</param>
+        /// <param name="progressReportToken">Optional token to receive progress updates</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public static async Task ForEach<T>(IEnumerable<T> collection, ForEachItem<T> delegateSub, bool runSynchronously = false, int batchSize = 0, ProgressReportToken progressReportToken = null)
+        {
+            await ForEach(collection, i =>
             {
                 delegateSub(i);
                 return Task.CompletedTask;
-            });
+            }, runSynchronously, batchSize, progressReportToken);
         }
+
+        /// <summary>
+        /// Asynchronously runs <see cref="delegateFunction"/> as a For statement would
+        /// </summary>
+        /// <param name="delegateFunction">The function to asynchronously run</param>
+        /// <param name="StartValue">The start value of the logical For statement</param>
+        /// <param name="EndValue">The end value of the logical For statement</param>
+        /// <param name="StepCount">How much to increment (or decrement if negative) the iterator of the logical For statement</param>
+        /// <param name="runSynchronously">Whether or not to allow running multiple tasks at once. Defaults to false.</param>
+        /// <param name="batchSize">The maximum number of tasks to run at once, or 0 or negative for no limit.</param>
+        /// <param name="progressReportToken">Optional token to receive progress updates</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public static async Task For(int startValue, int endValue, ForItemAsync delegateFunction, int stepCount = 1, bool runSynchronously = false, int batchSize = 0, ProgressReportToken progressReportToken = null)
+        {
+            void onProgressed(object sender, ProgressReportedEventArgs e)
+            {
+                progressReportToken.IsIndeterminate = e.IsIndeterminate;
+                progressReportToken.Progress = e.Progress;
+            }
+
+            void onComplete(object sender, EventArgs e)
+            {
+                progressReportToken.IsCompleted = true;
+            }
+
+            var a = new AsyncFor();
+            a.RunSynchronously = runSynchronously;
+            a.BatchSize = batchSize;
+
+            if (progressReportToken != null)
+            {
+                a.ProgressChanged += onProgressed;
+                a.Completed += onComplete;
+            }
+
+            await a.RunFor(delegateFunction, startValue, endValue, stepCount);
+
+            if (progressReportToken != null)
+            {
+                a.ProgressChanged -= onProgressed;
+                a.Completed -= onComplete;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously runs <see cref="delegateFunction"/> as a For statement would
+        /// </summary>
+        /// <param name="delegateSub">The function to asynchronously run</param>
+        /// <param name="StartValue">The start value of the logical For statement</param>
+        /// <param name="EndValue">The end value of the logical For statement</param>
+        /// <param name="StepCount">How much to increment (or decrement if negative) the iterator of the logical For statement</param>
+        /// <param name="runSynchronously">Whether or not to allow running multiple tasks at once. Defaults to false.</param>
+        /// <param name="batchSize">The maximum number of tasks to run at once, or 0 or negative for no limit.</param>
+        /// <param name="progressReportToken">Optional token to receive progress updates</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public static async Task For(int startValue, int endValue, ForItem delegateSub, int stepCount = 1, bool runSynchronously = false, int batchSize = 0, ProgressReportToken progressReportToken = null)
+        {
+            await For(startValue, endValue, i =>
+            {
+                delegateSub(i);
+                return Task.CompletedTask;
+            }, stepCount, runSynchronously, batchSize, progressReportToken);
+        }
+
         #endregion
 
+    }
+
+    public static class IEnumerableExtensions
+    {
+        /// <summary>
+        /// Asynchronously runs <paramref name="delegateFunction"/> for every item in the given collection
+        /// </summary>
+        /// <typeparam name="T">Type of the collection item</typeparam>
+        /// <param name="collection">The collection to be enumerated</param>
+        /// <param name="delegateFunction">The function to asynchronously run</param>
+        /// <param name="runSynchronously">Whether or not to allow running multiple tasks at once. Defaults to false.</param>
+        /// <param name="batchSize">The maximum number of tasks to run at once, or 0 or negative for no limit.</param>
+        /// <param name="progressReportToken">Optional token to receive progress updates</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public static async Task RunAsyncForEach<T>(this IEnumerable<T> collection, ForEachItemAsync<T> delegateFunction, bool runSynchronously = false, int batchSize = 0, ProgressReportToken progressReportToken = null)
+        {
+            await AsyncFor.ForEach(collection, delegateFunction, runSynchronously, batchSize, progressReportToken);
+        }
+
+        /// <summary>
+        /// Asynchronously runs <paramref name="delegateFunction"/> for every item in the given collection
+        /// </summary>
+        /// <typeparam name="T">Type of the collection item</typeparam>
+        /// <param name="collection">The collection to be enumerated</param>
+        /// <param name="delegateFunction">The function to asynchronously run</param>
+        /// <param name="runSynchronously">Whether or not to allow running multiple tasks at once. Defaults to false.</param>
+        /// <param name="batchSize">The maximum number of tasks to run at once, or 0 or negative for no limit.</param>
+        /// <param name="progressReportToken">Optional token to receive progress updates</param>
+        /// <exception cref="InvalidOperationException">Thrown if execution starts before the end of another operation</exception>
+        public static async Task RunAsyncForEach<T>(this IEnumerable<T> collection, ForEachItem<T> delegateFunction, bool runSynchronously = false, int batchSize = 0, ProgressReportToken progressReportToken = null)
+        {
+            await AsyncFor.ForEach(collection, delegateFunction, runSynchronously, batchSize, progressReportToken);
+        }
     }
 }
