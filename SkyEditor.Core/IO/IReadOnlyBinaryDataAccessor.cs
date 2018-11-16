@@ -181,6 +181,153 @@ namespace SkyEditor.Core.IO
         }
         #endregion
 
+        #region Big Endian Reads
+
+        /// <summary>
+        /// Reads a signed 16 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static Int16 ReadInt16BigEndian(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = accessor.Read(offset, 2);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads a signed 16 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static async Task<Int16> ReadInt16BigEndianAsync(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = await accessor.ReadAsync(offset, 2);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads a signed 32 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static Int32 ReadInt32BigEndian(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = accessor.Read(offset, 4);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt32(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads a signed 32 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static async Task<Int32> ReadInt32BigEndianAsync(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = await accessor.ReadAsync(offset, 4);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt32(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads a signed 64 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static Int64 ReadInt64BigEndian(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = accessor.Read(offset, 8);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt64(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads a signed 64 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static async Task<Int64> ReadInt64BigEndianAsync(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = await accessor.ReadAsync(offset, 8);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt64(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 16 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static UInt16 ReadUInt16BigEndian(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = accessor.Read(offset, 2);
+            Array.Reverse(bytes);
+            return BitConverter.ToUInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 16 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static async Task<UInt16> ReadUInt16BigEndianAsync(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = await accessor.ReadAsync(offset, 2);
+            Array.Reverse(bytes);
+            return BitConverter.ToUInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 32 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static UInt32 ReadUInt32BigEndian(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = accessor.Read(offset, 4);
+            Array.Reverse(bytes);
+            return BitConverter.ToUInt32(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 32 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static async Task<UInt32> ReadUInt32BigEndianAsync(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = await accessor.ReadAsync(offset, 4);
+            Array.Reverse(bytes);
+            return BitConverter.ToUInt32(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 64 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static UInt64 ReadUInt64BigEndian(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = accessor.Read(offset, 8);
+            Array.Reverse(bytes);
+            return BitConverter.ToUInt64(bytes, 0);
+        }
+
+        /// <summary>
+        /// Reads an unsigned 64 bit big endian integer
+        /// </summary>
+        /// <param name="offset">Offset of the integer to read.</param>
+        /// <returns>The integer from the given location</returns>
+        public static async Task<UInt64> ReadUInt64BigEndianAsync(this IReadOnlyBinaryDataAccessor accessor, long offset)
+        {
+            var bytes = await accessor.ReadAsync(offset, 8);
+            Array.Reverse(bytes);
+            return BitConverter.ToUInt64(bytes, 0);
+        }
+        #endregion
+
         #region String Reads
 
         /// <summary>

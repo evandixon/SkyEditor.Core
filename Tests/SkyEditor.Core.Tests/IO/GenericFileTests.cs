@@ -1040,6 +1040,154 @@ namespace SkyEditor.Core.Tests.IO
         }
         #endregion
 
+        #region Big Endian Integer Access
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadInt16BigEndian_Offset()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 42, 255, 255 });
+                Assert.AreEqual(42, f.ReadInt16BigEndian(0));
+                Assert.AreEqual(-1, f.ReadInt16BigEndian(2));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadInt16BigEndian_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 42, 255, 255 });
+                Assert.AreEqual(42, await f.ReadInt16BigEndianAsync(0));
+                Assert.AreEqual(-1, await f.ReadInt16BigEndianAsync(2));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadUInt16BigEndian_Offset()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 42, 255, 255 });
+                Assert.AreEqual(42, f.ReadUInt16BigEndian(0));
+                Assert.AreEqual(UInt16.MaxValue, f.ReadUInt16BigEndian(2));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadUInt16BigEndian_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 42, 255, 255 });
+                Assert.AreEqual(42, await f.ReadUInt16BigEndianAsync(0));
+                Assert.AreEqual(UInt16.MaxValue, await f.ReadUInt16BigEndianAsync(2));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadInt32BigEndian_Offset()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 42, 255, 255, 255, 255 });
+                Assert.AreEqual(42, f.ReadInt32BigEndian(0));
+                Assert.AreEqual(-1, f.ReadInt32BigEndian(4));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadInt32BigEndian_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 42, 255, 255, 255, 255 });
+                Assert.AreEqual(42, await f.ReadInt32BigEndianAsync(0));
+                Assert.AreEqual(-1, await f.ReadInt32BigEndianAsync(4));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadUInt32BigEndian_Offset()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 42, 255, 255, 255, 255 });
+                Assert.AreEqual((UInt32)42, f.ReadUInt32BigEndian(0));
+                Assert.AreEqual(UInt32.MaxValue, f.ReadUInt32BigEndian(4));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadUInt32BigEndian_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 42, 255, 255, 255, 255 });
+                Assert.AreEqual((UInt32)42, await f.ReadUInt32BigEndianAsync(0));
+                Assert.AreEqual(UInt32.MaxValue, await f.ReadUInt32BigEndianAsync(4));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadInt64BigEndian_Offset()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 00, 00, 00, 00, 42, 255, 255, 255, 255, 255, 255, 255, 255 });
+                Assert.AreEqual(42, f.ReadInt64BigEndian(0));
+                Assert.AreEqual(-1, f.ReadInt64BigEndian(8));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadInt64BigEndian_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 00, 00, 00, 00, 42, 255, 255, 255, 255, 255, 255, 255, 255 });
+                Assert.AreEqual(42, await f.ReadInt64BigEndianAsync(0));
+                Assert.AreEqual(-1, await f.ReadInt64BigEndianAsync(8));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public void ReadUInt64BigEndian_Offset()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 00, 00, 00, 00, 42, 255, 255, 255, 255, 255, 255, 255, 255 });
+                Assert.AreEqual((UInt64)42, f.ReadUInt64BigEndian(0));
+                Assert.AreEqual(UInt64.MaxValue, f.ReadUInt64BigEndian(8));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategory)]
+        public async Task ReadUInt64BigEndian_Async()
+        {
+            using (var f = new GenericFile())
+            {
+                f.CreateFile(new byte[] { 00, 00, 00, 00, 00, 00, 00, 42, 255, 255, 255, 255, 255, 255, 255, 255 });
+                Assert.AreEqual((UInt64)42, await f.ReadUInt64BigEndianAsync(0));
+                Assert.AreEqual(UInt64.MaxValue, await f.ReadUInt64BigEndianAsync(8));
+            }
+        }
+
+        #endregion
+
         #region String Access
         [TestMethod]
         [TestCategory(TestCategory)]
