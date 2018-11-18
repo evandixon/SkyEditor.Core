@@ -460,6 +460,7 @@ namespace SkyEditor.Core.IO
                 this.MemoryMappedFile = memoryMappedProvider.OpenMemoryMappedFile(filename);
                 this.MemoryMappedFilename = filename;
                 this.MemoryMappedProvider = memoryMappedProvider;
+                this.Filename = filename;
             }
             else if (EnableInMemoryLoad)
             {
