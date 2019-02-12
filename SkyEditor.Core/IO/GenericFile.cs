@@ -457,12 +457,27 @@ namespace SkyEditor.Core.IO
         {
             if (EnableMemoryMappedFileLoading && provider is IMemoryMappedIOProvider memoryMappedProvider)
             {
-                this.MemoryMappedFile = memoryMappedProvider.OpenMemoryMappedFile(filename);
-                this.MemoryMappedFilename = filename;
-                this.MemoryMappedProvider = memoryMappedProvider;
-                this.Filename = filename;
+                this.MemoryMappedFile = memoryMappedProvider.OpenMemoryMappedFile(filename);                
+                try
+                {
+                    // Sometimes we might not have enough memory.
+                    // When that happens, we get an IOException saying something "There are not enough memory resources available"
+                    if (MemoryMappedFile.CreateViewAccessor().Capacity > -1) // Compare the capacity to -1 just to see if we get an IOException
+                    {
+                        this.MemoryMappedFilename = filename;
+                        this.MemoryMappedProvider = memoryMappedProvider;
+                        this.Filename = filename;
+                        return;
+                    }
+                }
+                catch (IOException)
+                {
+                    // We can't use a MemoryMapped file.
+                    this.MemoryMappedFile = null;
+                }
             }
-            else if (EnableInMemoryLoad)
+
+            if (EnableInMemoryLoad)
             {
                 byte[] contents;
 
