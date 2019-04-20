@@ -265,16 +265,17 @@ namespace SkyEditor.Core.UI
             viewModels.Add(model); // We'll consider the model itself a view model, if anything directly targets it
 
             // Get all tabs that could be used for the model, given the RequestedTabTypes constraint
-            var availableTabs = from viewModel in viewModels
+            var availableTabs = (from viewModel in viewModels
                                 from view in GetViewControls(manager)
                                 let viewModelSortOrder = viewModel is GenericViewModel ? ((viewModel as GenericViewModel).SortOrder) : 0
                                 where requestedTabTypes.Any(x => ReflectionHelpers.IsOfType(view, x.GetTypeInfo())) &&
                                 view.GetSupportedTypes().Any(x => ReflectionHelpers.IsOfType(viewModel.GetType().GetTypeInfo(), x)) &&
                                 view.SupportsObject(viewModel)
                                 orderby viewModelSortOrder, view.GetSortOrder(modelType, true)
-                                select new { viewModel, view, viewModelSortOrder = viewModel is GenericViewModel ? ((viewModel as GenericViewModel).SortOrder) : 0 };
+                                select new { viewModel, view, viewModelSortOrder = viewModel is GenericViewModel ? ((viewModel as GenericViewModel).SortOrder) : 0 })
+                                .ToList();
 
-            var realTabs = availableTabs.Where(x => !x.view.GetIsBackupControl());
+            var realTabs = availableTabs.Where(x => !x.view.GetIsBackupControl()).ToList();
             foreach (var item in realTabs)
             {
                 if (!targetTabs.ContainsKey(item.viewModel))

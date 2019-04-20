@@ -19,7 +19,7 @@ namespace SkyEditor.Core.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -462,24 +462,6 @@ namespace SkyEditor.Core.Properties {
         internal static string UI_UnknownFileRegisterTemplate {
             get {
                 return ResourceManager.GetString("UI_UnknownFileRegisterTemplate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Only one AsyncFor operation can run at any one time.  To run another, create another instance of AsyncFor..
-        /// </summary>
-        internal static string Utilities_AsyncFor_ErrorNoConcurrentExecution {
-            get {
-                return ResourceManager.GetString("Utilities_AsyncFor_ErrorNoConcurrentExecution", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Step count cannot be zero..
-        /// </summary>
-        internal static string Utilities_AsyncFor_ErrorStepCount0 {
-            get {
-                return ResourceManager.GetString("Utilities_AsyncFor_ErrorStepCount0", resourceCulture);
             }
         }
         

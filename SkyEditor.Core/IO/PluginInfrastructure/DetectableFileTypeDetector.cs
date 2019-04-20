@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using SkyEditor.Utilities.AsyncFor;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
         public async Task<IEnumerable<FileTypeDetectionResult>> DetectFileType(GenericFile file, PluginManager manager)
         {
             ConcurrentQueue<FileTypeDetectionResult> matches = new ConcurrentQueue<FileTypeDetectionResult>();
-            Utilities.AsyncFor f = new Utilities.AsyncFor();
+            AsyncFor f = new AsyncFor();
             f.RunSynchronously = !file.IsThreadSafe;
             await f.RunForEach(manager.GetRegisteredObjects<IDetectableFileType>(), async (x) =>
             {
