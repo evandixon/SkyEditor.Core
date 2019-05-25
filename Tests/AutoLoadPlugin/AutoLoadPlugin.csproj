@@ -4,12 +4,12 @@
     <TargetFrameworks>netcoreapp2.2;net462</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'netstandard2.0'">
-    <OutputPath>..\SkyEditor.Core.Tests\bin\Debug\netcoreapp2.0\Resources\Extensions\Plugins\Development\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'netcoreapp2.2'">
+    <OutputPath>..\SkyEditor.Core.Tests\bin\Debug\netcoreapp2.2\Resources\Extensions\Plugins\Development\</OutputPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' And '$(TargetFramework)' == 'netstandard2.0'">
-    <OutputPath>..\SkyEditor.Core.Tests\bin\Release\netcoreapp2.0\Resources\Extensions\Plugins\Development\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' And '$(TargetFramework)' == 'netcoreapp2.2'">
+    <OutputPath>..\SkyEditor.Core.Tests\bin\Release\netcoreapp2.2\Resources\Extensions\Plugins\Development\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'net462'">

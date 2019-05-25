@@ -110,7 +110,7 @@ namespace SkyEditor.Core
         /// <returns>A boolean indicating whether or not plugin loading is enabled.</returns>
         public virtual bool IsPluginLoadingEnabled()
         {
-#if NETSTANDARD2_0
+#if NETCOREAPP
             return true;
 #elif NET462
             return true;
