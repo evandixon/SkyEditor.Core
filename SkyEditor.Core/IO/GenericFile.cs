@@ -1,5 +1,6 @@
 ﻿using SkyEditor.Core.IO.PluginInfrastructure;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace SkyEditor.Core.IO
 {
+    [Obsolete("Use SkyEditor.IO.Binary.BinaryFile where possible.")]
     public class GenericFile : INamed, ICreatableFile, IOpenableFile, IOnDisk, IBinaryDataAccessor, ISavableAs, IDisposable
     {
 
@@ -25,9 +27,7 @@ namespace SkyEditor.Core.IO
         /// <summary>
         /// Creates a new instance of <see cref="GenericFile"/> using the data at the given file
         /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="provider"></param>
-        public GenericFile(string filename, IIOProvider provider)
+        public GenericFile(string filename, IFileSystem provider)
         {
             OpenFileInternal(filename, provider);
         }
@@ -95,7 +95,7 @@ namespace SkyEditor.Core.IO
         /// <summary>
         /// Platform dependant abstraction layer for the file system.
         /// </summary>
-        protected IIOProvider CurrentIOProvider { get; set; }
+        protected IFileSystem CurrentFileSystem { get; set; }
 
         /// <summary>
         /// A memory mapped file object representing the loaded file. This is the preferred way to load data.
@@ -104,7 +104,7 @@ namespace SkyEditor.Core.IO
 
         private string MemoryMappedFilename { get; set; }
 
-        private IMemoryMappedIOProvider MemoryMappedProvider { get; set; }
+        private IMemoryMappedFileSystem MemoryMappedProvider { get; set; }
 
         /// <summary>
         /// The raw data of the file, if the file has been loaded in memory.  Null if <see cref="FileReader"/> is in use.
@@ -128,11 +128,11 @@ namespace SkyEditor.Core.IO
                     {
                         if (IsReadOnly)
                         {
-                            _fileReader = CurrentIOProvider.OpenFileReadOnly(PhysicalFilename);
+                            _fileReader = CurrentFileSystem.OpenFileReadOnly(PhysicalFilename);
                         }
                         else
                         {
-                            _fileReader = CurrentIOProvider.OpenFile(PhysicalFilename);
+                            _fileReader = CurrentFileSystem.OpenFile(PhysicalFilename);
                         }
                     }
                     return _fileReader;
@@ -360,7 +360,7 @@ namespace SkyEditor.Core.IO
         /// <param name="otherFile">File to copy</param>
         public void CreateFile(GenericFile otherFile)
         {
-            CreateFileInternal(otherFile.Name, Array.Empty<byte>(), otherFile.EnableInMemoryLoad, otherFile.CurrentIOProvider);
+            CreateFileInternal(otherFile.Name, Array.Empty<byte>(), otherFile.EnableInMemoryLoad, otherFile.CurrentFileSystem);
             SetLength(otherFile.Length);
 
             if (otherFile.MemoryMappedFile != null)
@@ -400,7 +400,7 @@ namespace SkyEditor.Core.IO
         /// <param name="enableInMemoryLoad">Whether or not to store the contents in memory</param>
         /// <param name="provider">Instance of the current I/O provider.  Not required if <paramref name="enableInMemoryLoad"/> is true.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="provider"/> is null when <paramref name="enableInMemoryLoad"/> is false</exception>
-        private void CreateFileInternal(string name, byte[] contents, bool enableInMemoryLoad, IIOProvider provider)
+        private void CreateFileInternal(string name, byte[] contents, bool enableInMemoryLoad, IFileSystem provider)
         {
             this.Name = name;
             this.EnableInMemoryLoad = enableInMemoryLoad;
@@ -412,7 +412,7 @@ namespace SkyEditor.Core.IO
 
             if (provider != null)
             {
-                this.CurrentIOProvider = provider;
+                this.CurrentFileSystem = provider;
             }
             
             // Don't try creating a memory mapped file since we're starting with an array
@@ -436,7 +436,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="filename">Path of the file</param>
         /// <param name="provider">Instance of the I/O provider that stores the file</param>
-        public virtual Task OpenFile(string filename, IIOProvider provider)
+        public virtual Task OpenFile(string filename, IFileSystem provider)
         {
             OpenFileInternal(filename, provider);
             return Task.CompletedTask;
@@ -453,9 +453,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="filename">Path of the file</param>
         /// <param name="provider">Instance of the I/O provider that stores the file</param>
-        private void OpenFileInternal(string filename, IIOProvider provider)
+        private void OpenFileInternal(string filename, IFileSystem provider)
         {
-            if (EnableMemoryMappedFileLoading && provider is IMemoryMappedIOProvider memoryMappedProvider)
+            if (EnableMemoryMappedFileLoading && provider is IMemoryMappedFileSystem memoryMappedProvider)
             {
                 this.MemoryMappedFile = memoryMappedProvider.OpenMemoryMappedFile(filename);                
                 try
@@ -488,7 +488,7 @@ namespace SkyEditor.Core.IO
                 }
                 catch (IOException)
                 {
-                    if (provider is PhysicalIOProvider)
+                    if (provider is PhysicalFileSystem)
                     {
                         if (File.Exists(filename) && (new FileInfo(filename)).Length > int.MaxValue)
                         {
@@ -503,7 +503,7 @@ namespace SkyEditor.Core.IO
                     }
                     else
                     {
-                        // Got an I/O exception and we're not sure if we're using the PhysicalIOProvider or not
+                        // Got an I/O exception and we're not sure if we're using the PhysicalFileSystem or not
                         // Let's assume it's because of the 2GB limit and use a stream
                         OpenFileInternalStream(filename, provider);
                         return;
@@ -520,7 +520,7 @@ namespace SkyEditor.Core.IO
                 _inMemoryFile = contents;
                 this.Filename = filename;
                 this.PhysicalFilename = filename;
-                this.CurrentIOProvider = provider;
+                this.CurrentFileSystem = provider;
             }
             else
             {
@@ -562,9 +562,9 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="filename">Path of the file</param>
         /// <param name="provider">Instance of the I/O provider that stores the file</param>
-        private void OpenFileInternalStream(string filename, IIOProvider provider)
+        private void OpenFileInternalStream(string filename, IFileSystem provider)
         {
-            this.CurrentIOProvider = provider;
+            this.CurrentFileSystem = provider;
             this.Filename = filename;
             if (EnableShadowCopy)
             {
@@ -591,7 +591,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="filename">Path of the file</param>
         /// <param name="provider">Instance of the I/O provider that will the file</param>
-        public virtual async Task Save(string filename, IIOProvider provider)
+        public virtual async Task Save(string filename, IFileSystem provider)
         {
             FileSaving?.Invoke(this, new EventArgs());
             if (MemoryMappedFile != null)
@@ -643,7 +643,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="provider">Instance of the I/O provider that will the file</param>
         /// <exception cref="NullReferenceException">Thrown if <see cref="Filename"/> is null.</exception>
-        public async Task Save(IIOProvider provider)
+        public async Task Save(IFileSystem provider)
         {
             if (string.IsNullOrEmpty(this.Filename))
             {
@@ -1511,9 +1511,9 @@ namespace SkyEditor.Core.IO
                     }
 
                     // Delete the temporary file if shadow copy is enabled, the current I/O provider is not null, the physical filename exists, and the physical filename is different than the logical one
-                    if (EnableShadowCopy && _inMemoryFile == null && CurrentIOProvider != null && !string.IsNullOrEmpty(PhysicalFilename) && CurrentIOProvider.FileExists(PhysicalFilename) && Filename != PhysicalFilename)
+                    if (EnableShadowCopy && _inMemoryFile == null && CurrentFileSystem != null && !string.IsNullOrEmpty(PhysicalFilename) && CurrentFileSystem.FileExists(PhysicalFilename) && Filename != PhysicalFilename)
                     {
-                        CurrentIOProvider.DeleteFile(PhysicalFilename);
+                        CurrentFileSystem.DeleteFile(PhysicalFilename);
                     }                    
                 }
 

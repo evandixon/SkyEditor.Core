@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenFile_InMemory()
         {
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllBytes("/test.bin", new byte[] { 0, 1, 2, 3 });
 
             var file = new GenericFile();
@@ -35,7 +36,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenFile_Stream()
         {
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllBytes("/test.bin", new byte[] { 0, 1, 2, 3 });
 
             var file = new GenericFile();
@@ -51,7 +52,7 @@ namespace SkyEditor.Core.Tests.IO
         [TestCategory(TestCategory)]
         public async Task OpenFile_Stream_ReadOnly()
         {
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllBytes("/test.bin", new byte[] { 0, 1, 2, 3 });
 
             var file = new GenericFile();
@@ -71,7 +72,7 @@ namespace SkyEditor.Core.Tests.IO
             // If we tried to do it in memory, it would require over 2GB of RAM.
             // This isn't practical and won't work on all machines, so let's use the filesystem instead
             // It's a safer bet we'll have over 2GB of disk space than  over 2GB of RAM
-            var provider = new PhysicalIOProvider();
+            var provider = new PhysicalFileSystem();
             var filename = "a2GBfile.bin";
 
             if (!File.Exists(filename) || (new FileInfo(filename)).Length <= (long)int.MaxValue + 1)

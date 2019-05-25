@@ -1,5 +1,6 @@
 ﻿using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,12 +51,12 @@ namespace SkyEditor.Core.ConsoleCommands
             return provider.GetStdOut();
         }
 
-        public ConsoleShell(ApplicationViewModel appViewModel, PluginManager manager, IConsoleProvider consoleProvider, IIOProvider ioProvider)
+        public ConsoleShell(ApplicationViewModel appViewModel, PluginManager manager, IConsoleProvider consoleProvider, IFileSystem FileSystem)
         {
             CurrentApplicationViewModel = appViewModel;
             CurrentPluginManager = manager;
             Console = consoleProvider;
-            CurrentIOProvider = ioProvider;
+            CurrentFileSystem = FileSystem;
             AllCommands = new Dictionary<string, ConsoleCommand>();
             foreach (ConsoleCommand item in manager.GetRegisteredObjects<ConsoleCommand>())
             {
@@ -66,7 +67,7 @@ namespace SkyEditor.Core.ConsoleCommands
 
         protected ApplicationViewModel CurrentApplicationViewModel { get; }
         protected PluginManager CurrentPluginManager { get; }
-        protected IIOProvider CurrentIOProvider { get; }
+        protected IFileSystem CurrentFileSystem { get; }
         protected Dictionary<string, ConsoleCommand> AllCommands { get; set; }
         protected IConsoleProvider Console { get; set; }
         protected Regex ParameterRegex => new Regex("(\\\".*?\\\")|\\S+", RegexOptions.Compiled);
@@ -81,7 +82,7 @@ namespace SkyEditor.Core.ConsoleCommands
             {
                 // Write bash-style working directory
                 Console.Write("~");
-                Console.Write(CurrentIOProvider.WorkingDirectory);
+                Console.Write(CurrentFileSystem.WorkingDirectory);
                 Console.Write(" $ ");
 
                 // Accept input
@@ -132,7 +133,7 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="argumentString">String containing the arguments of the command, separated by spaces.  Use quotation marks to include spaces in a parameter.</param>
         /// <param name="provider">The I/O provider to use with the command</param>
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
-        public async Task RunCommand(string commandName, string argumentString, bool reportErrorsToConsole = false, IIOProvider ioProvider = null)
+        public async Task RunCommand(string commandName, string argumentString, bool reportErrorsToConsole = false, IFileSystem FileSystem = null)
         {
             // Split arg on spaces, while respecting quotation marks
             var args = new List<string>();
@@ -145,7 +146,7 @@ namespace SkyEditor.Core.ConsoleCommands
             }
 
             // Run the command
-            await RunCommand(commandName, args, reportErrorsToConsole, ioProvider).ConfigureAwait(false);
+            await RunCommand(commandName, args, reportErrorsToConsole, FileSystem).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -154,12 +155,12 @@ namespace SkyEditor.Core.ConsoleCommands
         /// <param name="commandName">Name of the command.</param>
         /// <param name="arguments">Arguments of the command.</param>
         /// <param name="reportErrorsToConsole">True to print exceptions in the console.  False to throw the exception.</param>
-        public async Task RunCommand(string commandName, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IIOProvider ioProvider = null)
+        public async Task RunCommand(string commandName, IEnumerable<string> arguments, bool reportErrorsToConsole = false, IFileSystem FileSystem = null)
         {
             var command = AllCommands.Where(c => String.Compare(c.Key, commandName, StringComparison.CurrentCultureIgnoreCase) == 0).Select(c => c.Value).SingleOrDefault();
-            if (ioProvider != null && CurrentPluginManager.CanCreateInstance(command.GetType()))
+            if (FileSystem != null && CurrentPluginManager.CanCreateInstance(command.GetType()))
             {
-                command = CurrentPluginManager.CreateNewInstance(command, ioProvider) as ConsoleCommand;
+                command = CurrentPluginManager.CreateNewInstance(command, FileSystem) as ConsoleCommand;
             }
             await RunCommand(command, arguments, reportErrorsToConsole);
         }

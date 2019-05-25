@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.IO.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
             return (model as ISavableAs)?.GetSupportedExtensions();
         }
 
-        public async Task Save(object model, IIOProvider provider)
+        public async Task Save(object model, IFileSystem provider)
         {
             var savable = model as ISavable;
             if (savable != null)
@@ -26,7 +27,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
             }
         }
 
-        public async Task Save(object model, string filename, IIOProvider provider)
+        public async Task Save(object model, string filename, IFileSystem provider)
         {
             var savable = model as ISavableAs;
             if (savable != null)

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.IO.PluginInfrastructure;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.Projects
 {
@@ -145,7 +146,7 @@ namespace SkyEditor.Core.Projects
             ICreatableFile fileObj = CurrentPluginManager.CreateInstance(fileType.GetTypeInfo()) as ICreatableFile;
             fileObj.CreateFile(name);
             fileObj.Filename = Path.Combine(Path.GetDirectoryName(this.Filename), parentPath.Replace("/", "\\").TrimStart("\\".ToCharArray()), name);
-            await fileObj.Save(CurrentPluginManager.CurrentIOProvider);
+            await fileObj.Save(CurrentPluginManager.CurrentFileSystem);
 
             AddItem(fixedPath + "/" + name, new ProjectFileWrapper(this.Filename, Path.Combine(parentPath.Replace("/", "\\").TrimStart("\\".ToCharArray()), name), fileObj));
         }
@@ -204,7 +205,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="filePath">Physical path of the file to import</param>
         /// <param name="fileType">Type of the file, or null to auto-detect the type on load</param>
         /// <param name="provider">Instance of the IO provider from which to get the file located at <paramref name="filePath"/>.</param>
-        public virtual void AddExistingFileToPath(string destinationPath, string filePath, Type fileType, IIOProvider provider)
+        public virtual void AddExistingFileToPath(string destinationPath, string filePath, Type fileType, IFileSystem provider)
         {
             var fixedPath = FixPath(destinationPath);
 
@@ -226,7 +227,7 @@ namespace SkyEditor.Core.Projects
         /// <param name="filePath">Physical path of the file to import</param>
         /// <param name="fileType">Type of the file, or null to auto-detect the type on load</param>
         /// <param name="provider">Instance of the IO provider from which to get the file located at <paramref name="filePath"/>.</param>
-        public virtual void AddExistingFile(string parentPath, string filePath, Type fileType, IIOProvider provider)
+        public virtual void AddExistingFile(string parentPath, string filePath, Type fileType, IFileSystem provider)
         {
             var fixedPath = FixPath(parentPath);
             var importedName = GetImportedFilePath(fixedPath, filePath);
@@ -248,7 +249,7 @@ namespace SkyEditor.Core.Projects
         /// </summary>
         /// <param name="parentPath">Directory in which to put the imported file</param>
         /// <param name="filePath">Full path of the file to import</param>
-        public virtual void AddExistingFile(string parentPath, string filePath, IIOProvider provider)
+        public virtual void AddExistingFile(string parentPath, string filePath, IFileSystem provider)
         {
             AddExistingFile(parentPath, filePath, null, provider);
         }

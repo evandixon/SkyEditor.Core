@@ -416,7 +416,7 @@ namespace SkyEditor.Core.UI
             }
             else
             {
-                await saver.Save(Model, manager.CurrentIOProvider);
+                await saver.Save(Model, manager.CurrentFileSystem);
             }
             IsFileModified = false;
         }
@@ -440,7 +440,7 @@ namespace SkyEditor.Core.UI
 
             ForceViewModelRefresh();
             var saver = manager.GetRegisteredObjects<IFileSaver>().First(x => x.SupportsSaveAs(Model)); // First (instead of FirstOrDefault) is intentional, save shouldn't be called if this is not true
-            await saver.Save(Model, filename, manager.CurrentIOProvider);
+            await saver.Save(Model, filename, manager.CurrentFileSystem);
             IsFileModified = false;
         }
 

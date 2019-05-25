@@ -66,13 +66,13 @@ namespace SkyEditor.Core.Extensions
             List<ExtensionInfo> @out = new List<ExtensionInfo>();
 
             //Todo: cache this so paging works more efficiently
-            if (manager.CurrentIOProvider.DirectoryExists(Path.Combine(RootExtensionDirectory, InternalName)))
+            if (manager.CurrentFileSystem.DirectoryExists(Path.Combine(RootExtensionDirectory, InternalName)))
             {
-                foreach (var item in manager.CurrentIOProvider.GetDirectories(Path.Combine(RootExtensionDirectory, InternalName), true))
+                foreach (var item in manager.CurrentFileSystem.GetDirectories(Path.Combine(RootExtensionDirectory, InternalName), true))
                 {
-                    if (manager.CurrentIOProvider.FileExists(Path.Combine(item, "info.skyext")))
+                    if (manager.CurrentFileSystem.FileExists(Path.Combine(item, "info.skyext")))
                     {
-                        var e = ExtensionInfo.OpenFromFile(Path.Combine(item, "info.skyext"), manager.CurrentIOProvider);
+                        var e = ExtensionInfo.OpenFromFile(Path.Combine(item, "info.skyext"), manager.CurrentFileSystem);
                         e.IsInstalled = true;
                         @out.Add(e);
                     }
@@ -110,7 +110,7 @@ namespace SkyEditor.Core.Extensions
         /// <param name="TempDir">Temporary directory that contains the extension's files</param>
         public virtual async Task<ExtensionInstallResult> InstallExtension(string extensionID, string TempDir)
         {
-            await FileSystem.CopyDirectory(TempDir, GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentIOProvider).ConfigureAwait(false);
+            await FileSystem.CopyDirectory(TempDir, GetExtensionDirectory(extensionID), CurrentPluginManager.CurrentFileSystem).ConfigureAwait(false);
             return ExtensionInstallResult.Success;
         }
 
@@ -120,7 +120,7 @@ namespace SkyEditor.Core.Extensions
         /// <param name="extensionID">ID of the extension to uninstall</param>
         public virtual Task<ExtensionUninstallResult> UninstallExtension(string extensionID, PluginManager manager)
         {
-            CurrentPluginManager.CurrentIOProvider.DeleteDirectory(GetExtensionDirectory(extensionID));
+            CurrentPluginManager.CurrentFileSystem.DeleteDirectory(GetExtensionDirectory(extensionID));
             return Task.FromResult(ExtensionUninstallResult.Success);
         }
 

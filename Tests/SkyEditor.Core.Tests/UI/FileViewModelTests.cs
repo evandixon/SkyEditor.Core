@@ -6,6 +6,7 @@ using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using System.Threading.Tasks;
 using SkyEditor.Core.UI;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.Tests.UI
 {
@@ -27,9 +28,9 @@ namespace SkyEditor.Core.Tests.UI
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
         }
 
@@ -57,10 +58,10 @@ namespace SkyEditor.Core.Tests.UI
             {
                 await manager.LoadCore(new TestCoreMod());
 
-                manager.CurrentIOProvider.WriteAllText("/test.txt", "testing");
+                manager.CurrentFileSystem.WriteAllText("/test.txt", "testing");
 
                 var testFile = new TextFile();
-                await testFile.OpenFile("/test.txt", manager.CurrentIOProvider);
+                await testFile.OpenFile("/test.txt", manager.CurrentFileSystem);
 
                 var testFileViewModel = new FileViewModel(testFile, manager);
                 Assert.AreEqual(true, testFileViewModel.CanSave(manager));
@@ -91,15 +92,15 @@ namespace SkyEditor.Core.Tests.UI
             {
                 await manager.LoadCore(new TestCoreMod());
 
-                manager.CurrentIOProvider.WriteAllText("/test.txt", "testing");
+                manager.CurrentFileSystem.WriteAllText("/test.txt", "testing");
 
                 var testFile = new TextFile();
-                await testFile.OpenFile("/test.txt", manager.CurrentIOProvider);
+                await testFile.OpenFile("/test.txt", manager.CurrentFileSystem);
                 testFile.Contents = "saved";
 
                 var testFileViewModel = new FileViewModel(testFile, manager);
                 await testFileViewModel.Save(manager);
-                Assert.AreEqual("saved", manager.CurrentIOProvider.ReadAllText("/test.txt"));
+                Assert.AreEqual("saved", manager.CurrentFileSystem.ReadAllText("/test.txt"));
             }
         }
 
@@ -117,7 +118,7 @@ namespace SkyEditor.Core.Tests.UI
 
                 var testFileViewModel = new FileViewModel(testFile, manager);
                 await testFileViewModel.Save("/test.txt", manager);
-                Assert.AreEqual("saved", manager.CurrentIOProvider.ReadAllText("/test.txt"));
+                Assert.AreEqual("saved", manager.CurrentFileSystem.ReadAllText("/test.txt"));
             }
         }
     }

@@ -2,6 +2,7 @@
 using SkyEditor.Core.Utilities;
 using System.Threading.Tasks;
 using System;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.IO.PluginInfrastructure
 {
@@ -24,7 +25,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
         /// <param name="filename">Path of the file</param>
         /// <param name="provider">I/O provider containing the file</param>
         /// <returns>The newly opened file</returns>
-        public async Task<object> OpenFile(TypeInfo fileType, string filename, IIOProvider provider)
+        public async Task<object> OpenFile(TypeInfo fileType, string filename, IFileSystem provider)
         {
             if (fileType == null)
             {

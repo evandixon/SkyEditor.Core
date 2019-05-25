@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.IO.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -18,6 +19,6 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
         /// <param name="filename">Full path of the file to open</param>
         /// <param name="provider">Instance of the current IO provider</param>
         /// <returns>An object representing the requested file</returns>
-        Task<object> OpenFile(TypeInfo fileType, string filename, IIOProvider provider);
+        Task<object> OpenFile(TypeInfo fileType, string filename, IFileSystem provider);
     }
 }

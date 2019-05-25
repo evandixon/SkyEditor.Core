@@ -2,6 +2,7 @@
 using SkyEditor.Core.IO;
 using SkyEditor.Core.IO.PluginInfrastructure;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -33,14 +34,14 @@ namespace SkyEditor.Core.Tests.IO
                 this.Name = name;
             }
 
-            public Task OpenFile(string filename, IIOProvider provider)
+            public Task OpenFile(string filename, IFileSystem provider)
             {
                 Contents = provider.ReadAllText(filename);
                 this.Filename = filename;
                 return Task.CompletedTask;
             }
 
-            public Task Save(IIOProvider provider)
+            public Task Save(IFileSystem provider)
             {
                 provider.WriteAllText(Filename, Contents);
                 FileSaved?.Invoke(this, new EventArgs());
@@ -57,7 +58,7 @@ namespace SkyEditor.Core.Tests.IO
                 return Task.FromResult(true);
             }
 
-            public Task OpenFile(string filename, IIOProvider provider)
+            public Task OpenFile(string filename, IFileSystem provider)
             {
                 Contents = provider.ReadAllText(filename);
                 return Task.CompletedTask;
@@ -84,14 +85,14 @@ namespace SkyEditor.Core.Tests.IO
                 this.Name = name;
             }
 
-            public Task OpenFile(string filename, IIOProvider provider)
+            public Task OpenFile(string filename, IFileSystem provider)
             {
                 Contents = provider.ReadAllText(filename);
                 this.Filename = filename;
                 return Task.CompletedTask;
             }
 
-            public Task Save(IIOProvider provider)
+            public Task Save(IFileSystem provider)
             {
                 provider.WriteAllText(Filename, Contents);
                 FileSaved?.Invoke(this, new EventArgs());
@@ -111,7 +112,7 @@ namespace SkyEditor.Core.Tests.IO
         public async Task OpenableFileOpener_FunctionalityTest()
         {
             var opener = new OpenableFileOpener(new PluginManager());
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllText("/test.txt", "TEST");
 
             var creatable = await opener.OpenFile(typeof(CreatableTextFile).GetTypeInfo(), "/test.txt", provider);
@@ -130,7 +131,7 @@ namespace SkyEditor.Core.Tests.IO
         public async Task OpenableFileOpener_InvalidType()
         {
             var opener = new OpenableFileOpener(new PluginManager());
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllText("/test.txt", "TEST");
 
             try
@@ -150,7 +151,7 @@ namespace SkyEditor.Core.Tests.IO
         public async Task OpenableFileOpener_ArgumentNullCheck_fileType()
         {
             var opener = new OpenableFileOpener(new PluginManager());
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllText("/test.txt", "TEST");
 
             try
@@ -171,7 +172,7 @@ namespace SkyEditor.Core.Tests.IO
         public async Task OpenableFileOpener_ArgumentNullCheck_filename()
         {
             var opener = new OpenableFileOpener(new PluginManager());
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllText("/test.txt", "TEST");            
 
             try
@@ -192,7 +193,7 @@ namespace SkyEditor.Core.Tests.IO
         public async Task OpenableFileOpener_ArgumentNullCheck_provider()
         {
             var opener = new OpenableFileOpener(new PluginManager());
-            var provider = new MemoryIOProvider();
+            var provider = new MemoryFileSystem();
             provider.WriteAllText("/test.txt", "TEST");
 
             try

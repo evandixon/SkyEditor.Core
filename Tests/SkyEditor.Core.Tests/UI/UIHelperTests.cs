@@ -8,6 +8,7 @@ using SkyEditor.Core.TestComponents;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Reflection;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.Tests.UI
 {
@@ -227,9 +228,9 @@ namespace SkyEditor.Core.Tests.UI
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
 
             public override void Load(PluginManager manager)

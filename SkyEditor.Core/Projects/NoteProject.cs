@@ -34,7 +34,7 @@ namespace SkyEditor.Core.Projects
         {
             var rootDir = GetRootDirectory();
             var outputDir = GetOutputDirectory();
-            var provider = CurrentPluginManager.CurrentIOProvider;
+            var provider = CurrentPluginManager.CurrentFileSystem;
             var info = new ExtensionInfo();
             info.Name = this.Name;
             info.ExtensionTypeName = typeof(NoteExtension).AssemblyQualifiedName;

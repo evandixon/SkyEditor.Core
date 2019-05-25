@@ -3,6 +3,7 @@ using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -29,9 +30,9 @@ namespace SkyEditor.Core.Tests.Utilities
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
 
             public override bool IsCorePluginAssemblyDynamicTypeLoadEnabled()

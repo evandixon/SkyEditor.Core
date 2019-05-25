@@ -8,6 +8,7 @@ using SkyEditor.Core.Projects;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,13 +44,13 @@ namespace SkyEditor.Core
         #endregion
 
         /// <summary>
-        /// Creates an instance of the <see cref="IIOProvider"/> for the application environment.
+        /// Creates an instance of the <see cref="IFileSystem"/> for the application environment.
         /// </summary>
-        /// <returns>An instance of the <see cref="IIOProvider"/> for the application environment.</returns>
-        /// <remarks>Defaults to <see cref="PhysicalIOProvider"/> unless overridden.</remarks>
-        public virtual IIOProvider GetIOProvider()
+        /// <returns>An instance of the <see cref="IFileSystem"/> for the application environment.</returns>
+        /// <remarks>Defaults to <see cref="PhysicalFileSystem"/> unless overridden.</remarks>
+        public virtual IFileSystem GetFileSystem()
         {
-            return new PhysicalIOProvider();
+            return new PhysicalFileSystem();
         }
 
         /// <summary>
@@ -151,7 +152,7 @@ namespace SkyEditor.Core
             base.Load(manager);
 
             manager.AddSingletonDependency(GetApplicationViewModel(manager));
-            manager.AddSingletonDependency(GetIOProvider());
+            manager.AddSingletonDependency(GetFileSystem());
             manager.AddSingletonDependency(GetSettingsProvider(manager));
             manager.AddSingletonDependency(GetConsoleProvider());
 

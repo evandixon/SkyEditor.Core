@@ -96,14 +96,14 @@ namespace SkyEditor.Core.Extensions
         /// <param name="manager">Instance of the current plugin manager</param>
         public static async Task InstallPendingExtensions(string extensionDirectory, PluginManager manager)
         {
-            if (manager.CurrentIOProvider.DirectoryExists(extensionDirectory))
+            if (manager.CurrentFileSystem.DirectoryExists(extensionDirectory))
             {
-                foreach (var item in manager.CurrentIOProvider.GetFiles(extensionDirectory, "*.zip", true))
+                foreach (var item in manager.CurrentFileSystem.GetFiles(extensionDirectory, "*.zip", true))
                 {
                     var result = await InstallExtensionZip(item, manager);
                     if (result == ExtensionInstallResult.Success || result == ExtensionInstallResult.RestartRequired)
                     {
-                        manager.CurrentIOProvider.DeleteFile(item);
+                        manager.CurrentFileSystem.DeleteFile(item);
                     }
                 }
             }
@@ -117,7 +117,7 @@ namespace SkyEditor.Core.Extensions
         /// <returns>The result of the install</returns>
         public static async Task<ExtensionInstallResult> InstallExtensionZip(string extensionZipPath, PluginManager manager)
         {
-            var provider = manager.CurrentIOProvider;
+            var provider = manager.CurrentFileSystem;
             ExtensionInstallResult result;
 
             //Get the temporary directory

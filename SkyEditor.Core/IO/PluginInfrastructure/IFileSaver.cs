@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.IO.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
         /// </summary>
         /// <param name="model">Model to save</param>
         /// <param name="provider">The IO provider to use</param>
-        Task Save(object model, IIOProvider provider);
+        Task Save(object model, IFileSystem provider);
 
         /// <summary>
         /// Saves the model to a file at the given path
@@ -37,7 +38,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
         /// <param name="model">Model to save</param>
         /// <param name="filename">Path of the file to which the model will be saved</param>
         /// <param name="provider">The IO provider to use</param>
-        Task Save(object model, string filename, IIOProvider provider);
+        Task Save(object model, string filename, IFileSystem provider);
 
         /// <summary>
         /// Gets the default extension for the given model when using Save As.

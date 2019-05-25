@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using SkyEditor.Core.IO;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.ConsoleCommands
 {
@@ -13,9 +14,9 @@ namespace SkyEditor.Core.ConsoleCommands
 
         public override string Credits { get; }
 
-        public override IIOProvider GetIOProvider()
+        public override IFileSystem GetFileSystem()
         {
-            return new PhysicalIOProvider();
+            return new PhysicalFileSystem();
         }
 
         public override IConsoleProvider GetConsoleProvider()

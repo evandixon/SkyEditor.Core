@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.0;net462</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;net462</TargetFrameworks>
     <RuntimeIdentifiers>win10-x64;win10-x86;debian.8-x64;debian.8-x86</RuntimeIdentifiers>
   </PropertyGroup>
 

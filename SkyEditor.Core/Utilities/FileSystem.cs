@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.IO.FileSystem;
 using SkyEditor.Utilities.AsyncFor;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace SkyEditor.Core.Utilities
         /// </summary>
         /// <param name="sourceDirectory">The directory to copy</param>
         /// <param name="destinationDirectory">The new destination for the source directory</param>
-        public static async Task CopyDirectory(string sourceDirectory, string destinationDirectory, IIOProvider provider)
+        public static async Task CopyDirectory(string sourceDirectory, string destinationDirectory, IFileSystem provider)
         {
             // Get the files/directories to copy
             var files = provider.GetFiles(sourceDirectory, "*", false);
@@ -44,7 +45,7 @@ namespace SkyEditor.Core.Utilities
         /// </summary>
         /// <param name="directoryName">Path of the directory</param>
         /// <param name="provider">I/O provider containing the directory</param>
-        public static async Task EnsureDirectoryExistsEmpty(string directoryName, IIOProvider provider)
+        public static async Task EnsureDirectoryExistsEmpty(string directoryName, IFileSystem provider)
         {
 
             // Delete the main directory (to delete all child directories)

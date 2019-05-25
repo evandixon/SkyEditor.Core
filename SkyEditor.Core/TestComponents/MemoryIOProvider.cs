@@ -7,13 +7,14 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.TestComponents
 {
     /// <summary>
-    /// Implementation of <see cref="IIOProvider"/> that stores virtual files in memory.
+    /// Implementation of <see cref="IFileSystem"/> that stores virtual files in memory.
     /// </summary>
-    public class MemoryIOProvider : IIOProvider
+    public class MemoryFileSystem : IFileSystem
     {
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace SkyEditor.Core.TestComponents
             return regexString.ToString();
         }
 
-        public MemoryIOProvider()
+        public MemoryFileSystem()
         {
             Files = new ConcurrentDictionary<string, byte[]>();
             tempCounter = 0;

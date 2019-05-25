@@ -76,13 +76,13 @@ namespace SkyEditor.Core.Extensions
                 info.IsEnabled = true;
                 info.Version = Properties.Resources.PluginDevExtVersion;
                 
-                if (manager.CurrentIOProvider.DirectoryExists(devDir))
+                if (manager.CurrentFileSystem.DirectoryExists(devDir))
                 {
-                    foreach (var item in manager.CurrentIOProvider.GetFiles(devDir, "*.dll", true))
+                    foreach (var item in manager.CurrentFileSystem.GetFiles(devDir, "*.dll", true))
                     {
                         info.ExtensionFiles.Add(Path.GetFileName(item));
                     }
-                    foreach (var item in manager.CurrentIOProvider.GetFiles(devDir, "*.exe", true))
+                    foreach (var item in manager.CurrentFileSystem.GetFiles(devDir, "*.exe", true))
                     {
                         info.ExtensionFiles.Add(Path.GetFileName(item));
                     }
@@ -90,13 +90,13 @@ namespace SkyEditor.Core.Extensions
                     if (info.ExtensionFiles.Count == 0)
                     {
                         // Look in each subdirectory if the root was empty
-                        foreach (var dir in manager.CurrentIOProvider.GetDirectories(devDir, true))
+                        foreach (var dir in manager.CurrentFileSystem.GetDirectories(devDir, true))
                         {
-                            foreach (var item in manager.CurrentIOProvider.GetFiles(dir, "*.dll", true))
+                            foreach (var item in manager.CurrentFileSystem.GetFiles(dir, "*.dll", true))
                             {
                                 info.ExtensionFiles.Add(dir + "/" + Path.GetFileName(item));
                             }
-                            foreach (var item in manager.CurrentIOProvider.GetFiles(dir, "*.exe", true))
+                            foreach (var item in manager.CurrentFileSystem.GetFiles(dir, "*.exe", true))
                             {
                                 info.ExtensionFiles.Add(dir + "/" + Path.GetFileName(item));
                             }

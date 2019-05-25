@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.Tests
 {
@@ -38,9 +39,9 @@ namespace SkyEditor.Core.Tests
             return "/extensions";
         }
 
-        public override IIOProvider GetIOProvider()
+        public override IFileSystem GetFileSystem()
         {
-            return new MemoryIOProvider();
+            return new MemoryFileSystem();
         }
 
         public override ISettingsProvider GetSettingsProvider(PluginManager manager)

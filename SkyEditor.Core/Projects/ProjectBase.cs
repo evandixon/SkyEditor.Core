@@ -2,6 +2,7 @@
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.UI;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using SkyEditor.Utilities.AsyncFor;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace SkyEditor.Core.Projects
     /// <summary>
     /// Defines the common functionality of both projects and solutions
     /// </summary>
-    public abstract class ProjectBase : INotifyPropertyChanged, INotifyModified, IReportProgress, IOnDisk, ISavable, IIOProvider, IDisposable
+    public abstract class ProjectBase : INotifyPropertyChanged, INotifyModified, IReportProgress, IOnDisk, ISavable, IFileSystem, IDisposable
     {
         /// <summary>
         /// Creates a new project
@@ -65,9 +66,9 @@ namespace SkyEditor.Core.Projects
             // Get the filename
             var filename = Path.Combine(parentPath, projectName, projectName + "." + output.ProjectFileExtension);
             // Create the directory if it doesn't exist
-            if (!manager.CurrentIOProvider.DirectoryExists(Path.GetDirectoryName(filename)))
+            if (!manager.CurrentFileSystem.DirectoryExists(Path.GetDirectoryName(filename)))
             {
-                manager.CurrentIOProvider.CreateDirectory(Path.GetDirectoryName(filename));
+                manager.CurrentFileSystem.CreateDirectory(Path.GetDirectoryName(filename));
             }
 
             // Set the properties
@@ -88,7 +89,7 @@ namespace SkyEditor.Core.Projects
         public static async Task<ProjectBase> OpenProjectFile(string filename, PluginManager manager)
         {
             // Open the file
-            var file = Json.DeserializeFromFile<ProjectFile>(filename, manager.CurrentIOProvider);
+            var file = Json.DeserializeFromFile<ProjectFile>(filename, manager.CurrentFileSystem);
 
             // Get the type
             var projectType = ReflectionHelpers.GetTypeByName(file.AssemblyQualifiedTypeName, manager);
@@ -491,14 +492,16 @@ namespace SkyEditor.Core.Projects
         /// Saves the project to the current file
         /// </summary>
         /// <param name="provider">Instance of the current IO provider</param>
-        public Task Save(IIOProvider provider)
+        public Task Save(IFileSystem provider)
         {
-            var file = new ProjectFile();
-            file.FileFormat = ProjectFile.CurrentVersion;
-            file.AssemblyQualifiedTypeName = GetType().AssemblyQualifiedName;
-            file.Name = this.Name;
-            file.InternalSettings = this.Settings.Serialize();
-            file.Items = new Dictionary<string, ItemValue>();
+            var file = new ProjectFile
+            {
+                FileFormat = ProjectFile.CurrentVersion,
+                AssemblyQualifiedTypeName = GetType().AssemblyQualifiedName,
+                Name = this.Name,
+                InternalSettings = this.Settings.Serialize(),
+                Items = new Dictionary<string, ItemValue>()
+            };
 
             // Create the item dictionary for the file
             foreach (var item in Items)
@@ -764,9 +767,9 @@ namespace SkyEditor.Core.Projects
         /// <param name="path">The directory in which to check</param>
         /// <param name="recursive">Whether or not to search the top directory only</param>
         /// <returns>The directories found inside the given directory</returns>
-        public IEnumerable<string> GetDirectories(string path, bool recursive)
+        public string[] GetDirectories(string path, bool recursive)
         {
-            return GetItemsInternal(path, recursive, true).Select(x => x.Key);
+            return GetItemsInternal(path, recursive, true).Select(x => x.Key).ToArray();
         }
 
         /// <summary>
@@ -934,15 +937,15 @@ namespace SkyEditor.Core.Projects
         }
         #endregion
 
-        #region IIOProvider Implementation
+        #region IFileSystem Implementation
 
         /// <summary>
-        /// The working directory, as needed by <see cref="IIOProvider"/>
+        /// The working directory, as needed by <see cref="IFileSystem"/>
         /// </summary>
         public string WorkingDirectory { get; set; }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         public void ResetWorkingDirectory()
         {
@@ -950,7 +953,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual long GetFileLength(string filename)
@@ -959,7 +962,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual bool FileExists(string filename)
@@ -968,27 +971,27 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual string[] GetFiles(string path, string searchPattern, bool topDirectoryOnly)
         {
             var files = GetItems(path, !topDirectoryOnly);
-            var matcher = new Regex(MemoryIOProvider.GetFileSearchRegex(searchPattern), RegexOptions.Compiled);
+            var matcher = new Regex(MemoryFileSystem.GetFileSearchRegex(searchPattern), RegexOptions.Compiled);
             return files.Select(x => x.Key).Where(x => matcher.IsMatch(x)).ToArray();
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
-        string[] IIOProvider.GetDirectories(string path, bool topDirectoryOnly)
+        string[] IFileSystem.GetDirectories(string path, bool topDirectoryOnly)
         {
             return GetDirectories(path, !topDirectoryOnly).ToArray();
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual byte[] ReadAllBytes(string filename)
@@ -997,7 +1000,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual string ReadAllText(string filename)
@@ -1006,7 +1009,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual void WriteAllBytes(string filename, byte[] data)
@@ -1015,7 +1018,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual void WriteAllText(string filename, string data)
@@ -1024,7 +1027,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual void CopyFile(string sourceFilename, string destinationFilename)
@@ -1033,7 +1036,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual void DeleteFile(string filename)
@@ -1042,7 +1045,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual string GetTempFilename()
@@ -1051,7 +1054,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual string GetTempDirectory()
@@ -1060,7 +1063,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual Stream OpenFile(string filename)
@@ -1069,7 +1072,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual Stream OpenFileReadOnly(string filename)
@@ -1078,7 +1081,7 @@ namespace SkyEditor.Core.Projects
         }
 
         /// <summary>
-        /// Implementation of a method in <see cref="IIOProvider"/>
+        /// Implementation of a method in <see cref="IFileSystem"/>
         /// </summary>
         /// <exception cref="NotSupportedException">Thrown if the method has not been overridden by a child class.</exception>
         public virtual Stream OpenFileWriteOnly(string filename)

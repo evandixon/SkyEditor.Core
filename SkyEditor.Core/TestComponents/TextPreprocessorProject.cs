@@ -34,7 +34,7 @@ namespace SkyEditor.Core.TestComponents
                 var variablesFile = await GetFile("/variables.txt", IOHelper.PickFirstDuplicateMatchSelector, CurrentPluginManager) as TextFile;
                 variablesFile.CreateFile("variables.txt");
                 variablesFile.Contents = "# Define variables.  Each line should be in the form \"Variable=Value\".";
-                await variablesFile.Save(Path.Combine(GetRootDirectory(), "variables.txt"), CurrentPluginManager.CurrentIOProvider);
+                await variablesFile.Save(Path.Combine(GetRootDirectory(), "variables.txt"), CurrentPluginManager.CurrentFileSystem);
             }
 
             // Add the files folder if it does not exist
@@ -44,7 +44,7 @@ namespace SkyEditor.Core.TestComponents
             }
 
             // Create the output physical directory
-            CurrentPluginManager.CurrentIOProvider.CreateDirectory(GetOutputDirectory());
+            CurrentPluginManager.CurrentFileSystem.CreateDirectory(GetOutputDirectory());
         }
 
         public override async Task Build()
@@ -73,7 +73,7 @@ namespace SkyEditor.Core.TestComponents
                 {
                     contents = contents.Replace($"%{variable[0]}%", variable[1]);
                 }
-                CurrentPluginManager.CurrentIOProvider.WriteAllText(outputPath, contents);
+                CurrentPluginManager.CurrentFileSystem.WriteAllText(outputPath, contents);
             }
 
             await base.Build();

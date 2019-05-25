@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core;
+using SkyEditor.IO.FileSystem;
 
 namespace ManualLoadPlugin
 {
@@ -39,9 +40,9 @@ namespace ManualLoadPlugin
             return "/extensions";
         }
 
-        public override IIOProvider GetIOProvider()
+        public override IFileSystem GetFileSystem()
         {
-            return new MemoryIOProvider();
+            return new MemoryFileSystem();
         }
 
         public override ISettingsProvider GetSettingsProvider(PluginManager manager)

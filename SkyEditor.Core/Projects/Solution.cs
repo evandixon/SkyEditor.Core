@@ -125,7 +125,7 @@ namespace SkyEditor.Core.Projects
         {
             foreach (var item in GetAllProjects())
             {
-                await item.Save(CurrentPluginManager.CurrentIOProvider);
+                await item.Save(CurrentPluginManager.CurrentFileSystem);
             }
         }
 
@@ -134,7 +134,7 @@ namespace SkyEditor.Core.Projects
         /// </summary>
         public async Task SaveWithAllProjects()
         {
-            await this.Save(CurrentPluginManager.CurrentIOProvider);
+            await this.Save(CurrentPluginManager.CurrentFileSystem);
             await this.SaveAllProjects();
         }
 

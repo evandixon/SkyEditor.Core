@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,18 +9,18 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
 {
     public class ls : ConsoleCommand
     {
-        public ls(IIOProvider provider)
+        public ls(IFileSystem provider)
         {
-            CurrentIOProvider = provider;
+            CurrentFileSystem = provider;
         }
 
-        protected IIOProvider CurrentIOProvider { get; }
+        protected IFileSystem CurrentFileSystem { get; }
 
         protected override void Main(string[] arguments)
         {
             base.Main(arguments);
 
-            var provider = CurrentIOProvider;
+            var provider = CurrentFileSystem;
             var directory = ".";
             if (arguments.Length > 1)
             {

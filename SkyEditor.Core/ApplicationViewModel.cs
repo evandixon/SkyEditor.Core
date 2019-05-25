@@ -5,6 +5,7 @@ using SkyEditor.Core.Projects;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.UI;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using SkyEditor.Utilities.AsyncFor;
 using System;
 using System.Collections.Generic;
@@ -171,13 +172,13 @@ namespace SkyEditor.Core
         public PluginManager CurrentPluginManager { get; }
 
         /// <summary>
-        /// Instance of the current plugin manager's current I/O provider
+        /// Instance of the current plugin manager's current file system abstraction
         /// </summary>
-        protected IIOProvider CurrentIOProvider
+        protected IFileSystem CurrentFileSystem
         {
             get
             {
-                return CurrentPluginManager.CurrentIOProvider;
+                return CurrentPluginManager.CurrentFileSystem;
             }
         }
 
@@ -423,7 +424,7 @@ namespace SkyEditor.Core
             {
                 if (_consoleShell == null)
                 {
-                    _consoleShell = new ConsoleShell(this, CurrentPluginManager, CurrentPluginManager.CurrentConsoleProvider, CurrentIOProvider);
+                    _consoleShell = new ConsoleShell(this, CurrentPluginManager, CurrentPluginManager.CurrentConsoleProvider, CurrentFileSystem);
                 }
                 return _consoleShell;
             }

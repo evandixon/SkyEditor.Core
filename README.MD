@@ -17,7 +17,7 @@ Framework built on top of the plugin manager that can open files on disk as clas
 
 This is built on top of the GenericFile class, which allows editing any file on a byte level. The most notable feature of this class is the ability to load a file either as a stream or a byte array, which is mostly transparent to callers. (Pay attention to the IsThreadSafe property before performing any multi-threaded read or write operations.)
 
-Thanks to the I/O abstraction (IIOProvider interface), most classes built on top of this framework can load data from fake filesystems, whether it be simulated in memory or from an archive file. The possibilities are wide open: one could write a class to model a proprietary zip file, and other classes can load their data from one of the contained files as if it was a file system.
+Thanks to the I/O abstraction (IFileSystem interface), most classes built on top of this framework can load data from fake filesystems, whether it be simulated in memory or from an archive file. The possibilities are wide open: one could write a class to model a proprietary zip file, and other classes can load their data from one of the contained files as if it was a file system.
 
 ### UI Framework (UI namespace)
 Plugin framework for UI controls that can interact with view models that can interact with arbitrary classes (such as those that represent files loaded using the IO namespace).

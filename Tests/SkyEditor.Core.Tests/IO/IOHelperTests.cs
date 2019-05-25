@@ -3,6 +3,7 @@ using SkyEditor.Core.IO;
 using SkyEditor.Core.IO.PluginInfrastructure;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,14 +36,14 @@ namespace SkyEditor.Core.Tests.IO
                 this.Name = name;
             }
 
-            public Task OpenFile(string filename, IIOProvider provider)
+            public Task OpenFile(string filename, IFileSystem provider)
             {
                 Contents = provider.ReadAllText(filename);
                 this.Filename = filename;
                 return Task.CompletedTask;
             }
 
-            public Task Save(IIOProvider provider)
+            public Task Save(IFileSystem provider)
             {
                 provider.WriteAllText(Filename, Contents);
                 FileSaved?.Invoke(this, new EventArgs());
@@ -59,7 +60,7 @@ namespace SkyEditor.Core.Tests.IO
                 return Task.FromResult(true);
             }
 
-            public Task OpenFile(string filename, IIOProvider provider)
+            public Task OpenFile(string filename, IFileSystem provider)
             {
                 Contents = provider.ReadAllText(filename);
                 return Task.CompletedTask;
@@ -86,14 +87,14 @@ namespace SkyEditor.Core.Tests.IO
                 this.Name = name;
             }
 
-            public Task OpenFile(string filename, IIOProvider provider)
+            public Task OpenFile(string filename, IFileSystem provider)
             {
                 Contents = provider.ReadAllText(filename);
                 this.Filename = filename;
                 return Task.CompletedTask;
             }
 
-            public Task Save(IIOProvider provider)
+            public Task Save(IFileSystem provider)
             {
                 provider.WriteAllText(Filename, Contents);
                 FileSaved?.Invoke(this, new EventArgs());
@@ -113,7 +114,7 @@ namespace SkyEditor.Core.Tests.IO
                 return 10;
             }
 
-            public Task<object> OpenFile(TypeInfo fileType, string filename, IIOProvider provider)
+            public Task<object> OpenFile(TypeInfo fileType, string filename, IFileSystem provider)
             {
                 var output = new CustomTextFile();
                 output.Contents = provider.ReadAllText(filename);
@@ -162,7 +163,7 @@ namespace SkyEditor.Core.Tests.IO
                 return 0;
             }
 
-            public Task<object> OpenFile(TypeInfo fileType, string filename, IIOProvider provider)
+            public Task<object> OpenFile(TypeInfo fileType, string filename, IFileSystem provider)
             {
                 var output = new ADirectoryFormat();
                 output.Path = filename;
@@ -203,9 +204,9 @@ namespace SkyEditor.Core.Tests.IO
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
 
             public override bool IsCorePluginAssemblyDynamicTypeLoadEnabled()
@@ -475,7 +476,7 @@ namespace SkyEditor.Core.Tests.IO
             // Set up
             var manager = new PluginManager();
             await manager.LoadCore(new TestCoreMod());
-            manager.CurrentIOProvider.WriteAllText("/test.txt", "magic data");
+            manager.CurrentFileSystem.WriteAllText("/test.txt", "magic data");
 
             // Test 1
             var file1 = await IOHelper.OpenFile("/test.txt", typeof(OpenableTextFile).GetTypeInfo(), manager);
@@ -498,7 +499,7 @@ namespace SkyEditor.Core.Tests.IO
             var manager = new PluginManager();
             var coreMod = new TestCoreMod();
             await manager.LoadCore(coreMod);
-            manager.CurrentIOProvider.CreateDirectory("/test");
+            manager.CurrentFileSystem.CreateDirectory("/test");
 
             // Test
             var dir = await IOHelper.OpenFile("/test", typeof(ADirectoryFormat).GetTypeInfo(), manager);
@@ -570,7 +571,7 @@ namespace SkyEditor.Core.Tests.IO
             // Set up
             var manager = new PluginManager();
             await manager.LoadCore(new TestCoreMod());
-            manager.CurrentIOProvider.WriteAllText("/test.txt", "magic data");
+            manager.CurrentFileSystem.WriteAllText("/test.txt", "magic data");
 
             // Test
             var file = await IOHelper.OpenFile("/test.txt", IOHelper.PickFirstDuplicateMatchSelector, manager);
@@ -597,7 +598,7 @@ namespace SkyEditor.Core.Tests.IO
             var manager = new PluginManager();
             var coreMod = new TestCoreMod();
             await manager.LoadCore(coreMod);
-            manager.CurrentIOProvider.WriteAllText("/test.custom", "magic data");
+            manager.CurrentFileSystem.WriteAllText("/test.custom", "magic data");
 
             // Test
             var file = await IOHelper.OpenFile("/test.custom", IOHelper.PickFirstDuplicateMatchSelector, manager);
@@ -619,7 +620,7 @@ namespace SkyEditor.Core.Tests.IO
             // Set up
             var manager = new PluginManager();
             await manager.LoadCore(new TestCoreMod());
-            manager.CurrentIOProvider.WriteAllText("/test.txt", "magic data");
+            manager.CurrentFileSystem.WriteAllText("/test.txt", "magic data");
 
             // Assert
             try
@@ -646,7 +647,7 @@ namespace SkyEditor.Core.Tests.IO
             var manager = new PluginManager();
             var coreMod = new TestCoreMod();
             await manager.LoadCore(coreMod);
-            manager.CurrentIOProvider.CreateDirectory("/test");
+            manager.CurrentFileSystem.CreateDirectory("/test");
 
             // Test
             var dir = await IOHelper.OpenDirectory("/test", IOHelper.PickFirstDuplicateMatchSelector, manager);
@@ -668,18 +669,18 @@ namespace SkyEditor.Core.Tests.IO
             // Set up
             var manager = new PluginManager();
             await manager.LoadCore(new TestCoreMod());
-            manager.CurrentIOProvider.WriteAllText("/test.txt", "magic data");
-            manager.CurrentIOProvider.WriteAllText("/test.custom", "custom data");
+            manager.CurrentFileSystem.WriteAllText("/test.txt", "magic data");
+            manager.CurrentFileSystem.WriteAllText("/test.custom", "custom data");
 
             // Test
             using (var txtFile = new GenericFile())
             {
-                await txtFile.OpenFile("/test.txt", manager.CurrentIOProvider);
+                await txtFile.OpenFile("/test.txt", manager.CurrentFileSystem);
                 Assert.AreEqual(typeof(OpenableTextFile).GetTypeInfo(), await IOHelper.GetFileType(txtFile, IOHelper.PickFirstDuplicateMatchSelector, manager));
             }
             using (var customFile = new GenericFile())
             {
-                await customFile.OpenFile("/test.custom", manager.CurrentIOProvider);
+                await customFile.OpenFile("/test.custom", manager.CurrentFileSystem);
                 Assert.AreEqual(typeof(CustomTextFile).GetTypeInfo(), await IOHelper.GetFileType(customFile, IOHelper.PickFirstDuplicateMatchSelector, manager));
             }
         }
@@ -691,8 +692,8 @@ namespace SkyEditor.Core.Tests.IO
             // Set up
             var manager = new PluginManager();
             await manager.LoadCore(new TestCoreMod());
-            manager.CurrentIOProvider.CreateDirectory("/Dir");
-            manager.CurrentIOProvider.CreateDirectory("/anotherDir");
+            manager.CurrentFileSystem.CreateDirectory("/Dir");
+            manager.CurrentFileSystem.CreateDirectory("/anotherDir");
 
             // Test
             Assert.AreEqual(typeof(ADirectoryFormat).GetTypeInfo(), await IOHelper.GetDirectoryType("/Dir", IOHelper.PickFirstDuplicateMatchSelector, manager));

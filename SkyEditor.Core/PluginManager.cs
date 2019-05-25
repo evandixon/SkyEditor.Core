@@ -3,6 +3,7 @@ using SkyEditor.Core.Extensions;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.Settings;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -93,7 +94,7 @@ namespace SkyEditor.Core
         /// <summary>
         /// The current IO Provider for the application.
         /// </summary>
-        public IIOProvider CurrentIOProvider { get; protected set; }
+        public IFileSystem CurrentFileSystem { get; protected set; }
 
         /// <summary>
         /// The current Settings Provider for the applicaiton.
@@ -151,12 +152,12 @@ namespace SkyEditor.Core
             }
 
             // Load providers
-            CurrentIOProvider = core.GetIOProvider();
+            CurrentFileSystem = core.GetFileSystem();
             CurrentSettingsProvider = core.GetSettingsProvider(this);
             CurrentConsoleProvider = core.GetConsoleProvider();
 
             // Delete files and directories scheduled for deletion
-            await DeleteScheduledFiles(CurrentSettingsProvider, CurrentIOProvider);
+            await DeleteScheduledFiles(CurrentSettingsProvider, CurrentFileSystem);
 
             // Install pending extensions
             ExtensionDirectory = core.GetExtensionDirectory();
@@ -260,9 +261,9 @@ namespace SkyEditor.Core
         /// Deletes files and directories scheduled for deletion by the settings provider.
         /// </summary>
         /// <param name="settings"><see cref="ISettingsProvider"/> managing the files and directories scheduled for deletion.</param>
-        /// <param name="provider"><see cref="IIOProvider"/> managing where the files and directories are located.</param>
+        /// <param name="provider"><see cref="IFileSystem"/> managing where the files and directories are located.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="settings"/> or <paramref name="provider"/> is null.</exception>
-        protected async Task DeleteScheduledFiles(ISettingsProvider settings, IIOProvider provider)
+        protected async Task DeleteScheduledFiles(ISettingsProvider settings, IFileSystem provider)
         {
             if (settings == null)
             {
@@ -277,9 +278,9 @@ namespace SkyEditor.Core
             // Files
             foreach (var item in settings.GetFilesScheduledForDeletion().ToList()) // Create a new list because the original will be continuously modified
             {
-                if (CurrentIOProvider.FileExists(item))
+                if (CurrentFileSystem.FileExists(item))
                 {
-                    CurrentIOProvider.DeleteFile(item);
+                    CurrentFileSystem.DeleteFile(item);
                 }
                 CurrentSettingsProvider.UnscheduleFileForDeletion(item);
                 await CurrentSettingsProvider.Save(provider);
@@ -288,9 +289,9 @@ namespace SkyEditor.Core
             // Directories
             foreach (var item in settings.GetDirectoriesScheduledForDeletion().ToList())
             {
-                if (CurrentIOProvider.DirectoryExists(item))
+                if (CurrentFileSystem.DirectoryExists(item))
                 {
-                    CurrentIOProvider.DeleteDirectory(item);
+                    CurrentFileSystem.DeleteDirectory(item);
                 }
                 CurrentSettingsProvider.UnscheduleDirectoryForDeletion(item);
                 await CurrentSettingsProvider.Save(provider);

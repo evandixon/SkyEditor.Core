@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,21 +9,21 @@ namespace SkyEditor.Core.ConsoleCommands.ShellCommands
 {
     public class mkdir : ConsoleCommand
     {
-        public mkdir(IIOProvider provider)
+        public mkdir(IFileSystem provider)
         {
-            CurrentIOProvider = provider;
+            CurrentFileSystem = provider;
         }
 
-        protected IIOProvider CurrentIOProvider { get; }
+        protected IFileSystem CurrentFileSystem { get; }
 
         protected override void Main(string[] arguments)
         {
             if (arguments.Length > 1)
             {
                 var directory = arguments[1];
-                if (!CurrentIOProvider.DirectoryExists(directory))
+                if (!CurrentFileSystem.DirectoryExists(directory))
                 {
-                    CurrentIOProvider.CreateDirectory(directory);
+                    CurrentFileSystem.CreateDirectory(directory);
                 }
                 else
                 {

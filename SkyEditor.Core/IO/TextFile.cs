@@ -1,4 +1,5 @@
 ﻿using SkyEditor.Core.IO.PluginInfrastructure;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +34,7 @@ namespace SkyEditor.Core.IO
             return new string[] { "*.txt" };
         }
 
-        public virtual Task OpenFile(string filename, IIOProvider provider)
+        public virtual Task OpenFile(string filename, IFileSystem provider)
         {
             this.Contents = provider.ReadAllText(filename);
             this.Filename = filename;
@@ -41,12 +42,12 @@ namespace SkyEditor.Core.IO
             return Task.CompletedTask;
         }
 
-        public virtual async Task Save(IIOProvider provider)
+        public virtual async Task Save(IFileSystem provider)
         {
             await Save(Filename, provider);
         }
 
-        public virtual Task Save(string filename, IIOProvider provider)
+        public virtual Task Save(string filename, IFileSystem provider)
         {
             provider.WriteAllText(filename, Contents);
             this.Filename = filename;

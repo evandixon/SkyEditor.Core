@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.Tests.ConsoleCommands
 {
@@ -74,7 +75,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
 
         public class TestConsoleCommandException : ConsoleCommand
         {
-            public TestConsoleCommandException(IIOProvider provider)
+            public TestConsoleCommandException(IFileSystem provider)
             {
             }
 
@@ -97,9 +98,9 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
 
             public override IConsoleProvider GetConsoleProvider()
@@ -118,7 +119,7 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                 // base.Load(manager);
 
                 manager.AddSingletonDependency(GetApplicationViewModel(manager));
-                manager.AddSingletonDependency(GetIOProvider());
+                manager.AddSingletonDependency(GetFileSystem());
                 manager.AddSingletonDependency(GetSettingsProvider(manager));
                 manager.AddSingletonDependency(GetConsoleProvider());
 
@@ -139,9 +140,9 @@ namespace SkyEditor.Core.Tests.ConsoleCommands
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
 
             public override IConsoleProvider GetConsoleProvider()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.IO.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +21,6 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        Task Save(IIOProvider provider);  
+        Task Save(IFileSystem provider);  
     }
 }

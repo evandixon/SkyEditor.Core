@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;net462</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'netstandard2.0'">
@@ -22,6 +22,10 @@
 
   <ItemGroup>
     <None Remove="project.lock.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkyEditor.IO" Version="5.0.8" />
   </ItemGroup>
 
   <ItemGroup>

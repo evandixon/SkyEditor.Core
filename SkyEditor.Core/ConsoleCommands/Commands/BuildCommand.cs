@@ -1,6 +1,7 @@
 ﻿using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using SkyEditor.Utilities.AsyncFor;
 using System;
 using System.Collections.Generic;
@@ -12,13 +13,13 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class BuildCommand : ConsoleCommand
     {
-        public BuildCommand(IIOProvider ioProvider, PluginManager pluginManager)
+        public BuildCommand(IFileSystem FileSystem, PluginManager pluginManager)
         {
-            CurrentIOProvider = ioProvider ?? throw new ArgumentNullException(nameof(ioProvider));
+            CurrentFileSystem = FileSystem ?? throw new ArgumentNullException(nameof(FileSystem));
             CurrentPluginManager = pluginManager ?? throw new ArgumentNullException(nameof(pluginManager));
         }
 
-        protected IIOProvider CurrentIOProvider { get; }
+        protected IFileSystem CurrentFileSystem { get; }
         protected PluginManager CurrentPluginManager { get; }
 
         public override async Task MainAsync(string[] arguments)
@@ -26,14 +27,14 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
             var solutionFiles = new List<string>();
             if (arguments.Length > 1)
             {
-                if (CurrentIOProvider.FileExists(arguments[1]))
+                if (CurrentFileSystem.FileExists(arguments[1]))
                 {
                     solutionFiles.Add(arguments[1]);
                 }
             }
             else
             {
-                foreach (var file in CurrentIOProvider.GetFiles("./", "*.skysln", true))
+                foreach (var file in CurrentFileSystem.GetFiles("./", "*.skysln", true))
                 {
                     solutionFiles.Add(file);
                 }

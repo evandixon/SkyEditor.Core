@@ -8,20 +8,20 @@ using System.Threading.Tasks;
 namespace SkyEditor.Core.Tests.TestComponents
 {
     [TestClass]
-    public class MemoryIOProviderTests
+    public class MemoryFileSystemTests
     {
 
-        public const string MemoryIOProviderCategory = "Memory IOProvider Tests";
-        public MemoryIOProvider Provider { get; set; }
+        public const string MemoryFileSystemCategory = "Memory FileSystem Tests";
+        public MemoryFileSystem Provider { get; set; }
 
         [TestInitialize]
         public void Init()
         {
-            Provider = new MemoryIOProvider();
+            Provider = new MemoryFileSystem();
         }
 
         [TestMethod]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void FileExistsNegativeTest()
         {
             Assert.IsFalse(Provider.FileExists(""), "No files should exist.");
@@ -31,7 +31,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void DirectoryExistsNegativeTest()
         {
             Assert.IsFalse(Provider.DirectoryExists(""), "No directories should exist.");
@@ -41,7 +41,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void CreateDirectory()
         {
             Provider.CreateDirectory("/directory");
@@ -52,7 +52,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void CreateDirectoryRecursive()
         {
             Provider.CreateDirectory("/root/directory");
@@ -64,7 +64,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void ByteReadWrite()
         {
             byte[] testSequence = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -75,7 +75,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void TextReadWrite()
         {
             string testSequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZqbcdefghijklmnopqrstuvwxyz0123456789àèéêç";
@@ -86,7 +86,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void FileLength()
         {
             byte[] testSequence = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -96,7 +96,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void DeleteDirectory()
         {
             Provider.CreateDirectory("/directory/subDirectory");
@@ -114,7 +114,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void DeleteDirectoryRecursive()
         {
             Provider.CreateDirectory("/directory/subDirectory");
@@ -132,7 +132,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void DeleteFile()
         {
             byte[] testSequence = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -149,7 +149,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void CopyFile()
         {
             byte[] testSequence = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -167,7 +167,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void GetFiles()
         {
             Provider.WriteAllText("/dir1/file1.txt", "");
@@ -209,7 +209,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void GetTempFilename_NotNull()
         {
             var tempFilename = Provider.GetTempFilename();
@@ -217,7 +217,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void GetTempFilename_FileExists()
         {
             var tempFilename = Provider.GetTempFilename();
@@ -225,7 +225,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void GetTempDirectory_NotNull()
         {
             var tempDirectory = Provider.GetTempDirectory();
@@ -233,7 +233,7 @@ namespace SkyEditor.Core.Tests.TestComponents
         }
 
         [TestMethod()]
-        [TestCategory(MemoryIOProviderCategory)]
+        [TestCategory(MemoryFileSystemCategory)]
         public void GetTempDirectory_FileExists()
         {
             var tempDirectory = Provider.GetTempDirectory();

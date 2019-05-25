@@ -116,14 +116,14 @@ namespace SkyEditor.Core.Extensions.Online
         public async Task<ExtensionInstallResult> InstallExtension(string extensionID, string version, PluginManager manager)
         {
             //Download zip
-            var tempName = manager.CurrentIOProvider.GetTempFilename();
-            manager.CurrentIOProvider.WriteAllText(tempName, await Client.GetStringAsync((await GetResponse().ConfigureAwait(false)).DownloadExtensionEndpoint + $"/{extensionID}/{version}"));
+            var tempName = manager.CurrentFileSystem.GetTempFilename();
+            manager.CurrentFileSystem.WriteAllText(tempName, await Client.GetStringAsync((await GetResponse().ConfigureAwait(false)).DownloadExtensionEndpoint + $"/{extensionID}/{version}"));
 
             //Install
             var result = await ExtensionHelper.InstallExtensionZip(tempName, manager).ConfigureAwait(false);
 
             //Clean up
-            manager.CurrentIOProvider.DeleteFile(tempName);
+            manager.CurrentFileSystem.DeleteFile(tempName);
 
             return result;
         }

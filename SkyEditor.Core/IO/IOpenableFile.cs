@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.IO.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,6 @@ namespace SkyEditor.Core.IO
     /// </summary>
     public interface IOpenableFile
     {
-        Task OpenFile(string filename, IIOProvider provider);
+        Task OpenFile(string filename, IFileSystem provider);
     }
 }

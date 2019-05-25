@@ -1,5 +1,6 @@
 ﻿using SkyEditor.Core.IO;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,7 +29,7 @@ namespace SkyEditor.Core.Extensions
         /// <param name="filename">Path of the extension file</param>
         /// <param name="provider">I/O provider from which to load the file</param>
         /// <returns>A new instance of <see cref="ExtensionInfo"/> representing the given file</returns>
-        public static ExtensionInfo OpenFromFile(string filename, IIOProvider provider)
+        public static ExtensionInfo OpenFromFile(string filename, IFileSystem provider)
         {
             var output = Json.DeserializeFromFile<ExtensionInfo>(filename, provider);
             output.Filename = filename;
@@ -117,7 +118,7 @@ namespace SkyEditor.Core.Extensions
         /// </summary>
         /// <param name="filename">Path of the extension file</param>
         /// <param name="provider">I/O provider in which to save the file</param>
-        public void Save(string filename, IIOProvider provider)
+        public void Save(string filename, IFileSystem provider)
         {
             Json.SerializeToFile(filename, this, provider);
         }

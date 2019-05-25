@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyEditor.IO.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace SkyEditor.Core.IO
         /// </summary>
         /// <param name="filename">Path of the destination file</param>
         /// <param name="provider">Instance of the current I/O provider</param>
-        Task Save(string filename, IIOProvider provider);
+        Task Save(string filename, IFileSystem provider);
 
         /// <summary>
         /// Gets the default extension for the file

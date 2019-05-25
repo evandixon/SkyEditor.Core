@@ -8,6 +8,7 @@ using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.IO.PluginInfrastructure;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.Tests.Projects
 {
@@ -29,9 +30,9 @@ namespace SkyEditor.Core.Tests.Projects
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
         }
 
@@ -43,7 +44,7 @@ namespace SkyEditor.Core.Tests.Projects
             {
                 await manager.LoadCore(new TestCoreMod());
 
-                var provider = manager.CurrentIOProvider;
+                var provider = manager.CurrentFileSystem;
 
                 // Create the solution
                 var solution = await ProjectBase.CreateProject<TextPreprocessorSolution>("/projects", "Test Solution", manager);
@@ -109,7 +110,7 @@ namespace SkyEditor.Core.Tests.Projects
                 // Arrange 
                 await manager.LoadCore(new TestCoreMod());
 
-                var provider = manager.CurrentIOProvider;
+                var provider = manager.CurrentFileSystem;
                 
                 // - Set up solution
                 var solution = await ProjectBase.CreateProject<TextPreprocessorSolution>("/projects", "Test Solution", manager);
@@ -156,7 +157,7 @@ namespace SkyEditor.Core.Tests.Projects
             {
                 await manager.LoadCore(new TestCoreMod());
 
-                var provider = manager.CurrentIOProvider;
+                var provider = manager.CurrentFileSystem;
 
                 // Create the solution
                 var solution = await ProjectBase.CreateProject<TextPreprocessorSolution>("/projects", "Test Solution", manager);

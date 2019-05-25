@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SkyEditor.Core.IO;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace SkyEditor.Core.Utilities
         /// <param name="filename"></param>
         /// <param name="obj"></param>
         /// <param name="provider"></param>
-        public static void SerializeToFile(string filename, object obj, IIOProvider provider)
+        public static void SerializeToFile(string filename, object obj, IFileSystem provider)
         {
             provider.WriteAllText(filename, Serialize(obj));
         }
@@ -62,7 +63,7 @@ namespace SkyEditor.Core.Utilities
         /// <param name="filename"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        public static T DeserializeFromFile<T>(string filename, IIOProvider provider)
+        public static T DeserializeFromFile<T>(string filename, IFileSystem provider)
         {
             return Deserialize<T>(provider.ReadAllText(filename));
         }

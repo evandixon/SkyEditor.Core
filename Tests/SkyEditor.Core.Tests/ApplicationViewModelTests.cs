@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SkyEditor.Core.IO;
 using SkyEditor.Core.TestComponents;
 using SkyEditor.Core.Projects;
+using SkyEditor.IO.FileSystem;
 
 namespace SkyEditor.Core.Tests
 {
@@ -27,9 +28,9 @@ namespace SkyEditor.Core.Tests
                 return "/extensions";
             }
 
-            public override IIOProvider GetIOProvider()
+            public override IFileSystem GetFileSystem()
             {
-                return new MemoryIOProvider();
+                return new MemoryFileSystem();
             }
         }
 
@@ -73,7 +74,7 @@ namespace SkyEditor.Core.Tests
             using (var manager = new PluginManager())
             {
                 await manager.LoadCore(new CoreMod());
-                manager.CurrentIOProvider.WriteAllText("/test.txt", "testing");
+                manager.CurrentFileSystem.WriteAllText("/test.txt", "testing");
                 using (var appViewModel = new ApplicationViewModel(manager))
                 {
                     Assert.IsNull(appViewModel.SelectedFile, "Selected File should be null before any file is opened");

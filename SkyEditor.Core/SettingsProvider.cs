@@ -1,5 +1,6 @@
 ﻿using SkyEditor.Core.IO;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -87,9 +88,9 @@ namespace SkyEditor.Core
                 throw new ArgumentNullException(nameof(manager));
             }
 
-            if (manager.CurrentIOProvider.FileExists(filename))
+            if (manager.CurrentFileSystem.FileExists(filename))
             {
-                var provider = Deserialize(manager.CurrentIOProvider.ReadAllText(filename), manager);
+                var provider = Deserialize(manager.CurrentFileSystem.ReadAllText(filename), manager);
                 provider.Filename = filename;
                 return provider;
             }
@@ -241,7 +242,7 @@ namespace SkyEditor.Core
         /// <summary>
         /// Saves the settings to the original settings file
         /// </summary>
-        public Task Save(IIOProvider provider)
+        public Task Save(IFileSystem provider)
         {
             provider.WriteAllText(Filename, Serialize());
             FileSaved?.Invoke(this, new EventArgs());

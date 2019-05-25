@@ -42,7 +42,7 @@ namespace SkyEditor.Core.Tests.Projects
 
                 var theFile = await project.GetFile("/test.txt", IOHelper.PickFirstDuplicateMatchSelector, manager) as TextFile;
                 theFile.Contents = "This is a test note.";
-                await theFile.Save(manager.CurrentIOProvider);
+                await theFile.Save(manager.CurrentFileSystem);
 
                 // Build
                 await solution.Build();
@@ -64,7 +64,7 @@ namespace SkyEditor.Core.Tests.Projects
                 Assert.AreEqual(1, notes.Count);
 
                 // Cleanup
-                manager.CurrentIOProvider.DeleteDirectory("projects");
+                manager.CurrentFileSystem.DeleteDirectory("projects");
                 foreach (var item in extBank.GetExtensions(manager))
                 {
                     await extBank.UninstallExtension(item.ID, manager);

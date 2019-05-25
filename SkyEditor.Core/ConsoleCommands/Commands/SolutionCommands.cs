@@ -1,6 +1,7 @@
 ﻿using SkyEditor.Core.IO;
 using SkyEditor.Core.Projects;
 using SkyEditor.Core.Utilities;
+using SkyEditor.IO.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,16 +11,16 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
 {
     public class SolutionCommands : ConsoleCommand
     {
-        public SolutionCommands(ApplicationViewModel applicationViewModel, PluginManager pluginManager, IIOProvider provider)
+        public SolutionCommands(ApplicationViewModel applicationViewModel, PluginManager pluginManager, IFileSystem provider)
         {
             CurrentApplicationViewModel = applicationViewModel;
             CurrentPluginManager = pluginManager;
-            CurrentIOProvider = provider;
+            CurrentFileSystem = provider;
         }
 
         protected ApplicationViewModel CurrentApplicationViewModel { get; }
         protected PluginManager CurrentPluginManager { get; }
-        protected IIOProvider CurrentIOProvider { get; }
+        protected IFileSystem CurrentFileSystem { get; }
 
         public override string CommandName => "Solution";
         public override async Task MainAsync(string[] arguments)
@@ -40,7 +41,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                             solutionType = typeof(Solution);
                         }
 
-                        CurrentApplicationViewModel.CurrentSolution = await ProjectBase.CreateProject<Solution>(CurrentIOProvider.WorkingDirectory, arguments[2], solutionType, CurrentPluginManager);
+                        CurrentApplicationViewModel.CurrentSolution = await ProjectBase.CreateProject<Solution>(CurrentFileSystem.WorkingDirectory, arguments[2], solutionType, CurrentPluginManager);
 
                         if (CurrentApplicationViewModel.CurrentSolution.RequiresInitializationWizard)
                         {
@@ -70,7 +71,7 @@ namespace SkyEditor.Core.ConsoleCommands.Commands
                     case "save":
                         if (CurrentApplicationViewModel.CurrentSolution != null)
                         {
-                            await CurrentApplicationViewModel.CurrentSolution.Save(CurrentIOProvider);
+                            await CurrentApplicationViewModel.CurrentSolution.Save(CurrentFileSystem);
                         }
                         else
                         {

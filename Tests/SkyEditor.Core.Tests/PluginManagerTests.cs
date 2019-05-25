@@ -43,7 +43,7 @@ namespace SkyEditor.Core.Tests
             await Manager.LoadCore(Core);
 
             Assert.IsTrue(Manager.GetPlugins().Contains(Core));
-            Assert.IsNotNull(Manager.CurrentIOProvider);
+            Assert.IsNotNull(Manager.CurrentFileSystem);
             Assert.IsNotNull(Manager.CurrentSettingsProvider);
             Assert.IsNotNull(Manager.CurrentConsoleProvider);
         }

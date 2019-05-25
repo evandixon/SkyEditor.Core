@@ -133,7 +133,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
 
             if (manager.CanCreateInstance(fileType))
             {
-                return await openers.OrderBy(x => x.GetUsagePriority(fileType)).First().OpenFile(fileType, filename, manager.CurrentIOProvider);
+                return await openers.OrderBy(x => x.GetUsagePriority(fileType)).First().OpenFile(fileType, filename, manager.CurrentFileSystem);
             }
             else
             {
@@ -178,7 +178,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
                 // Nothing can model the file
                 // Re-open GenericFile so it's not readonly
                 var newFile = new GenericFile();
-                await newFile.OpenFile(file.Filename, manager.CurrentIOProvider);
+                await newFile.OpenFile(file.Filename, manager.CurrentFileSystem);
                 return newFile;
             }
             else
@@ -189,7 +189,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
                 var fileOpener = openers.OrderByDescending(x => x.GetUsagePriority(type)).First();
                 if (fileOpener is IFileOpener fromFileOpener)
                 {
-                    return await fromFileOpener.OpenFile(type, file.Filename, manager.CurrentIOProvider);
+                    return await fromFileOpener.OpenFile(type, file.Filename, manager.CurrentFileSystem);
                 }
                 else if (fileOpener is IFileFromGenericFileOpener fromGenericFileOpener)
                 {
@@ -228,16 +228,16 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
                 throw new ArgumentNullException(nameof(manager));
             }
 
-            if (manager.CurrentIOProvider.FileExists(path))
+            if (manager.CurrentFileSystem.FileExists(path))
             {
                 using (var file = new GenericFile())
                 {
                     file.IsReadOnly = true;
-                    await file.OpenFile(path, manager.CurrentIOProvider);
+                    await file.OpenFile(path, manager.CurrentFileSystem);
                     return await OpenFile(file, duplicateFileTypeSelector, manager);
                 }
             }
-            else if (manager.CurrentIOProvider.DirectoryExists(path))
+            else if (manager.CurrentFileSystem.DirectoryExists(path))
             {
                 return OpenDirectory(path, duplicateFileTypeSelector, manager);
             }
@@ -281,7 +281,7 @@ namespace SkyEditor.Core.IO.PluginInfrastructure
             }
             else
             {
-                return await openers.OrderBy(x => x.GetUsagePriority(type)).First().OpenFile(type, path, manager.CurrentIOProvider);
+                return await openers.OrderBy(x => x.GetUsagePriority(type)).First().OpenFile(type, path, manager.CurrentFileSystem);
             }
         }
 
